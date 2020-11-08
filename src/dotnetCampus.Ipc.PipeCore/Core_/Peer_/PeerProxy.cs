@@ -22,8 +22,10 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcContext = ipcContext;
 
             ResponseManager = new ResponseManager();
+            ResponseManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
+       
 
         internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs, IpcContext ipcContext) :
             this(peerName, ipcClientService, ipcContext)
@@ -103,6 +105,11 @@ namespace dotnetCampus.Ipc.PipeCore
             ResponseManager.OnReceiveMessage(e);
 
             MessageReceived?.Invoke(sender, e);
+        }
+
+        private void ResponseManager_OnIpcClientRequestReceived(object? sender, IpcClientRequestArgs e)
+        {
+            
         }
     }
 }

@@ -3,21 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore.Context;
-using dotnetCampus.Ipc.PipeCore.IpcPipe;
 using dotnetCampus.Ipc.PipeCore.Utils;
 
 namespace dotnetCampus.Ipc.PipeCore
 {
-    /// <summary>
-    /// 关联 <see cref="ResponseManager"/> 和 <see cref="IIpcRequestHandler"/> 的联系
-    /// </summary>
-    class IpcRequestHandlerProvider
-    {
-
-    }
-
     /// <summary>
     ///     对等通讯，每个都是服务器端，每个都是客户端
     /// </summary>
@@ -137,7 +127,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             void CreatePeerProxy(IpcClientService ipcClientService)
             {
-                var peerProxy = new PeerProxy(e.PeerName, ipcClientService, e,IpcContext);
+                var peerProxy = new PeerProxy(e.PeerName, ipcClientService, e, IpcContext);
 
                 if (PeerManager.TryAdd(peerProxy))
                 {
@@ -190,7 +180,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
                 var ipcClientService = new IpcClientService(IpcContext, peerName);
 
-                peerProxy = new PeerProxy(peerName, ipcClientService,IpcContext);
+                peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
                 PeerManager.TryAdd(peerProxy);
 
                 await ipcClientService.Start();

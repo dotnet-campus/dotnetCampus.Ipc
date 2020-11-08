@@ -24,6 +24,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
             PipeName = pipeName;
 
             AckManager = new AckManager(this);
+            IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
         }
@@ -33,6 +34,8 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         internal IpcConfiguration IpcConfiguration { get; }
 
         internal IpcProvider IpcProvider { get; }
+
+        internal IpcRequestHandlerProvider IpcRequestHandlerProvider { get; }
 
         /// <summary>
         /// 管道名，本地服务器名
