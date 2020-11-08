@@ -74,12 +74,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
                     // 标记在这一级消费
                     args.SetHandle(message: nameof(HandleRequest));
 
-                    var binaryReader = new BinaryReader(message);
-                    var messageId = binaryReader.ReadUInt64();
-                    var requestMessageLength = binaryReader.ReadInt32();
-                    var requestMessageByteList = binaryReader.ReadBytes(requestMessageLength);
-                    var ipcClientRequestArgs =
-                        new IpcClientRequestArgs(new IpcClientRequestMessageId(messageId), new IpcBufferMessage(requestMessageByteList));
+                    var ipcClientRequestArgs = ParseRequestMessage(message);
 
                     OnIpcClientRequestReceived?.Invoke(this, ipcClientRequestArgs);
                 }
@@ -88,6 +83,18 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             {
                 message.Position = currentPosition;
             }
+        }
+
+        private static IpcClientRequestArgs ParseRequestMessage(Stream message)
+        {
+            var binaryReader = new BinaryReader(message);
+            var messageId = binaryReader.ReadUInt64();
+            var requestMessageLength = binaryReader.ReadInt32();
+            var requestMessageByteList = binaryReader.ReadBytes(requestMessageLength);
+            var ipcClientRequestArgs =
+                new IpcClientRequestArgs(new IpcClientRequestMessageId(messageId),
+                    new IpcBufferMessage(requestMessageByteList));
+            return ipcClientRequestArgs;
         }
 
         public event EventHandler<IpcClientRequestArgs>? OnIpcClientRequestReceived;
