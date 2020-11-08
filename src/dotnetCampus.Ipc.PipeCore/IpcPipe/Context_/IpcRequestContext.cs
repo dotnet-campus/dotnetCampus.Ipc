@@ -1,7 +1,7 @@
 ﻿using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore.Context;
 
-namespace dotnetCampus.Ipc.PipeCore
+namespace dotnetCampus.Ipc.PipeCore.IpcPipe
 {
     class IpcRequestContext : IIpcRequestContext
     {
