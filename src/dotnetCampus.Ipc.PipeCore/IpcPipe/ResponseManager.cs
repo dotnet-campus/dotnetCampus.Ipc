@@ -70,16 +70,16 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
            * Response Message
            */
             var currentMessageIdByteList = BitConverter.GetBytes(messageId.MessageIdValue);
-
-            var responseMessageLengthByteList = BitConverter.GetBytes(response.Count);
+            
+            var responseMessageLengthByteList = BitConverter.GetBytes(response.RequestMessage.Count);
             return new IpcBufferMessageContext
             (
-                summary,
+                response.Summary,
                 IpcMessageCommandType.ResponseMessage,
                 new IpcBufferMessage(ResponseMessageHeader),
                 new IpcBufferMessage(currentMessageIdByteList),
                 new IpcBufferMessage(responseMessageLengthByteList),
-                response
+                response.RequestMessage
             );
         }
 
