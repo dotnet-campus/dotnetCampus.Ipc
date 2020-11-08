@@ -37,6 +37,8 @@ namespace dotnetCampus.Ipc.PipeCore.Context
 
         internal IpcRequestHandlerProvider IpcRequestHandlerProvider { get; }
 
+        internal IpcMessageResponseManager IpcMessageResponseManager { get; } = new IpcMessageResponseManager();
+
         /// <summary>
         /// 管道名，本地服务器名
         /// </summary>

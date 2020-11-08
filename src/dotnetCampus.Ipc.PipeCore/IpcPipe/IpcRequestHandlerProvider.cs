@@ -31,16 +31,18 @@ namespace dotnetCampus.Ipc.PipeCore
 
             var ipcRequestContext = new IpcRequestContext(requestMessage);
 
+            // 处理消息
             IIpcRequestHandler ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;
             var result = ipcRequestHandler.HandleRequestMessage(ipcRequestContext);
 
             // 构建信息回复
-            var peerProxy = sender;
-            var responseManager = peerProxy.IpcMessageRequestManager;
-            //var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
+            var responseManager = IpcContext.IpcMessageResponseManager;
+            var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
 
-            //// 发送回客户端
-            //await peerProxy.IpcClientService.WriteMessageAsync(responseMessage);
+            var peerProxy = sender;
+
+            // 发送回客户端
+            await peerProxy.IpcClientService.WriteMessageAsync(responseMessage);
         }
     }
 }
