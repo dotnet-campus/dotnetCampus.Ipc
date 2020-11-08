@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using dotnetCampus.Ipc.Abstractions;
 
@@ -16,6 +17,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         /// <param name="message"></param>
         /// <param name="ack"></param>
         /// <param name="messageCommandType"></param>
+        [DebuggerStepThrough]
         public PeerMessageArgs(string peerName, Stream message, in Ack ack, IpcMessageCommandType messageCommandType)
         {
             Message = message;
