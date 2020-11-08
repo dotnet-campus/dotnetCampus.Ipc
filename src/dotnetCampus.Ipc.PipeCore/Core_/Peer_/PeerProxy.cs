@@ -19,7 +19,6 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcClientService = ipcClientService;
             IpcMessageWriter = new IpcMessageWriter(ipcClientService);
 
-            ResponseManager = new ResponseManager();
             IpcContext = ipcContext;
         }
 
@@ -45,14 +44,13 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public event EventHandler<IPeerMessageArgs>? MessageReceived;
 
-        public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)
-        {
-            var ipcClientRequestMessage = ResponseManager.CreateRequestMessage(request);
-            await IpcClientService.WriteMessageAsync(ipcClientRequestMessage.IpcBufferMessageContext);
-            return await ipcClientRequestMessage.Task;
-        }
+        //public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)
+        //{
+        //    var ipcClientRequestMessage = ResponseManager.CreateRequestMessage(request);
+        //    await IpcClientService.WriteMessageAsync(ipcClientRequestMessage.IpcBufferMessageContext);
+        //    return await ipcClientRequestMessage.Task;
+        //}
 
-        private ResponseManager ResponseManager { get; }
 
         /// <summary>
         /// 用于写入数据
@@ -97,7 +95,6 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
         {
-            ResponseManager.OnReceiveMessage(e);
 
             MessageReceived?.Invoke(sender, e);
         }

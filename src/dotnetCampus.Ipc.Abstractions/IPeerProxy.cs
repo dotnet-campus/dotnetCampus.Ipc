@@ -25,12 +25,12 @@ namespace dotnetCampus.Ipc.Abstractions
         /// </summary>
         event EventHandler<IPeerMessageArgs> MessageReceived;
 
-        /// <summary>
-        /// 发送请求给对方，请求对方的响应。这是客户端-服务器端模式
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request);
+        ///// <summary>
+        ///// 发送请求给对方，请求对方的响应。这是客户端-服务器端模式
+        ///// </summary>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request);
 
         //IpcRequestMessage HandleIpcRequestMessage(IIpcRequestContext requestContext);
     }
