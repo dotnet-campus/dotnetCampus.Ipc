@@ -127,7 +127,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             void CreatePeerProxy(IpcClientService ipcClientService)
             {
-                var peerProxy = new PeerProxy(e.PeerName, ipcClientService, e);
+                var peerProxy = new PeerProxy(e.PeerName, ipcClientService, e,IpcContext);
 
                 if (PeerManager.TryAdd(peerProxy))
                 {
@@ -180,7 +180,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
                 var ipcClientService = new IpcClientService(IpcContext, peerName);
 
-                peerProxy = new PeerProxy(peerName, ipcClientService);
+                peerProxy = new PeerProxy(peerName, ipcClientService,IpcContext);
                 PeerManager.TryAdd(peerProxy);
 
                 await ipcClientService.Start();

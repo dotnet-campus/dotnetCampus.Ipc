@@ -13,17 +13,19 @@ namespace dotnetCampus.Ipc.PipeCore
     /// </summary>
     public class PeerProxy : IPeerProxy
     {
-        internal PeerProxy(string peerName, IpcClientService ipcClientService)
+        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcContext ipcContext)
         {
             PeerName = peerName;
             IpcClientService = ipcClientService;
             IpcMessageWriter = new IpcMessageWriter(ipcClientService);
 
             ResponseManager = new ResponseManager();
+            IpcContext = ipcContext;
         }
 
-        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs) :
-            this(peerName, ipcClientService)
+
+        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs, IpcContext ipcContext) :
+            this(peerName, ipcClientService, ipcContext)
         {
             Update(ipcInternalPeerConnectedArgs);
         }
@@ -35,6 +37,8 @@ namespace dotnetCampus.Ipc.PipeCore
 
         internal TaskCompletionSource<bool> WaitForFinishedTaskCompletionSource { get; } =
             new TaskCompletionSource<bool>();
+
+        private IpcContext IpcContext { get; }
 
         /// <summary>
         /// 当收到消息时触发
