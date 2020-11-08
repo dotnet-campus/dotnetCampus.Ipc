@@ -3,9 +3,9 @@ using dotnetCampus.Ipc.PipeCore.Context;
 
 namespace dotnetCampus.Ipc.PipeCore.IpcPipe
 {
-    class IpcRequestContext : IIpcRequestContext
+    class IpcRequestMessageContext : IIpcRequestContext
     {
-        public IpcRequestContext(IpcBufferMessage ipcBufferMessage)
+        public IpcRequestMessageContext(IpcBufferMessage ipcBufferMessage)
         {
             IpcBufferMessage = ipcBufferMessage;
         }

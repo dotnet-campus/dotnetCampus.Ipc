@@ -28,7 +28,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
         {
             var requestMessage = args.IpcBufferMessage;
 
-            var ipcRequestContext = new IpcRequestContext(requestMessage);
+            var ipcRequestContext = new IpcRequestMessageContext(requestMessage);
 
             // 处理消息
             IIpcRequestHandler ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;
