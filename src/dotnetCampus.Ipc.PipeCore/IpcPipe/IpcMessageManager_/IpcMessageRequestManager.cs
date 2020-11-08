@@ -38,31 +38,6 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             return new IpcClientRequestMessage(requestMessage, task.Task, new IpcClientRequestMessageId(currentMessageId));
         }
 
-        private IpcBufferMessageContext CreateRequestMessageInner(in IpcRequestMessage request, ulong currentMessageId)
-        {
-            /*
-            * MessageHeader
-            * MessageId
-             * Request Message Length
-            * Request Message
-            */
-            var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);
-
-            var requestMessageLengthByteList = BitConverter.GetBytes(request.RequestMessage.Count);
-
-            return new IpcBufferMessageContext
-            (
-                request.Summary,
-                IpcMessageCommandType.RequestMessage,
-                new IpcBufferMessage(RequestMessageHeader),
-                new IpcBufferMessage(currentMessageIdByteList),
-                new IpcBufferMessage(requestMessageLengthByteList),
-                request.RequestMessage
-            );
-        }
-
-      
-
         private Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>> TaskList { get; } =
             new Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>>();
 
