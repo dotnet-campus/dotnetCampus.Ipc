@@ -18,7 +18,11 @@ namespace dotnetCampus.Ipc.PipeCore
 
         public void HandleRequest(PeerProxy sender, IpcClientRequestArgs args)
         {
+            //var requestMessage = args.IpcBufferMessage;
 
+            //var ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;
+
+             
         }
     }
 }
