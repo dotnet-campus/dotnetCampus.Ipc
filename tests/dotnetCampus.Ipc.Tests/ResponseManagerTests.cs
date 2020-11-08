@@ -36,7 +36,8 @@ namespace dotnetCampus.Ipc.Tests
 
                 Assert.IsNotNull(ipcClientRequestArgs);
                 var responseByteList = new byte[] { 0xF1, 0xF2 };
-                var responseMessageContext = responseManager.CreateResponseMessage(ipcClientRequestArgs.MessageId, new IpcRequestMessage("Tests", new IpcBufferMessage(responseByteList)));
+                var ipcMessageResponseManager = new IpcMessageResponseManager();
+                var responseMessageContext = ipcMessageResponseManager.CreateResponseMessage(ipcClientRequestArgs.MessageId, new IpcRequestMessage("Tests", new IpcBufferMessage(responseByteList)));
                 var responseStream = IpcBufferMessageContextToStream(responseMessageContext);
                 responseManager.OnReceiveMessage(new PeerMessageArgs("Foo", responseStream, ack: 100, IpcMessageCommandType.ResponseMessage));
 

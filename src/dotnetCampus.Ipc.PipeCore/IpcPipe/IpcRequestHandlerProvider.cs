@@ -37,10 +37,10 @@ namespace dotnetCampus.Ipc.PipeCore
             // 构建信息回复
             var peerProxy = sender;
             var responseManager = peerProxy.IpcMessageRequestManager;
-            var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
+            //var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
 
-            // 发送回客户端
-            await peerProxy.IpcClientService.WriteMessageAsync(responseMessage);
+            //// 发送回客户端
+            //await peerProxy.IpcClientService.WriteMessageAsync(responseMessage);
         }
     }
 }

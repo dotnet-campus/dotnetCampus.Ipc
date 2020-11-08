@@ -16,10 +16,10 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
     /// 通过调用 <see cref="CreateRequestMessage"/> 方法创建出请求消息 <para/>
     /// 然后将此消息的 <see cref="IpcClientRequestMessage.IpcBufferMessageContext"/> 通过现有 <see cref="PeerProxy"/> 发送到服务器端。同时客户端可以使用 <see cref="IpcClientRequestMessage.Task"/> 进行等待 <para/>
     /// 服务器端接收到 <see cref="IpcClientRequestMessage"/> 的内容，将会在 <see cref="OnIpcClientRequestReceived"/> 事件触发，这个事件将会带上 <see cref="IpcClientRequestArgs"/> 参数 <para/>
-    /// 在服务器端处理完成之后，底层的方法是通过调用 <see cref="CreateResponseMessage"/> 方法创建响应消息，通过 <see cref="PeerProxy"/> 发送给客户端 <para/>
+    /// 在服务器端处理完成之后，底层的方法是通过调用 <see cref="IpcMessageResponseManager.CreateResponseMessage"/> 方法创建响应消息，通过 <see cref="PeerProxy"/> 发送给客户端 <para/>
     /// 客户端收到了服务器端的响应信息，将会释放 <see cref="IpcClientRequestMessage.Task"/> 任务，客户端从 <see cref="IpcClientRequestMessage.Task"/> 可以拿到服务器端的返回值
     /// </summary>
-    class IpcMessageRequestManager
+    class IpcMessageRequestManager : IpcMessageManagerBase
     {
         public IpcClientRequestMessage CreateRequestMessage(IpcRequestMessage request)
         {
@@ -61,27 +61,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             );
         }
 
-        public IpcBufferMessageContext CreateResponseMessage(IpcClientRequestMessageId messageId, IpcRequestMessage response)
-        {
-            /*
-           * MessageHeader
-           * MessageId
-            * Response Message Length
-           * Response Message
-           */
-            var currentMessageIdByteList = BitConverter.GetBytes(messageId.MessageIdValue);
-            
-            var responseMessageLengthByteList = BitConverter.GetBytes(response.RequestMessage.Count);
-            return new IpcBufferMessageContext
-            (
-                response.Summary,
-                IpcMessageCommandType.ResponseMessage,
-                new IpcBufferMessage(ResponseMessageHeader),
-                new IpcBufferMessage(currentMessageIdByteList),
-                new IpcBufferMessage(responseMessageLengthByteList),
-                response.RequestMessage
-            );
-        }
+      
 
         private Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>> TaskList { get; } =
             new Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>>();
@@ -125,6 +105,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
                     var requestMessageByteList = binaryReader.ReadBytes(requestMessageLength);
                     var ipcClientRequestArgs =
                         new IpcClientRequestArgs(new IpcClientRequestMessageId(messageId), new IpcBufferMessage(requestMessageByteList));
+
                     OnIpcClientRequestReceived?.Invoke(this, ipcClientRequestArgs);
                 }
             }
@@ -189,42 +170,8 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             }
         }
 
-        private static bool CheckHeader(Stream stream, byte[] header)
-        {
-            for (var i = 0; i < header.Length; i++)
-            {
-                if (stream.ReadByte() == header[i])
-                {
-                }
-                else
-                {
-                    return false;
-                }
-            }
 
-            return true;
-        }
-        private bool CheckResponseHeader(Stream stream)
-        {
-            var header = ResponseMessageHeader;
-
-            return CheckHeader(stream, header);
-        }
-        private bool CheckRequestHeader(Stream stream)
-        {
-            var header = RequestMessageHeader;
-            return CheckHeader(stream, header);
-        }
-
-        private object Locker => RequestMessageHeader;
-
-        /// <summary>
-        /// 用于标识请求消息
-        /// </summary>
-        /// 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74 0x00 就是 Request 字符
-        private byte[] RequestMessageHeader { get; } = { 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x00 };
-
-        private byte[] ResponseMessageHeader { get; } = { 0x52, 0x65, 0x73, 0x70, 0x6F, 0x6E, 0x73, 0x65 };
+        private object Locker => TaskList;
 
         private ulong CurrentMessageId { set; get; }
     }
