@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.Ipc.PipeCore
+﻿namespace dotnetCampus.Ipc.PipeCore.IpcPipe
 {
     public readonly struct IpcClientRequestMessageId
     {

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore.Context;
+using dotnetCampus.Ipc.PipeCore.IpcPipe;
 using dotnetCampus.Ipc.PipeCore.Utils;
 
 namespace dotnetCampus.Ipc.PipeCore

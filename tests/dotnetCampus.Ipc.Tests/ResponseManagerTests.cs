@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore;
 using dotnetCampus.Ipc.PipeCore.Context;
+using dotnetCampus.Ipc.PipeCore.IpcPipe;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MSTest.Extensions.Contracts;
 
