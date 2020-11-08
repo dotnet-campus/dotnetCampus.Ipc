@@ -61,7 +61,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             );
         }
 
-        public IpcBufferMessageContext CreateResponseMessage(IpcClientRequestMessageId messageId, IpcBufferMessage response, string summary)
+        public IpcBufferMessageContext CreateResponseMessage(IpcClientRequestMessageId messageId, IpcRequestMessage response)
         {
             /*
            * MessageHeader
