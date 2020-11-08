@@ -44,6 +44,12 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public event EventHandler<IPeerMessageArgs>? MessageReceived;
 
+        /// <summary>
+        /// 当收到消息时触发，将会比 <see cref="MessageReceived"/> 触发，用于框架内先处理
+        /// </summary>
+        /// 其实就是 WPF 的隧道事件
+        internal event EventHandler<IPeerMessageArgs>? PreviewMessageReceived;
+
         //public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)
         //{
         //    var ipcClientRequestMessage = ResponseManager.CreateRequestMessage(request);
@@ -95,7 +101,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
         {
-
+            PreviewMessageReceived?.Invoke(sender, e);
             MessageReceived?.Invoke(sender, e);
         }
     }
