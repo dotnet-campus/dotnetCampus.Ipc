@@ -48,7 +48,7 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public event EventHandler<IPeerMessageArgs>? MessageReceived;
 
-        private ResponseManager ResponseManager { get; }
+        internal ResponseManager ResponseManager { get; }
 
         /// <inheritdoc />
         public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)

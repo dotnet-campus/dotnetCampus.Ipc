@@ -16,25 +16,32 @@ namespace dotnetCampus.Ipc.PipeCore
 
         public IpcContext IpcContext { get; }
 
-        public void HandleRequest(PeerProxy sender, IpcClientRequestArgs args)
+        /// <summary>
+        /// 处理请求消息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// 有三步
+        /// 1. 取出消息和上下文里面带的 <see cref="IIpcRequestHandler"/> 用于处理消息
+        /// 2. 构建出 <see cref="IIpcRequestContext"/> 传入到 <see cref="IIpcRequestHandler"/> 处理
+        /// 3. 将 <see cref="IIpcRequestHandler"/> 的返回值发送给到客户端
+        public async void HandleRequest(PeerProxy sender, IpcClientRequestArgs args)
         {
             var requestMessage = args.IpcBufferMessage;
 
             var ipcRequestContext = new IpcRequestContext(requestMessage);
 
-            var ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;
-            var ipcRequestMessage = ipcRequestHandler.HandleRequestMessage(ipcRequestContext);
-        }
-    }
+            IIpcRequestHandler ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;
+            var result = ipcRequestHandler.HandleRequestMessage(ipcRequestContext);
 
-    class IpcRequestContext : IIpcRequestContext
-    {
-        public IpcRequestContext(IpcBufferMessage ipcBufferMessage)
-        {
-            IpcBufferMessage = ipcBufferMessage;
-        }
+            // 构建信息回复
+            var peerProxy = sender;
+            var responseManager = peerProxy.ResponseManager;
+            var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
 
-        public IpcBufferMessage IpcBufferMessage { get; }
+            // 发送回客户端
+            await peerProxy.IpcClientService.WriteMessageAsync(responseMessage);
+        }
     }
 }
 
