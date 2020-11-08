@@ -50,12 +50,12 @@ namespace dotnetCampus.Ipc.Demo
     {
         private static void Main(string[] args)
         {
-            var ipcProvider = new IpcClientProvider();
+            //var ipcProvider = new IpcClientProvider();
 
-            var f1 = ipcProvider.GetObject<IF1>();
+            //var f1 = ipcProvider.GetObject<IF1>();
 
-            f1.F2();
-            f1.F3();
+            //f1.F2();
+            //f1.F3();
 
             //Console.WriteLine(string.Join(",", Encoding.UTF8.GetBytes("ACK").Select(temp => "0x" + temp.ToString("X2"))));
             //var byteList = BitConverter.GetBytes((ulong) 100);
