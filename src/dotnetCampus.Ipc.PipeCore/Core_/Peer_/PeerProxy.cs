@@ -21,8 +21,8 @@ namespace dotnetCampus.Ipc.PipeCore
 
             IpcContext = ipcContext;
 
-            ResponseManager = new ResponseManager();
-            ResponseManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
+            IpcMessageRequestManager = new IpcMessageRequestManager();
+            IpcMessageRequestManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
 
@@ -48,12 +48,12 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public event EventHandler<IPeerMessageArgs>? MessageReceived;
 
-        internal ResponseManager ResponseManager { get; }
+        internal IpcMessageRequestManager IpcMessageRequestManager { get; }
 
         /// <inheritdoc />
         public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)
         {
-            var ipcClientRequestMessage = ResponseManager.CreateRequestMessage(request);
+            var ipcClientRequestMessage = IpcMessageRequestManager.CreateRequestMessage(request);
             await IpcClientService.WriteMessageAsync(ipcClientRequestMessage.IpcBufferMessageContext);
             return await ipcClientRequestMessage.Task;
         }
@@ -102,7 +102,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
         {
-            ResponseManager.OnReceiveMessage(e);
+            IpcMessageRequestManager.OnReceiveMessage(e);
 
             MessageReceived?.Invoke(sender, e);
         }

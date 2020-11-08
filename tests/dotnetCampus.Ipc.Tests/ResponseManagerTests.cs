@@ -17,7 +17,7 @@ namespace dotnetCampus.Ipc.Tests
         {
             "发送消息之后，能等待收到对应的回复".Test(() =>
             {
-                var responseManager = new ResponseManager();
+                var responseManager = new IpcMessageRequestManager();
                 var requestByteList = new byte[] { 0xFF, 0xFE };
                 var request = new IpcRequestMessage("Tests", new IpcBufferMessage(requestByteList));
                 var ipcClientRequestMessage = responseManager.CreateRequestMessage(request);

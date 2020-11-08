@@ -19,7 +19,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
     /// 在服务器端处理完成之后，底层的方法是通过调用 <see cref="CreateResponseMessage"/> 方法创建响应消息，通过 <see cref="PeerProxy"/> 发送给客户端 <para/>
     /// 客户端收到了服务器端的响应信息，将会释放 <see cref="IpcClientRequestMessage.Task"/> 任务，客户端从 <see cref="IpcClientRequestMessage.Task"/> 可以拿到服务器端的返回值
     /// </summary>
-    class ResponseManager
+    class IpcMessageRequestManager
     {
         public IpcClientRequestMessage CreateRequestMessage(IpcRequestMessage request)
         {

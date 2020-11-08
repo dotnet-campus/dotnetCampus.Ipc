@@ -5,7 +5,7 @@ using dotnetCampus.Ipc.PipeCore.IpcPipe;
 namespace dotnetCampus.Ipc.PipeCore
 {
     /// <summary>
-    /// 关联 <see cref="ResponseManager"/> 和 <see cref="IIpcRequestHandler"/> 的联系
+    /// 关联 <see cref="IpcMessageRequestManager"/> 和 <see cref="IIpcRequestHandler"/> 的联系
     /// </summary>
     class IpcRequestHandlerProvider
     {
@@ -36,7 +36,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             // 构建信息回复
             var peerProxy = sender;
-            var responseManager = peerProxy.ResponseManager;
+            var responseManager = peerProxy.IpcMessageRequestManager;
             var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ReturnMessage);
 
             // 发送回客户端
