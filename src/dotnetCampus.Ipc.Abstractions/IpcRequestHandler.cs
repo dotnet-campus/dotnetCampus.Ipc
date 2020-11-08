@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="requestContext"></param>
         /// <returns></returns>
-        IpcRequestMessage HandleRequestMessage(IIpcRequestContext requestContext);
+        IIpcHandleRequestMessageResult HandleRequestMessage(IIpcRequestContext requestContext);
     }
 }

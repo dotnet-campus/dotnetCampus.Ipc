@@ -37,10 +37,21 @@ namespace dotnetCampus.Ipc.PipeCore.Context
 
     class EmptyIpcRequestHandler : IIpcRequestHandler
     {
-        public IpcRequestMessage HandleRequestMessage(IIpcRequestContext requestContext)
+        public IIpcHandleRequestMessageResult HandleRequestMessage(IIpcRequestContext requestContext)
         {
             // 我又不知道业务，不知道怎么玩……
-            return new IpcRequestMessage(nameof(EmptyIpcRequestHandler), new IpcBufferMessage(new byte[0]));
+            var responseMessage = new IpcRequestMessage(nameof(EmptyIpcRequestHandler), new IpcBufferMessage(new byte[0]));
+            return new IpcHandleRequestMessageResult(responseMessage);
         }
+    }
+
+    class IpcHandleRequestMessageResult : IIpcHandleRequestMessageResult
+    {
+        public IpcHandleRequestMessageResult(IpcRequestMessage returnMessage)
+        {
+            ReturnMessage = returnMessage;
+        }
+
+        public IpcRequestMessage ReturnMessage { get; }
     }
 }
