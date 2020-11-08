@@ -20,6 +20,8 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcMessageWriter = new IpcMessageWriter(ipcClientService);
 
             IpcContext = ipcContext;
+
+            ResponseManager = new ResponseManager();
         }
 
 
@@ -44,7 +46,7 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public event EventHandler<IPeerMessageArgs>? MessageReceived;
 
-        private ResponseManager ResponseManager => IpcContext.ResponseManager;
+        private ResponseManager ResponseManager { get; }
 
         /// <inheritdoc />
         public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)

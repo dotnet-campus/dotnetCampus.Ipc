@@ -28,8 +28,6 @@ namespace dotnetCampus.Ipc.PipeCore.Context
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
         }
 
-        internal ResponseManager ResponseManager { get; } = new ResponseManager();
-
         internal AckManager AckManager { get; }
 
         internal IpcConfiguration IpcConfiguration { get; }
