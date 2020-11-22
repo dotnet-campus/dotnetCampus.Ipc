@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore.Context;
 using dotnetCampus.Ipc.PipeCore.Utils;
 

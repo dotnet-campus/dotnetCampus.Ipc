@@ -1,4 +1,5 @@
 ﻿using System;
+using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore.Context;
 
 namespace dotnetCampus.Ipc.PipeCore.IpcPipe
