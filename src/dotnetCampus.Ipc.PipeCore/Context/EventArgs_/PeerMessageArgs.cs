@@ -57,7 +57,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         /// <summary>
         /// 设置被处理，同时添加 <paramref name="message"/> 用于调试的信息
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">用于调试的信息，请记录是谁设置的，原因是什么</param>
         public void SetHandle(string message)
         {
             Handle = true;
