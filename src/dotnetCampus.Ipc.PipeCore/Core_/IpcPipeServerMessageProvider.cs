@@ -77,7 +77,7 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             // 不在这一层释放 NamedPipeServerStream 类
             //NamedPipeServerStream.Dispose();
-            ServerStreamMessageReader.Dispose();
+            ServerStreamMessageReader?.Dispose();
         }
     }
 }

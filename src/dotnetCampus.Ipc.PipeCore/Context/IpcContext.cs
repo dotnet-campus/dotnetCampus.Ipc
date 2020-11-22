@@ -27,9 +27,17 @@ namespace dotnetCampus.Ipc.PipeCore.Context
             IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
+
+            Logger = new IpcLogger(this);
         }
 
         internal AckManager AckManager { get; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"[{PipeName}]";
+        }
 
         internal IpcConfiguration IpcConfiguration { get; }
 
@@ -46,11 +54,26 @@ namespace dotnetCampus.Ipc.PipeCore.Context
 
         internal PeerRegisterProvider PeerRegisterProvider { get; } = new PeerRegisterProvider();
 
-        internal ILogger Logger { get; } = null!;
+        internal ILogger Logger { get; }
 
         /// <summary>
         /// 规定回应 ack 的值使用的 ack 是最大值
         /// </summary>
         internal Ack AckUsedForReply { get; } = new Ack(ulong.MaxValue);
+    }
+
+    class IpcLogger : ILogger
+    {
+        public IpcLogger(IpcContext ipcContext)
+        {
+            IpcContext = ipcContext;
+        }
+
+        public override string ToString()
+        {
+            return $"[{IpcContext.PipeName}]";
+        }
+
+        private IpcContext IpcContext { get; }
     }
 }

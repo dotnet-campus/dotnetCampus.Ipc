@@ -150,12 +150,16 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private async Task QueueWriteAsync(Func<Ack, Task> task, string summary)
         {
-            await DoubleBufferTask.AddTaskAsync(async () =>
+            async Task CreateDoubleBufferTaskFunc(Ack ack)
             {
-                await AckManager.DoWillReceivedAck(task, PeerName, TimeSpan.FromSeconds(3), maxRetryCount: 10, summary,
-                    IpcContext.Logger);
-            });
+                await DoubleBufferTask.AddTaskAsync(async () => { await task(ack); });
+            }
+
+            await AckManager.DoWillReceivedAck(CreateDoubleBufferTaskFunc, PeerName, TimeSpan.FromSeconds(3), maxRetryCount: 10, summary,
+                IpcContext.Logger);
         }
+
+
 
         private DoubleBufferTask<Func<Task>> DoubleBufferTask { get; }
 
@@ -166,6 +170,8 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <returns></returns>
         public async Task SendAckAsync(Ack receivedAck)
         {
+            Logger.Debug($"[{nameof(IpcClientService)}][{nameof(SendAckAsync)}] {receivedAck} Start AddTaskAsync");
+
             var ackMessage = AckManager.BuildAckMessage(receivedAck);
 
             // 这里不能调用 WriteMessageAsync 方法，因为这些方法都使用了 QueueWriteAsync 方法，在这里面将会不断尝试发送信息，需要收到对方的 ack 才能完成。而作为回复 ack 消息的逻辑，如果还需要等待对方回复 ack 那么将会存在相互等待。本地回复对方的 ack 消息需要等待对方的 ack 消息，而对方的 ack 消息又需要等待本地的回复
