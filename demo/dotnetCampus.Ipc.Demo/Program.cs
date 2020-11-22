@@ -8,6 +8,34 @@ using dotnetCampus.Ipc.PipeCore.Context;
 
 namespace dotnetCampus.Ipc.Demo
 {
+
+    public class IpcProxy<T> : DispatchProxy
+    {
+        protected override object Invoke(MethodInfo targetMethod, object[] args)
+        {
+            var actualReturnType = GetAndCheckActualReturnType(targetMethod.ReturnType);
+
+            return default!;
+        }
+
+        private Type GetAndCheckActualReturnType(Type returnType)
+        {
+            if (returnType == typeof(Task))
+            {
+                return typeof(void);
+            }
+            else if (returnType.IsGenericType is true && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                if (returnType.GenericTypeArguments.Length == 1)
+                {
+                    return returnType.GenericTypeArguments[0];
+                }
+            }
+
+            throw new ArgumentException($"方法返回值只能是 Task 或 Task 泛形");
+        }
+    }
+
     public interface IF1
     {
         Task<int> F2();
@@ -22,12 +50,12 @@ namespace dotnetCampus.Ipc.Demo
     {
         private static void Main(string[] args)
         {
-            var ipcProvider = new IpcClientProvider();
+            //var ipcProvider = new IpcClientProvider();
 
-            var f1 = ipcProvider.GetObject<IF1>();
+            //var f1 = ipcProvider.GetObject<IF1>();
 
-            f1.F2();
-            f1.F3();
+            //f1.F2();
+            //f1.F3();
 
             //Console.WriteLine(string.Join(",", Encoding.UTF8.GetBytes("ACK").Select(temp => "0x" + temp.ToString("X2"))));
             //var byteList = BitConverter.GetBytes((ulong) 100);

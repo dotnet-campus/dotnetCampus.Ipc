@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace dotnetCampus.Ipc
+namespace dotnetCampus.Ipc.Context
 {
     /// <summary>
     /// 发送给服务器的请求数据
@@ -9,7 +8,7 @@ namespace dotnetCampus.Ipc
     /// Copy From: https://github.com/jacqueskang/IpcServiceFramework.git
     public class IpcRequest
     {
-        public Type ObjectType { set; get; }
+        public IpcSerializableType ObjectType { set; get; }
 
         /// <summary>
         /// 用来标识服务器端的对象
@@ -20,8 +19,8 @@ namespace dotnetCampus.Ipc
 
         public List<IpcRequestParameter> ParameterList { set; get; }
 
-        public List<Type> GenericArgumentList { set; get; }
+        public List<IpcSerializableType> GenericArgumentList { set; get; }
 
-        public Type ReturnType { set; get; }
+        public IpcSerializableType ReturnType { set; get; }
     }
 }

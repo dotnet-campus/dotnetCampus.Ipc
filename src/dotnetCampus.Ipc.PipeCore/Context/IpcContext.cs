@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.PipeCore.Context
+﻿using dotnetCampus.Ipc.PipeCore.IpcPipe;
+
+namespace dotnetCampus.Ipc.PipeCore.Context
 {
     /// <summary>
     /// 用于作为 Ipc 库的上下文，包括各个过程需要使用的工具和配置等
@@ -22,6 +24,7 @@
             PipeName = pipeName;
 
             AckManager = new AckManager(this);
+            IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
         }
@@ -31,6 +34,10 @@
         internal IpcConfiguration IpcConfiguration { get; }
 
         internal IpcProvider IpcProvider { get; }
+
+        internal IpcRequestHandlerProvider IpcRequestHandlerProvider { get; }
+
+        internal IpcMessageResponseManager IpcMessageResponseManager { get; } = new IpcMessageResponseManager();
 
         /// <summary>
         /// 管道名，本地服务器名

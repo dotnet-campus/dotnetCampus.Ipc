@@ -46,6 +46,8 @@
 
 进度：基本可用
 
+优先实现管道，是因为管道又快有稳。但是缺点是不支持 Linux 下使用，同时稳定的管道需要设计为两个半工的管道
+
 ### dotnetCampus.Ipc
 
 提供给上层业务开发者使用的项目，这个项目有良好的 API 设计
@@ -56,10 +58,28 @@
 
 进度：等待 API 设计中，也许会接入 [https://github.com/jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework) 的实现，或者模拟 WCF 或 Remoting 的实现
 
+## API 特点
+
+### 设计特点
+
+底层每次调用需要传入 `string summary` 用于标识
+
+优势在于解决调试的时候，看到传送的二进制以及调用堆栈的时候，如何对应上具体的业务方的问题
+
+整个库编写过程中注意了给参数加上单位，不会存在基础类型的传入。例如给 ulong 的 Ack 特别定义了结构体等
+
 ## 进度
 
 - 基本完成 dotnetCampus.Ipc.PipeCore 部分
-- 最小可用呆魔
+- 基本完成 客户端服务器端模型
+- 基本完成 最小可用呆魔
+
+- [ ] 顶层调用 API 设计
+
+- [ ] 远程调用的实现
+- [ ] 性能优化，包括内存优化
+- [ ] 接入预编译提供上层的远程调用封装
+
 
 ## 不支持的列表
 

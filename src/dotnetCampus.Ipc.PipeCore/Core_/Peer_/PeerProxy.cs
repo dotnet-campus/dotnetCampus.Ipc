@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore.Context;
+using dotnetCampus.Ipc.PipeCore.IpcPipe;
 using dotnetCampus.Ipc.PipeCore.Utils;
 
 namespace dotnetCampus.Ipc.PipeCore
@@ -9,17 +11,24 @@ namespace dotnetCampus.Ipc.PipeCore
     /// <summary>
     /// 用于表示远程的对方
     /// </summary>
-    public class PeerProxy
+    public class PeerProxy : IPeerProxy
     {
-        internal PeerProxy(string peerName, IpcClientService ipcClientService)
+        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcContext ipcContext)
         {
             PeerName = peerName;
             IpcClientService = ipcClientService;
             IpcMessageWriter = new IpcMessageWriter(ipcClientService);
+
+            IpcContext = ipcContext;
+
+            IpcMessageRequestManager = new IpcMessageRequestManager();
+            IpcMessageRequestManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
-        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs) :
-            this(peerName, ipcClientService)
+
+
+        internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs, IpcContext ipcContext) :
+            this(peerName, ipcClientService, ipcContext)
         {
             Update(ipcInternalPeerConnectedArgs);
         }
@@ -32,10 +41,23 @@ namespace dotnetCampus.Ipc.PipeCore
         internal TaskCompletionSource<bool> WaitForFinishedTaskCompletionSource { get; } =
             new TaskCompletionSource<bool>();
 
+        private IpcContext IpcContext { get; }
+
         /// <summary>
         /// 当收到消息时触发
         /// </summary>
-        public event EventHandler<PeerMessageArgs>? MessageReceived;
+        public event EventHandler<IPeerMessageArgs>? MessageReceived;
+
+        internal IpcMessageRequestManager IpcMessageRequestManager { get; }
+
+        /// <inheritdoc />
+        public async Task<IpcBufferMessage> GetResponseAsync(IpcRequestMessage request)
+        {
+            var ipcClientRequestMessage = IpcMessageRequestManager.CreateRequestMessage(request);
+            await IpcClientService.WriteMessageAsync(ipcClientRequestMessage.IpcBufferMessageContext);
+            return await ipcClientRequestMessage.Task;
+        }
+
 
         /// <summary>
         /// 用于写入数据
@@ -80,7 +102,15 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
         {
+            IpcMessageRequestManager.OnReceiveMessage(e);
+
             MessageReceived?.Invoke(sender, e);
+        }
+
+        private void ResponseManager_OnIpcClientRequestReceived(object? sender, IpcClientRequestArgs e)
+        {
+            var ipcRequestHandlerProvider = IpcContext.IpcRequestHandlerProvider;
+            ipcRequestHandlerProvider.HandleRequest(this, e);
         }
     }
 }
