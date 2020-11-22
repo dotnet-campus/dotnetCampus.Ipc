@@ -6,6 +6,7 @@ using System.Windows.Threading;
 // ReSharper disable once CheckNamespace
 namespace Walterlv.ThreadSwitchingTasks
 {
+    // 细节请看 [将 C++/WinRT 中的线程切换体验带到 C# 中来（WPF 版本）_walterlv - 吕毅-CSDN博客_c++ winrt](https://blog.csdn.net/WPwalter/article/details/90344486)
     public static class DispatcherSwitcher
     {
         public static ThreadPoolAwaiter ResumeBackground() => new ThreadPoolAwaiter();
