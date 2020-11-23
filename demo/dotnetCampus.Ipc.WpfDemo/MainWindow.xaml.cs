@@ -90,12 +90,12 @@ namespace dotnetCampus.Ipc.WpfDemo
                 {
                     ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
 
-                    peer.PeerConnectBroke += Peer_PeerConnectBroke;
+                    peer.PeerConnectionBroken += Peer_PeerConnectBroke;
                 }
             });
         }
 
-        private void Peer_PeerConnectBroke(object? sender, IPeerConnectBreakArgs e)
+        private void Peer_PeerConnectBroke(object? sender, IPeerConnectionBrokenArgs e)
         {
             var peer = (PeerProxy) sender!;
             Log($"[连接断开] {peer.PeerName}");

@@ -60,7 +60,7 @@ namespace dotnetCampus.Ipc.PipeCore
         }
 
         /// <inheritdoc />
-        public event EventHandler<IPeerConnectBreakArgs>? PeerConnectBroke;
+        public event EventHandler<IPeerConnectionBrokenArgs>? PeerConnectionBroken;
 
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace dotnetCampus.Ipc.PipeCore
             }
         }
 
-        private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectBreakArgs e)
+        private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectionBrokenArgs e)
         {
             OnPeerConnectBroke(e);
         }
@@ -126,9 +126,9 @@ namespace dotnetCampus.Ipc.PipeCore
             ipcRequestHandlerProvider.HandleRequest(this, e);
         }
 
-        private void OnPeerConnectBroke(IPeerConnectBreakArgs e)
+        private void OnPeerConnectBroke(IPeerConnectionBrokenArgs e)
         {
-            PeerConnectBroke?.Invoke(this, e);
+            PeerConnectionBroken?.Invoke(this, e);
         }
     }
 }

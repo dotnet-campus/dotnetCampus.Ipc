@@ -38,6 +38,6 @@ namespace dotnetCampus.Ipc.Abstractions
         /// <summary>
         /// 对方连接断开事件
         /// </summary>
-        event EventHandler<IPeerConnectBreakArgs> PeerConnectBroke;
+        event EventHandler<IPeerConnectionBrokenArgs> PeerConnectionBroken;
     }
 }
