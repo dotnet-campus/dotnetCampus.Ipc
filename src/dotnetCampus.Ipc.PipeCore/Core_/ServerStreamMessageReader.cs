@@ -189,7 +189,7 @@ namespace dotnetCampus.Ipc.PipeCore
                     // [断开某个进程 使用大量CPU在读取 · Issue #15 · dotnet-campus/dotnetCampus.Ipc](https://github.com/dotnet-campus/dotnetCampus.Ipc/issues/15 )
                     IpcContext.Logger.Error($"对方已关闭");
 
-                    OnPeerConnectBroke(new PeerConnectBreakArgs());
+                    OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                     return;
                 }
                 catch (Exception e)
@@ -202,7 +202,7 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <summary>
         /// 对方连接断开
         /// </summary>
-        public event EventHandler<PeerConnectBreakArgs>? PeerConnectBroke;
+        public event EventHandler<PeerConnectionBrokenArgs>? PeerConnectBroke;
 
         private void OnAckReceived(AckArgs e)
         {
@@ -248,7 +248,7 @@ namespace dotnetCampus.Ipc.PipeCore
             GC.SuppressFinalize(this);
         }
 
-       private void OnPeerConnectBroke(PeerConnectBreakArgs e)
+        private void OnPeerConnectBroke(PeerConnectionBrokenArgs e)
         {
             PeerConnectBroke?.Invoke(this, e);
         }
