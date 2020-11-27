@@ -244,7 +244,7 @@ namespace dotnetCampus.Ipc.PipeCore
             GC.SuppressFinalize(this);
         }
 
-       private void OnPeerConnectBroke(PeerConnectionBrokenArgs e)
+        private void OnPeerConnectBroke(PeerConnectionBrokenArgs e)
         {
             PeerConnectBroke?.Invoke(this, e);
         }
