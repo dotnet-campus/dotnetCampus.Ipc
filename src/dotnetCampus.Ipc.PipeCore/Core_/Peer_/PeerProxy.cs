@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Abstractions;
+using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore.Context;
 using dotnetCampus.Ipc.PipeCore.IpcPipe;
 using dotnetCampus.Ipc.PipeCore.Utils;
@@ -58,6 +59,9 @@ namespace dotnetCampus.Ipc.PipeCore
             return await ipcClientRequestMessage.Task;
         }
 
+        /// <inheritdoc />
+        public event EventHandler<IPeerConnectionBrokenArgs>? PeerConnectionBroken;
+
 
         /// <summary>
         /// 用于写入数据
@@ -89,6 +93,10 @@ namespace dotnetCampus.Ipc.PipeCore
             serverStreamMessageReader.MessageReceived -= ServerStreamMessageReader_MessageReceived;
             serverStreamMessageReader.MessageReceived += ServerStreamMessageReader_MessageReceived;
 
+            // 连接断开
+            serverStreamMessageReader.PeerConnectBroke -= ServerStreamMessageReader_PeerConnectBroke;
+            serverStreamMessageReader.PeerConnectBroke += ServerStreamMessageReader_PeerConnectBroke;
+
             IsConnectedFinished = true;
 
             if (WaitForFinishedTaskCompletionSource.TrySetResult(true))
@@ -98,6 +106,11 @@ namespace dotnetCampus.Ipc.PipeCore
             {
                 Debug.Assert(false, "重复调用");
             }
+        }
+
+        private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectionBrokenArgs e)
+        {
+            OnPeerConnectBroke(e);
         }
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
@@ -111,6 +124,11 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             var ipcRequestHandlerProvider = IpcContext.IpcRequestHandlerProvider;
             ipcRequestHandlerProvider.HandleRequest(this, e);
+        }
+
+        private void OnPeerConnectBroke(IPeerConnectionBrokenArgs e)
+        {
+            PeerConnectionBroken?.Invoke(this, e);
         }
     }
 }

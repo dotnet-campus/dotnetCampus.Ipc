@@ -15,8 +15,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using dotnetCampus.Ipc.Abstractions;
+using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore;
 using dotnetCampus.Ipc.WpfDemo.View;
+using Walterlv.ThreadSwitchingTasks;
 
 namespace dotnetCampus.Ipc.WpfDemo
 {
@@ -86,14 +89,23 @@ namespace dotnetCampus.Ipc.WpfDemo
                 if (ConnectedPeerModelList.All(temp => !ReferenceEquals(temp.Peer, peer)))
                 {
                     ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
+
+                    peer.PeerConnectionBroken += Peer_PeerConnectBroke;
                 }
             });
         }
 
+        private void Peer_PeerConnectBroke(object? sender, IPeerConnectionBrokenArgs e)
+        {
+            var peer = (PeerProxy) sender!;
+            Log($"[连接断开] {peer.PeerName}");
+        }
+
         private IpcProvider IpcProvider { set; get; } = null!;
 
-        private void Log(string message)
+        private async void Log(string message)
         {
+            await Dispatcher.ResumeForeground();
             LogTextBox.Text += DateTime.Now.ToString("hh:mm:ss.fff") + " " + message + "\r\n";
             if (LogTextBox.Text.Length > 2000)
             {

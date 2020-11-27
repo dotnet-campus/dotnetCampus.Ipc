@@ -19,6 +19,7 @@ namespace dotnetCampus.Ipc.PipeCore
         }
 
         public IpcContext IpcContext { get; }
+        private ILogger Logger => IpcContext.Logger;
 
         /// <summary>
         /// 被对方连接的对方设备名
@@ -50,9 +51,17 @@ namespace dotnetCampus.Ipc.PipeCore
 
         public async void Run()
         {
-            await WaitForConnectionAsync().ConfigureAwait(false);
+            try
+            {
+                await WaitForConnectionAsync().ConfigureAwait(false);
 
-            await ReadMessageAsync().ConfigureAwait(false);
+                await ReadMessageAsync().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                // 当前是后台线程了，不能接受任何的抛出
+                Logger.Error(e);
+            }
         }
 
         private async Task WaitForConnectionAsync()
@@ -176,6 +185,8 @@ namespace dotnetCampus.Ipc.PipeCore
                     // 对方关闭了
                     // [断开某个进程 使用大量CPU在读取 · Issue #15 · dotnet-campus/dotnetCampus.Ipc](https://github.com/dotnet-campus/dotnetCampus.Ipc/issues/15 )
                     IpcContext.Logger.Error($"对方已关闭");
+
+                    OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                     return;
                 }
                 catch (Exception e)
@@ -184,6 +195,11 @@ namespace dotnetCampus.Ipc.PipeCore
                 }
             }
         }
+
+        /// <summary>
+        /// 对方连接断开
+        /// </summary>
+        public event EventHandler<PeerConnectionBrokenArgs>? PeerConnectBroke;
 
         private void OnAckReceived(AckArgs e)
         {
@@ -226,6 +242,11 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+       private void OnPeerConnectBroke(PeerConnectionBrokenArgs e)
+        {
+            PeerConnectBroke?.Invoke(this, e);
         }
     }
 }
