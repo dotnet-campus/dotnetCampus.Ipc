@@ -71,7 +71,8 @@ namespace dotnetCampus.Ipc
             //int n = await foo.FooAsync();
             //var re = IpcObjectSerializer.Serialize(ipcRequest);
 
-            return default!;
+            // 此方法还没完成，等待下一次实现，有技术实现问题
+            throw new NotImplementedException();
         }
 
         private Type GetAndCheckActualReturnType(Type returnType)
@@ -91,7 +92,7 @@ namespace dotnetCampus.Ipc
                 }
             }
 
-            throw new ArgumentException($"方法返回值只能是 Task 或 Task 泛形");
+            throw new ArgumentException($"方法返回值只能是 Task 或 Task 泛型");
         }
     }
 }
