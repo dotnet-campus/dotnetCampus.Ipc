@@ -32,6 +32,7 @@ namespace dotnetCampus.Ipc.PipeCore
         public IpcProvider(string pipeName, IpcConfiguration? ipcConfiguration = null)
         {
             IpcContext = new IpcContext(this, pipeName, ipcConfiguration);
+            IpcContext.Logger.Debug($"[IpcProvider] 本地服务名 {pipeName}");
         }
 
         private IpcContext IpcContext { get; }

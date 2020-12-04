@@ -81,7 +81,8 @@ namespace dotnetCampus.Ipc.Demo
                 //Task.Run(LibearlafeCilinoballnelnall),
                 //Task.Run(LibearlafeCilinoballnelnall),
                 //Task.Run(WhejeewukawBalbejelnewearfe),
-                Task.Run(WheehakawlucearHalwahewurlaiwhair), Task.Run(BaiqealawbawKeqakeyawaw)
+                Task.Run(WheehakawlucearHalwahewurlaiwhair),
+                Task.Run(BaiqealawbawKeqakeyawaw)
             };
 
             Task.WaitAll(jalejekemNereyararli.ToArray());

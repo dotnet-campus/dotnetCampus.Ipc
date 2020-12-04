@@ -10,6 +10,7 @@ namespace dotnetCampus.Ipc.PipeCore
     /// <summary>
     /// 基础的数据读取
     /// </summary>
+    [DebuggerDisplay("ServerStreamMessageReader [{" + nameof(IpcContext) + "}]")]
     class ServerStreamMessageReader : IDisposable
     {
         public ServerStreamMessageReader(IpcContext ipcContext, Stream stream)
@@ -54,6 +55,8 @@ namespace dotnetCampus.Ipc.PipeCore
             try
             {
                 await WaitForConnectionAsync().ConfigureAwait(false);
+
+                Logger.Debug($"连接完成");
 
                 await ReadMessageAsync().ConfigureAwait(false);
             }
@@ -104,7 +107,7 @@ namespace dotnetCampus.Ipc.PipeCore
                         if (IpcContext.AckManager.IsAckMessage(stream, out var ack))
                         {
                             // 只有作为去连接对方的时候，才会收到这个消息
-                            IpcContext.Logger.Debug($"[{nameof(IpcServerService)}] AckReceived {ack} From {PeerName}");
+                            IpcContext.Logger.Debug($"[{nameof(IpcServerService)}] AckReceived {ack} From {PeerName} 收到SendAckAndRegisterToPeer消息");
                             OnAckReceived(new AckArgs(PeerName, ack));
 
                             if (isPeerRegisterMessage)
@@ -218,6 +221,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void OnAckRequested(in Ack e)
         {
+            Logger.Debug($"[{nameof(ServerStreamMessageReader)}][{nameof(OnAckRequested)}] 请求回复 Ack 消息 {e}");
             AckRequested?.Invoke(this, e);
         }
 
