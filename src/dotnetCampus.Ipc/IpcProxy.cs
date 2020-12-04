@@ -17,7 +17,7 @@ namespace dotnetCampus.Ipc
         }
 #endif
 
-        public class IpcProxy<T> : DispatchProxy
+    public class IpcProxy<T> : DispatchProxy
     {
         /// <summary>
         /// 用来标识服务器端的对象
