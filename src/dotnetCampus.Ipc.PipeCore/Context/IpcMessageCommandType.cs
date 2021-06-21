@@ -23,7 +23,7 @@
         /// <summary>
         /// 业务层的消息
         /// </summary>
-        Business = 0B0000_1000_0000,
+        Business = (1 << 16 - 1),
 
         /// <summary>
         /// 请求信息，这也是业务层消息

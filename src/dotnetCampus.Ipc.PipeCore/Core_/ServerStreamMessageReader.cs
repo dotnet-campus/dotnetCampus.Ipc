@@ -27,12 +27,15 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         public string PeerName { set; get; } = null!;
 
+        public bool IsConnected => !string.IsNullOrEmpty(PeerName);
+
         private IpcConfiguration IpcConfiguration => IpcContext.IpcConfiguration;
         private Stream Stream { get; }
 
         /// <summary>
         /// 请求发送回复的 ack 消息
         /// </summary>
+        [Obsolete(DebugContext.DoNotUseAck)]
         internal event EventHandler<Ack>? AckRequested;
 
         /// <summary>
@@ -54,11 +57,13 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             try
             {
-                await WaitForConnectionAsync().ConfigureAwait(false);
+                //await WaitForConnectionAsync().ConfigureAwait(false);
 
-                Logger.Debug($"连接完成");
+                //Logger.Debug($"连接完成");
 
-                await ReadMessageAsync().ConfigureAwait(false);
+                //await ReadMessageAsync().ConfigureAwait(false);
+
+                await RunAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -67,6 +72,111 @@ namespace dotnetCampus.Ipc.PipeCore
             }
         }
 
+        public async Task RunAsync()
+        {
+            while (!_isDisposed)
+            {
+                try
+                {
+                    var ipcMessageResult = await IpcMessageConverter.ReadAsync(Stream,
+                        IpcConfiguration.MessageHeader,
+                        IpcConfiguration.SharedArrayPool);
+
+                    DispatchMessage(ipcMessageResult);
+                }
+                catch (EndOfStreamException)
+                {
+                    // 对方关闭了
+                    // [断开某个进程 使用大量CPU在读取 · Issue #15 · dotnet-campus/dotnetCampus.Ipc](https://github.com/dotnet-campus/dotnetCampus.Ipc/issues/15 )
+                    IpcContext.Logger.Error($"对方已关闭");
+
+                    OnPeerConnectBroke(new PeerConnectionBrokenArgs());
+                    return;
+                }
+                catch (Exception e)
+                {
+                    IpcContext.Logger.Error(e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 调度消息
+        /// </summary>
+        /// <param name="ipcMessageResult"></param>
+        private void DispatchMessage(IpcMessageResult ipcMessageResult)
+        {
+            var success = ipcMessageResult.Success;
+            var ipcMessageContext = ipcMessageResult.IpcMessageContext;
+            var ipcMessageCommandType = ipcMessageResult.IpcMessageCommandType;
+
+            if (!success)
+            {
+                // 没有成功哇
+                return;
+            }
+
+            var stream = new ByteListMessageStream(ipcMessageContext);
+
+            if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.PeerRegister))
+            {
+                var isPeerRegisterMessage =
+                IpcContext.PeerRegisterProvider.TryParsePeerRegisterMessage(stream, out var peerName);
+
+                if (IsConnected)
+                {
+                    // 对方是不是挂了？居然重复注册
+                    // 注册的逻辑可是框架层做的哦，业务层可决定不了
+                    // 可能存在的原因是注册的时候，本进程太忙碌，于是对方连续给了两条注册消息过来，这也是预期的
+
+                    if (string.Equals(PeerName, peerName))
+                    {
+                        // 也许是对方发送两条注册消息过来
+                    }
+                    else
+                    {
+                        // 对方想改名而已
+                    }
+                }
+
+                if (isPeerRegisterMessage)
+                {
+                    PeerName = peerName;
+
+                    OnPeerConnected(new IpcInternalPeerConnectedArgs(peerName, Stream, ipcMessageContext.Ack,
+                        this));
+
+                    if (string.IsNullOrEmpty(peerName))
+                    {
+                        // 这难道是 lsj 的号？居然名字是空的
+                    }
+                }
+                else
+                {
+                    // 版本不对？消息明明是说注册的，然而解析失败
+                }
+            }
+            // 只有业务的才能发给上层
+            else if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.Business))
+            {
+                if (IsConnected)
+                {
+                    OnMessageReceived(new PeerMessageArgs(PeerName, stream, ipcMessageContext.Ack, ipcMessageCommandType));
+                }
+                else
+                {
+                    // 还没注册完成哇
+                }
+            }
+            else
+            {
+                // 不知道这是啥消息哇
+                // 但是更新一下 ack 意思一下还可以
+                OnAckReceived(new AckArgs(PeerName, ipcMessageContext.Ack));
+            }
+        }
+
+#if false // 下面是注释的代码
         private async Task WaitForConnectionAsync()
         {
             while (!_isDisposed)
@@ -199,6 +309,16 @@ namespace dotnetCampus.Ipc.PipeCore
             }
         }
 
+        [Obsolete(DebugContext.DoNotUseAck)]
+        private void OnAckRequested(in Ack e)
+        {
+            throw new NotSupportedException(DebugContext.DoNotUseAck);
+
+            Logger.Debug($"[{nameof(ServerStreamMessageReader)}][{nameof(OnAckRequested)}] 请求回复 Ack 消息 {e}");
+            AckRequested?.Invoke(this, e);
+        }
+#endif
+
         /// <summary>
         /// 对方连接断开
         /// </summary>
@@ -219,15 +339,16 @@ namespace dotnetCampus.Ipc.PipeCore
             PeerConnected?.Invoke(this, e);
         }
 
-        private void OnAckRequested(in Ack e)
-        {
-            Logger.Debug($"[{nameof(ServerStreamMessageReader)}][{nameof(OnAckRequested)}] 请求回复 Ack 消息 {e}");
-            AckRequested?.Invoke(this, e);
-        }
-
         ~ServerStreamMessageReader()
         {
-            Dispose(false);
+            try
+            {
+                Dispose(false);
+            }
+            catch (Exception)
+            {
+                // 如果在此抛出，那么进程将会退出
+            }
         }
 
         protected virtual void Dispose(bool disposing)
@@ -252,5 +373,10 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             PeerConnectBroke?.Invoke(this, e);
         }
+    }
+
+    class DebugContext
+    {
+        public const string DoNotUseAck = "当前不再需要回复ACK信息，因为管道通讯形式是不需要获取对方是否收到";
     }
 }
