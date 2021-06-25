@@ -41,7 +41,10 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <summary>
         /// 开启的管道服务端，用于接收消息
         /// </summary>
-        public IpcServerService IpcServerService { private set; get; } = null!;
+        public IpcServerService IpcServerService
+        {
+            get => _ipcServerService!;
+        }
 
         /// <summary>
         /// 启动服务，启动之后将可以被对方连接。此方法几乎不会返回
@@ -49,10 +52,10 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <returns></returns>
         public async void StartServer()
         {
-            if (IpcServerService != null!) return;
+            if (_ipcServerService != null) return;
 
             var ipcServerService = new IpcServerService(IpcContext);
-            IpcServerService = ipcServerService;
+            _ipcServerService = ipcServerService;
 
             ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
 
@@ -81,7 +84,7 @@ namespace dotnetCampus.Ipc.PipeCore
         private async Task ConnectBackToPeer(IpcInternalPeerConnectedArgs e)
         {
             var peerName = e.PeerName;
-            var receivedAck = e.Ack;
+            //var receivedAck = e.Ack;
 
             if (PeerManager.ConnectedServerManagerList.TryGetValue(peerName, out _))
             {
@@ -205,5 +208,7 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcServerService.Dispose();
             PeerManager.Dispose();
         }
+
+        private IpcServerService? _ipcServerService;
     }
 }
