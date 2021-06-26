@@ -18,10 +18,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Margin="10,10,10,10" Text="{Binding Path=PeerName}" />
-        <ListView x:Name="MessageListView" Grid.Row="1" ItemsSource="{Binding Path=MessageList}">
+        <ListView x:Name="MessageListView" Grid.Row="1" ItemsSource="{Binding Path=MessageList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding}" />
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

@@ -72,7 +72,16 @@ namespace dotnetCampus.Ipc.PipeCore
             // 也许是对方反过来连接
             if (PeerManager.ConnectedServerManagerList.TryGetValue(e.PeerName, out var peerProxy))
             {
-                peerProxy.Update(e);
+                if (peerProxy.IsBroken)
+                {
+                    // 理论上不会进入这个分支，因为如果 IsBroken 将会自动去清理，除非刚好一个断开，然后立刻连接
+                    PeerManager.RemovePeerProxy(peerProxy);
+                    await ConnectBackToPeer(e);
+                }
+                else
+                {
+                    peerProxy.Update(e);
+                }
             }
             else
             {

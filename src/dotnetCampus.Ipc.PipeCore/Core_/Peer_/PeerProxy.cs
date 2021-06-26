@@ -71,6 +71,8 @@ namespace dotnetCampus.Ipc.PipeCore
         /// 框架内使用
         internal IpcClientService IpcClientService { get; }
 
+        internal bool IsBroken { get; private set; }
+
         /// <summary>
         /// 获取是否连接完成，也就是可以读取，可以发送
         /// </summary>
@@ -125,6 +127,9 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void OnPeerConnectionBroken(IPeerConnectionBrokenArgs e)
         {
+            IsBroken = true;
+            IpcClientService.Dispose();
+
             PeerConnectionBroken?.Invoke(this, e);
         }
     }

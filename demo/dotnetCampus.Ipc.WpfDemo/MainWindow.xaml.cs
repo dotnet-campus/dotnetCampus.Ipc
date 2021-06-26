@@ -86,12 +86,17 @@ namespace dotnetCampus.Ipc.WpfDemo
             Dispatcher.InvokeAsync(() =>
             {
                 Log($"收到 {peer.PeerName} 连接");
-                if (ConnectedPeerModelList.All(temp => !ReferenceEquals(temp.Peer, peer)))
-                {
-                    ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
 
-                    peer.PeerConnectionBroken += Peer_PeerConnectBroke;
+                var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
+                if (currentPeer != null)
+                {
+                    currentPeer.Peer.PeerConnectionBroken -= Peer_PeerConnectBroke;
+                    ConnectedPeerModelList.Remove(currentPeer);
                 }
+
+                ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
+
+                peer.PeerConnectionBroken += Peer_PeerConnectBroke;
             });
         }
 
