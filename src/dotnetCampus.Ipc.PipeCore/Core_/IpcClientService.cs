@@ -215,9 +215,17 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <inheritdoc />
         public void Dispose()
         {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            IsDisposed = true;
             NamedPipeClientStream.Dispose();
             DoubleBufferTask.Finish();
         }
+
+        private bool IsDisposed { set; get; }
 
         Task IClientMessageWriter.WriteMessageAsync(in IpcBufferMessageContext ipcBufferMessageContext) =>
             WriteMessageAsync(ipcBufferMessageContext);
