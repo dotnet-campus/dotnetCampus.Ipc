@@ -26,8 +26,6 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcMessageRequestManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
-
-
         internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs, IpcContext ipcContext) :
             this(peerName, ipcClientService, ipcContext)
         {
@@ -62,7 +60,6 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <inheritdoc />
         public event EventHandler<IPeerConnectionBrokenArgs>? PeerConnectionBroken;
 
-
         /// <summary>
         /// 用于写入数据
         /// </summary>
@@ -73,6 +70,8 @@ namespace dotnetCampus.Ipc.PipeCore
         /// </summary>
         /// 框架内使用
         internal IpcClientService IpcClientService { get; }
+
+        internal bool IsBroken { get; private set; }
 
         /// <summary>
         /// 获取是否连接完成，也就是可以读取，可以发送
@@ -110,7 +109,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectionBrokenArgs e)
         {
-            OnPeerConnectBroke(e);
+            OnPeerConnectionBroken(e);
         }
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
@@ -126,8 +125,11 @@ namespace dotnetCampus.Ipc.PipeCore
             ipcRequestHandlerProvider.HandleRequest(this, e);
         }
 
-        private void OnPeerConnectBroke(IPeerConnectionBrokenArgs e)
+        private void OnPeerConnectionBroken(IPeerConnectionBrokenArgs e)
         {
+            IsBroken = true;
+            IpcClientService.Dispose();
+
             PeerConnectionBroken?.Invoke(this, e);
         }
     }

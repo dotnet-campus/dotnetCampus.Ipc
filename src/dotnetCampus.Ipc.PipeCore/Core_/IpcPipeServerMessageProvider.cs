@@ -36,7 +36,13 @@ namespace dotnetCampus.Ipc.PipeCore
             var namedPipeServerStream = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 250);
             NamedPipeServerStream = namedPipeServerStream;
 
+#if NETCOREAPP
             await namedPipeServerStream.WaitForConnectionAsync();
+#else
+            await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
+                namedPipeServerStream.EndWaitForConnection, null);
+#endif
+
 
             //var streamMessageConverter = new StreamMessageConverter(namedPipeServerStream,
             //    IpcConfiguration.MessageHeader, IpcConfiguration.SharedArrayPool);
@@ -47,7 +53,7 @@ namespace dotnetCampus.Ipc.PipeCore
             var serverStreamMessageConverter = new ServerStreamMessageReader(IpcContext, NamedPipeServerStream);
             ServerStreamMessageReader = serverStreamMessageConverter;
 
-            serverStreamMessageConverter.AckRequested += ServerStreamMessageConverter_AckRequested;
+            //serverStreamMessageConverter.AckRequested += ServerStreamMessageConverter_AckRequested;
             serverStreamMessageConverter.AckReceived += IpcContext.AckManager.OnAckReceived;
             serverStreamMessageConverter.PeerConnected += IpcServerService.OnPeerConnected;
             serverStreamMessageConverter.MessageReceived += IpcServerService.OnMessageReceived;
@@ -55,13 +61,16 @@ namespace dotnetCampus.Ipc.PipeCore
             serverStreamMessageConverter.Run();
         }
 
+        /*
         private void ServerStreamMessageConverter_AckRequested(object? sender, Ack e)
         {
             SendAck(e);
         }
+        */
 
         private ServerStreamMessageReader ServerStreamMessageReader { set; get; } = null!;
 
+        /*
         private async void SendAck(Ack receivedAck) => await SendAckAsync(receivedAck);
 
         private async Task SendAckAsync(Ack receivedAck)
@@ -72,6 +81,7 @@ namespace dotnetCampus.Ipc.PipeCore
             var ipcClient = peerProxy.IpcClientService;
             await ipcClient.SendAckAsync(receivedAck);
         }
+        */
 
         public void Dispose()
         {

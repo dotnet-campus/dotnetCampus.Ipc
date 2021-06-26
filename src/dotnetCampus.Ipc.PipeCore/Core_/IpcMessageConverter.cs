@@ -71,8 +71,9 @@ namespace dotnetCampus.Ipc.PipeCore
              * byte[] Content        实际的内容
              */
 
-            // 当前版本默认是 0 版本，这个值用来后续如果有协议上的更改时，兼容旧版本使用
-            const uint version = 0;
+            // 当前版本默认是 1 版本，这个值用来后续如果有协议上的更改时，兼容旧版本使用
+            // - 版本是 0 的版本，每条消息都有回复 ack 的值
+            const uint version = 1;
 
             var asyncBinaryWriter = new AsyncBinaryWriter(stream);
             var messageHeaderLength = (ushort) messageHeader.Length;
@@ -116,7 +117,12 @@ namespace dotnetCampus.Ipc.PipeCore
             var binaryReader = new AsyncBinaryReader(stream);
             // UInt32 Version        当前IPC服务的版本
             var version = await binaryReader.ReadUInt32Async();
-            Debug.Assert(version == 0);
+            Debug.Assert(version == 1);
+            if (version == 0)
+            {
+                // 这是上个版本的，但是不兼容了
+                return new IpcMessageResult("收到版本为 0 的旧版本消息，但是不兼容此版本");
+            }
 
             // UInt64 Ack            用于给对方确认收到消息使用
             var ack = await binaryReader.ReadReadUInt64Async();

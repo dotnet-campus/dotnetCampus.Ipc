@@ -8,6 +8,8 @@ using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.PipeCore
 {
+    /*
+     当前不使用 ACK 啦，所以这个单元测试跑不过
     [TestClass]
     public class AckManagerTest
     {
@@ -84,4 +86,5 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private AckManager AckManager { get; } = new AckManager(new IpcContext(new IpcProvider(), "123123"));
     }
+    */
 }

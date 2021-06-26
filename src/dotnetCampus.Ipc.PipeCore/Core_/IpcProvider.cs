@@ -41,7 +41,10 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <summary>
         /// 开启的管道服务端，用于接收消息
         /// </summary>
-        public IpcServerService IpcServerService { private set; get; } = null!;
+        public IpcServerService IpcServerService
+        {
+            get => _ipcServerService!;
+        }
 
         /// <summary>
         /// 启动服务，启动之后将可以被对方连接。此方法几乎不会返回
@@ -49,10 +52,10 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <returns></returns>
         public async void StartServer()
         {
-            if (IpcServerService != null) return;
+            if (_ipcServerService != null) return;
 
             var ipcServerService = new IpcServerService(IpcContext);
-            IpcServerService = ipcServerService;
+            _ipcServerService = ipcServerService;
 
             ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
 
@@ -69,7 +72,16 @@ namespace dotnetCampus.Ipc.PipeCore
             // 也许是对方反过来连接
             if (PeerManager.ConnectedServerManagerList.TryGetValue(e.PeerName, out var peerProxy))
             {
-                peerProxy.Update(e);
+                if (peerProxy.IsBroken)
+                {
+                    // 理论上不会进入这个分支，因为如果 IsBroken 将会自动去清理，除非刚好一个断开，然后立刻连接
+                    PeerManager.RemovePeerProxy(peerProxy);
+                    await ConnectBackToPeer(e);
+                }
+                else
+                {
+                    peerProxy.Update(e);
+                }
             }
             else
             {
@@ -81,7 +93,7 @@ namespace dotnetCampus.Ipc.PipeCore
         private async Task ConnectBackToPeer(IpcInternalPeerConnectedArgs e)
         {
             var peerName = e.PeerName;
-            var receivedAck = e.Ack;
+            //var receivedAck = e.Ack;
 
             if (PeerManager.ConnectedServerManagerList.TryGetValue(peerName, out _))
             {
@@ -93,10 +105,16 @@ namespace dotnetCampus.Ipc.PipeCore
                 // 无须再次启动本地的服务器端，因为有对方连接过来，此时一定开启了本地的服务器端
                 var ipcClientService = new IpcClientService(IpcContext, peerName);
 
-                // 此时不需要向对方注册，因为对方知道本地的存在，是对方主动连接本地
-                var shouldRegisterToPeer = false;
-                await ipcClientService.Start(shouldRegisterToPeer: shouldRegisterToPeer);
+                // 此时向对方注册，让对方重新触发逻辑
+                var shouldRegisterToPeer = true;
+                var task = ipcClientService.Start(shouldRegisterToPeer: shouldRegisterToPeer);
 
+                // 此时就建立完成了链接
+                CreatePeerProxy(ipcClientService);
+                // 先建立链接再继续发送注册，解决多进程同时注册
+                await task;
+
+                /*
                 SendAckAndRegisterToPeer();
 
                 // 发送 ack 同时注册自身
@@ -125,6 +143,8 @@ namespace dotnetCampus.Ipc.PipeCore
                     // 此时就建立完成了链接
                     CreatePeerProxy(ipcClientService);
                 }
+                */
+
             }
 
             void CreatePeerProxy(IpcClientService ipcClientService)
@@ -197,5 +217,7 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcServerService.Dispose();
             PeerManager.Dispose();
         }
+
+        private IpcServerService? _ipcServerService;
     }
 }

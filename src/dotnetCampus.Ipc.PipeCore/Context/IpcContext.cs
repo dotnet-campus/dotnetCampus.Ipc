@@ -23,7 +23,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
             IpcProvider = ipcProvider;
             PipeName = pipeName;
 
-            AckManager = new AckManager(this);
+            AckManager = new AckManager();
             IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
