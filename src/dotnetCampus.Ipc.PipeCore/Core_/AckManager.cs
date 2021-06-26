@@ -12,12 +12,14 @@ namespace dotnetCampus.Ipc.PipeCore
     {
         private ulong _currentAck;
 
+        /*
         public AckManager(IpcContext ipcContext)
         {
             IpcContext = ipcContext;
         }
 
         private IpcContext IpcContext { get; }
+        */
 
         public Ack CurrentAck
         {
@@ -59,6 +61,7 @@ namespace dotnetCampus.Ipc.PipeCore
             }
         }
 
+        /*
         /// <summary>
         /// 后续不单独发送 ACK 了，因此就不再需要这个信息了
         /// </summary>
@@ -67,6 +70,7 @@ namespace dotnetCampus.Ipc.PipeCore
         public byte[] AckHeader { get; } = { 0x41, 0x43, 0x4B };
 
         private object Locker => AckHeader;
+        */
 
         public Ack GetAck()
         {
@@ -83,7 +87,8 @@ namespace dotnetCampus.Ipc.PipeCore
             return CurrentAck;
         }
 
-        /*public bool IsAckMessage(Stream stream, out Ack ack)
+        /*
+        public bool IsAckMessage(Stream stream, out Ack ack)
         {
             var position = stream.Position;
             if (IsAckMessageInner(stream, out ack))
@@ -93,7 +98,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             stream.Position = position;
             return false;
-        }*/
+        }
 
         /// <summary>
         /// 后续不单独发送 ACK 了，因此就不再需要这个信息了
@@ -123,7 +128,7 @@ namespace dotnetCampus.Ipc.PipeCore
             return buffer;
         }
 
-        /*private bool IsAckMessageInner(Stream stream, out Ack ack)
+        private bool IsAckMessageInner(Stream stream, out Ack ack)
         {
             /*
              * AckHeader
@@ -159,7 +164,7 @@ namespace dotnetCampus.Ipc.PipeCore
             }
 
             return true;
-        }*/
+        }
 
         /// <summary>
         /// 执行任务，直到收到回复才返回或超时等
@@ -251,10 +256,13 @@ namespace dotnetCampus.Ipc.PipeCore
             }
         }
 
+        private Dictionary<ulong, AckTask> AckTaskList { get; } = new Dictionary<ulong, AckTask>();
+
+        */
         internal void OnAckReceived(object? sender, AckArgs e)
         {
             CurrentAck = e.Ack;
-            return;
+            /*
             // 其他的也不用干了
 
             AckTask ackTask;
@@ -277,8 +285,7 @@ namespace dotnetCampus.Ipc.PipeCore
             {
                 // 不是发生给这个客户端的，只是 ack 相同，这个类被改错
             }
+            */
         }
-
-        private Dictionary<ulong, AckTask> AckTaskList { get; } = new Dictionary<ulong, AckTask>();
     }
 }
