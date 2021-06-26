@@ -26,8 +26,6 @@ namespace dotnetCampus.Ipc.PipeCore
             IpcMessageRequestManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
-
-
         internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcInternalPeerConnectedArgs ipcInternalPeerConnectedArgs, IpcContext ipcContext) :
             this(peerName, ipcClientService, ipcContext)
         {
@@ -61,7 +59,6 @@ namespace dotnetCampus.Ipc.PipeCore
 
         /// <inheritdoc />
         public event EventHandler<IPeerConnectionBrokenArgs>? PeerConnectionBroken;
-
 
         /// <summary>
         /// 用于写入数据
@@ -110,7 +107,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectionBrokenArgs e)
         {
-            OnPeerConnectBroke(e);
+            OnPeerConnectionBroken(e);
         }
 
         private void ServerStreamMessageReader_MessageReceived(object? sender, PeerMessageArgs e)
@@ -126,7 +123,7 @@ namespace dotnetCampus.Ipc.PipeCore
             ipcRequestHandlerProvider.HandleRequest(this, e);
         }
 
-        private void OnPeerConnectBroke(IPeerConnectionBrokenArgs e)
+        private void OnPeerConnectionBroken(IPeerConnectionBrokenArgs e)
         {
             PeerConnectionBroken?.Invoke(this, e);
         }
