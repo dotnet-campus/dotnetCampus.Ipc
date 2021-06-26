@@ -32,11 +32,13 @@ namespace dotnetCampus.Ipc.PipeCore
         private IpcConfiguration IpcConfiguration => IpcContext.IpcConfiguration;
         private Stream Stream { get; }
 
+        /*
         /// <summary>
         /// 请求发送回复的 ack 消息
         /// </summary>
         [Obsolete(DebugContext.DoNotUseAck)]
         internal event EventHandler<Ack>? AckRequested;
+        */
 
         /// <summary>
         /// 当收到对方确定收到消息时触发

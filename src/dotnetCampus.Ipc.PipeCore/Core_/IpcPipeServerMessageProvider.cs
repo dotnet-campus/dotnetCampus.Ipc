@@ -36,7 +36,13 @@ namespace dotnetCampus.Ipc.PipeCore
             var namedPipeServerStream = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 250);
             NamedPipeServerStream = namedPipeServerStream;
 
+#if NETCOREAPP
             await namedPipeServerStream.WaitForConnectionAsync();
+#else
+            await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
+                namedPipeServerStream.EndWaitForConnection, null);
+#endif
+
 
             //var streamMessageConverter = new StreamMessageConverter(namedPipeServerStream,
             //    IpcConfiguration.MessageHeader, IpcConfiguration.SharedArrayPool);

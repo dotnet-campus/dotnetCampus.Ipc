@@ -66,8 +66,9 @@ namespace dotnetCampus.Ipc.PipeCore
 
         public void Dispose()
         {
-            foreach (var (_, peer) in ConnectedServerManagerList)
+            foreach (var pair in ConnectedServerManagerList)
             {
+                var peer = pair.Value;
                 // 为什么 PeerProxy 不加上 IDisposable 方法
                 // 因为这个类在上层业务使用，被上层业务调释放就可以让框架不能使用
                 peer.IpcClientService.Dispose();

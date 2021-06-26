@@ -50,7 +50,8 @@ namespace dotnetCampus.Ipc.WpfDemo.View
         private async void SendButton_OnClick(object sender, RoutedEventArgs e)
         {
             ConnectedPeerModel.AddMessage(ServerName, MessageTextBox.Text);
-            await ConnectedPeerModel.Peer.IpcMessageWriter.WriteMessageAsync(MessageTextBox.Text, "CharPage").ConfigureAwait(false);
+            await ConnectedPeerModel.Peer.IpcMessageWriter.WriteMessageAsync(MessageTextBox.Text, "CharPage")
+                .ConfigureAwait(false);
         }
     }
 }

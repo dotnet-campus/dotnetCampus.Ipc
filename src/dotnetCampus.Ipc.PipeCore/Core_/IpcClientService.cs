@@ -79,7 +79,14 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.InOut,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
+#if NETCOREAPP
             await namedPipeClientStream.ConnectAsync();
+#else
+            // 使用 Yield 释放方法，解决在 UI 上调用 await Start 方法在 Connect 等待
+            await Task.Yield();
+            // 在 NET45 没有 ConnectAsync 方法
+            namedPipeClientStream.Connect();
+#endif
 
             NamedPipeClientStream = namedPipeClientStream;
 
