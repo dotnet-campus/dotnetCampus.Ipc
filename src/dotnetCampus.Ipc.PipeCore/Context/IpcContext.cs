@@ -61,19 +61,4 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         /// </summary>
         internal Ack AckUsedForReply { get; } = new Ack(ulong.MaxValue);
     }
-
-    class IpcLogger : ILogger
-    {
-        public IpcLogger(IpcContext ipcContext)
-        {
-            IpcContext = ipcContext;
-        }
-
-        public override string ToString()
-        {
-            return $"[{IpcContext.PipeName}]";
-        }
-
-        private IpcContext IpcContext { get; }
-    }
 }
