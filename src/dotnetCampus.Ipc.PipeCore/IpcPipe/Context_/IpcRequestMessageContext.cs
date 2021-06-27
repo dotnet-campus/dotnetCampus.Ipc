@@ -8,9 +8,10 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
     class IpcRequestMessageContext : IIpcRequestContext
     {
         [DebuggerStepThrough]
-        public IpcRequestMessageContext(IpcBufferMessage ipcBufferMessage)
+        public IpcRequestMessageContext(IpcBufferMessage ipcBufferMessage, IPeerProxy peer)
         {
             IpcBufferMessage = ipcBufferMessage;
+            Peer = peer;
         }
 
         /// <inheritdoc />
@@ -18,5 +19,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
 
         /// <inheritdoc />
         public IpcBufferMessage IpcBufferMessage { get; }
+
+        public IPeerProxy Peer { get; }
     }
 }

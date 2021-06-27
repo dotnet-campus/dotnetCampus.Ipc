@@ -18,23 +18,25 @@ namespace dotnetCampus.Ipc.Tests
         [ContractTestCase]
         public void SendAndGetResponse()
         {
-            "发送消息到另一个IPC服务，可以等待收到对方的返回值".Test(async () =>
+            "发送消息到另一个 IPC 服务，可以等待收到对方的返回值".Test(async () =>
             {
                 var ipcAName = Guid.NewGuid().ToString("N");
                 var ipcBName = Guid.NewGuid().ToString("N");
-                var requestByteList = new byte[] { 0xFF, 0xFE };
-                var responseByteList = new byte[] { 0xF1, 0xF2 };
+                var requestByteList = new byte[] {0xFF, 0xFE};
+                var responseByteList = new byte[] {0xF1, 0xF2};
 
-                var ipcA = new IpcProvider(ipcAName);
-                var ipcB = new IpcProvider(ipcBName, new IpcConfiguration()
+                using var ipcA = new IpcProvider(ipcAName);
+                using var ipcB = new IpcProvider(ipcBName, new IpcConfiguration()
                 {
                     DefaultIpcRequestHandler = new DelegateIpcRequestHandler(c =>
                     {
+                        Assert.AreEqual(ipcAName, c.Peer.PeerName);
                         c.Handle = true;
                         var span = c.IpcBufferMessage.AsSpan();
                         Assert.AreEqual(true, span.SequenceEqual(requestByteList));
 
-                        return new IpcHandleRequestMessageResult(new IpcRequestMessage("Return", new IpcBufferMessage(responseByteList)));
+                        return new IpcHandleRequestMessageResult(new IpcRequestMessage("Return",
+                            new IpcBufferMessage(responseByteList)));
                     })
                 });
                 ipcA.StartServer();
@@ -42,7 +44,8 @@ namespace dotnetCampus.Ipc.Tests
 
                 var bPeer = await ipcA.GetAndConnectToPeerAsync(ipcBName);
                 // 从 A 发送消息给到 B 然后可以收到从 B 返回的消息
-                var response = await bPeer.GetResponseAsync(new IpcRequestMessage("发送", new IpcBufferMessage(requestByteList)));
+                var response =
+                    await bPeer.GetResponseAsync(new IpcRequestMessage("发送", new IpcBufferMessage(requestByteList)));
                 Assert.AreEqual(true, response.AsSpan().SequenceEqual(responseByteList));
             });
         }
@@ -53,7 +56,7 @@ namespace dotnetCampus.Ipc.Tests
             "发送消息之后，能等待收到对应的回复".Test(() =>
             {
                 var ipcMessageRequestManager = new IpcMessageRequestManager();
-                var requestByteList = new byte[] { 0xFF, 0xFE };
+                var requestByteList = new byte[] {0xFF, 0xFE};
                 var request = new IpcRequestMessage("Tests", new IpcBufferMessage(requestByteList));
                 var ipcClientRequestMessage = ipcMessageRequestManager.CreateRequestMessage(request);
                 Assert.AreEqual(false, ipcClientRequestMessage.Task.IsCompleted);
@@ -67,14 +70,18 @@ namespace dotnetCampus.Ipc.Tests
                 };
 
                 Assert.IsNotNull(requestStream);
-                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", requestStream, ack: 100, IpcMessageCommandType.RequestMessage));
+                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", requestStream, ack: 100,
+                    IpcMessageCommandType.RequestMessage));
 
                 Assert.IsNotNull(ipcClientRequestArgs);
-                var responseByteList = new byte[] { 0xF1, 0xF2 };
+                var responseByteList = new byte[] {0xF1, 0xF2};
                 var ipcMessageResponseManager = new IpcMessageResponseManager();
-                var responseMessageContext = ipcMessageResponseManager.CreateResponseMessage(ipcClientRequestArgs.MessageId, new IpcRequestMessage("Tests", new IpcBufferMessage(responseByteList)));
+                var responseMessageContext = ipcMessageResponseManager.CreateResponseMessage(
+                    ipcClientRequestArgs.MessageId,
+                    new IpcRequestMessage("Tests", new IpcBufferMessage(responseByteList)));
                 var responseStream = IpcBufferMessageContextToStream(responseMessageContext);
-                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", responseStream, ack: 100, IpcMessageCommandType.ResponseMessage));
+                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", responseStream, ack: 100,
+                    IpcMessageCommandType.ResponseMessage));
 
                 Assert.AreEqual(true, ipcClientRequestMessage.Task.IsCompleted);
             });

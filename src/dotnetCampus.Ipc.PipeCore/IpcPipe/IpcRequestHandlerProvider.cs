@@ -27,11 +27,11 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
         public async void HandleRequest(PeerProxy sender, IpcClientRequestArgs args)
         {
             var requestMessage = args.IpcBufferMessage;
+            var peerProxy = sender;
 
-            var ipcRequestContext = new IpcRequestMessageContext(requestMessage);
+            var ipcRequestContext = new IpcRequestMessageContext(requestMessage, peerProxy);
 
             // 处理消息
-            var peerProxy = sender;
             // 优先从 Peer 里面找处理的方法，这样上层可以对某个特定的 Peer 做不同的处理
             // Todo 需要设计这部分 API 现在因为没有 API 的设计，先全部走 DefaultIpcRequestHandler 的逻辑
             IIpcRequestHandler ipcRequestHandler = IpcContext.IpcConfiguration.DefaultIpcRequestHandler;

@@ -13,7 +13,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         /// 创建基于委托的 IPC 请求处理
         /// </summary>
         /// <param name="handler"></param>
-        public DelegateIpcRequestHandler(Func<IIpcRequestContext,Task<IIpcHandleRequestMessageResult>> handler)
+        public DelegateIpcRequestHandler(Func<IIpcRequestContext, Task<IIpcHandleRequestMessageResult>> handler)
         {
             _handler = handler;
         }
@@ -21,7 +21,7 @@ namespace dotnetCampus.Ipc.PipeCore.Context
         /// <summary>
         /// 创建基于委托的 IPC 请求处理
         /// </summary>
-        public DelegateIpcRequestHandler(Func<IIpcRequestContext,IIpcHandleRequestMessageResult> handler)
+        public DelegateIpcRequestHandler(Func<IIpcRequestContext, IIpcHandleRequestMessageResult> handler)
         {
             _handler = c => Task.FromResult(handler(c));
         }
@@ -31,6 +31,6 @@ namespace dotnetCampus.Ipc.PipeCore.Context
             return _handler(requestContext);
         }
 
-        private readonly Func<IIpcRequestContext,Task<IIpcHandleRequestMessageResult>> _handler;
+        private readonly Func<IIpcRequestContext, Task<IIpcHandleRequestMessageResult>> _handler;
     }
 }

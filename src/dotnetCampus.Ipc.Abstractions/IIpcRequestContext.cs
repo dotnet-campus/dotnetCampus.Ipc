@@ -16,5 +16,10 @@ namespace dotnetCampus.Ipc.Abstractions
         /// 收到客户端发生过来的消息
         /// </summary>
         IpcBufferMessage IpcBufferMessage { get; }
+
+        /// <summary>
+        /// 发送请求的对方
+        /// </summary>
+        IPeerProxy Peer { get; }
     }
 }
