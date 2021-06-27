@@ -18,18 +18,10 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             logger.Debug($"[{nameof(IpcMessageConverter)}] Start Write {ipcBufferMessageContext.Summary}");
 
-            if (ipcBufferMessageContext.Length > IpcConfiguration.MaxMessageLength)
-            {
-                throw new ArgumentException($"Message Length too long  MessageLength={ipcBufferMessageContext.Length} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}")
-                {
-                    Data =
-                    {
-                        {"Message Length", ipcBufferMessageContext.Length}
-                    }
-                };
-            }
+            VerifyMessageLength(ipcBufferMessageContext.Length);
 
-            var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, ipcBufferMessageContext.IpcMessageCommandType);
+            var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack,
+                ipcBufferMessageContext.IpcMessageCommandType);
 
             await binaryWriter.WriteAsync(ipcBufferMessageContext.Length);
             foreach (var ipcBufferMessage in ipcBufferMessageContext.IpcBufferMessageList)
@@ -46,12 +38,25 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             logger.Debug($"[{nameof(IpcMessageConverter)}] Start Write {summary}");
 
+            VerifyMessageLength(count);
+
             var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, ipcMessageCommandType);
 
             await binaryWriter.WriteAsync(count);
             await stream.WriteAsync(buffer, offset, count);
 
             logger.Debug($"[{nameof(IpcMessageConverter)}] Finished Write {summary}");
+        }
+
+        private static void VerifyMessageLength(int messageLength)
+        {
+            if (messageLength > IpcConfiguration.MaxMessageLength)
+            {
+                throw new ArgumentException($"Message Length too long  MessageLength={messageLength} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}")
+                {
+                    Data = { { "Message Length", messageLength } }
+                };
+            }
         }
 
         public static async Task<AsyncBinaryWriter> WriteHeaderAsync(Stream stream, byte[] messageHeader, Ack ack,
@@ -127,7 +132,7 @@ namespace dotnetCampus.Ipc.PipeCore
             var empty = await binaryReader.ReadUInt32Async();
             Debug.Assert(empty == 0);
 
-            // UInt16 Command Type   命令类型，业务端的值将会是 0 而框架层采用其他值
+            // UInt16 Command Type   命令类型，业务端的值将会是大于 0 而框架层采用其他值
             var commandType = (IpcMessageCommandType) await binaryReader.ReadUInt16Async();
 
             // UInt32 Content Length 这条消息的内容长度
@@ -136,7 +141,8 @@ namespace dotnetCampus.Ipc.PipeCore
             if (messageLength > IpcConfiguration.MaxMessageLength)
             {
                 // 太长了
-                return new IpcMessageResult($"Message Length too long  MessageLength={messageLength} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}");
+                return new IpcMessageResult(
+                    $"Message Length too long  MessageLength={messageLength} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}");
             }
 
             var messageBuffer = sharedArrayPool.Rent((int) messageLength);
