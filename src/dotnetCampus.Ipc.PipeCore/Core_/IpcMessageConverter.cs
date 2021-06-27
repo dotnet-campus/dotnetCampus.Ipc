@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore.Context;
 using dotnetCampus.Ipc.PipeCore.Utils;
 using dotnetCampus.Ipc.PipeCore.Utils.Extensions;
@@ -18,6 +18,17 @@ namespace dotnetCampus.Ipc.PipeCore
         {
             logger.Debug($"[{nameof(IpcMessageConverter)}] Start Write {ipcBufferMessageContext.Summary}");
 
+            if (ipcBufferMessageContext.Length > IpcConfiguration.MaxMessageLength)
+            {
+                throw new ArgumentException($"Message Length too long  MessageLength={ipcBufferMessageContext.Length} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}")
+                {
+                    Data =
+                    {
+                        {"Message Length", ipcBufferMessageContext.Length}
+                    }
+                };
+            }
+
             var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, ipcBufferMessageContext.IpcMessageCommandType);
 
             await binaryWriter.WriteAsync(ipcBufferMessageContext.Length);
@@ -27,21 +38,6 @@ namespace dotnetCampus.Ipc.PipeCore
             }
 
             logger.Debug($"[{nameof(IpcMessageConverter)}] Finished Write {ipcBufferMessageContext.Summary}");
-        }
-
-        public static async Task WriteAsync(Stream stream, byte[] messageHeader, Ack ack,
-            IpcMessageCommandType ipcMessageCommandType,
-            IpcBufferMessage ipcBufferMessage, string? summary, ILogger logger)
-        {
-            logger.Debug($"[{nameof(IpcMessageConverter)}] Start Write {summary}");
-
-            var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, ipcMessageCommandType);
-
-            await binaryWriter.WriteAsync(ipcBufferMessage.Count);
-
-            await stream.WriteAsync(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Count);
-
-            logger.Debug($"[{nameof(IpcMessageConverter)}] Finished Write {summary}");
         }
 
         public static async Task WriteAsync(Stream stream, byte[] messageHeader, Ack ack,
@@ -95,8 +91,7 @@ namespace dotnetCampus.Ipc.PipeCore
         }
 
         public static async Task<IpcMessageResult> ReadAsync(Stream stream,
-            byte[] messageHeader, ISharedArrayPool sharedArrayPool,
-            int maxMessageLength = ushort.MaxValue * byte.MaxValue)
+            byte[] messageHeader, ISharedArrayPool sharedArrayPool)
         {
             /*
              * UInt16 Message Header Length 消息头的长度
@@ -138,11 +133,10 @@ namespace dotnetCampus.Ipc.PipeCore
             // UInt32 Content Length 这条消息的内容长度
             var messageLength = await binaryReader.ReadUInt32Async();
 
-            if (messageLength > maxMessageLength)
+            if (messageLength > IpcConfiguration.MaxMessageLength)
             {
                 // 太长了
-                return new IpcMessageResult(
-                    $"Message Length too long  MessageLength={messageLength} MaxMessageLength={maxMessageLength}");
+                return new IpcMessageResult($"Message Length too long  MessageLength={messageLength} MaxMessageLength={IpcConfiguration.MaxMessageLength}. {DebugContext.OverMaxMessageLength}");
             }
 
             var messageBuffer = sharedArrayPool.Rent((int) messageLength);

@@ -9,6 +9,14 @@ namespace dotnetCampus.Ipc.PipeCore.Context
     public class IpcConfiguration
     {
         /// <summary>
+        /// 消息内容允许最大的长度。超过这个长度，咋不上天
+        /// <para>
+        /// 如果真有那么大的内容准备传的，自己开共享内存或写文件等方式传输，然后通过 IPC 告知对方如何获取即可
+        /// </para>
+        /// </summary>
+        public const int MaxMessageLength = ushort.MaxValue * byte.MaxValue;
+
+        /// <summary>
         /// 用于内部使用的数组分配池
         /// </summary>
         public ISharedArrayPool SharedArrayPool { get; set; } = new SharedArrayPool();
