@@ -42,6 +42,10 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
         private Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>> TaskList { get; } =
             new Dictionary<ulong, TaskCompletionSource<IpcBufferMessage>>();
 
+        /// <summary>
+        /// 收到消息，包括收到别人的请求消息，和收到别人的响应消息
+        /// </summary>
+        /// <param name="args"></param>
         public void OnReceiveMessage(PeerMessageArgs args)
         {
             HandleResponse(args);
