@@ -1,4 +1,5 @@
-﻿using dotnetCampus.Ipc.Utils;
+﻿using dotnetCampus.Ipc.Abstractions;
+using dotnetCampus.Ipc.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MSTest.Extensions.Contracts;
 

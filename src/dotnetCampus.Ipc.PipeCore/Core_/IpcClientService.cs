@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.PipeCore.Context;
 using dotnetCampus.Ipc.PipeCore.Utils;
 using dotnetCampus.Ipc.PipeCore.Utils.Extensions;
@@ -11,11 +12,6 @@ using dotnetCampus.Threading;
 
 namespace dotnetCampus.Ipc.PipeCore
 {
-    internal interface IClientMessageWriter : IMessageWriter
-    {
-        Task WriteMessageAsync(in IpcBufferMessageContext ipcBufferMessageContext);
-    }
-
     /// <summary>
     /// 管道的客户端，用于发送消息
     /// </summary>

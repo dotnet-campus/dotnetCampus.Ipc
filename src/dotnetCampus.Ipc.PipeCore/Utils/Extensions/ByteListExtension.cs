@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.Ipc.PipeCore.Utils
+﻿namespace dotnetCampus.Ipc.PipeCore.Utils.Extensions
 {
     internal static class ByteListExtension
     {

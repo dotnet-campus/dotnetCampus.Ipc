@@ -1,4 +1,4 @@
-﻿namespace dotnetCampus.Ipc.Utils
+﻿namespace dotnetCampus.Ipc.Abstractions
 {
     /// <summary>
     /// 对象序列化器
