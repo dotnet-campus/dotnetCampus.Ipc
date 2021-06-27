@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Abstractions;
 using dotnetCampus.Ipc.Abstractions.Context;
 using dotnetCampus.Ipc.PipeCore;
 using dotnetCampus.Ipc.PipeCore.Context;
 using dotnetCampus.Ipc.PipeCore.IpcPipe;
+using dotnetCampus.Ipc.PipeCore.Utils.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MSTest.Extensions.Contracts;
 
@@ -13,6 +15,38 @@ namespace dotnetCampus.Ipc.Tests
     [TestClass]
     public class ResponseManagerTests
     {
+        [ContractTestCase]
+        public void SendAndGetResponse()
+        {
+            "发送消息到另一个IPC服务，可以等待收到对方的返回值".Test(async () =>
+            {
+                var ipcAName = Guid.NewGuid().ToString("N");
+                var ipcBName = Guid.NewGuid().ToString("N");
+                var requestByteList = new byte[] { 0xFF, 0xFE };
+                var responseByteList = new byte[] { 0xF1, 0xF2 };
+
+                var ipcA = new IpcProvider(ipcAName);
+                var ipcB = new IpcProvider(ipcBName, new IpcConfiguration()
+                {
+                    DefaultIpcRequestHandler = new DelegateIpcRequestHandler(c =>
+                    {
+                        c.Handle = true;
+                        var span = c.IpcBufferMessage.AsSpan();
+                        Assert.AreEqual(true, span.SequenceEqual(requestByteList));
+
+                        return new IpcHandleRequestMessageResult(new IpcRequestMessage("Return", new IpcBufferMessage(responseByteList)));
+                    })
+                });
+                ipcA.StartServer();
+                ipcB.StartServer();
+
+                var bPeer = await ipcA.GetAndConnectToPeerAsync(ipcBName);
+                // 从 A 发送消息给到 B 然后可以收到从 B 返回的消息
+                var response = await bPeer.GetResponseAsync(new IpcRequestMessage("发送", new IpcBufferMessage(requestByteList)));
+                Assert.AreEqual(true, response.AsSpan().SequenceEqual(responseByteList));
+            });
+        }
+
         [ContractTestCase]
         public void GetResponseAsync()
         {

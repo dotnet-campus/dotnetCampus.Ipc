@@ -1,4 +1,5 @@
-﻿using dotnetCampus.Ipc.Abstractions.Context;
+﻿using System.Diagnostics;
+using dotnetCampus.Ipc.Abstractions.Context;
 
 namespace dotnetCampus.Ipc.Abstractions
 {
@@ -12,10 +13,19 @@ namespace dotnetCampus.Ipc.Abstractions
         /// </summary>
         /// <param name="summary"></param>
         /// <param name="requestMessage"></param>
+        [DebuggerStepThrough]
         public IpcRequestMessage(string summary, IpcBufferMessage requestMessage)
         {
             Summary = summary;
             RequestMessage = requestMessage;
+        }
+
+        /// <summary>
+        /// 创建 IPC 请求消息
+        /// </summary>
+        [DebuggerStepThrough]
+        public IpcRequestMessage(string summary, byte[] buffer):this(summary,new IpcBufferMessage(buffer))
+        {
         }
 
         /// <summary>

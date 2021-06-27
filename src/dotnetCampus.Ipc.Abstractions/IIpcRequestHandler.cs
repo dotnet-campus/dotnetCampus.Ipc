@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.Abstractions
+﻿using System.Threading.Tasks;
+
+namespace dotnetCampus.Ipc.Abstractions
 {
     /// <summary>
     /// 用于在服务器端处理客户端请求的处理器
@@ -10,6 +12,6 @@
         /// </summary>
         /// <param name="requestContext"></param>
         /// <returns></returns>
-        IIpcHandleRequestMessageResult HandleRequestMessage(IIpcRequestContext requestContext);
+        Task<IIpcHandleRequestMessageResult> HandleRequestMessage(IIpcRequestContext requestContext);
     }
 }

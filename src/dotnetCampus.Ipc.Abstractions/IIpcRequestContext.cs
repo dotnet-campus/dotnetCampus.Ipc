@@ -8,6 +8,11 @@ namespace dotnetCampus.Ipc.Abstractions
     public interface IIpcRequestContext
     {
         /// <summary>
+        /// 是否已处理
+        /// </summary>
+        bool Handle { get; set; }
+
+        /// <summary>
         /// 收到客户端发生过来的消息
         /// </summary>
         IpcBufferMessage IpcBufferMessage { get; }
