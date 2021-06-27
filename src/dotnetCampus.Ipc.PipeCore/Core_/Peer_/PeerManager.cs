@@ -19,7 +19,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
         private void PeerProxy_PeerConnectionBroken(object? sender, dotnetCampus.Ipc.Abstractions.Context.IPeerConnectionBrokenArgs e)
         {
-            var peerProxy = (PeerProxy)sender!;
+            var peerProxy = (PeerProxy) sender!;
             RemovePeerProxy(peerProxy);
         }
 
