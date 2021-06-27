@@ -47,7 +47,7 @@ namespace dotnetCampus.Ipc.PipeCore
         }
 
         /// <summary>
-        /// 启动服务，启动之后将可以被对方连接。此方法几乎不会返回
+        /// 启动服务，启动之后将可以被对方连接
         /// </summary>
         /// <returns></returns>
         public async void StartServer()
@@ -59,6 +59,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
 
+            // 以下的 Start 是一个循环，不会返回的
             await ipcServerService.Start();
         }
 
