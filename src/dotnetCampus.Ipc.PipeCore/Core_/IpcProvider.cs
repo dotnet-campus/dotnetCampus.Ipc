@@ -172,11 +172,11 @@ namespace dotnetCampus.Ipc.PipeCore
         public event EventHandler<PeerConnectedArgs>? PeerConnected;
 
         /// <summary>
-        /// 连接其他客户端
+        /// 获取一个连接到指定 <paramref name="peerName"/> 的客户端。如没有连接过，则需要等待连接。如已建立连接则不需要重新建立连接
         /// </summary>
         /// <param name="peerName">对方</param>
         /// <returns></returns>
-        public async Task<PeerProxy> ConnectToPeerAsync(string peerName)
+        public async Task<PeerProxy> GetAndConnectToPeerAsync(string peerName)
         {
             var peerProxy = await GetOrCreatePeerProxyAsync(peerName);
 

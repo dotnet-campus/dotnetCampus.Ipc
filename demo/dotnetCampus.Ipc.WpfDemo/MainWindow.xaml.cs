@@ -52,7 +52,7 @@ namespace dotnetCampus.Ipc.WpfDemo
 
         private async void ConnectToPeer(string peerName)
         {
-            var peer = await IpcProvider.ConnectToPeerAsync(peerName);
+            var peer = await IpcProvider.GetAndConnectToPeerAsync(peerName);
             AddPeer(peer);
         }
 

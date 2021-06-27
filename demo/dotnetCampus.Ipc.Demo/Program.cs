@@ -112,7 +112,7 @@ namespace dotnetCampus.Ipc.Demo
             ipcProvider.PeerConnected += (sender, proxy) =>
             {
             };
-            var peer = await ipcProvider.ConnectToPeerAsync(IpcContext.DefaultPipeName);
+            var peer = await ipcProvider.GetAndConnectToPeerAsync(IpcContext.DefaultPipeName);
             await peer.IpcMessageWriter.WriteMessageAsync("林德熙是逗比");
             await Task.Delay(TimeSpan.FromSeconds(1));
             ipcProvider.Dispose();
@@ -125,7 +125,7 @@ namespace dotnetCampus.Ipc.Demo
             ipcProvider.PeerConnected += (sender, proxy) =>
             {
             };
-            var peer = await ipcProvider.ConnectToPeerAsync(IpcContext.DefaultPipeName);
+            var peer = await ipcProvider.GetAndConnectToPeerAsync(IpcContext.DefaultPipeName);
             Console.WriteLine($"连接上{peer.PeerName}");
         }
 
