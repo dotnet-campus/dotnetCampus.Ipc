@@ -25,6 +25,7 @@ namespace dotnetCampus.Ipc.Abstractions.Context
         /// <param name="buffer"></param>
         /// <param name="start"></param>
         /// <param name="count"></param>
+        [DebuggerStepThrough]
         public IpcBufferMessage(byte[] buffer, int start, int count)
         {
             Buffer = buffer;
