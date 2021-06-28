@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.Abstractions.Context
+﻿using System.Diagnostics;
+
+namespace dotnetCampus.Ipc.Abstractions.Context
 {
     /// <summary>
     /// 表示一段 Ipc 消息内容
@@ -9,6 +11,7 @@
         /// 创建一段 Ipc 消息内容
         /// </summary>
         /// <param name="buffer"></param>
+        [DebuggerStepThrough]
         public IpcBufferMessage(byte[] buffer)
         {
             Buffer = buffer;
@@ -22,6 +25,7 @@
         /// <param name="buffer"></param>
         /// <param name="start"></param>
         /// <param name="count"></param>
+        [DebuggerStepThrough]
         public IpcBufferMessage(byte[] buffer, int start, int count)
         {
             Buffer = buffer;

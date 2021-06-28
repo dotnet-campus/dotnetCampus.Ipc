@@ -5,8 +5,12 @@
         public static bool Equals(byte[] a, byte[] b, int length)
         {
             for (var i = 0; i < length; i++)
+            {
                 if (a[i] != b[i])
+                {
                     return false;
+                }
+            }
 
             return true;
         }

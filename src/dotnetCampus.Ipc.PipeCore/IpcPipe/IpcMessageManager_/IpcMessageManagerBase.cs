@@ -37,7 +37,7 @@ namespace dotnetCampus.Ipc.PipeCore.IpcPipe
             /*
             * MessageHeader
             * MessageId
-             * Request Message Length
+            * Request Message Length
             * Request Message
             */
             var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);

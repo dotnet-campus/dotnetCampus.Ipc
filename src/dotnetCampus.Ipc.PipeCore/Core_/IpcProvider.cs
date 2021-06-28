@@ -47,7 +47,7 @@ namespace dotnetCampus.Ipc.PipeCore
         }
 
         /// <summary>
-        /// 启动服务，启动之后将可以被对方连接。此方法几乎不会返回
+        /// 启动服务，启动之后将可以被对方连接
         /// </summary>
         /// <returns></returns>
         public async void StartServer()
@@ -59,6 +59,7 @@ namespace dotnetCampus.Ipc.PipeCore
 
             ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
 
+            // 以下的 Start 是一个循环，不会返回的
             await ipcServerService.Start();
         }
 
@@ -172,11 +173,11 @@ namespace dotnetCampus.Ipc.PipeCore
         public event EventHandler<PeerConnectedArgs>? PeerConnected;
 
         /// <summary>
-        /// 连接其他客户端
+        /// 获取一个连接到指定 <paramref name="peerName"/> 的客户端。如没有连接过，则需要等待连接。如已建立连接则不需要重新建立连接
         /// </summary>
         /// <param name="peerName">对方</param>
         /// <returns></returns>
-        public async Task<PeerProxy> ConnectToPeerAsync(string peerName)
+        public async Task<PeerProxy> GetAndConnectToPeerAsync(string peerName)
         {
             var peerProxy = await GetOrCreatePeerProxyAsync(peerName);
 

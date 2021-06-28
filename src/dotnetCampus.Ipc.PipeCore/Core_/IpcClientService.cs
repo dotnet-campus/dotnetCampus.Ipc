@@ -110,15 +110,26 @@ namespace dotnetCampus.Ipc.PipeCore
             // 告诉服务器端不连接
         }
 
+        /// <summary>
+        /// 向服务端发送消息
+        /// </summary>
+        /// <remarks>
+        /// 框架层使用的
+        /// </remarks>
         internal async Task WriteMessageAsync(IpcBufferMessageContext ipcBufferMessageContext)
         {
             await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner);
 
             async Task WriteMessageAsyncInner()
             {
-                await IpcMessageConverter.WriteAsync(NamedPipeClientStream, IpcConfiguration.MessageHeader,
+                await IpcMessageConverter.WriteAsync
+                (
+                    NamedPipeClientStream,
+                    IpcConfiguration.MessageHeader,
                     AckManager.GetAck(),
-                    ipcBufferMessageContext, IpcContext.Logger);
+                    ipcBufferMessageContext,
+                    Logger
+                );
                 await NamedPipeClientStream.FlushAsync();
             }
         }
@@ -131,7 +142,9 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <param name="count"></param>
         /// <param name="summary">这一次写入的是什么内容，用于调试</param>
         /// <returns></returns>
+        /// <remarks>
         /// 业务层使用的
+        /// </remarks>
         public async Task WriteMessageAsync(byte[] buffer, int offset, int count,
             [CallerMemberName] string summary = null!)
         {

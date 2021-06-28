@@ -1,6 +1,4 @@
-﻿
-
-namespace dotnetCampus.Ipc.PipeCore.Utils
+﻿namespace dotnetCampus.Ipc.PipeCore.Utils
 {
 #if NETCOREAPP
     using System.Buffers;
