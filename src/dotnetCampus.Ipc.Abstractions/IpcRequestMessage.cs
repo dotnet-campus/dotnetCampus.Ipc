@@ -24,7 +24,7 @@ namespace dotnetCampus.Ipc.Abstractions
         /// 创建 IPC 请求消息
         /// </summary>
         [DebuggerStepThrough]
-        public IpcRequestMessage(string summary, byte[] buffer):this(summary,new IpcBufferMessage(buffer))
+        public IpcRequestMessage(string summary, byte[] buffer) : this(summary, new IpcBufferMessage(buffer))
         {
         }
 

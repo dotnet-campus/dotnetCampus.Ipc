@@ -22,8 +22,8 @@ namespace dotnetCampus.Ipc.Tests
             {
                 var ipcAName = Guid.NewGuid().ToString("N");
                 var ipcBName = Guid.NewGuid().ToString("N");
-                var requestByteList = new byte[] {0xFF, 0xFE};
-                var responseByteList = new byte[] {0xF1, 0xF2};
+                var requestByteList = new byte[] { 0xFF, 0xFE };
+                var responseByteList = new byte[] { 0xF1, 0xF2 };
 
                 using var ipcA = new IpcProvider(ipcAName);
                 using var ipcB = new IpcProvider(ipcBName, new IpcConfiguration()
@@ -56,7 +56,7 @@ namespace dotnetCampus.Ipc.Tests
             "发送消息之后，能等待收到对应的回复".Test(() =>
             {
                 var ipcMessageRequestManager = new IpcMessageRequestManager();
-                var requestByteList = new byte[] {0xFF, 0xFE};
+                var requestByteList = new byte[] { 0xFF, 0xFE };
                 var request = new IpcRequestMessage("Tests", new IpcBufferMessage(requestByteList));
                 var ipcClientRequestMessage = ipcMessageRequestManager.CreateRequestMessage(request);
                 Assert.AreEqual(false, ipcClientRequestMessage.Task.IsCompleted);
@@ -74,7 +74,7 @@ namespace dotnetCampus.Ipc.Tests
                     IpcMessageCommandType.RequestMessage));
 
                 Assert.IsNotNull(ipcClientRequestArgs);
-                var responseByteList = new byte[] {0xF1, 0xF2};
+                var responseByteList = new byte[] { 0xF1, 0xF2 };
                 var ipcMessageResponseManager = new IpcMessageResponseManager();
                 var responseMessageContext = ipcMessageResponseManager.CreateResponseMessage(
                     ipcClientRequestArgs.MessageId,
