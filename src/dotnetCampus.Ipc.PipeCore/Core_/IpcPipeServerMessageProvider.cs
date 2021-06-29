@@ -34,7 +34,18 @@ namespace dotnetCampus.Ipc.PipeCore
 
         public async Task Start()
         {
-            var namedPipeServerStream = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 250);
+            var namedPipeServerStream = new NamedPipeServerStream
+            (
+                PipeName,
+                // 本框架使用两个半工做双向通讯，因此这里只是接收，不做发送
+                PipeDirection.In,
+                // 旧框架采用默认为 260 个实例链接，这里减少 10 个，没有具体的理由，待测试
+                250,
+                // 默认都采用 byte 方式
+                PipeTransmissionMode.Byte,
+                // 采用异步的方式。如果没有设置，默认是同步方式，即使有 Async 的方法，底层也是走同步
+                PipeOptions.Asynchronous
+            );
             NamedPipeServerStream = namedPipeServerStream;
 
 #if NETCOREAPP
@@ -43,7 +54,6 @@ namespace dotnetCampus.Ipc.PipeCore
             await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
                 namedPipeServerStream.EndWaitForConnection, null);
 #endif
-
 
             //var streamMessageConverter = new StreamMessageConverter(namedPipeServerStream,
             //    IpcConfiguration.MessageHeader, IpcConfiguration.SharedArrayPool);
