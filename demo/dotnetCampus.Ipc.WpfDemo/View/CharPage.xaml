@@ -27,6 +27,6 @@
         </ListView>
         <TextBox x:Name="MessageTextBox" Grid.Row="2" Margin="10,10,10,10"
                  Height="100" AcceptsReturn="True" TextWrapping="Wrap" />
-        <Button Grid.Row="3" Margin="10,0,10,10" HorizontalAlignment="Right" Content="Send" Click="SendButton_OnClick" />
+        <RepeatButton Grid.Row="3" Margin="10,0,10,10" HorizontalAlignment="Right" Content="Send" Click="SendButton_OnClick" />
     </Grid>
 </UserControl>
