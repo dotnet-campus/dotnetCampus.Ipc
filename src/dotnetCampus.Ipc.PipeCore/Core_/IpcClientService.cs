@@ -73,15 +73,13 @@ namespace dotnetCampus.Ipc.PipeCore
         /// <returns></returns>
         public async Task Start(bool shouldRegisterToPeer = true)
         {
-            var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.InOut,
+            var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
 #if NETCOREAPP
             await namedPipeClientStream.ConnectAsync();
 #else
-            // 使用 Yield 释放方法，解决在 UI 上调用 await Start 方法在 Connect 等待
-            await Task.Yield();
             // 在 NET45 没有 ConnectAsync 方法
-            namedPipeClientStream.Connect();
+            await Task.Run(namedPipeClientStream.Connect);
 #endif
 
             NamedPipeClientStream = namedPipeClientStream;
