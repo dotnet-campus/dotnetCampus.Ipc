@@ -124,3 +124,7 @@
 ## 感谢
 
 [jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework)
+
+## 踩过的坑
+
+- [2019-12-1-构造PipeAccessRule时请不要使用字符串指定Identity - huangtengxiao](https://huangtengxiao.gitee.io/post/%E6%9E%84%E9%80%A0PipeAccessRule%E6%97%B6%E8%AF%B7%E4%B8%8D%E8%A6%81%E4%BD%BF%E7%94%A8%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8C%87%E5%AE%9AIdentity.html)
