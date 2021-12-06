@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.Abstractions;
-using dotnetCampus.Ipc.Abstractions.Context;
+
+using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.PipeCore;
-using dotnetCampus.Ipc.PipeCore.Context;
-using dotnetCampus.Ipc.PipeCore.IpcPipe;
-using dotnetCampus.Ipc.PipeCore.Utils.Extensions;
+using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Utils.Extensions;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests
@@ -31,12 +35,12 @@ namespace dotnetCampus.Ipc.Tests
                     DefaultIpcRequestHandler = new DelegateIpcRequestHandler(c =>
                     {
                         Assert.AreEqual(ipcAName, c.Peer.PeerName);
-                        c.Handle = true;
-                        var span = c.IpcBufferMessage.AsSpan();
+                        c.Handled = true;
+                        var span = c.IpcBufferMessage.Body.AsSpan();
                         Assert.AreEqual(true, span.SequenceEqual(requestByteList));
 
-                        return new IpcHandleRequestMessageResult(new IpcRequestMessage("Return",
-                            new IpcBufferMessage(responseByteList)));
+                        return new IpcHandleRequestMessageResult(new IpcMessage("Return",
+                            new IpcMessageBody(responseByteList)));
                     })
                 });
                 ipcA.StartServer();
@@ -45,8 +49,8 @@ namespace dotnetCampus.Ipc.Tests
                 var bPeer = await ipcA.GetAndConnectToPeerAsync(ipcBName);
                 // 从 A 发送消息给到 B 然后可以收到从 B 返回的消息
                 var response =
-                    await bPeer.GetResponseAsync(new IpcRequestMessage("发送", new IpcBufferMessage(requestByteList)));
-                Assert.AreEqual(true, response.AsSpan().SequenceEqual(responseByteList));
+                    await bPeer.GetResponseAsync(new IpcMessage("发送", new IpcMessageBody(requestByteList)));
+                Assert.AreEqual(true, response.Body.AsSpan().SequenceEqual(responseByteList));
             });
         }
 
@@ -57,7 +61,7 @@ namespace dotnetCampus.Ipc.Tests
             {
                 var ipcMessageRequestManager = new IpcMessageRequestManager();
                 var requestByteList = new byte[] { 0xFF, 0xFE };
-                var request = new IpcRequestMessage("Tests", new IpcBufferMessage(requestByteList));
+                var request = new IpcMessage("Tests", new IpcMessageBody(requestByteList));
                 var ipcClientRequestMessage = ipcMessageRequestManager.CreateRequestMessage(request);
                 Assert.AreEqual(false, ipcClientRequestMessage.Task.IsCompleted);
 
@@ -70,7 +74,7 @@ namespace dotnetCampus.Ipc.Tests
                 };
 
                 Assert.IsNotNull(requestStream);
-                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", requestStream, ack: 100,
+                ipcMessageRequestManager.OnReceiveMessage(new PeerStreamMessageArgs(new IpcMessageContext(), "Foo", requestStream, ack: 100,
                     IpcMessageCommandType.RequestMessage));
 
                 Assert.IsNotNull(ipcClientRequestArgs);
@@ -78,21 +82,100 @@ namespace dotnetCampus.Ipc.Tests
                 var ipcMessageResponseManager = new IpcMessageResponseManager();
                 var responseMessageContext = ipcMessageResponseManager.CreateResponseMessage(
                     ipcClientRequestArgs.MessageId,
-                    new IpcRequestMessage("Tests", new IpcBufferMessage(responseByteList)));
+                    new IpcMessage("Tests", new IpcMessageBody(responseByteList)));
                 var responseStream = IpcBufferMessageContextToStream(responseMessageContext);
-                ipcMessageRequestManager.OnReceiveMessage(new PeerMessageArgs("Foo", responseStream, ack: 100,
+                ipcMessageRequestManager.OnReceiveMessage(new PeerStreamMessageArgs(new IpcMessageContext(), "Foo", responseStream, ack: 100,
                     IpcMessageCommandType.ResponseMessage));
 
                 Assert.AreEqual(true, ipcClientRequestMessage.Task.IsCompleted);
             });
         }
 
-        private static Stream IpcBufferMessageContextToStream(IpcBufferMessageContext ipcBufferMessageContext)
+        [ContractTestCase]
+        public void WaitingResponseCount()
+        {
+            "所有发送消息都收到回复后，将清空等待响应的数量".Test(() =>
+            {
+                // 请求的顺序是
+                // A: 生成请求消息
+                // A: 发送请求消息
+                // B: 收到请求消息
+                // B: 生成回复消息
+                // B: 发送回复消息
+                // A: 收到回复消息
+                // A: 完成请求
+                var aIpcMessageRequestManager = new IpcMessageRequestManager();
+                var requestByteList = new byte[] { 0xFF, 0xFE };
+                var request = new IpcMessage("Tests", new IpcMessageBody(requestByteList));
+
+                var ipcClientRequestMessageList = new List<IpcClientRequestMessage>();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    // 创建请求消息
+                    IpcClientRequestMessage ipcClientRequestMessage = aIpcMessageRequestManager.CreateRequestMessage(request);
+                    ipcClientRequestMessageList.Add(ipcClientRequestMessage);
+
+                    Assert.AreEqual(i + 1, aIpcMessageRequestManager.WaitingResponseCount);
+                }
+
+                // 创建的请求消息还没发送出去，需要进行发送
+                // 发送的做法就是往 B 里面调用接收方法
+                // 在测试里面不引入 IPC 的发送逻辑，因此 A 的发送就是调用 B 的接收
+                var bIpcMessageRequestManager = new IpcMessageRequestManager();
+                var bIpcMessageResponseManager = new IpcMessageResponseManager();
+
+                // 接收 B 的消息，用的是事件
+                var ipcClientRequestArgsList = new List<IpcClientRequestArgs>();
+                bIpcMessageRequestManager.OnIpcClientRequestReceived += (sender, args) =>
+                {
+                    ipcClientRequestArgsList.Add(args);
+                };
+
+                // 开始发送消息
+                foreach (var ipcClientRequestMessage in ipcClientRequestMessageList)
+                {
+                    var requestStream = IpcBufferMessageContextToStream(ipcClientRequestMessage.IpcBufferMessageContext);
+                    var args = new PeerStreamMessageArgs(new IpcMessageContext(), "Foo", requestStream, ack: 100,
+                         IpcMessageCommandType.RequestMessage);
+
+                    bIpcMessageRequestManager.OnReceiveMessage(args);
+                }
+
+                // 因为 A 发送了 10 条消息，因此 B 需要接收到 10 条
+                Assert.AreEqual(ipcClientRequestMessageList.Count, ipcClientRequestArgsList.Count);
+
+                // 逐条消息回复
+                foreach (var ipcClientRequestArgs in ipcClientRequestArgsList)
+                {
+                    var responseByteList = new byte[] { 0xF1, 0xF2 };
+                    var responseMessageContext = bIpcMessageResponseManager.CreateResponseMessage(
+                        ipcClientRequestArgs.MessageId,
+                        new IpcMessage("Tests", new IpcMessageBody(responseByteList)));
+                    var responseStream = IpcBufferMessageContextToStream(responseMessageContext);
+
+                    // 回复就是发送消息给 A 相当于让 A 接收消息
+                    aIpcMessageRequestManager.OnReceiveMessage(new PeerStreamMessageArgs(new IpcMessageContext(), "Foo", responseStream, ack: 100,
+                        IpcMessageCommandType.ResponseMessage));
+                }
+
+                // 此时 A 没有等待回复的消息
+                Assert.AreEqual(0, aIpcMessageRequestManager.WaitingResponseCount);
+                // 所有发送的消息都收到回复
+
+                foreach (var ipcClientRequestMessage in ipcClientRequestMessageList)
+                {
+                    Assert.AreEqual(true, ipcClientRequestMessage.Task.IsCompleted);
+                }
+            });
+        }
+
+        private static MemoryStream IpcBufferMessageContextToStream(IpcBufferMessageContext ipcBufferMessageContext)
         {
             var stream = new MemoryStream();
             foreach (var ipcBufferMessage in ipcBufferMessageContext.IpcBufferMessageList)
             {
-                stream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Count);
+                stream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Length);
             }
 
             stream.Position = 0;

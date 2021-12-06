@@ -1,8 +1,13 @@
 ﻿using System.IO;
+
+using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.PipeCore;
-using dotnetCampus.Ipc.PipeCore.Context;
-using dotnetCampus.Ipc.PipeCore.Utils;
+using dotnetCampus.Ipc.Utils.Buffers;
+using dotnetCampus.Ipc.Utils.IO;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests
@@ -23,7 +28,7 @@ namespace dotnetCampus.Ipc.Tests
 
                 foreach (var ipcBufferMessage in bufferMessageContext.IpcBufferMessageList)
                 {
-                    memoryStream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Count);
+                    memoryStream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Length);
                 }
 
                 // 写入其他内容
@@ -63,12 +68,12 @@ namespace dotnetCampus.Ipc.Tests
                 var memoryStream = new MemoryStream(bufferMessageContext.Length);
                 var ipcConfiguration = new IpcConfiguration();
 
-                await IpcMessageConverter.WriteAsync(memoryStream, ipcConfiguration.MessageHeader, 10,
-                    bufferMessageContext, null!);
+                await IpcMessageConverter.WriteAsync(memoryStream, ipcConfiguration.MessageHeader, ack: 10,
+                    bufferMessageContext);
 
                 memoryStream.Position = 0;
-                var (success, ipcMessageContext) = await IpcMessageConverter.ReadAsync(memoryStream,
-                    ipcConfiguration.MessageHeader, new SharedArrayPool());
+                var (success, ipcMessageContext) = (await IpcMessageConverter.ReadAsync(memoryStream,
+                    ipcConfiguration.MessageHeader, new SharedArrayPool())).Result;
 
                 Assert.AreEqual(true, success);
 
@@ -90,7 +95,7 @@ namespace dotnetCampus.Ipc.Tests
 
                 foreach (var ipcBufferMessage in bufferMessageContext.IpcBufferMessageList)
                 {
-                    memoryStream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Count);
+                    memoryStream.Write(ipcBufferMessage.Buffer, ipcBufferMessage.Start, ipcBufferMessage.Length);
                 }
 
                 memoryStream.Position = 0;

@@ -5,11 +5,13 @@
     <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup> 
 
   <ItemGroup>
       <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" />
-    <ProjectReference Include="..\..\src\dotnetCampus.Ipc.PipeCore\dotnetCampus.Ipc.PipeCore.csproj" />
+    <ProjectReference Include="..\..\src\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj" />
   </ItemGroup>
 
 </Project>
