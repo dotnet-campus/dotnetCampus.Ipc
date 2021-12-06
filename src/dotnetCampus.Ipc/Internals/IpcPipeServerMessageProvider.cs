@@ -54,7 +54,7 @@ namespace dotnetCampus.Ipc.Internals
             try
             {
 #if NETCOREAPP
-            await namedPipeServerStream.WaitForConnectionAsync().ConfigureAwait(false);
+                await namedPipeServerStream.WaitForConnectionAsync().ConfigureAwait(false);
 #else
             await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
                 namedPipeServerStream.EndWaitForConnection, null).ConfigureAwait(false);
@@ -110,7 +110,7 @@ namespace dotnetCampus.Ipc.Internals
             if (ServerStreamMessageReader is null)
             {
                 // 证明此时还没完全连接
-               NamedPipeServerStream.Dispose();
+                NamedPipeServerStream.Dispose();
             }
             else
             {

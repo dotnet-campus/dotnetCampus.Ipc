@@ -161,7 +161,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 return null;
             }
 
-            if (argModels.Length is  0)
+            if (argModels.Length is 0)
             {
                 return new object?[0];
             }

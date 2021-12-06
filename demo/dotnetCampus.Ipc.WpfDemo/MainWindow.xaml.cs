@@ -78,19 +78,19 @@ namespace dotnetCampus.Ipc.WpfDemo
         }
 
 
-/* 项目“dotnetCampus.Ipc.WpfDemo (net45)”的未合并的更改
-在此之前:
-        private void IpcProvider_PeerConnected(object? sender, PipeCore.Context.PeerConnectedArgs e)
-在此之后:
-        private void IpcProvider_PeerConnected(object? sender, PeerConnectedArgs e)
-*/
+        /* 项目“dotnetCampus.Ipc.WpfDemo (net45)”的未合并的更改
+        在此之前:
+                private void IpcProvider_PeerConnected(object? sender, PipeCore.Context.PeerConnectedArgs e)
+        在此之后:
+                private void IpcProvider_PeerConnected(object? sender, PeerConnectedArgs e)
+        */
 
-/* 项目“dotnetCampus.Ipc.WpfDemo (net45)”的未合并的更改
-在此之前:
-        private void IpcProvider_PeerConnected(object? sender, Context.EventArgs.PeerConnectedArgs e)
-在此之后:
-        private void IpcProvider_PeerConnected(object? sender, PeerConnectedArgs e)
-*/
+        /* 项目“dotnetCampus.Ipc.WpfDemo (net45)”的未合并的更改
+        在此之前:
+                private void IpcProvider_PeerConnected(object? sender, Context.EventArgs.PeerConnectedArgs e)
+        在此之后:
+                private void IpcProvider_PeerConnected(object? sender, PeerConnectedArgs e)
+        */
         private void IpcProvider_PeerConnected(object? sender, Context.PeerConnectedArgs e)
         {
             AddPeer(e.Peer);

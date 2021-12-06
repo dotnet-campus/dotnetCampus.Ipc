@@ -15,9 +15,9 @@ namespace dotnetCampus.Ipc.Pipes
     /// 用于表示远程的对方
     /// </summary>
     public class PeerProxy : IPeerProxy
-        // 为什么 PeerProxy 不加上 IDisposable 方法
-        // 因为这个类在上层业务使用，如果被上层业务调释放了，框架层就没得玩
-        //, IDisposable
+    // 为什么 PeerProxy 不加上 IDisposable 方法
+    // 因为这个类在上层业务使用，如果被上层业务调释放了，框架层就没得玩
+    //, IDisposable
     {
         internal PeerProxy(string peerName, IpcClientService ipcClientService, IpcContext ipcContext)
         {
