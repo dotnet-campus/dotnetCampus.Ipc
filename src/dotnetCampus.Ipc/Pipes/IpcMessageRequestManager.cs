@@ -100,7 +100,7 @@ namespace dotnetCampus.Ipc.Pipes
                 var ipcPeerConnectionBrokenException = new IpcPeerConnectionBrokenException();
                 if (taskCompletionSource.TrySetException(ipcPeerConnectionBrokenException))
                 {
-                    
+
                 }
                 else
                 {

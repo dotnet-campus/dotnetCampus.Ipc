@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dotnetCampus.Ipc.Utils.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using dotnetCampus.Ipc.Utils.Buffers;
+using dotnetCampus.Ipc.Utils.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Utils.IO.Tests

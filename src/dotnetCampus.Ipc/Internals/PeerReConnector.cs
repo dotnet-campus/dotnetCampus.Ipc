@@ -27,7 +27,7 @@ namespace dotnetCampus.Ipc.Internals
         private async void Reconnect()
         {
             var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
-             await ipcClientService.Start();
+            await ipcClientService.Start();
             _peerProxy.Reconnect(ipcClientService);
         }
     }
