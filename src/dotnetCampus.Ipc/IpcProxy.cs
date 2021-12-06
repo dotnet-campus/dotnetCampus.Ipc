@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.Abstractions;
+
 using dotnetCampus.Ipc.Context;
-using dotnetCampus.Ipc.Utils;
+using dotnetCampus.Ipc.Serialization;
 
 namespace dotnetCampus.Ipc
 {
 
 #if !NETCOREAPP
     // todo 后续需要放在 .NET Core 程序集，因此这个库后续理论上是需要支持 .NET Framework 的
-        public abstract class DispatchProxy
+    public abstract class DispatchProxy
         {
             protected abstract object Invoke(MethodInfo targetMethod, object[] args);
         }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.PipeCore;
-using dotnetCampus.Ipc.PipeCore.Context;
+
+using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Pipes;
 
 namespace dotnetCampus.Ipc.Demo
 {
@@ -59,7 +60,7 @@ namespace dotnetCampus.Ipc.Demo
 
             //Console.WriteLine(string.Join(",", Encoding.UTF8.GetBytes("ACK").Select(temp => "0x" + temp.ToString("X2"))));
             //var byteList = BitConverter.GetBytes((ulong) 100);
-            //Console.WriteLine(sizeof(ulong)); 
+            //Console.WriteLine(sizeof(ulong));
 
             //var peerRegisterProviderTests = new PeerRegisterProviderTests();
             //peerRegisterProviderTests.Run();

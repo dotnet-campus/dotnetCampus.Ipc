@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -16,8 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\dotnetCampus.Ipc.Abstractions\dotnetCampus.Ipc.Abstractions.csproj" />
-      <ProjectReference Include="..\..\src\dotnetCampus.Ipc.PipeCore\dotnetCampus.Ipc.PipeCore.csproj" />
       <ProjectReference Include="..\..\src\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj" />
     </ItemGroup>
 

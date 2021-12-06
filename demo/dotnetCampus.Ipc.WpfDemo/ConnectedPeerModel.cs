@@ -2,8 +2,10 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Threading;
-using dotnetCampus.Ipc.Abstractions;
-using dotnetCampus.Ipc.PipeCore;
+
+using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Pipes;
 
 namespace dotnetCampus.Ipc.WpfDemo
 {
@@ -22,7 +24,7 @@ namespace dotnetCampus.Ipc.WpfDemo
 
         private void Peer_MessageReceived(object? sender, IPeerMessageArgs e)
         {
-            var streamReader = new StreamReader(e.Message);
+            var streamReader = new StreamReader(e.Message.Body.ToMemoryStream());
             var message = streamReader.ReadToEnd();
 
             Dispatcher.InvokeAsync(() =>
