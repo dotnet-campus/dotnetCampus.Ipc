@@ -212,7 +212,7 @@ namespace dotnetCampus.Ipc.Internals
 
             var messageHeaderLength = messageHeaderLengthResult.Result;
 
-            Debug.Assert(messageHeaderLength == messageHeader.Length);
+            //Debug.Assert(messageHeaderLength == messageHeader.Length);
             if (messageHeaderLength != messageHeader.Length)
             {
                 // 消息不对，忽略
