@@ -130,6 +130,8 @@ namespace dotnetCampus.Ipc.Tests
                 };
 
                 await receiveANotifyTask.Task.WaitTimeout(TimeSpan.FromSeconds(5));
+                await notifyTask.WaitTimeout(TimeSpan.FromSeconds(5));
+
                 // 发送成功
                 Assert.AreEqual(true, notifyTask.IsCompleted);
                 if (receiveANotifyTask.Task.IsCompleted)
