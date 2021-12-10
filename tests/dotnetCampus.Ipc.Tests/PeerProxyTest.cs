@@ -66,10 +66,10 @@ namespace dotnetCampus.Ipc.Tests
 
             "断开连接过程中，发送的所有消息，都可以在重连之后发送".Test(async () =>
             {
-                var name = "B_PeerReconnected";
+                var name = "B_PeerReconnected_F2";
                 var aRequest = new byte[] { 0xF1 };
 
-                var a = new IpcProvider("A_PeerReconnected", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerReconnected_F2", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true,
                 });
@@ -128,11 +128,11 @@ namespace dotnetCampus.Ipc.Tests
         {
             "向对方请求响应，可以拿到对方的回复".Test(async () =>
             {
-                var name = "B_PeerReconnected";
+                var name = "B_PeerReconnected_GetResponseAsync";
                 var aRequest = new byte[] { 0xF1 };
                 var bResponse = new byte[] { 0xF1, 0xF2 };
 
-                var a = new IpcProvider("A_PeerReconnected");
+                var a = new IpcProvider("A_PeerReconnected_GetResponseAsync");
                 var b = new IpcProvider(name, new IpcConfiguration()
                 {
                     DefaultIpcRequestHandler = new DelegateIpcRequestHandler(context =>
@@ -157,8 +157,8 @@ namespace dotnetCampus.Ipc.Tests
         {
             "连接过程中，对方断掉重连，可以收到重连事件".Test(async () =>
             {
-                var name = "B_PeerReconnected";
-                var a = new IpcProvider("A_PeerReconnected", new IpcConfiguration()
+                var name = "B_PeerReconnected_Main";
+                var a = new IpcProvider("A_PeerReconnected_Main", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
@@ -267,11 +267,11 @@ namespace dotnetCampus.Ipc.Tests
             {
                 // 让 a 去连接 b 然后聊聊天
                 // 接着将 b 结束，此时 a 的 peer 将会断开连接
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_PeerConnectionBroken";
                 var aRequest = new byte[] { 0xF1 };
                 var bResponse = new byte[] { 0xF1, 0xF2 };
 
-                var a = new IpcProvider("A_PeerConnectionBroken");
+                var a = new IpcProvider("A_PeerConnectionBroken_PeerConnectionBroken");
                 var b = new IpcProvider(name,
                     new IpcConfiguration()
                     {
@@ -316,10 +316,10 @@ namespace dotnetCampus.Ipc.Tests
         {
             "使用释放的服务发送消息，将会提示对象释放".Test(async () =>
             {
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_Dispose";
 
                 var aRequest = new byte[] { 0xF1 };
-                var a = new IpcProvider("A_PeerConnectionBroken", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerConnectionBroken_Dispose", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
@@ -344,9 +344,9 @@ namespace dotnetCampus.Ipc.Tests
 
             "设置为自动重连的服务，释放之后，不会有任何资源进入等待".Test(async () =>
             {
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_Dispose2";
 
-                var a = new IpcProvider("A_PeerConnectionBroken", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerConnectionBroken_Dispose2", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
