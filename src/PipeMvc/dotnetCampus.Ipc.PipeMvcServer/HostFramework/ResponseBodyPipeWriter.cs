@@ -8,7 +8,7 @@ using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
 {
     internal class ResponseBodyPipeWriter : PipeWriter
     {

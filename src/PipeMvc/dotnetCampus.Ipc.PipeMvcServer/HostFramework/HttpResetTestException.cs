@@ -4,7 +4,7 @@
 using System;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
 {
     /// <summary>
     /// Used to surface to the test client that the application invoked <see cref="IHttpResetFeature.Reset"/>

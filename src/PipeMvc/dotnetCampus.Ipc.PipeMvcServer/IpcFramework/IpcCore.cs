@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.PipeMvcServer.HostFramework;
 using dotnetCampus.Ipc.Pipes;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
