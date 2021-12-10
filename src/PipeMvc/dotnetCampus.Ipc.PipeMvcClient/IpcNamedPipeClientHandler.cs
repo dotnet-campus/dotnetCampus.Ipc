@@ -10,7 +10,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
     {
 
 
-        public IpcNamedPipeClientHandler(PeerProxy client)
+        public IpcNamedPipeClientHandler(PeerProxy client, IpcProvider clientIpcProvider)
         {
             Client = client;
         }

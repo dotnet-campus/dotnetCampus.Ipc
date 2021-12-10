@@ -21,7 +21,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc.PipeMvcSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Ipc.PipeMvcClient", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcClient\dotnetCampus.Ipc.PipeMvcClient.csproj", "{1ACE3261-CC3D-4442-8C83-516721B3DA46}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "dotnetCampus.Ipc.PipeMvcShare", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.shproj", "{05ACE3BB-61E5-4592-AC73-747850DB1081}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{05ace3bb-61e5-4592-ac73-747850db1081}*SharedItemsImports = 13
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{0f6b9c0c-7a64-4b21-bc28-e52565245a1a}*SharedItemsImports = 5
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{1ace3261-cc3d-4442-8c83-516721b3da46}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -113,6 +120,7 @@ Global
 		{0E10A5EB-7E48-408A-A4E7-8AB2A7AF143A} = {65FA7B8E-7D2E-41D1-9740-BBB7D8B8ABE3}
 		{0F6B9C0C-7A64-4B21-BC28-E52565245A1A} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
 		{1ACE3261-CC3D-4442-8C83-516721B3DA46} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
+		{05ACE3BB-61E5-4592-AC73-747850DB1081} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8828641-2F8C-4B6A-BF1D-F8F3C8C8454D}

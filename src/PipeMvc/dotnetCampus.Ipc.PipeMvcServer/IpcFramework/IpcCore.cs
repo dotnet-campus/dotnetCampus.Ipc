@@ -46,26 +46,26 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
         public static readonly string IpcServerName = Guid.NewGuid().ToString("N");
 
 
-        public static PeerProxy Client { set; get; }
+        //public static PeerProxy Client { set; get; }
 
-        public static IpcProvider? IpcClient { set; get; }
+        //public static IpcProvider? IpcClient { set; get; }
 
-        public static async Task<HttpClient> GetHttpClientAsync()
-        {
-            if (IpcClient == null)
-            {
-                IpcClient = new IpcProvider();
-                IpcClient.StartServer();
-                var peer = await IpcClient.GetAndConnectToPeerAsync(IpcServerName);
-                Client = peer;
-            }
+        //public static async Task<HttpClient> GetHttpClientAsync()
+        //{
+        //    if (IpcClient == null)
+        //    {
+        //        IpcClient = new IpcProvider();
+        //        IpcClient.StartServer();
+        //        var peer = await IpcClient.GetAndConnectToPeerAsync(IpcServerName);
+        //        Client = peer;
+        //    }
 
-            return new HttpClient(new IpcNamedPipeClientHandler(Client))
-            {
-                BaseAddress = BaseAddress,
-            };
-        }
+        //    return new HttpClient(new IpcNamedPipeClientHandler(Client))
+        //    {
+        //        BaseAddress = BaseAddress,
+        //    };
+        //}
 
-        public static Uri BaseAddress { get; set; } = new Uri("http://localhost/");
+        //public static Uri BaseAddress { get; set; } = new Uri("http://localhost/");
     }
 }

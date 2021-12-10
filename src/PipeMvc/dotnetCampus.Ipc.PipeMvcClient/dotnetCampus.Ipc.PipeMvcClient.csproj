@@ -7,4 +7,10 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj" />
+    </ItemGroup>
+
+    <Import Project="..\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems" Label="Shared" />
+
 </Project>
