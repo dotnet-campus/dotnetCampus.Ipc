@@ -2,9 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.PipeMvcServer.IpcFramework;
 using dotnetCampus.Ipc.Pipes;
 
-namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
+namespace dotnetCampus.Ipc.PipeMvcClient
 {
     class IpcNamedPipeClientHandler : HttpMessageHandler
     {
