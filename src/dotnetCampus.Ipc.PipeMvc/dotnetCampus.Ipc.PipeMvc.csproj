@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" />
-    <PackageReference Include="System.IO.Pipelines" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+    <PackageReference Include="System.IO.Pipelines" Version="6.0.0" />
     <!-- <PackageReference Include="Microsoft.Extensions.HostFactoryResolver.Sources" /> -->
   </ItemGroup>
 
