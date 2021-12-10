@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
-    public class HttpRequestMessageDeserializeContent : HttpRequestMessageContentBase
+    class HttpRequestMessageDeserializeContent : HttpRequestMessageContentBase
     {
         public HttpRequestMessage ToHttpResponseMessage()
         {

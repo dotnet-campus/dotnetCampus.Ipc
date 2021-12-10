@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
-    public class HttpResponseMessageSerializeContent : HttpResponseMessageContentBase
+    class HttpResponseMessageSerializeContent : HttpResponseMessageContentBase
     {
         public HttpResponseMessageSerializeContent(HttpResponseMessage message) : base(message)
         {

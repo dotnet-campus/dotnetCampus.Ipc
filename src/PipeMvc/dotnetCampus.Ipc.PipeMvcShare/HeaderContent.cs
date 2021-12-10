@@ -2,7 +2,7 @@
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
-    public class HeaderContent
+    class HeaderContent
     {
         public string Key { set; get; }
         public List<string> Value { set; get; }

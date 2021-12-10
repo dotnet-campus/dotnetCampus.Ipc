@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
-    public class HttpRequestMessageContentBase
+    class HttpRequestMessageContentBase
     {
         public HttpRequestMessageContentBase(HttpRequestMessage message)
         {
