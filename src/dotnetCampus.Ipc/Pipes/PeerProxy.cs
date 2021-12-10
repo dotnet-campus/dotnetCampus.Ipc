@@ -173,11 +173,14 @@ namespace dotnetCampus.Ipc.Pipes
         /// <summary>
         /// 重新连接
         /// </summary>
-        internal void Reconnect(IpcClientService ipcClientService)
+        internal async void Reconnect(IpcClientService ipcClientService)
         {
             Debug.Assert(ipcClientService.PeerName == PeerName);
 
             IpcClientService = ipcClientService;
+
+            // 等待完成更新之后，再进行通知，否则将会在收到事件时，还在准备完成所有逻辑
+            await WaitForFinishedTaskCompletionSource.Task;
 
             PeerReconnected?.Invoke(this, new PeerReconnectedArgs());
         }
