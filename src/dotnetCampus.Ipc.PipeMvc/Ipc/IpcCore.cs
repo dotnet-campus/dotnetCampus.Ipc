@@ -7,11 +7,14 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
+
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +22,7 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
 {
     class IpcCore
     {
-        public IpcCore(IServiceProvider serviceProvider,string? ipcServerName)
+        public IpcCore(IServiceProvider serviceProvider, string? ipcServerName)
         {
             ipcServerName ??= IpcServerName;
 
@@ -27,11 +30,11 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
             {
                 DefaultIpcRequestHandler = new DelegateIpcRequestHandler(async context =>
                 {
-                    var server = (IpcServer)serviceProvider.GetRequiredService<IServer>();
+                    var server = (IpcServer) serviceProvider.GetRequiredService<IServer>();
 
                     var requestMessage = HttpMessageSerializer.DeserializeToRequest(context.IpcBufferMessage.Body.Buffer);
 
-                    var clientHandler = (ClientHandler)server.CreateHandler();
+                    var clientHandler = (ClientHandler) server.CreateHandler();
                     var response = await clientHandler.SendInnerAsync(requestMessage, CancellationToken.None);
 
                     var responseByteList = HttpMessageSerializer.Serialize(response);
@@ -130,7 +133,7 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
 
             if (headerContentList != null)
             {
-                foreach (var headerContent in  headerContentList)
+                foreach (var headerContent in headerContentList)
                 {
                     result.Content.Headers.Add(headerContent.Key, headerContent.Value);
                 }
@@ -294,7 +297,7 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
         public HttpStatusCode StatusCode { get; set; }
     }
 
-     static class HttpMessageSerializer
+    static class HttpMessageSerializer
     {
         public static byte[] Serialize(HttpResponseMessage response)
         {
