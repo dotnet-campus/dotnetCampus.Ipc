@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
+
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.PipeMvcServer.HostFramework;
 using dotnetCampus.Ipc.Pipes;
+
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,14 +13,9 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     class IpcCore
     {
-        public IpcCore(IServiceProvider serviceProvider, IpcProvider ipcProvider)
-        {
-            IpcServer = ipcProvider;
-        }
-
         public IpcCore(IServiceProvider serviceProvider, string? ipcServerName)
         {
-            ipcServerName ??= IpcServerName;
+            ipcServerName ??= "IpcPipeMvcServer" + Guid.NewGuid().ToString("N");
 
             IpcServer = new IpcProvider(ipcServerName, new IpcConfiguration()
             {
@@ -42,30 +37,5 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 
         public void Start() => IpcServer.StartServer();
         public IpcProvider IpcServer { set; get; }
-
-        public static readonly string IpcServerName = Guid.NewGuid().ToString("N");
-
-
-        //public static PeerProxy Client { set; get; }
-
-        //public static IpcProvider? IpcClient { set; get; }
-
-        //public static async Task<HttpClient> GetHttpClientAsync()
-        //{
-        //    if (IpcClient == null)
-        //    {
-        //        IpcClient = new IpcProvider();
-        //        IpcClient.StartServer();
-        //        var peer = await IpcClient.GetAndConnectToPeerAsync(IpcServerName);
-        //        Client = peer;
-        //    }
-
-        //    return new HttpClient(new IpcNamedPipeClientHandler(Client))
-        //    {
-        //        BaseAddress = BaseAddress,
-        //    };
-        //}
-
-        //public static Uri BaseAddress { get; set; } = new Uri("http://localhost/");
     }
 }
