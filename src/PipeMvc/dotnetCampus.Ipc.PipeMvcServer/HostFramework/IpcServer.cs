@@ -105,6 +105,9 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
             _hostInstance = host;
 
             Services = host.Services;
+
+            var ipcCore = Services.GetRequiredService<IpcPipeMvcServerCore>();
+            IpcPipeMvcServerCore = ipcCore;
         }
 
         /// <summary>
