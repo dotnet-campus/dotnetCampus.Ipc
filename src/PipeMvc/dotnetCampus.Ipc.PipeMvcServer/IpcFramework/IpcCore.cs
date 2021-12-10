@@ -13,6 +13,11 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     class IpcCore
     {
+        public IpcCore(IServiceProvider serviceProvider, IpcProvider ipcProvider)
+        {
+            IpcServer = ipcProvider;
+        }
+
         public IpcCore(IServiceProvider serviceProvider, string? ipcServerName)
         {
             ipcServerName ??= IpcServerName;
