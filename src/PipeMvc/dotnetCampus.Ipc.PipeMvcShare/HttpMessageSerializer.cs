@@ -35,9 +35,10 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
             return content.ToHttpResponseMessage();
         }
 
-        public static HttpRequestMessage DeserializeToRequest(byte[] d)
+        public static HttpRequestMessage DeserializeToRequest(IpcMessageBody body)
         {
-            var json = Encoding.UTF8.GetString(d);
+            var span = body.AsSpan();
+            var json = Encoding.UTF8.GetString(span);
             var httpRequestMessageDeserializeContent = JsonConvert.DeserializeObject<HttpRequestMessageDeserializeContent>(json);
             return httpRequestMessageDeserializeContent.ToHttpResponseMessage();
         }

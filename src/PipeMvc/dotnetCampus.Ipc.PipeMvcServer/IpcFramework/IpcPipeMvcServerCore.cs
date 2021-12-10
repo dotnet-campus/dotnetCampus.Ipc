@@ -23,7 +23,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
                 {
                     var server = (IpcServer) serviceProvider.GetRequiredService<IServer>();
 
-                    var requestMessage = HttpMessageSerializer.DeserializeToRequest(context.IpcBufferMessage.Body.Buffer);
+                    var requestMessage = HttpMessageSerializer.DeserializeToRequest(context.IpcBufferMessage.Body);
 
                     var clientHandler = (ClientHandler) server.CreateHandler();
                     var response = await clientHandler.SendInnerAsync(requestMessage, CancellationToken.None);
