@@ -4,9 +4,9 @@
     <Description>Pipe</Description>
     <TargetFramework>net5.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>aspnetcore;hosting;testing</PackageTags>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
