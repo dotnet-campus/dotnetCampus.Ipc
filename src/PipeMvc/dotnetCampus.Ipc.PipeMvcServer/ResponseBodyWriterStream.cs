@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     internal class ResponseBodyWriterStream : Stream
     {

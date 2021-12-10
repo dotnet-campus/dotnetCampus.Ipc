@@ -6,7 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     /// <summary>
     /// Used to construct a HttpRequestMessage object.

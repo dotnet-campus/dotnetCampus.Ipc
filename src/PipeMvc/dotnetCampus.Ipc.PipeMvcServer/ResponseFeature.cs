@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     internal class ResponseFeature : IHttpResponseFeature, IHttpResponseBodyFeature
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     internal abstract class ApplicationWrapper
     {

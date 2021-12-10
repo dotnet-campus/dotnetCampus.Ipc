@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     /// <summary>
     /// Options for the test server.

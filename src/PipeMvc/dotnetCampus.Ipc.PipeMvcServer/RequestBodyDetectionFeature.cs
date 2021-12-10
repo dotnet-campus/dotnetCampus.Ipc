@@ -3,7 +3,7 @@
 
 using Microsoft.AspNetCore.Http.Features;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     internal class RequestBodyDetectionFeature : IHttpRequestBodyDetectionFeature
     {

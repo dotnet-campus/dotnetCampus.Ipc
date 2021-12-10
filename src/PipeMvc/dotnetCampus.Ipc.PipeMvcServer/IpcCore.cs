@@ -7,18 +7,15 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
-
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace dotnetCampus.Ipc.PipeMvc.Ipc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     class IpcCore
     {

@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace dotnetCampus.Ipc.PipeMvc
+namespace dotnetCampus.Ipc.PipeMvcServer
 {
     internal class RequestLifetimeFeature : IHttpRequestLifetimeFeature
     {
