@@ -18,7 +18,7 @@ namespace dotnetCampus.Ipc.PipeMvc
     /// <summary>
     /// An <see cref="IServer"/> implementation for executing tests.
     /// </summary>
-    public class TestServer : IServer
+    public class IpcServer : IServer
     {
         private readonly IWebHost? _hostInstance;
         private bool _disposed;
@@ -29,7 +29,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// </summary>
         /// <param name="services"></param>
         /// <param name="optionsAccessor"></param>
-        public TestServer(IServiceProvider services, IOptions<IpcServerOptions> optionsAccessor)
+        public IpcServer(IServiceProvider services, IOptions<IpcServerOptions> optionsAccessor)
             : this(services, new FeatureCollection(), optionsAccessor)
         {
 
@@ -41,7 +41,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// <param name="services"></param>
         /// <param name="featureCollection"></param>
         /// <param name="optionsAccessor"></param>
-        public TestServer(IServiceProvider services, IFeatureCollection featureCollection, IOptions<IpcServerOptions> optionsAccessor)
+        public IpcServer(IServiceProvider services, IFeatureCollection featureCollection, IOptions<IpcServerOptions> optionsAccessor)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             Features = featureCollection ?? throw new ArgumentNullException(nameof(featureCollection));
@@ -56,13 +56,11 @@ namespace dotnetCampus.Ipc.PipeMvc
 
         private IpcCore IpcCore { get; }
 
-        //internal static TestServer CurrentTestServer { set; get; }
-
         /// <summary>
         /// For use with IHostBuilder.
         /// </summary>
         /// <param name="services"></param>
-        public TestServer(IServiceProvider services)
+        public IpcServer(IServiceProvider services)
             : this(services, new FeatureCollection())
         {
         }
@@ -72,7 +70,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// </summary>
         /// <param name="services"></param>
         /// <param name="featureCollection"></param>
-        public TestServer(IServiceProvider services, IFeatureCollection featureCollection)
+        public IpcServer(IServiceProvider services, IFeatureCollection featureCollection)
             : this(services, featureCollection, Options.Create(new IpcServerOptions()))
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
@@ -83,7 +81,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// For use with IWebHostBuilder.
         /// </summary>
         /// <param name="builder"></param>
-        public TestServer(IWebHostBuilder builder)
+        public IpcServer(IWebHostBuilder builder)
             : this(builder, new FeatureCollection())
         {
         }
@@ -93,7 +91,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="featureCollection"></param>
-        public TestServer(IWebHostBuilder builder, IFeatureCollection featureCollection)
+        public IpcServer(IWebHostBuilder builder, IFeatureCollection featureCollection)
         {
             if (builder == null)
             {
@@ -122,7 +120,7 @@ namespace dotnetCampus.Ipc.PipeMvc
             get
             {
                 return _hostInstance
-                    ?? throw new InvalidOperationException("The TestServer constructor was not called with a IWebHostBuilder so IWebHost is not available.");
+                    ?? throw new InvalidOperationException("The IpcServer constructor was not called with a IWebHostBuilder so IWebHost is not available.");
             }
         }
 

@@ -27,7 +27,7 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
             {
                 DefaultIpcRequestHandler = new DelegateIpcRequestHandler(async context =>
                 {
-                    var server = (TestServer)serviceProvider.GetRequiredService<IServer>();
+                    var server = (IpcServer)serviceProvider.GetRequiredService<IServer>();
 
                     var requestMessage = HttpMessageSerializer.DeserializeToRequest(context.IpcBufferMessage.Body.Buffer);
 

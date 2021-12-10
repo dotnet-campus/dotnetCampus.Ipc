@@ -15,17 +15,17 @@ namespace dotnetCampus.Ipc.PipeMvc
     public static class HostBuilderIpcServerExtensions
     {
         /// <summary>
-        /// Retrieves the TestServer from the host services.
+        /// Retrieves the IpcServer from the host services.
         /// </summary>
         /// <param name="host"></param>
         /// <returns></returns>
-        public static TestServer GetTestServer(this IHost host)
+        public static IpcServer GetTestServer(this IHost host)
         {
-            return (TestServer)host.Services.GetRequiredService<IServer>();
+            return (IpcServer)host.Services.GetRequiredService<IServer>();
         }
 
         /// <summary>
-        /// Retrieves the test client from the TestServer in the host services.
+        /// Retrieves the test client from the IpcServer in the host services.
         /// </summary>
         /// <param name="host"></param>
         /// <returns></returns>

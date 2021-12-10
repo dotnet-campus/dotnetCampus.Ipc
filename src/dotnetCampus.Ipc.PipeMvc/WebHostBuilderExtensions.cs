@@ -18,7 +18,7 @@ namespace dotnetCampus.Ipc.PipeMvc
     public static class WebHostBuilderExtensions
     {
         /// <summary>
-        /// Enables the <see cref="TestServer" /> service.
+        /// Enables the <see cref="IpcServer" /> service.
         /// </summary>
         /// <param name="builder">The <see cref="IWebHostBuilder"/>.</param>
         /// <param name="ipcPipeName">设置 Ipc 服务的管道名</param>
@@ -27,7 +27,7 @@ namespace dotnetCampus.Ipc.PipeMvc
             => builder.UsePipeIpcServer(option => option.IpcPipeName = ipcPipeName);
 
         /// <summary>
-        /// Enables the <see cref="TestServer" /> service.
+        /// Enables the <see cref="IpcServer" /> service.
         /// </summary>
         /// <param name="builder">The <see cref="IWebHostBuilder"/>.</param>
         /// <param name="configureOptions">Configures test server options</param>
@@ -41,7 +41,7 @@ namespace dotnetCampus.Ipc.PipeMvc
                     services.Configure(configureOptions);
                 }
                 services.AddSingleton<IHostLifetime, NoopHostLifetime>();
-                services.AddSingleton<IServer, TestServer>();
+                services.AddSingleton<IServer, IpcServer>();
 
                 services.AddSingleton<IpcCore>();
             });

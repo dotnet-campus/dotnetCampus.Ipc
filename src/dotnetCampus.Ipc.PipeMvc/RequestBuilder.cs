@@ -20,16 +20,16 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// </summary>
         /// <param name="server"></param>
         /// <param name="path"></param>
-        public RequestBuilder(TestServer server, string path)
+        public RequestBuilder(IpcServer server, string path)
         {
-            TestServer = server ?? throw new ArgumentNullException(nameof(server));
+            IpcServer = server ?? throw new ArgumentNullException(nameof(server));
             _req = new HttpRequestMessage(HttpMethod.Get, path);
         }
 
         /// <summary>
-        /// Gets the <see cref="TestServer"/> instance for which the request is being built.
+        /// Gets the <see cref="IpcServer"/> instance for which the request is being built.
         /// </summary>
-        public TestServer TestServer { get; }
+        public IpcServer IpcServer { get; }
 
         /// <summary>
         /// Configure any HttpRequestMessage properties.
@@ -78,7 +78,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         public Task<HttpResponseMessage> SendAsync(string method)
         {
             _req.Method = new HttpMethod(method);
-            return TestServer.CreateClient().SendAsync(_req);
+            return IpcServer.CreateClient().SendAsync(_req);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         public Task<HttpResponseMessage> GetAsync()
         {
             _req.Method = HttpMethod.Get;
-            return TestServer.CreateClient().SendAsync(_req);
+            return IpcServer.CreateClient().SendAsync(_req);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         public Task<HttpResponseMessage> PostAsync()
         {
             _req.Method = HttpMethod.Post;
-            return TestServer.CreateClient().SendAsync(_req);
+            return IpcServer.CreateClient().SendAsync(_req);
         }
     }
 }
