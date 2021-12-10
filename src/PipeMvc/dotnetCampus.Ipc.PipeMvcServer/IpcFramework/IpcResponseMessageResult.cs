@@ -1,6 +1,6 @@
 ﻿using dotnetCampus.Ipc.Messages;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     class IpcResponseMessageResult : IIpcResponseMessage
     {

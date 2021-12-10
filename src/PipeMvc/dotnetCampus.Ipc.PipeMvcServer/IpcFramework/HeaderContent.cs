@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     public class HeaderContent
     {

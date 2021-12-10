@@ -9,7 +9,7 @@ using dotnetCampus.Ipc.Pipes;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     class IpcCore
     {

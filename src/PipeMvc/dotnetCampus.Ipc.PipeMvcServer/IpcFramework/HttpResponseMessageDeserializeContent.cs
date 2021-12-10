@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     public class HttpResponseMessageDeserializeContent : HttpResponseMessageContentBase
     {

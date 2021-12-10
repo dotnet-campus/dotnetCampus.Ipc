@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     public class HttpResponseMessageContentBase
     {

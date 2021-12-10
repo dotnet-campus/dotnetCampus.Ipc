@@ -3,7 +3,7 @@ using System.Text;
 using dotnetCampus.Ipc.Messages;
 using Newtonsoft.Json;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     static class HttpMessageSerializer
     {

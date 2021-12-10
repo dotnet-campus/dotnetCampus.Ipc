@@ -3,6 +3,7 @@
 
 using System;
 using dotnetCampus.Ipc.PipeMvcServer.HostFramework;
+using dotnetCampus.Ipc.PipeMvcServer.IpcFramework;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;

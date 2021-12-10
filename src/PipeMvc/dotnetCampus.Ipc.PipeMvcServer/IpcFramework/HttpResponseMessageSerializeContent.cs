@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     public class HttpResponseMessageSerializeContent : HttpResponseMessageContentBase
     {

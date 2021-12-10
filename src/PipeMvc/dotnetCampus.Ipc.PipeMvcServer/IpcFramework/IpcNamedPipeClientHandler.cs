@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
 
-namespace dotnetCampus.Ipc.PipeMvcServer
+namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
     public class IpcNamedPipeClientHandler : HttpMessageHandler
     {
