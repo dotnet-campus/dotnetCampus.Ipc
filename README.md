@@ -6,15 +6,15 @@
 |--|--|
 |![](https://github.com/dotnet-campus/dotnetCampus.Ipc/workflows/.NET%20Core/badge.svg)|[![](https://img.shields.io/nuget/v/dotnetCampus.Ipc.svg)](https://www.nuget.org/packages/dotnetCampus.Ipc)|
 
-开发中……
+项目可用状态
 
-大概是基础可用
+打磨中
 
 ## 特点
 
 - 采用两个半工命名管道
 - 采用 P2P 方式，每个端都是服务端也是客户端
-- 加入消息 Ack 机制，弱化版，因为管道形式只要能写入就是成功 Ack 了
+- ~~加入消息 Ack 机制，弱化版，因为管道形式只要能写入就是成功 Ack 了~~
 - 提供 PeerProxy 机制，利用这个机制可以进行发送和接收某个对方的信息
 - 追求稳定，而不追求高性能
 
@@ -23,12 +23,18 @@
 - [x] 通讯建立
 - [x] 消息收到回复机制
 - [x] 断线重连功能
-- [ ] 大量异常处理
+- [x] 大量异常处理
+
+- [x] 支持裸数据双向传输方式
+- [x] 支持裸数据请求响应模式
+- [x] 支持字符串消息协议
+- [x] 支持远程对象调用和对象存根传输方式
+- [x] 支持 NamedPipeStreamForMvc (NamedPipeMvc) 客户端服务器端 MVC 模式
 
 - [x] .NET Framework 4.5
 - [x] .NET Core 3.1
 
-## 项目设计
+<!-- ## 项目设计
 
 ### dotnetCampus.Ipc.Abstractions
 
@@ -60,7 +66,7 @@
 
 这个项目能支持的不应该只有管道一个方式，而是任何基于 dotnetCampus.Ipc.Abstractions 的抽象实现都应该支持
 
-进度：等待 API 设计中，也许会接入 [https://github.com/jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework) 的实现，或者模拟 WCF 或 Remoting 的实现
+进度：等待 API 设计中，也许会接入 [https://github.com/jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework) 的实现，或者模拟 WCF 或 Remoting 的实现 -->
 
 ## API 特点
 
@@ -74,56 +80,21 @@
 
 ## 进度
 
-- 基本完成 dotnetCampus.Ipc.PipeCore 部分
-- 基本完成 客户端服务器端模型
+- 基本完成 dotnetCampus.Ipc 的 API 定义和功能实现
+- 完成 客户端服务器端模型
+- 完成 P2P 式模型
+- 完成远程调用的实现
 - 完成 最小可用呆魔，支持主动和被动连接，支持通讯发送文本
+- 完成断线重连
+- 完成性能优化，包括内存优化
+- 完成 MVC 模式
 
-- [ ] 顶层调用 API 设计
-
-- [ ] 远程调用的实现
-- [ ] 性能优化，包括内存优化
 - [ ] 接入预编译提供上层的远程调用封装
-
-
-## 不支持的列表
-
-也许后续会支持
-
-### 传入实例类
-
-在 dotnet core 的 DispatchProxy 只支持代理
-
-### 使用属性
-
-因为不能使用同步方法，因此属性都不能使用
-
-### 同步的方法
-
-所有方法都需要是异步的
-
-### 返回值不是 Task 或 Task 泛形或框架封装的类型
-
-框架不知道业务层的返回类型，因此无法封装返回值
-
-### 返回值包含两层 Task 如 `Task<Task<int>>` 类型
-
-框架无法封装和序列化传递
-
-### 事件和方法传入委托
-
-无法序列化由另一个进程调用
-
-### 框架主动通知断开
-
-现在的设计不确定是否可以在框架进行通知，依然是在业务端进行通知
-
-### 发送消息自动等待连接
-
-如果连接断开，此时发送将会失败，是否可以设计为发送时，如果对方断开，自动等待对方再次连接上之后，自动发送数据
 
 ## 感谢
 
-[jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework)
+- [jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework)
+- [https://github.com/dotnet/aspnetcore](https://github.com/dotnet/aspnetcore) for PipeMVC
 
 ## 踩过的坑
 
