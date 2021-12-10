@@ -50,11 +50,11 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
             PreserveExecutionContext = options.PreserveExecutionContext;
             BaseAddress = options.BaseAddress;
 
-            var ipcCore = Services.GetRequiredService<IpcCore>();
-            IpcCore = ipcCore;
+            var ipcCore = Services.GetRequiredService<IpcPipeMvcServerCore>();
+            IpcPipeMvcServerCore = ipcCore;
         }
 
-        private IpcCore IpcCore { get; }
+        private IpcPipeMvcServerCore IpcPipeMvcServerCore { get; }
 
         /// <summary>
         /// For use with IHostBuilder.
@@ -240,7 +240,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
                 }
             });
 
-            IpcCore.Start();
+            IpcPipeMvcServerCore.Start();
 
             return Task.CompletedTask;
         }

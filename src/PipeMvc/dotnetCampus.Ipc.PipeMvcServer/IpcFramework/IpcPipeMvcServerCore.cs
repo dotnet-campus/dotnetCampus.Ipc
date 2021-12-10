@@ -11,9 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
-    class IpcCore
+    class IpcPipeMvcServerCore
     {
-        public IpcCore(IServiceProvider serviceProvider, string? ipcServerName)
+        public IpcPipeMvcServerCore(IServiceProvider serviceProvider, string? ipcServerName)
         {
             ipcServerName ??= "IpcPipeMvcServer" + Guid.NewGuid().ToString("N");
 

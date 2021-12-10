@@ -32,7 +32,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer
                 services.AddSingleton<IHostLifetime, NoopHostLifetime>();
                 services.AddSingleton<IServer, IpcServer>();
 
-                services.AddSingleton<IpcCore>(s => new IpcCore(s, ipcPipeName));
+                services.AddSingleton<IpcPipeMvcServerCore>(s => new IpcPipeMvcServerCore(s, ipcPipeName));
             });
         }
     }
