@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿#nullable disable // 序列化的代码，不需要可空
+
+using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework

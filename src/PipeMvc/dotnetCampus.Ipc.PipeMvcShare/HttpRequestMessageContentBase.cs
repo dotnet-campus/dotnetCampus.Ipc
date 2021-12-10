@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable disable // 序列化的代码，不需要可空
+
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;

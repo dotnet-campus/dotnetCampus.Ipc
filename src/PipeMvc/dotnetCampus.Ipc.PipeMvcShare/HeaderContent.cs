@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable disable // 序列化的代码，不需要可空
+using System.Collections.Generic;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 {
