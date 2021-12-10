@@ -29,7 +29,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// </summary>
         /// <param name="services"></param>
         /// <param name="optionsAccessor"></param>
-        public TestServer(IServiceProvider services, IOptions<TestServerOptions> optionsAccessor)
+        public TestServer(IServiceProvider services, IOptions<IpcServerOptions> optionsAccessor)
             : this(services, new FeatureCollection(), optionsAccessor)
         {
 
@@ -41,7 +41,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// <param name="services"></param>
         /// <param name="featureCollection"></param>
         /// <param name="optionsAccessor"></param>
-        public TestServer(IServiceProvider services, IFeatureCollection featureCollection, IOptions<TestServerOptions> optionsAccessor)
+        public TestServer(IServiceProvider services, IFeatureCollection featureCollection, IOptions<IpcServerOptions> optionsAccessor)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             Features = featureCollection ?? throw new ArgumentNullException(nameof(featureCollection));
@@ -73,7 +73,7 @@ namespace dotnetCampus.Ipc.PipeMvc
         /// <param name="services"></param>
         /// <param name="featureCollection"></param>
         public TestServer(IServiceProvider services, IFeatureCollection featureCollection)
-            : this(services, featureCollection, Options.Create(new TestServerOptions()))
+            : this(services, featureCollection, Options.Create(new IpcServerOptions()))
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             Features = featureCollection ?? throw new ArgumentNullException(nameof(featureCollection));

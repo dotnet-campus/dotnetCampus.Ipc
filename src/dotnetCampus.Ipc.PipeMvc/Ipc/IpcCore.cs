@@ -19,9 +19,11 @@ namespace dotnetCampus.Ipc.PipeMvc.Ipc
 {
     class IpcCore
     {
-        public IpcCore(IServiceProvider serviceProvider)
+        public IpcCore(IServiceProvider serviceProvider,string? ipcServerName)
         {
-            IpcServer = new IpcProvider(IpcServerName, new IpcConfiguration()
+            ipcServerName ??= IpcServerName;
+
+            IpcServer = new IpcProvider(ipcServerName, new IpcConfiguration()
             {
                 DefaultIpcRequestHandler = new DelegateIpcRequestHandler(async context =>
                 {
