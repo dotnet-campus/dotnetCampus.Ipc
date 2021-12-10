@@ -53,7 +53,15 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         public IpcServerService IpcServerService
         {
-            get => _ipcServerService!;
+            get
+            {
+                if (!IsStarted)
+                {
+                    throw new InvalidOperationException($"未启动之前，不能获取 IpcServerService 属性的值");
+                }
+
+                return _ipcServerService!;
+            }
         }
 
         /// <summary>
