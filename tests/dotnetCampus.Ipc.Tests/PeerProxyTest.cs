@@ -108,6 +108,7 @@ namespace dotnetCampus.Ipc.Tests
                 var receiveANotifyTask = new TaskCompletionSource<bool>();
                 c.PeerConnected += (s, e) =>
                 {
+                    // 预期这里是 A 连接过来
                     e.Peer.MessageReceived += (sender, args) =>
                     {
                         if (args.Message.Body.AsSpan().SequenceEqual(aRequest))
@@ -117,12 +118,35 @@ namespace dotnetCampus.Ipc.Tests
                     };
                 };
 
+                var receiveAFromGlobalMessageReceived = new TaskCompletionSource<bool>();
+                c.IpcServerService.MessageReceived += (s, e) =>
+                {
+                    if (e.Message.Body.AsSpan().SequenceEqual(aRequest))
+                    {
+                        receiveAFromGlobalMessageReceived.SetResult(true);
+                    }
+                };
+
                 c.StartServer();
 
                 await receiveANotifyTask.Task.WaitTimeout(TimeSpan.FromSeconds(5));
                 // 发送成功
                 Assert.AreEqual(true, notifyTask.IsCompleted);
-                Assert.AreEqual(true, receiveANotifyTask.Task.IsCompleted);
+                if (receiveANotifyTask.Task.IsCompleted)
+                {
+                    // 和平，能收到重新连接发过来的消息
+                }
+                else
+                {
+                    if (receiveAFromGlobalMessageReceived.Task.IsCompleted)
+                    {
+                        // 如果被全局收了，那也是预期的，因为连接过来之后，立刻收到消息，此时的 e.Peer.MessageReceived+=xx 的代码还没跑
+                    }
+                    else
+                    {
+                        Assert.Fail("没有收到重连的消息");
+                    }
+                }
             });
         }
 
