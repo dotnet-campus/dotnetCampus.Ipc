@@ -22,7 +22,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.TestHost.Ipc
 {
-    public class IpcCore
+    class IpcCore
     {
         public IpcCore(IServiceProvider serviceProvider)
         {

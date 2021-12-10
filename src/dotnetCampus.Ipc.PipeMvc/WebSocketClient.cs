@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.TestHost
     /// <summary>
     /// Provides a client for connecting over WebSockets to a test server.
     /// </summary>
-    public class WebSocketClient
+    class WebSocketClient
     {
         private readonly ApplicationWrapper _application;
         private readonly PathString _pathBase;

@@ -13,7 +13,8 @@ namespace Microsoft.AspNetCore.TestHost
     /// <summary>
     /// Contains extensions for retrieving properties from <see cref="IHost"/>.
     /// </summary>
-    public static class HostBuilderTestServerExtensions
+    /// Copy from https://github.com/dotnet/aspnetcore/blob/a450cb69b5e4549f5515cdb057a68771f56cefd7/src/Hosting/TestHost/src/HostBuilderTestServerExtensions.cs
+    public static class HostBuilderIpcServerExtensions
     {
         /// <summary>
         /// Retrieves the TestServer from the host services.

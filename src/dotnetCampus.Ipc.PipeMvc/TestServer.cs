@@ -168,24 +168,24 @@ namespace Microsoft.AspNetCore.TestHost
             return new HttpClient(CreateHandler()) { BaseAddress = BaseAddress };
         }
 
-        /// <summary>
-        /// Creates a <see cref="WebSocketClient" /> for interacting with the test server.
-        /// </summary>
-        public WebSocketClient CreateWebSocketClient()
-        {
-            var pathBase = BaseAddress == null ? PathString.Empty : PathString.FromUriComponent(BaseAddress);
-            return new WebSocketClient(pathBase, Application) { AllowSynchronousIO = AllowSynchronousIO, PreserveExecutionContext = PreserveExecutionContext };
-        }
+        ///// <summary>
+        ///// Creates a <see cref="WebSocketClient" /> for interacting with the test server.
+        ///// </summary>
+        //public WebSocketClient CreateWebSocketClient()
+        //{
+        //    var pathBase = BaseAddress == null ? PathString.Empty : PathString.FromUriComponent(BaseAddress);
+        //    return new WebSocketClient(pathBase, Application) { AllowSynchronousIO = AllowSynchronousIO, PreserveExecutionContext = PreserveExecutionContext };
+        //}
 
-        /// <summary>
-        /// Begins constructing a request message for submission.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns><see cref="RequestBuilder"/> to use in constructing additional request details.</returns>
-        public RequestBuilder CreateRequest(string path)
-        {
-            return new RequestBuilder(this, path);
-        }
+        ///// <summary>
+        ///// Begins constructing a request message for submission.
+        ///// </summary>
+        ///// <param name="path"></param>
+        ///// <returns><see cref="RequestBuilder"/> to use in constructing additional request details.</returns>
+        //public RequestBuilder CreateRequest(string path)
+        //{
+        //    return new RequestBuilder(this, path);
+        //}
 
         /// <summary>
         /// Creates, configures, sends, and returns a <see cref="HttpContext"/>. This completes as soon as the response is started.

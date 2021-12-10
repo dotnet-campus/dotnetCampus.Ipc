@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.TestHost
     /// This adapts HttpRequestMessages to ASP.NET Core requests, dispatches them through the pipeline, and returns the
     /// associated HttpResponseMessage.
     /// </summary>
-    public class ClientHandler : HttpMessageHandler
+    internal class ClientHandler : HttpMessageHandler
     {
         private readonly ApplicationWrapper _application;
         private readonly PathString _pathBase;
