@@ -118,6 +118,8 @@ namespace dotnetCampus.Ipc.Tests
                     };
                 };
 
+                c.StartServer();
+
                 var receiveAFromGlobalMessageReceived = new TaskCompletionSource<bool>();
                 c.IpcServerService.MessageReceived += (s, e) =>
                 {
@@ -126,8 +128,6 @@ namespace dotnetCampus.Ipc.Tests
                         receiveAFromGlobalMessageReceived.SetResult(true);
                     }
                 };
-
-                c.StartServer();
 
                 await receiveANotifyTask.Task.WaitTimeout(TimeSpan.FromSeconds(5));
                 // 发送成功
