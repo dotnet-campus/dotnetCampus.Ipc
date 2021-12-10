@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
@@ -8,7 +9,9 @@ using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Threading;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests
@@ -180,7 +183,7 @@ namespace dotnetCampus.Ipc.Tests
                 // 等待2秒，预计此时是不会收到重新连接消息，也就是 peerReconnectedTask 任务还没完成
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 // 判断此时是否收到重连消息
-                Assert.AreEqual(false, peerReconnectedTask.Task.IsCompleted);
+                Assert.AreEqual(false, peerReconnectedTask.Task.IsCompleted, "还没有重启 b 服务，但是已收到重连消息");
 
                 // 重新启动 b 服务，用法是再新建一个 c 用了 b 的 name 从而假装是 b 重启
                 var c = new IpcProvider(name);
