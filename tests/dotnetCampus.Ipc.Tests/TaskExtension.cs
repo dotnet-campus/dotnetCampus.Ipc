@@ -12,9 +12,9 @@ namespace dotnetCampus.Ipc.Tests
 
 #if DEBUG
             // 进入断点，也许上面的时间太短
-            if (!task.IsCompleted)
+            for (int i = 0; i < 100 && !task.IsCompleted; i++)
             {
-                await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
+                await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(1)));
             }
 #endif
         }

@@ -177,7 +177,8 @@ namespace dotnetCampus.Ipc.Tests
                 // 断开 b 此时只会收到断开消息，不会收到重连消息
                 b.Dispose();
 
-                await Task.Yield();
+                // 等待2秒，预计此时是不会收到重新连接消息，也就是 peerReconnectedTask 任务还没完成
+                await Task.Delay(TimeSpan.FromSeconds(2));
                 // 判断此时是否收到重连消息
                 Assert.AreEqual(false, peerReconnectedTask.Task.IsCompleted);
 
@@ -186,15 +187,7 @@ namespace dotnetCampus.Ipc.Tests
                 c.StartServer();
 
                 // 多线程，需要等待一下，等待连接
-                await Task.WhenAny(peerReconnectedTask.Task, Task.Delay(TimeSpan.FromSeconds(3)));
-
-                if (!peerReconnectedTask.Task.IsCompleted)
-                {
-#if DEBUG
-                    // 进入断点，也许上面的时间太短
-                    await Task.WhenAny(peerReconnectedTask.Task, Task.Delay(TimeSpan.FromMinutes(5)));
-#endif
-                }
+                await peerReconnectedTask.Task.WaitTimeout(TimeSpan.FromSeconds(3));
 
                 Assert.AreEqual(true, peerReconnectedTask.Task.IsCompleted);
                 Assert.AreEqual(true, peerReconnectedTask.Task.Result);
