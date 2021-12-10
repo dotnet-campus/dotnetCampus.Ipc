@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     internal class NoopHostLifetime : IHostLifetime
     {

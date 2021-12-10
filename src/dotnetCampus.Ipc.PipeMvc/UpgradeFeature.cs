@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     internal class UpgradeFeature : IHttpUpgradeFeature
     {

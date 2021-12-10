@@ -14,10 +14,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.TestHost.Ipc;
 using Microsoft.Net.Http.Headers;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     /// <summary>
     /// This adapts HttpRequestMessages to ASP.NET Core requests, dispatches them through the pipeline, and returns the

@@ -6,13 +6,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using dotnetCampus.Ipc.PipeMvc.Ipc;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.TestHost.Ipc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     /// <summary>
     /// Contains extensions for configuring the <see cref="IWebHostBuilder" /> instance.

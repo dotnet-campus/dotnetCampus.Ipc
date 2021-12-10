@@ -9,7 +9,7 @@ using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     /// <summary>
     /// The client's view of the response body.

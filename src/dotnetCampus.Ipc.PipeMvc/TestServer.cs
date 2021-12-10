@@ -5,15 +5,15 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using dotnetCampus.Ipc.PipeMvc.Ipc;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.TestHost.Ipc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.TestHost
+namespace dotnetCampus.Ipc.PipeMvc
 {
     /// <summary>
     /// An <see cref="IServer"/> implementation for executing tests.
