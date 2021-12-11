@@ -9,7 +9,7 @@ namespace dotnetCampus.Ipc.PipeMvcClient
 {
     class IpcNamedPipeClientHandler : HttpMessageHandler
     {
-        public IpcNamedPipeClientHandler(PeerProxy client, IpcProvider clientIpcProvider)
+        public IpcNamedPipeClientHandler(PeerProxy client, IpcProvider? clientIpcProvider)
         {
             Client = client;
             ClientIpcProvider = clientIpcProvider;
@@ -21,7 +21,8 @@ namespace dotnetCampus.Ipc.PipeMvcClient
         /// 客户端的 IPC 服务
         /// </summary>
         /// 只是引用对象，不然 IpcProvider 将被回收
-        private IpcProvider ClientIpcProvider { get; }
+        /// 可空，不给就不给咯，只是做引用
+        private IpcProvider? ClientIpcProvider { get; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

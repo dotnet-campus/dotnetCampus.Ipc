@@ -34,5 +34,6 @@ namespace dotnetCampus.Ipc.PipeMvcClient
                 BaseAddress = new Uri(IpcPipeMvcContext.BaseAddressUrl),
             };
         }
+
     }
 }
