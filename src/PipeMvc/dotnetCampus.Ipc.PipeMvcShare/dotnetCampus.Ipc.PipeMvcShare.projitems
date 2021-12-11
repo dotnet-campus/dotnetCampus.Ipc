@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpResponseMessageContentBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpResponseMessageDeserializeContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpResponseMessageSerializeContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IpcPipeMvcContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IpcResponseMessageResult.cs" />
   </ItemGroup>
 </Project>

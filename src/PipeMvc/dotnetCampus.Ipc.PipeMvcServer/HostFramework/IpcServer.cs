@@ -113,7 +113,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
         /// <summary>
         /// Gets or sets the base address associated with the HttpClient returned by the test server. Defaults to http://localhost/.
         /// </summary>
-        public Uri BaseAddress { get; set; } = new Uri("http://localhost/");
+        public Uri BaseAddress { get; set; } = new Uri(IpcPipeMvcContext.BaseAddressUrl);
 
         /// <summary>
         /// Gets the <see cref="IWebHost" /> instance associated with the test server.

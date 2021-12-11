@@ -3,6 +3,8 @@
 
 using System;
 using System.Threading;
+using dotnetCampus.Ipc.PipeMvcServer.IpcFramework;
+
 using Microsoft.AspNetCore.Http;
 
 namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
@@ -28,8 +30,8 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
         public bool PreserveExecutionContext { get; set; }
 
         /// <summary>
-        /// Gets or sets the base address associated with the HttpClient returned by the test server. Defaults to http://localhost/.
+        /// Gets or sets the base address associated with the HttpClient returned by the test server. Defaults to http://localhost/ 也就是 <see cref="IpcPipeMvcContext.BaseAddressUrl"/> 的值.
         /// </summary>
-        public Uri BaseAddress { get; set; } = new Uri("http://localhost/");
+        public Uri BaseAddress { get; set; } = new Uri(IpcPipeMvcContext.BaseAddressUrl);
     }
 }
