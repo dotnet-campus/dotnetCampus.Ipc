@@ -39,10 +39,10 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 var result = await proxy.ConvertObjectAsync(new FakeIpcObjectSubModelA(1, 2, 3, 4));
 
                 // 植物。
-                Assert.AreEqual((double)1, result.A);
-                Assert.AreEqual((uint)2, result.B);
-                Assert.AreEqual((int)3, result.C);
-                Assert.AreEqual((byte)4, result.D);
+                Assert.AreEqual((double) 1, result.A);
+                Assert.AreEqual((uint) 2, result.B);
+                Assert.AreEqual((int) 3, result.C);
+                Assert.AreEqual((byte) 4, result.D);
             });
 
             "发送字符串，收回字符串，可 IPC 通信。".Test(async () =>
