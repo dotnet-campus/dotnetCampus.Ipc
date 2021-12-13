@@ -340,3 +340,4 @@ ASALocalRun/
 healthchecksdb
 /GetAssemblyVersionTask/Properties/launchSettings.json
 /WriteAppVersionTask/Properties/launchSettings.json
+/src/dotnetCampus.Ipc.PipeMvc/Properties/launchSettings.json

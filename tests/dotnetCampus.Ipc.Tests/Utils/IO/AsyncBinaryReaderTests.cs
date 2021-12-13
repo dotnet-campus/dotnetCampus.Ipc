@@ -30,11 +30,11 @@ namespace dotnetCampus.Ipc.Utils.IO.Tests
 
                 var asyncBinaryReader = new AsyncBinaryReader(memoryStream, new FakeSharedArrayPool());
                 var r1 = await asyncBinaryReader.ReadUInt16Async();
-                Assert.AreEqual(n1, r1);
+                Assert.AreEqual(n1, r1.Result);
                 var r2 = await asyncBinaryReader.ReadReadUInt64Async();
-                Assert.AreEqual(n2, r2);
+                Assert.AreEqual(n2, r2.Result);
                 var r3 = await asyncBinaryReader.ReadUInt32Async();
-                Assert.AreEqual(n3, r3);
+                Assert.AreEqual(n3, r3.Result);
             });
         }
 

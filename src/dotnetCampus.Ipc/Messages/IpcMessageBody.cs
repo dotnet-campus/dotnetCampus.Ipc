@@ -73,5 +73,14 @@ namespace dotnetCampus.Ipc.Messages
         /// <returns></returns>
         public static MemoryStream ToMemoryStream(this IpcMessageBody message) =>
             new MemoryStream(message.Buffer, message.Start, message.Length, false);
+
+#if NETCOREAPP3_1_OR_GREATER
+        /// <summary>
+        /// 转换为 Span 类型
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static Span<byte> AsSpan(this IpcMessageBody message) =>new Span<byte>(message.Buffer, message.Start, message.Length);
+#endif
     }
 }

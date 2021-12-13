@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
@@ -8,7 +9,9 @@ using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Threading;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests
@@ -66,10 +69,10 @@ namespace dotnetCampus.Ipc.Tests
 
             "断开连接过程中，发送的所有消息，都可以在重连之后发送".Test(async () =>
             {
-                var name = "B_PeerReconnected";
+                var name = "B_PeerReconnected_F2";
                 var aRequest = new byte[] { 0xF1 };
 
-                var a = new IpcProvider("A_PeerReconnected", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerReconnected_F2", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true,
                 });
@@ -105,6 +108,7 @@ namespace dotnetCampus.Ipc.Tests
                 var receiveANotifyTask = new TaskCompletionSource<bool>();
                 c.PeerConnected += (s, e) =>
                 {
+                    // 预期这里是 A 连接过来
                     e.Peer.MessageReceived += (sender, args) =>
                     {
                         if (args.Message.Body.AsSpan().SequenceEqual(aRequest))
@@ -116,10 +120,35 @@ namespace dotnetCampus.Ipc.Tests
 
                 c.StartServer();
 
-                await receiveANotifyTask.Task.WaitTimeout();
+                var receiveAFromGlobalMessageReceived = new TaskCompletionSource<bool>();
+                c.IpcServerService.MessageReceived += (s, e) =>
+                {
+                    if (e.Message.Body.AsSpan().SequenceEqual(aRequest))
+                    {
+                        receiveAFromGlobalMessageReceived.SetResult(true);
+                    }
+                };
+
+                await receiveANotifyTask.Task.WaitTimeout(TimeSpan.FromSeconds(5));
+                await notifyTask.WaitTimeout(TimeSpan.FromSeconds(5));
+
                 // 发送成功
                 Assert.AreEqual(true, notifyTask.IsCompleted);
-                Assert.AreEqual(true, receiveANotifyTask.Task.IsCompleted);
+                if (receiveANotifyTask.Task.IsCompleted)
+                {
+                    // 和平，能收到重新连接发过来的消息
+                }
+                else
+                {
+                    if (receiveAFromGlobalMessageReceived.Task.IsCompleted)
+                    {
+                        // 如果被全局收了，那也是预期的，因为连接过来之后，立刻收到消息，此时的 e.Peer.MessageReceived+=xx 的代码还没跑
+                    }
+                    else
+                    {
+                        Assert.Fail("没有收到重连的消息");
+                    }
+                }
             });
         }
 
@@ -128,11 +157,11 @@ namespace dotnetCampus.Ipc.Tests
         {
             "向对方请求响应，可以拿到对方的回复".Test(async () =>
             {
-                var name = "B_PeerReconnected";
+                var name = "B_PeerReconnected_GetResponseAsync";
                 var aRequest = new byte[] { 0xF1 };
                 var bResponse = new byte[] { 0xF1, 0xF2 };
 
-                var a = new IpcProvider("A_PeerReconnected");
+                var a = new IpcProvider("A_PeerReconnected_GetResponseAsync");
                 var b = new IpcProvider(name, new IpcConfiguration()
                 {
                     DefaultIpcRequestHandler = new DelegateIpcRequestHandler(context =>
@@ -157,8 +186,8 @@ namespace dotnetCampus.Ipc.Tests
         {
             "连接过程中，对方断掉重连，可以收到重连事件".Test(async () =>
             {
-                var name = "B_PeerReconnected";
-                var a = new IpcProvider("A_PeerReconnected", new IpcConfiguration()
+                var name = "B_PeerReconnected_Main";
+                var a = new IpcProvider("A_PeerReconnected_Main", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
@@ -177,24 +206,17 @@ namespace dotnetCampus.Ipc.Tests
                 // 断开 b 此时只会收到断开消息，不会收到重连消息
                 b.Dispose();
 
-                await Task.Yield();
+                // 等待2秒，预计此时是不会收到重新连接消息，也就是 peerReconnectedTask 任务还没完成
+                await Task.Delay(TimeSpan.FromSeconds(2));
                 // 判断此时是否收到重连消息
-                Assert.AreEqual(false, peerReconnectedTask.Task.IsCompleted);
+                Assert.AreEqual(false, peerReconnectedTask.Task.IsCompleted, "还没有重启 b 服务，但是已收到重连消息");
 
                 // 重新启动 b 服务，用法是再新建一个 c 用了 b 的 name 从而假装是 b 重启
                 var c = new IpcProvider(name);
                 c.StartServer();
 
                 // 多线程，需要等待一下，等待连接
-                await Task.WhenAny(peerReconnectedTask.Task, Task.Delay(TimeSpan.FromSeconds(3)));
-
-                if (!peerReconnectedTask.Task.IsCompleted)
-                {
-#if DEBUG
-                    // 进入断点，也许上面的时间太短
-                    await Task.WhenAny(peerReconnectedTask.Task, Task.Delay(TimeSpan.FromMinutes(5)));
-#endif
-                }
+                await peerReconnectedTask.Task.WaitTimeout(TimeSpan.FromSeconds(3));
 
                 Assert.AreEqual(true, peerReconnectedTask.Task.IsCompleted);
                 Assert.AreEqual(true, peerReconnectedTask.Task.Result);
@@ -267,11 +289,11 @@ namespace dotnetCampus.Ipc.Tests
             {
                 // 让 a 去连接 b 然后聊聊天
                 // 接着将 b 结束，此时 a 的 peer 将会断开连接
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_PeerConnectionBroken";
                 var aRequest = new byte[] { 0xF1 };
                 var bResponse = new byte[] { 0xF1, 0xF2 };
 
-                var a = new IpcProvider("A_PeerConnectionBroken");
+                var a = new IpcProvider("A_PeerConnectionBroken_PeerConnectionBroken");
                 var b = new IpcProvider(name,
                     new IpcConfiguration()
                     {
@@ -316,10 +338,10 @@ namespace dotnetCampus.Ipc.Tests
         {
             "使用释放的服务发送消息，将会提示对象释放".Test(async () =>
             {
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_Dispose";
 
                 var aRequest = new byte[] { 0xF1 };
-                var a = new IpcProvider("A_PeerConnectionBroken", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerConnectionBroken_Dispose", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
@@ -344,9 +366,9 @@ namespace dotnetCampus.Ipc.Tests
 
             "设置为自动重连的服务，释放之后，不会有任何资源进入等待".Test(async () =>
             {
-                var name = "B_PeerConnectionBroken";
+                var name = "B_PeerConnectionBroken_Dispose2";
 
-                var a = new IpcProvider("A_PeerConnectionBroken", new IpcConfiguration()
+                var a = new IpcProvider("A_PeerConnectionBroken_Dispose2", new IpcConfiguration()
                 {
                     AutoReconnectPeers = true
                 });
