@@ -80,7 +80,7 @@ namespace dotnetCampus.Ipc.Messages
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static Span<byte> AsSpan(this IpcMessageBody message) =>new Span<byte>(message.Buffer, message.Start, message.Length);
+        public static Span<byte> AsSpan(this IpcMessageBody message) => new Span<byte>(message.Buffer, message.Start, message.Length);
 #endif
     }
 }

@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
@@ -98,7 +98,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
             readableBuffer = readableBuffer.Slice(0, actual);
             readableBuffer.CopyTo(new Span<byte>(buffer, offset, count));
             _pipe.Reader.AdvanceTo(readableBuffer.End);
-            return (int)actual;
+            return (int) actual;
         }
 
         private static void VerifyBuffer(byte[] buffer, int offset, int count)
