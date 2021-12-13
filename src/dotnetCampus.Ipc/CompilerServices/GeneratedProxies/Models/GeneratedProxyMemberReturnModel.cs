@@ -36,10 +36,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             else
             {
                 // 当返回对象为其他类型时，将尝试进行序列化。
-                var jValue = KnownTypeConverter.Convert(@return);
+                var jToken = KnownTypeConverter.Convert(@return);
                 Return = new GeneratedProxyObjectModel
                 {
-                    Value = jValue,
+                    Value = jToken,
                 };
             }
         }

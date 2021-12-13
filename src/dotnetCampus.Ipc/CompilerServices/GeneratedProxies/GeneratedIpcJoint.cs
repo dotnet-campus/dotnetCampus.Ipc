@@ -298,9 +298,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
         private T? Cast<T>(object? arg)
         {
-            if (arg is JValue jValue)
+            if (arg is JToken jToken)
             {
-                return KnownTypeConverter.ConvertBack<T>(jValue);
+                return KnownTypeConverter.ConvertBack<T>(jToken);
             }
             return (T?) arg;
         }
