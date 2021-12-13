@@ -21,7 +21,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
         /// <returns></returns>
         public static IpcServer GetTestServer(this IHost host)
         {
-            return (IpcServer)host.Services.GetRequiredService<IServer>();
+            return (IpcServer) host.Services.GetRequiredService<IServer>();
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
@@ -30,7 +30,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
 
         internal override object CreateContext(IFeatureCollection features)
         {
-            return ((IHttpApplication<TContext>)this).CreateContext(features);
+            return ((IHttpApplication<TContext>) this).CreateContext(features);
         }
 
         TContext IHttpApplication<TContext>.CreateContext(IFeatureCollection features)
@@ -40,7 +40,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
 
         internal override void DisposeContext(object context, Exception? exception)
         {
-            ((IHttpApplication<TContext>)this).DisposeContext((TContext)context, exception);
+            ((IHttpApplication<TContext>) this).DisposeContext((TContext) context, exception);
         }
 
         void IHttpApplication<TContext>.DisposeContext(TContext context, Exception? exception)
@@ -50,7 +50,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.HostFramework
 
         internal override Task ProcessRequestAsync(object context)
         {
-            return ((IHttpApplication<TContext>)this).ProcessRequestAsync((TContext)context);
+            return ((IHttpApplication<TContext>) this).ProcessRequestAsync((TContext) context);
         }
 
         Task IHttpApplication<TContext>.ProcessRequestAsync(TContext context)
