@@ -20,26 +20,26 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
         {
             "发送基本类型，收回元组，可 IPC 通信。".Test(async () =>
             {
-            // 准备。
-            var (peer, proxy) = await CreateIpcPairAsync("001");
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync("001");
 
-            // 安放。
-            var result = await proxy.ConstructAsync(1, 2, 3, 4);
+                // 安放。
+                var result = await proxy.ConstructAsync(1, 2, 3, 4);
 
-            // 植物。
-            Assert.AreEqual(new ValueTuple<double, uint, int, byte>(1, 2, 3, 4), result);
+                // 植物。
+                Assert.AreEqual(new ValueTuple<double, uint, int, byte>(1, 2, 3, 4), result);
             });
 
             "发送复杂类型，收回复杂类型，可 IPC 通信。".Test(async () =>
             {
-            // 准备。
-            var (peer, proxy) = await CreateIpcPairAsync("002");
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync("002");
 
-            // 安放。
-            var result = await proxy.ConvertObjectAsync(new FakeIpcObjectSubModelA(1, 2, 3, 4));
+                // 安放。
+                var result = await proxy.ConvertObjectAsync(new FakeIpcObjectSubModelA(1, 2, 3, 4));
 
-            // 植物。
-            Assert.AreEqual((double)1, result.A);
+                // 植物。
+                Assert.AreEqual((double)1, result.A);
                 Assert.AreEqual((uint)2, result.B);
                 Assert.AreEqual((int)3, result.C);
                 Assert.AreEqual((byte)4, result.D);
@@ -47,14 +47,14 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 
             "发送字符串，收回字符串，可 IPC 通信。".Test(async () =>
             {
-            // 准备。
-            var (peer, proxy) = await CreateIpcPairAsync("003");
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync("003");
 
-            // 安放。
-            var result = await proxy.ConvertStringAsync("Test");
+                // 安放。
+                var result = await proxy.ConvertStringAsync("Test");
 
-            // 植物。
-            Assert.AreEqual("Test", result);
+                // 植物。
+                Assert.AreEqual("Test", result);
             });
         }
 
