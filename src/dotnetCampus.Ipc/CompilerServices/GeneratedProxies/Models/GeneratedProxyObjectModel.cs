@@ -33,6 +33,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
         public string? AssemblyQualifiedName { get; set; }
 
         [DataMember(Name = "v")]
-        public JValue? Value { get; set; }
+        public JToken? Value { get; set; }
     }
 }

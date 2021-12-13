@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
 {
     internal static class KnownTypeConverter
     {
-        private static readonly Dictionary<Type, (Func<object, JValue> serializer, Func<JValue, object> deserializer)> KnownTypeConverters = new()
+        private static readonly Dictionary<Type, (Func<object, JValue> serializer, Func<JValue, object> deserializer)> JValueConverters = new()
         {
             {
                 typeof(IntPtr),
@@ -16,30 +17,26 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
             },
         };
 
-        internal static JValue Convert(object? value)
+        internal static JToken? Convert(object? value) => value switch
         {
-            if (value == null)
-            {
-                return JValue.CreateNull();
-            }
+            // null。
+            null => JValue.CreateNull(),
 
-            var type = value.GetType();
-            if (KnownTypeConverters.TryGetValue(type, out var vt))
-            {
-                var serializer = vt.serializer;
-                return serializer(value!);
-            }
-            return new JValue(value);
-        }
+            // dotnetCampus.Ipc 支持的类型。
+            IntPtr @intPtr => new JValue(intPtr.ToInt64()),
 
-        internal static T ConvertBack<T>(JValue jValue)
-        {
-            if (KnownTypeConverters.TryGetValue(typeof(T), out var vt))
+            // 默认类型。
+            _ => JToken.FromObject(value),
+        };
+
+        internal static T? ConvertBack<T>(JToken? jToken) => JValueConverters.TryGetValue(typeof(T), out var converter)
+            ? (T) converter.deserializer((JValue) jToken!)
+            : jToken switch
             {
-                var deserializer = vt.deserializer;
-                return (T) deserializer(jValue);
-            }
-            return jValue.ToObject<T>()!;
-        }
+                null => default!,
+                JValue jValue => jValue.ToObject<T>(),
+                JObject jObject => jObject.ToObject<T>(),
+                _ => throw new NotSupportedException("不支持将其他 JToken 类型转换成 IPC 业务类型。")
+            };
     }
 }
