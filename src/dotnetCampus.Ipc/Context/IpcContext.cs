@@ -1,6 +1,7 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Threading.Tasks;
 using dotnetCampus.Ipc.Utils.Logging;
 
@@ -16,7 +17,7 @@ namespace dotnetCampus.Ipc.Context
         /// </summary>
         public const string DefaultPipeName = "dotnet campus";
 
-        private static readonly IpcTask DefaultIpcTask = new();
+        private static readonly IpcTask DefaultIpcTask = new(new IpcThreadPool());
 
         /// <summary>
         /// 创建上下文
@@ -34,6 +35,12 @@ namespace dotnetCampus.Ipc.Context
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
             GeneratedProxyJointIpcContext = new GeneratedProxyJointIpcContext(this);
+
+            TaskPool = IpcConfiguration.IpcTaskScheduling is IpcTaskScheduling.GlobalConcurrent
+                // 支持并发的 IPC 将共用同一个线程池。
+                ? DefaultIpcTask
+                // 要求在同一线程调度的 IPC 将近似独享一个“线程”。
+                : new IpcTask(new IpcSingleThreadPool());
 
             Logger = IpcConfiguration.IpcLoggerProvider?.Invoke(pipeName) ?? new IpcLogger(pipeName);
         }
@@ -73,7 +80,7 @@ namespace dotnetCampus.Ipc.Context
         ///  2. 大多数为小型任务，但可能会出现一些难以预料到的长时间的任务；
         ///  3. 不阻塞调用线程。
         /// </summary>
-        internal IpcTask TaskPool { get; } = DefaultIpcTask;
+        internal IpcTask TaskPool { get; }
 
         // 当前干掉回应的逻辑
         ///// <summary>

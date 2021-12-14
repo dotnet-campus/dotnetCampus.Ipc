@@ -17,13 +17,18 @@ namespace dotnetCampus.Ipc.Threading.Tasks
     {
         private volatile int _isRunning;
         private readonly ConcurrentQueue<TaskItem> _queue = new();
-        private readonly IpcThreadPool _threadPool = new();
+        private readonly IIpcThreadPool _threadPool;
 
         /// <summary>
         /// 由于原子操作仅提供高性能的并发处理而不保证准确性，因此需要一个锁来同步 <see cref="_isRunning"/> 中值为 0 时所指的不确定情况。
         /// 不能使用一个锁来同步所有情况是因为在锁中使用 async/await 是不安全的，因此避免在锁中执行异步任务；我们使用原子操作来判断异步任务的执行条件。
         /// </summary>
         private readonly object _locker = new();
+
+        public IpcTask(IIpcThreadPool threadPool)
+        {
+            _threadPool = threadPool;
+        }
 
         /// <summary>
         /// 支持并发进入的 IPC 任务。
