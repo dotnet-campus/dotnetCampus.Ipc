@@ -38,7 +38,10 @@
 
   <ItemGroup>
     <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.0.1" PrivateAssets="all" />
-    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.4" />
+    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
