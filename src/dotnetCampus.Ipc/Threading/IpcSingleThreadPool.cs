@@ -13,8 +13,9 @@ namespace dotnetCampus.Ipc.Threading
     {
         public async Task<Task> Run(Action action, ILogger? logger)
         {
+            action();
             // 因为此方法的调用方能保证依次执行而不并发，所以这里直接 Task.Run 也不会浪费线程。
-            await Task.Run(action).ConfigureAwait(false);
+            //await Task.Run(action).ConfigureAwait(false);
             return Task.FromResult(0);
         }
     }
