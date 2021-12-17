@@ -13,7 +13,7 @@ namespace dotnetCampus.Ipc.Tests
         [ContractTestCase]
         public void Serialize()
         {
-            "序列化对象之后，能否通过二进制放序列化回对象".Test(() =>
+            "序列化对象之后，能通过二进制反序列化回对象".Test(() =>
             {
                 // Arrange
                 IIpcObjectSerializer ipcObjectSerializer = new IpcObjectJsonSerializer();
