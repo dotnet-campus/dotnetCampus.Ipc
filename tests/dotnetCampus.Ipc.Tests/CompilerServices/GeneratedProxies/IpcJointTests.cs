@@ -11,7 +11,7 @@ using Moq;
 
 using MSTest.Extensions.Contracts;
 
-namespace dotnetCampus.Ipc.Tests
+namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 {
     [TestClass]
     public class IpcJointTests
