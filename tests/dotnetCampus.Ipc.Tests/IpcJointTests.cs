@@ -27,6 +27,8 @@ namespace dotnetCampus.Ipc.Tests
                 var ipcProviderB = new IpcProvider();
 
                 var mock = new Mock<IIpcJointTestObject>();
+                mock.Setup(t => t.TestMethod1Async()).Returns(Task.CompletedTask);
+
                 var ipcJointTestRealObject = new IpcJointTestRealObject(mock.Object);
 
                 // 注册关联
@@ -41,7 +43,7 @@ namespace dotnetCampus.Ipc.Tests
                 // 通过在客户端里，创建对象代理，即可拿到代理。代理是给本机使用，但实际执行逻辑，是发送远程调用
                 var ipcJointTestObjectProxy = ipcProviderA.CreateIpcProxy<IIpcJointTestObject, IpcJointTestObjectIpcProxy>(peer);
 
-                // 无参，无返回值方法
+                // 无参，无返回值 同步方法
                 await Task.Run(() =>
                 {
                     // 在客户端里调用无参，无返回值方法。实际可以是在服务端执行
@@ -50,7 +52,16 @@ namespace dotnetCampus.Ipc.Tests
                     mock.Verify(t => t.TestMethod1(), Times.Once);
                 });
 
-                // 带基础类型参数，无返回值方法
+                // 无参，无返回值 异步方法
+                await Task.Run(async () =>
+                {
+                    // 在客户端里调用无参，无返回值方法。实际可以是在服务端执行
+                    await ipcJointTestObjectProxy.TestMethod1Async();
+                    // 判断是在服务端执行
+                    mock.Verify(t => t.TestMethod1Async(), Times.Once);
+                });
+
+                // 带基础类型参数，无返回值同步方法
                 await Task.Run(() =>
                 {
                     string a0 = "lindexi is doubi";
@@ -58,6 +69,16 @@ namespace dotnetCampus.Ipc.Tests
 
                     ipcJointTestObjectProxy.TestMethod2(a0, a1);
                     mock.Verify(t => t.TestMethod2(a0, a1), Times.Once);
+                });
+
+                // 带基础类型参数，无返回值异步方法
+                await Task.Run(async () =>
+                {
+                    string a0 = "lindexi is doubi";
+                    int a1 = 2;
+
+                    await ipcJointTestObjectProxy.TestMethod2Async(a0, a1);
+                    mock.Verify(t => t.TestMethod2Async(a0, a1), Times.Once);
                 });
             });
         }
@@ -69,7 +90,10 @@ namespace dotnetCampus.Ipc.Tests
     public interface IIpcJointTestObject
     {
         void TestMethod2(string arg1, int arg2);
+        Task TestMethod2Async(string arg1, int arg2);
+
         void TestMethod1();
+        Task TestMethod1Async();
     }
 
     /// <summary>
@@ -93,9 +117,19 @@ namespace dotnetCampus.Ipc.Tests
             _mockObject.TestMethod2(arg1, arg2);
         }
 
+        public Task TestMethod2Async(string arg1, int arg2)
+        {
+            return _mockObject.TestMethod2Async(arg1, arg2);
+        }
+
         public void TestMethod1()
         {
             _mockObject.TestMethod1();
+        }
+
+        public Task TestMethod1Async()
+        {
+            return _mockObject.TestMethod1Async();
         }
     }
 
@@ -108,7 +142,10 @@ namespace dotnetCampus.Ipc.Tests
         protected override void MatchMembers(IIpcJointTestObject real)
         {
             MatchMethod(nameof(IIpcJointTestObject.TestMethod1), new Action(() => real.TestMethod1()));
-            MatchMethod(nameof(IIpcJointTestObject.TestMethod2), new Action<string, int>((string a0, int a1) => real.TestMethod2(a0, a1)));
+            MatchMethod(nameof(IIpcJointTestObject.TestMethod1Async), new Func<Task>(() => real.TestMethod1Async()));
+
+            MatchMethod(nameof(IIpcJointTestObject.TestMethod2), new Action<string, int>((a0, a1) => real.TestMethod2(a0, a1)));
+            MatchMethod(nameof(IIpcJointTestObject.TestMethod2Async), new Func<string, int, Task>((a0, a1) => real.TestMethod2Async(a0, a1)));
         }
     }
 
@@ -123,9 +160,19 @@ namespace dotnetCampus.Ipc.Tests
             CallMethod(new object[] { arg1, arg2 }).Wait();
         }
 
+        public async Task TestMethod2Async(string arg1, int arg2)
+        {
+            await CallMethodAsync(new object[] { arg1, arg2 });
+        }
+
         public void TestMethod1()
         {
             CallMethod().Wait();
+        }
+
+        public async Task TestMethod1Async()
+        {
+            await CallMethodAsync();
         }
     }
 }
