@@ -80,14 +80,19 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         public async Task Start(bool shouldRegisterToPeer = true)
         {
-            var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
+            var namedPipeClientStream = new NamedPipeClientStream(".", "a123123123123", PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 #if NETCOREAPP
             await namedPipeClientStream.ConnectAsync();
 #else
             // 在 NET45 没有 ConnectAsync 方法
-            await Task.Run(namedPipeClientStream.Connect);
+            namedPipeClientStream.Connect(1000);
+            if (namedPipeClientStream.IsConnected)
+            {
+                
+            }
+            //await Task.Run(namedPipeClientStream.Connect);
 #endif
             if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
             {

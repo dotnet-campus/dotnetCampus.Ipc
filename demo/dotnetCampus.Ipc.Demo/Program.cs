@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.Json;
+//using System.Text.Json;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
@@ -10,48 +10,49 @@ using dotnetCampus.Ipc.Pipes;
 namespace dotnetCampus.Ipc.Demo
 {
 
-    public class IpcProxy<T> : DispatchProxy
-    {
-        protected override object Invoke(MethodInfo targetMethod, object[] args)
-        {
-            var actualReturnType = GetAndCheckActualReturnType(targetMethod.ReturnType);
+    //public class IpcProxy<T> : DispatchProxy
+    //{
+    //    protected override object Invoke(MethodInfo targetMethod, object[] args)
+    //    {
+    //        var actualReturnType = GetAndCheckActualReturnType(targetMethod.ReturnType);
 
-            return default!;
-        }
+    //        return default!;
+    //    }
 
-        private Type GetAndCheckActualReturnType(Type returnType)
-        {
-            if (returnType == typeof(Task))
-            {
-                return typeof(void);
-            }
-            else if (returnType.IsGenericType is true && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-            {
-                if (returnType.GenericTypeArguments.Length == 1)
-                {
-                    return returnType.GenericTypeArguments[0];
-                }
-            }
+    //    private Type GetAndCheckActualReturnType(Type returnType)
+    //    {
+    //        if (returnType == typeof(Task))
+    //        {
+    //            return typeof(void);
+    //        }
+    //        else if (returnType.IsGenericType is true && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+    //        {
+    //            if (returnType.GenericTypeArguments.Length == 1)
+    //            {
+    //                return returnType.GenericTypeArguments[0];
+    //            }
+    //        }
 
-            throw new ArgumentException($"方法返回值只能是 Task 或 Task 泛形");
-        }
-    }
+    //        throw new ArgumentException($"方法返回值只能是 Task 或 Task 泛形");
+    //    }
+    //}
 
-    public interface IF1
-    {
-        Task<int> F2();
+    //public interface IF1
+    //{
+    //    Task<int> F2();
 
-        Task F3();
+    //    Task F3();
 
-        void Fx();
-    }
+    //    void Fx();
+    //}
 
 
     internal class Program
     {
         private static void Main(string[] args)
         {
-            //var ipcProvider = new IpcClientProvider();
+            var ipcProvider = new IpcProvider();
+            ipcProvider.GetAndConnectToPeerAsync("123").Wait();
 
             //var f1 = ipcProvider.GetObject<IF1>();
 
