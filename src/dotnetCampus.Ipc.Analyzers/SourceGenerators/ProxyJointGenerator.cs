@@ -9,13 +9,13 @@ using dotnetCampus.Ipc.Analyzers.Core;
 
 using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
 
-namespace dotnetCampus.Ipc.Analyzers.SourceGenerators;
+namespace dotnetCampus.Ipc;
 
 /// <summary>
 /// 为 IPC 对象生成对应的代理（Proxy）和对接（Joint）。
 /// </summary>
 [Generator]
-public class IpcProxyJointSourceGenerator : ISourceGenerator
+public class ProxyJointGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -32,9 +32,9 @@ public class IpcProxyJointSourceGenerator : ISourceGenerator
                 var proxySource = GenerateProxySource(ipcObjectType);
                 var jointSource = GenerateJointSource(ipcObjectType);
                 var assemblySource = GenerateAssemblySource(ipcObjectType);
-                context.AddSource($"{contractType}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                context.AddSource($"{contractType}.joint", SourceText.From(jointSource, Encoding.UTF8));
-                context.AddSource($"{contractType}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                context.AddSource($"{contractType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                context.AddSource($"{contractType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                context.AddSource($"{contractType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
             }
             catch (DiagnosticException ex)
             {
