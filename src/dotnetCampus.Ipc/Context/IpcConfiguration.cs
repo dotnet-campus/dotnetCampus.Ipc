@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Buffers;
 using dotnetCampus.Ipc.Utils.Logging;
 
@@ -31,6 +32,11 @@ namespace dotnetCampus.Ipc.Context
         /// 用于内部使用的数组分配池
         /// </summary>
         public ISharedArrayPool SharedArrayPool { get; set; } = new SharedArrayPool();
+
+        /// <summary>
+        /// 决定如何调度 IPC 通知到业务的代码。
+        /// </summary>
+        public IpcTaskScheduling IpcTaskScheduling { get; set; }
 
         /// <summary>
         /// 为 IPC 记录日志。

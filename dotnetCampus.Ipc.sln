@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc", "src\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj", "{F7ED61F4-920C-49EB-8DC1-74B2BE6AF272}"
 EndProject
@@ -19,9 +19,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PipeMvc", "PipeMvc", "{716A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc.PipeMvcServer", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcServer\dotnetCampus.Ipc.PipeMvcServer.csproj", "{0F6B9C0C-7A64-4B21-BC28-E52565245A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetCampus.Ipc.PipeMvcClient", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcClient\dotnetCampus.Ipc.PipeMvcClient.csproj", "{1ACE3261-CC3D-4442-8C83-516721B3DA46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc.PipeMvcClient", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcClient\dotnetCampus.Ipc.PipeMvcClient.csproj", "{1ACE3261-CC3D-4442-8C83-516721B3DA46}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "dotnetCampus.Ipc.PipeMvcShare", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.shproj", "{05ACE3BB-61E5-4592-AC73-747850DB1081}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11767A0B-CBFB-4323-BCEE-DE1CDD6C4B4B}"
+	ProjectSection(SolutionItems) = preProject
+		build\Version.props = build\Version.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
