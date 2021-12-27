@@ -1,9 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 
+using dotnetCampus.Ipc.Analyzers.Core;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 using Microsoft.CodeAnalysis;
+
+using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
 
 namespace dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
 
@@ -61,7 +64,10 @@ internal class PublicIpcObjectMemberInfo
         {
             IMethodSymbol methodSymbol => GenerateProxyMethod(methodSymbol),
             IPropertySymbol propertySymbol => GenerateProxyProperty(propertySymbol),
-            _ => throw new NotImplementedException(),
+            _ => throw new DiagnosticException(
+                DIPC003_OnlyMethodOrPropertyIsSupported,
+                _implementationMember.Locations.FirstOrDefault(),
+                _interfaceMember.Name),
         };
     }
 
@@ -141,7 +147,10 @@ internal class PublicIpcObjectMemberInfo
         }
         else
         {
-            throw new NotImplementedException();
+            throw new DiagnosticException(
+                DIPC004_OnlyGetOrGetSetPropertyIsSupported,
+                _implementationMember.Locations.FirstOrDefault(),
+                _interfaceMember.Name);
         }
     }
 
@@ -156,7 +165,10 @@ internal class PublicIpcObjectMemberInfo
         {
             IMethodSymbol methodSymbol => GenerateJointMethodMatch(methodSymbol, realInstanceVariableName),
             IPropertySymbol propertySymbol => GenerateJointPropertyMatch(propertySymbol, realInstanceVariableName),
-            _ => throw new NotImplementedException(),
+            _ => throw new DiagnosticException(
+                DIPC003_OnlyMethodOrPropertyIsSupported,
+                _implementationMember.Locations.FirstOrDefault(),
+                _interfaceMember.Name),
         };
     }
 
@@ -206,7 +218,10 @@ internal class PublicIpcObjectMemberInfo
         }
         else
         {
-            throw new NotImplementedException();
+            throw new DiagnosticException(
+                DIPC004_OnlyGetOrGetSetPropertyIsSupported,
+                _implementationMember.Locations.FirstOrDefault(),
+                _interfaceMember.Name);
         }
     }
 

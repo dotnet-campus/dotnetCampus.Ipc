@@ -1,10 +1,13 @@
 ﻿using System.Linq;
 
+using dotnetCampus.Ipc.Analyzers.Core;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
 
 namespace dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
 
@@ -118,12 +121,12 @@ internal class PublicIpcObjectCompilation
                     }
                     else
                     {
-                        throw new NotImplementedException("需要报告编译错误");
+                        throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, classDeclarationSymbol.Locations.FirstOrDefault());
                     }
                 }
                 else
                 {
-                    throw new NotImplementedException("需要报告编译错误");
+                    throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, classDeclarationSymbol.Locations.FirstOrDefault());
                 }
             }
         }

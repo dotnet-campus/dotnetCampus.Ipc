@@ -5,7 +5,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
-using System.Diagnostics;
+using dotnetCampus.Ipc.Analyzers.Core;
+
+using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
 
 namespace dotnetCampus.Ipc.Analyzers.SourceGenerators;
 
@@ -17,20 +19,31 @@ public class IpcProxyJointSourceGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-        //Debugger.Launch();
+        //System.Diagnostics.Debugger.Launch();
     }
 
     public void Execute(GeneratorExecutionContext context)
     {
         foreach (var ipcObjectType in FindIpcPublicObjects(context.Compilation))
         {
-            var contractType = ipcObjectType.ContractType;
-            var proxySource = GenerateProxySource(ipcObjectType);
-            var jointSource = GenerateJointSource(ipcObjectType);
-            var assemblySource = GenerateAssemblySource(ipcObjectType);
-            context.AddSource($"{contractType}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-            context.AddSource($"{contractType}.joint", SourceText.From(jointSource, Encoding.UTF8));
-            context.AddSource($"{contractType}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+            try
+            {
+                var contractType = ipcObjectType.ContractType;
+                var proxySource = GenerateProxySource(ipcObjectType);
+                var jointSource = GenerateJointSource(ipcObjectType);
+                var assemblySource = GenerateAssemblySource(ipcObjectType);
+                context.AddSource($"{contractType}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                context.AddSource($"{contractType}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                context.AddSource($"{contractType}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+            }
+            catch (DiagnosticException ex)
+            {
+                context.ReportDiagnostic(ex.ToDiagnostic());
+            }
+            catch (Exception ex)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
+            }
         }
     }
 
