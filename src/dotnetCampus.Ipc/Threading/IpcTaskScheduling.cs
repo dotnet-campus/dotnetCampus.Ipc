@@ -8,7 +8,12 @@ namespace dotnetCampus.Ipc.Threading
     public enum IpcTaskScheduling
     {
         /// <summary>
-        /// 按顺序依次通知。
+        /// 所有的 IPC 共享同一个调度线程池。以大体上按顺序（但不保证）的并发方式通知。
+        /// </summary>
+        GlobalConcurrent = 0,
+
+        /// <summary>
+        /// 按顺序依次通知，并且与其他 IPC 实例互不影响。
         /// </summary>
         /// <remarks>
         /// <para>使用前请避免在业务中创造死锁条件：</para>
@@ -17,12 +22,6 @@ namespace dotnetCampus.Ipc.Threading
         /// </list>
         /// <para>在这种情况下，按顺序的发送方式将导致死锁。</para>
         /// </remarks>
-        [Obsolete("尚未开发完成。")]
-        Temp = -1,
-
-        /// <summary>
-        /// 所有的 IPC 共享同一个调度线程池。以大体上按顺序（但不保证）的并发方式通知。
-        /// </summary>
-        GlobalConcurrent = 0,
+        LocalOneByOne = 1,
     }
 }
