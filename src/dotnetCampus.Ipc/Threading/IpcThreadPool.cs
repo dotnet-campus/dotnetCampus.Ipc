@@ -18,7 +18,7 @@ namespace dotnetCampus.Ipc.Threading
     /// 此类型的所有公共方法都不是线程安全的，因此你需要确保在临界区调用这些代码。
     /// 但内部方法是线程安全的。
     /// </summary>
-    internal sealed class IpcThreadPool
+    internal sealed class IpcThreadPool : IIpcThreadPool
     {
         /// <summary>
         /// 为每一个创建的线程名称准备一个序号。
