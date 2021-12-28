@@ -21,12 +21,15 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
                 RequestUri = RequestUri,
             };
 
-            var memoryStream = new MemoryStream(Convert.FromBase64String(ContentBase64));
-            //var text = Encoding.UTF8.GetString(memoryStream.ToArray());
-            var streamContent = new StreamContent(memoryStream);
-            result.Content = streamContent;
+            if(ContentBase64 is not null)
+            {
+                var memoryStream = new MemoryStream(Convert.FromBase64String(ContentBase64));
+                //var text = Encoding.UTF8.GetString(memoryStream.ToArray());
+                var streamContent = new StreamContent(memoryStream);
+                result.Content = streamContent;
+            }
 
-            var headerContentList = ContentHeaders.ToObject<List<HeaderContent>>();
+            var headerContentList = ContentHeaders?.ToObject<List<HeaderContent>>();
 
             if (headerContentList != null)
             {
