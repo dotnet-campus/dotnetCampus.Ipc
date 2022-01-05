@@ -1,10 +1,10 @@
-﻿using dotnetCampus.Ipc.Analyzers.Properties;
+﻿using dotnetCampus.Ipc.Properties;
 
 using Microsoft.CodeAnalysis;
 
-using static dotnetCampus.Ipc.Analyzers.Properties.Resources;
+using static dotnetCampus.Ipc.Properties.Resources;
 
-namespace dotnetCampus.Ipc.Analyzers.Core;
+namespace dotnetCampus.Ipc.Core;
 
 /// <summary>
 /// 包含 IPC 框架分析器中的所有诊断。

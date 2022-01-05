@@ -1,14 +1,14 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 
-using dotnetCampus.Ipc.Analyzers.Core;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Core;
 
 using Microsoft.CodeAnalysis;
 
-using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
+using static dotnetCampus.Ipc.Core.Diagnostics;
 
-namespace dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
+namespace dotnetCampus.Ipc.SourceGenerators.Utils;
 
 /// <summary>
 /// 辅助生成契约接口中每一个成员对应的 IPC 代理和对接。

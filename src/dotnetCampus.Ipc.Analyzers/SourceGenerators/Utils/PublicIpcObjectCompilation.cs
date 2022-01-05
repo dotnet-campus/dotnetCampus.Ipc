@@ -1,15 +1,15 @@
 ﻿using System.Linq;
 
-using dotnetCampus.Ipc.Analyzers.Core;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Core;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
+using static dotnetCampus.Ipc.Core.Diagnostics;
 
-namespace dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
+namespace dotnetCampus.Ipc.SourceGenerators.Utils;
 
 /// <summary>
 /// 提供 PublicIpcObject 的语法和语义分析。
@@ -103,9 +103,9 @@ internal class PublicIpcObjectCompilation
                                        where node.IsKind(SyntaxKind.ClassDeclaration)
                                        select (ClassDeclarationSyntax) node;
 
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
         foreach (var classDeclarationSyntax in classDeclarationSyntaxes)
         {
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
             if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax) is { } classDeclarationSymbol
                 && classDeclarationSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
                      x.AttributeClass?.ToString(),

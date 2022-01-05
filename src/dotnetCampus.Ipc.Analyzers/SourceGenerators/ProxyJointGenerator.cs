@@ -3,11 +3,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using dotnetCampus.Ipc.Analyzers.SourceGenerators.Utils;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
-using dotnetCampus.Ipc.Analyzers.Core;
 
-using static dotnetCampus.Ipc.Analyzers.Core.Diagnostics;
+using static dotnetCampus.Ipc.Core.Diagnostics;
+using dotnetCampus.Ipc.Core;
+using dotnetCampus.Ipc.SourceGenerators.Utils;
 
 namespace dotnetCampus.Ipc;
 

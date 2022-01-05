@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace dotnetCampus.Ipc.Analyzers.Core;
+namespace dotnetCampus.Ipc.Core;
 
 /// <summary>
 /// 当出现错误时，通过抛出此异常来报告编译错误。
