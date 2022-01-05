@@ -28,13 +28,13 @@ public class ProxyJointGenerator : ISourceGenerator
         {
             try
             {
-                var contractType = ipcObjectType.ContractType;
+                var realType = ipcObjectType.RealType;
                 var proxySource = GenerateProxySource(ipcObjectType);
                 var jointSource = GenerateJointSource(ipcObjectType);
                 var assemblySource = GenerateAssemblySource(ipcObjectType);
-                context.AddSource($"{contractType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                context.AddSource($"{contractType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
-                context.AddSource($"{contractType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                context.AddSource($"{realType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                context.AddSource($"{realType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                context.AddSource($"{realType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
             }
             catch (DiagnosticException ex)
             {
@@ -54,7 +54,6 @@ public class ProxyJointGenerator : ISourceGenerator
     /// <returns>代理类的源代码。</returns>
     private string GenerateProxySource(PublicIpcObjectCompilation realTypeCompilation)
     {
-        var (contractTypeName, ipcTypeName) = GetIpcContractTypeNames(realTypeCompilation.ContractType);
         var members = string.Join(
             Environment.NewLine + Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
@@ -64,7 +63,7 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 namespace {realTypeCompilation.GetNamespace()}
 {{
-    internal class {ipcTypeName}IpcProxy : GeneratedIpcProxy<{contractTypeName}>, {contractTypeName}
+    internal class {realTypeCompilation.RealType.Name}IpcProxy : GeneratedIpcProxy<{realTypeCompilation.ContractType.Name}>, {realTypeCompilation.ContractType.Name}
     {{
 {members}
     }}
@@ -81,7 +80,6 @@ namespace {realTypeCompilation.GetNamespace()}
     private string GenerateJointSource(PublicIpcObjectCompilation realTypeCompilation)
     {
         const string realInstanceName = "real";
-        var (contractTypeName, ipcTypeName) = GetIpcContractTypeNames(realTypeCompilation.ContractType);
         var matches = string.Join(
             Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
@@ -91,9 +89,9 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 namespace {realTypeCompilation.GetNamespace()}
 {{
-    internal class {ipcTypeName}IpcJoint : GeneratedIpcJoint<{contractTypeName}>
+    internal class {realTypeCompilation.RealType.Name}IpcJoint : GeneratedIpcJoint<{realTypeCompilation.ContractType.Name}>
     {{
-        protected override void MatchMembers({contractTypeName} {realInstanceName})
+        protected override void MatchMembers({realTypeCompilation.ContractType.Name} {realInstanceName})
         {{
 {matches}
         }}
@@ -110,11 +108,10 @@ namespace {realTypeCompilation.GetNamespace()}
     /// <returns>程序集特性的源代码。</returns>
     private string GenerateAssemblySource(PublicIpcObjectCompilation realTypeCompilation)
     {
-        var (_, ipcTypeName) = GetIpcContractTypeNames(realTypeCompilation.ContractType);
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {realTypeCompilation.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute))}(typeof({realTypeCompilation.ContractType}), typeof({ipcTypeName}IpcProxy), typeof({ipcTypeName}IpcJoint))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute))}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
         return sourceCode;
     }
 
@@ -135,20 +132,6 @@ using {realTypeCompilation.GetNamespace()};
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// 根据契约类型生成文件名的一部分。
-    /// </summary>
-    /// <param name="contractType">契约类型。</param>
-    /// <returns>（随便取的）契约类型名和 IPC 类型名。</returns>
-    private (string contractTypeName, string ipcTypeName) GetIpcContractTypeNames(ITypeSymbol contractType)
-    {
-        var contractTypeName = contractType.Name;
-        var typeName = contractTypeName.StartsWith("I")
-            ? contractTypeName.Substring(1)
-            : contractTypeName;
-        return (contractTypeName, typeName);
     }
 
     /// <summary>
