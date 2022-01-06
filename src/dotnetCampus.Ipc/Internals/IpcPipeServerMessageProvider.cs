@@ -60,7 +60,7 @@ namespace dotnetCampus.Ipc.Internals
                 namedPipeServerStream.EndWaitForConnection, null).ConfigureAwait(false);
 #endif
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 // "管道已结束。"
                 // 当前服务关闭，此时异常符合预期

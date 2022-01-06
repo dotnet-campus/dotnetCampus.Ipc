@@ -51,6 +51,6 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 
         public JContainer Headers { set; get; }
 
-        public JContainer ContentHeaders { set; get; }
+        public new JContainer ContentHeaders { set; get; }
     }
 }

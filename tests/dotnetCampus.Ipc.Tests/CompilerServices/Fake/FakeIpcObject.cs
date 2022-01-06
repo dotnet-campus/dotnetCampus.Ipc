@@ -52,23 +52,24 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return IsFake;
         }
 
-        public async Task DoSomethingAsync()
+        public Task DoSomethingAsync()
         {
+            return Task.CompletedTask;
         }
 
-        public async Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d)
+        public Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d)
         {
-            return (a, b, c, d);
+            return Task.FromResult((a, b, c, d));
         }
 
-        public async Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model)
+        public Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model)
         {
-            return new FakeIpcObjectSubModelA(model.A, model.B, model.C, model.D);
+            return Task.FromResult(new FakeIpcObjectSubModelA(model.A, model.B, model.C, model.D));
         }
 
-        public async Task<string> ConvertStringAsync(string source)
+        public Task<string> ConvertStringAsync(string source)
         {
-            return source;
+            return Task.FromResult(source);
         }
     }
 }
