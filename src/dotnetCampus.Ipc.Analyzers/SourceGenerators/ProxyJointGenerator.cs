@@ -1,13 +1,11 @@
 ﻿using System.Linq;
-
+using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Core;
+using dotnetCampus.Ipc.SourceGenerators.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using dotnetCampus.Ipc.CompilerServices.Attributes;
-
 using static dotnetCampus.Ipc.Core.Diagnostics;
-using dotnetCampus.Ipc.Core;
-using dotnetCampus.Ipc.SourceGenerators.Utils;
 
 namespace dotnetCampus.Ipc;
 

@@ -213,7 +213,7 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        private new IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string remotePeerName)
+        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string remotePeerName)
         {
             var tracker = new IpcMessageTracker<IpcMessageContext>(
                 IpcContext.PipeName,
