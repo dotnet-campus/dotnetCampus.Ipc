@@ -37,11 +37,11 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug'">
-    <PackageReference Include="dotnetCampus.UsingMSBuildCopyOutputFileToFastDebug" Version="1.3.217" />
+    <PackageReference Include="dotnetCampus.UsingMSBuildCopyOutputFileToFastDebug" Version="1.3.217" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.0.1" PrivateAssets="all" />
+    <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.1.0" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -50,5 +50,12 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
+
+  <!-- 生成 NuGet 包。 -->
+  <Target Name="_IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="..\dotnetCampus.Ipc.Analyzers\bin\$(Configuration)\**\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
+    </ItemGroup>
+  </Target>
 
 </Project>
