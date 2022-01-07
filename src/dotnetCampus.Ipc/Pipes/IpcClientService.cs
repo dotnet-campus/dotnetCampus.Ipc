@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
@@ -83,12 +84,31 @@ namespace dotnetCampus.Ipc.Pipes
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
+
+            // 带有重试的连接。
+            for (int i = 0; i < 4; i++)
+            {
+                try
+                {
 #if NETCOREAPP
-            await namedPipeClientStream.ConnectAsync();
+                    await namedPipeClientStream.ConnectAsync();
 #else
-            // 在 NET45 没有 ConnectAsync 方法
-            await Task.Run(namedPipeClientStream.Connect);
+                    // 在 NET45 没有 ConnectAsync 方法
+                    await Task.Run(namedPipeClientStream.Connect);
 #endif
+                    break;
+                }
+                catch (FileNotFoundException ex)
+                {
+                    // 因为每个端有两条管道，各自作为服务端和客户端。
+                    // 当重连时，靠的是服务端管道读到末尾来判断的；但此时重连的却是客户端。
+                    // 有极少情况下，这两条的断开时间间隔足够长到本方法的客户端已开始重连。
+                    // 那么，本方法的客户端在一开始试图连接对方时连上了，但随即就完成了之前没完成的断开，于是出现 FileNotFoundException。
+                    // 这时，我们通过重新连接一次可以再次等对方重新启动完再连。
+                    await Task.Delay(16);
+                }
+            }
+
             if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
             {
                 _namedPipeClientStreamTaskCompletionSource.SetResult(namedPipeClientStream);
