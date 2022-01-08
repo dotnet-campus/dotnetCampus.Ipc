@@ -91,7 +91,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     .FirstOrDefault(x => x.ContractType == contractType);
                 if (attribute is null)
                 {
-                    throw new ArgumentException($"{realType.Name} 类型上标记的契约类型与自动生成代理对接的契约类型不匹配，这可能是 dotnetCampus.Ipc 自动生成代码模块的 bug。 ", nameof(realType));
+                    throw new NotSupportedException($"因为编译时没有生成“{realType.Name} : {contractType.Name}”类型的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。", nameof(realType));
                 }
                 return (attribute.ContractType, attribute.ProxyType, attribute.JointType);
             }
