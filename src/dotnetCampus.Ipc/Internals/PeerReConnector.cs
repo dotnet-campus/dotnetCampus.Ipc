@@ -38,12 +38,12 @@ namespace dotnetCampus.Ipc.Internals
                     break;
                 }
                 // ## 此异常有两种
-                catch (FileNotFoundException ex)
+                catch (FileNotFoundException)
                 {
                     // 1. 一种来自于 namedPipeClientStream.ConnectAsync()，刚调用时还能获取到管道句柄，但马上与之连接时便已断开。
                     await Task.Delay(16);
                 }
-                catch (IOException ex)
+                catch (IOException)
                 {
                     // 2. 另一种来自 RegisterToPeer()，前面已经连上了，但试图发消息时便已断开。
                     await Task.Delay(16);
