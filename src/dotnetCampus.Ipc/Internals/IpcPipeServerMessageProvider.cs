@@ -62,13 +62,13 @@ namespace dotnetCampus.Ipc.Internals
                 namedPipeServerStream.EndWaitForConnection, null).ConfigureAwait(false);
 #endif
             }
-            catch (IOException ex)
+            catch (IOException)
             {
                 // "管道已结束。"
                 // 当前服务关闭，此时异常符合预期
                 return;
             }
-            catch (ObjectDisposedException ex)
+            catch (ObjectDisposedException)
             {
                 // 当等待客户端连上此服务端期间，被调用了 Dispose 方法后，会抛出此异常。
                 // 日志在 Dispose 方法里记。
