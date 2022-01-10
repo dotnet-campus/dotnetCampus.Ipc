@@ -16,7 +16,7 @@ namespace dotnetCampus.Ipc.Threading
             action();
             // 因为此方法的调用方能保证依次执行而不并发，所以这里直接 Task.Run 也不会浪费线程。
             //await Task.Run(action).ConfigureAwait(false);
-            return Task.FromResult(Task.FromResult(0));
+            return Task.FromResult<Task>(Task.FromResult(0));
         }
     }
 }

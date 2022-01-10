@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.Internals
 {
@@ -60,10 +62,16 @@ namespace dotnetCampus.Ipc.Internals
                 namedPipeServerStream.EndWaitForConnection, null).ConfigureAwait(false);
 #endif
             }
-            catch (IOException)
+            catch (IOException ex)
             {
                 // "管道已结束。"
                 // 当前服务关闭，此时异常符合预期
+                return;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                // 当等待客户端连上此服务端期间，被调用了 Dispose 方法后，会抛出此异常。
+                // 日志在 Dispose 方法里记。
                 return;
             }
             //var streamMessageConverter = new StreamMessageConverter(namedPipeServerStream,
@@ -107,16 +115,25 @@ namespace dotnetCampus.Ipc.Internals
 
         public void Dispose()
         {
-            if (ServerStreamMessageReader is null)
+            try
             {
-                // 证明此时还没完全连接
-                NamedPipeServerStream.Dispose();
+                if (ServerStreamMessageReader is null)
+                {
+                    // 证明此时还没完全连接
+                    NamedPipeServerStream.Dispose();
+                }
+                else
+                {
+                    // 证明已连接完成，此时不需要释放 NamedPipeServerStream 类
+                    // 不在这一层释放 NamedPipeServerStream 类
+                    ServerStreamMessageReader.Dispose();
+                }
             }
-            else
+            finally
             {
-                // 证明已连接完成，此时不需要释放 NamedPipeServerStream 类
-                // 不在这一层释放 NamedPipeServerStream 类
-                ServerStreamMessageReader.Dispose();
+                // 通过查看 Dispose 的堆栈来检查出异常时到底是谁在 Dispose。
+                IpcContext.Logger.Warning(@$"IpcPipeServerMessageProvider.Dispose
+{new StackTrace()}");
             }
         }
     }

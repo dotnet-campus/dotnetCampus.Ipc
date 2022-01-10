@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
@@ -9,6 +10,7 @@ using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 using dotnetCampus.Threading;
@@ -83,12 +85,14 @@ namespace dotnetCampus.Ipc.Pipes
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
+
 #if NETCOREAPP
             await namedPipeClientStream.ConnectAsync();
 #else
             // 在 NET45 没有 ConnectAsync 方法
             await Task.Run(namedPipeClientStream.Connect);
 #endif
+
             if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
             {
                 _namedPipeClientStreamTaskCompletionSource.SetResult(namedPipeClientStream);
