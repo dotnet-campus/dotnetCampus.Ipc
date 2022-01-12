@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static dotnetCampus.Ipc.Core.Diagnostics;
 
-namespace dotnetCampus.Ipc.SourceGenerators.Utils;
+namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 /// <summary>
 /// 提供 PublicIpcObject 的语法和语义分析。
@@ -70,7 +70,7 @@ internal class PublicIpcObjectCompilation
     /// 以契约接口类型为准，查找所有成员。
     /// </summary>
     /// <returns>所有成员信息。</returns>
-    public IEnumerable<PublicIpcObjectMemberInfo> EnumerateMembersByContractType()
+    public IEnumerable<PublicIpcObjectMemberProxyJointGenerator> EnumerateMembersByContractType()
     {
         var members = ContractType.GetMembers();
         foreach (var member in members)
@@ -83,7 +83,7 @@ internal class PublicIpcObjectCompilation
 
             if (RealType.FindImplementationForInterfaceMember(member) is ISymbol implementationMember)
             {
-                yield return new PublicIpcObjectMemberInfo(ContractType, member, implementationMember);
+                yield return new PublicIpcObjectMemberProxyJointGenerator(ContractType, member, implementationMember);
             }
         }
     }
