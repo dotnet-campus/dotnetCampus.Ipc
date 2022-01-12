@@ -40,6 +40,7 @@ public abstract class IpcMemberAttribute : Attribute
     /// <item>如果此值无法写成编译时常量，请使用字符串形式编写（例如 "IntPtr.Zero" ，含英文引号），编译后会自动将其转为真实代码。</item>
     /// </list>
     /// </summary>
+    [DefaultValue(null)]
     public object? DefaultReturn { get; set; }
 
     /// <summary>
@@ -48,10 +49,19 @@ public abstract class IpcMemberAttribute : Attribute
     /// 如果同时设置了默认值，则异常时会使用此默认值；如果没有设置默认值，则异常时会使用类型默认值 default。
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// 请注意：
+    /// <list type="bullet">
+    /// <item>此特性仅忽略 IPC 异常（例如进程退出、连接断开等），而不会忽略普通业务异常（例如业务实现中抛出了 <see cref="NullReferenceException"/> 等）。</item>
+    /// <item>另外，如果 IPC 框架内部出现了 bug 导致了异常，也不会因此而忽略。</item>
+    /// </list>
+    /// </remarks>
+    [DefaultValue(false)]
     public bool IgnoreIpcException { get; set; }
 
     /// <summary>
     /// 设定此方法执行的超时时间。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
     /// </summary>
-    public int Timeout { get; set; }
+    [DefaultValue(null)]
+    public int? Timeout { get; set; }
 }

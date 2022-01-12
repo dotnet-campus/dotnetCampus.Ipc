@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 
@@ -29,5 +30,6 @@ public sealed class IpcPropertyAttribute : IpcMemberAttribute
     /// 标记一个属性是对于 IPC 代理访问来说是只读的。
     /// 当通过 IPC 访问过一次这个属性后，此属性不再变化，后续无需再通过 IPC 读取，可直接使用本地缓存的值。
     /// </summary>
+    [DefaultValue(false)]
     public bool IsReadonly { get; set; }
 }

@@ -1,54 +1,61 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
 using dotnetCampus.Ipc.Exceptions;
-using dotnetCampus.Ipc.Messages;
-
-using Newtonsoft.Json.Linq;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 {
     /// <summary>
     /// 提供给自动生成的代理对象使用，以便能够生成通过 IPC 方式访问目标成员的能力。
     /// </summary>
-    public abstract class GeneratedIpcProxy
+    public abstract partial class GeneratedIpcProxy
     {
-        private GeneratedProxyJointIpcContext? _context;
-        private string? _typeName;
+        /// <summary>
+        /// 为库内派生类提供 IPC 代理调用的辅助方法。
+        /// </summary>
+        private protected IpcProxyInvokingHelper Invoker { get; } = new IpcProxyInvokingHelper();
 
         /// <summary>
         /// 提供基于 .NET 类型的 IPC 传输上下文信息。
         /// </summary>
-        internal GeneratedProxyJointIpcContext Context
+        public GeneratedProxyJointIpcContext Context
         {
-            get => _context ?? throw new IpcLocalException($"基于 .NET 类型的 IPC 传输机制应使用 {typeof(GeneratedIpcFactory)} 工厂类型来构造。");
-            set => _context = value ?? throw new ArgumentNullException(nameof(value));
+            get => Invoker.Context;
+            internal set => Invoker.Context = value;
         }
 
         /// <summary>
         /// 获取或设置目标 IPC 节点。
         /// 如果设定为 null，则所有请求将返回默认值。（未来可能运行在抛出异常和返回默认值之间进行选择。）
         /// </summary>
-        public IPeerProxy? PeerProxy { get; set; }
+        public IPeerProxy? PeerProxy
+        {
+            get => Invoker.PeerProxy;
+            internal set => Invoker.PeerProxy = value;
+        }
 
         /// <summary>
         /// 如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。
         /// </summary>
         public string TypeName
         {
-            get => _typeName ?? throw new IpcLocalException($"基于 .NET 类型的 IPC 传输机制应使用 {typeof(GeneratedIpcFactory)} 工厂类型来构造。");
-            internal set => _typeName = value;
+            get => Invoker.TypeName;
+            internal set => Invoker.TypeName = value;
         }
 
         /// <summary>
         /// 如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。
         /// </summary>
-        public string? ObjectId { get; set; }
+        public string? ObjectId
+        {
+            get => Invoker.ObjectId;
+            internal set => Invoker.ObjectId = value;
+        }
     }
 
     /// <summary>
@@ -70,31 +77,29 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 通过 IPC 访问目标对象上某属性的值。
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
+        /// <param name="attributes">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性的值。</returns>
-        protected async Task<T?> GetValueAsync<T>([CallerMemberName] string propertyName = "")
+        protected async Task<T?> GetValueAsync<T>(IpcProxyMemberAttributes attributes, [CallerMemberName] string propertyName = "")
         {
-            return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// 通过 IPC 访问目标对象上某标记了 <see cref="IpcPropertyAttribute"/> 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
-        /// 当发生并发时，可能导致多次通过 IPC 访问此属性的值，但此方法依然是线程安全的。
-        /// </summary>
-        /// <typeparam name="T">属性类型。</typeparam>
-        /// <param name="propertyName">属性名称。</param>
-        /// <returns>可异步等待的属性的值。</returns>
-        protected async Task<T?> GetReadonlyValueAsync<T>([CallerMemberName] string propertyName = "")
-        {
-            if (_readonlyPropertyValues.TryGetValue(propertyName, out var cachedValue))
+            if (attributes.Flags.HasFlag(IpcMemberAttributeFlags.IsReadonly))
             {
-                // 当只读字典中存在此属性的缓存时，直接取缓存。
-                return (T?) cachedValue;
+                // 通过 IPC 访问目标对象上某标记了 IpcPropertyAttribute 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
+                // 当发生并发时，可能导致多次通过 IPC 访问此属性的值，但此方法依然是线程安全的。
+                if (_readonlyPropertyValues.TryGetValue(propertyName, out var cachedValue))
+                {
+                    // 当只读字典中存在此属性的缓存时，直接取缓存。
+                    return (T?) cachedValue;
+                }
+                // 否则，通过 IPC 访问获取此属性的值后设入缓存。（这里可能存在并发情况，会导致浪费的 IPC 访问，但能确保数据一致性）。
+                var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, attributes).ConfigureAwait(false);
+                _readonlyPropertyValues.TryAdd(propertyName, value);
+                return value;
             }
-            // 否则，通过 IPC 访问获取此属性的值后设入缓存。（这里可能存在并发情况，会导致浪费的 IPC 访问，但能确保数据一致性）。
-            var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null).ConfigureAwait(false);
-            _readonlyPropertyValues.TryAdd(propertyName, value);
-            return value;
+            else
+            {
+                return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, attributes).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -102,145 +107,100 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
         /// <param name="value">要设置的属性的值。</param>
+        /// <param name="attributes">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性设置。</returns>
-        protected async Task SetValueAsync<T>(T value, [CallerMemberName] string propertyName = "")
+        protected Task SetValueAsync<T>(T value, IpcProxyMemberAttributes attributes, [CallerMemberName] string propertyName = "")
         {
-            await IpcInvokeAsync<object>(MemberInvokingType.SetProperty, propertyName, new object?[] { value }).ConfigureAwait(false);
+            return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, propertyName, new object?[] { value }, attributes);
         }
 
-        protected async Task CallMethod([CallerMemberName] string methodName = "")
+        /// <summary>
+        /// 通过 IPC 调用目标对象上的某个方法。
+        /// </summary>
+        /// <param name="args">方法参数列表。</param>
+        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="methodName">方法名。</param>
+        /// <returns>可异步等待方法返回值的可等待对象。</returns>
+        protected Task CallMethod(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
         {
-            await IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, new object?[0]).ConfigureAwait(false);
+            return IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, args, attributes);
         }
 
-        protected async Task<T?> CallMethod<T>([CallerMemberName] string methodName = "")
+        /// <summary>
+        /// 通过 IPC 调用目标对象上的某个方法。
+        /// </summary>
+        /// <param name="args">方法参数列表。</param>
+        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="methodName">方法名。</param>
+        /// <returns>可异步等待方法返回值的可等待对象。</returns>
+        protected Task<T?> CallMethod<T>(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
         {
-            return await IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, new object?[0]).ConfigureAwait(false);
+            return IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, args, attributes);
         }
 
-        protected async Task CallMethod(object?[]? args, [CallerMemberName] string methodName = "")
+        /// <summary>
+        /// 通过 IPC 调用目标对象上的某个异步方法。
+        /// </summary>
+        /// <param name="args">方法参数列表。</param>
+        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="methodName">方法名。</param>
+        /// <returns>可异步等待方法返回值的可等待对象。</returns>
+        protected Task CallMethodAsync(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
         {
-            await IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, args).ConfigureAwait(false);
+            return IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, args, attributes);
         }
 
-        protected async Task<T?> CallMethod<T>(object?[]? args, [CallerMemberName] string methodName = "")
+        /// <summary>
+        /// 通过 IPC 调用目标对象上的某个异步方法。
+        /// </summary>
+        /// <param name="args">方法参数列表。</param>
+        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="methodName">方法名。</param>
+        /// <returns>可异步等待方法返回值的可等待对象。</returns>
+        protected Task<T?> CallMethodAsync<T>(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
         {
-            return await IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, args).ConfigureAwait(false);
+            return IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, args, attributes);
         }
 
-        protected async Task CallMethodAsync([CallerMemberName] string methodName = "")
+        /// <summary>
+        /// 在 <see cref="IpcMethodAttribute"/> 和 <see cref="IpcPropertyAttribute"/> 中标记的访问属性和调用方法相关的个性化方式，大多数将在此方法中被实践，少数在自动生成代理类时被实践。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="callType">调用类型（属性还是方法）。</param>
+        /// <param name="memberName">成员名。</param>
+        /// <param name="args">调用参数。</param>
+        /// <param name="attributes">包含属性上标记的调用此 IPC 成员的个性化方式。</param>
+        /// <returns>可异步等待方法返回值的可等待对象。</returns>
+        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, object?[]? args, IpcProxyMemberAttributes attributes)
         {
-            await IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, new object?[0]).ConfigureAwait(false);
-        }
-
-        protected async Task<T?> CallMethodAsync<T>([CallerMemberName] string methodName = "")
-        {
-            return await IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, new object?[0]).ConfigureAwait(false);
-        }
-
-        protected async Task CallMethodAsync(object?[]? args, [CallerMemberName] string methodName = "")
-        {
-            await IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, args).ConfigureAwait(false);
-        }
-
-        protected async Task<T?> CallMethodAsync<T>(object?[]? args, [CallerMemberName] string methodName = "")
-        {
-            return await IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, args).ConfigureAwait(false);
-        }
-
-        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, object?[]? args)
-        {
-            if (PeerProxy is null)
+            try
             {
-                return default;
+                return attributes.Timeout is int timeout && timeout > 0
+                    ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout).ConfigureAwait(false)
+                    : await Invoker.IpcInvokeAsync<T>(callType, memberName, args).ConfigureAwait(false);
             }
-
-            var returnModel = await IpcInvokeAsync(new GeneratedProxyMemberInvokeModel
+            catch (IpcRemoteException) when (attributes.Flags.HasFlag(IpcMemberAttributeFlags.IgnoreIpcException))
             {
-                Id = ObjectId,
-                ContractFullTypeName = TypeName,
-                CallType = callType,
-                MemberName = memberName,
-                Args = args?.Select(SerializeArg).ToArray(),
-            }).ConfigureAwait(false);
-
-            if (returnModel is null)
-            {
-                // 如果远端返回 null，则本地代理返回 null。
-                return default;
+                // 如果目标要求忽略异常，则返回指定值或默认值。
+                return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
             }
-
-            if (returnModel.Exception is { } exceptionModel)
-            {
-                // 如果远端抛出了异常，则本地代理抛出相同的异常。
-                exceptionModel.Throw();
-            }
-
-            if (returnModel.Return is { } model
-                && Context.TryCreateProxyFromSerializationInfo(PeerProxy,
-                    model.AssemblyQualifiedName, model.Id, out var proxyInstance))
-            {
-                // 如果远端返回 IPC 公开的对象，则本地获取此对象的代理并返回。
-                return (T) proxyInstance;
-            }
-
-            // 其他情况直接使用反序列化的值返回。
-            return Cast<T>(returnModel.Return?.Value);
         }
 
-        private async Task<GeneratedProxyMemberReturnModel?> IpcInvokeAsync(GeneratedProxyMemberInvokeModel model)
+        private async Task<T?> InvokeWithTimeoutAsync<T>(MemberInvokingType callType, string memberName, object?[]? args, int millisecondsTimeout)
         {
-            if (PeerProxy is null)
+            var ipcTask = Invoker.IpcInvokeAsync<T>(callType, memberName, args);
+            var timeoutTask = Task.Delay(millisecondsTimeout);
+            var task = await Task.WhenAny(ipcTask, timeoutTask).ConfigureAwait(false);
+            if (task == ipcTask)
             {
-                return null;
-            }
-
-            var requestMessage = GeneratedProxyMemberInvokeModel.Serialize(model);
-            requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
-            var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
-            if (GeneratedProxyMemberReturnModel.TryDeserialize(responseMessage, out var returnModel))
-            {
-                return returnModel;
+                // 任务正常完成。
+                return ipcTask.Result;
             }
             else
             {
-                throw new NotSupportedException("请谨慎对待此异常！无法处理 IPC 代理调用的返回值。");
-            }
-        }
-
-        private T? Cast<T>(object? arg)
-        {
-            if (arg is JToken jToken)
-            {
-                return KnownTypeConverter.ConvertBack<T>(jToken);
-            }
-            return (T?) arg;
-        }
-
-        private GeneratedProxyObjectModel? SerializeArg(object? arg)
-        {
-            if (PeerProxy is null)
-            {
-                return null;
-            }
-
-            if (Context.TryCreateSerializationInfoFromIpcRealInstance(arg, out var objectId, out var assemblyQualifiedName))
-            {
-                // 如果此参数是一个 IPC 对象。
-                return new GeneratedProxyObjectModel
-                {
-                    Id = objectId,
-                    AssemblyQualifiedName = assemblyQualifiedName,
-                };
-            }
-            else
-            {
-                // 如果此参数只是一个普通对象。
-                return new GeneratedProxyObjectModel
-                {
-                    Value = KnownTypeConverter.Convert(arg),
-                };
+                // 任务超时。
+                throw new IpcInvokingTimeoutException(memberName, TimeSpan.FromMilliseconds(millisecondsTimeout));
             }
         }
     }

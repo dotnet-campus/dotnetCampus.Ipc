@@ -35,20 +35,19 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateProxyMember()
     {
-        var isReadonly = _property.CheckIpcIsReadonly();
-        var getterName = isReadonly ? "GetReadonlyValueAsync" : "GetValueAsync";
+        var attributes = _property.GetIpcAttributesAsAnInvokingArg();
         if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
         {
             var sourceCode = $@"        public {_property.Type} {_property.Name}
         {{
-            get => {getterName}<{_property.Type}>().Result;
-            set => SetValueAsync(value).Wait();
+            get => GetValueAsync<{_property.Type}>({attributes}).Result;
+            set => SetValueAsync(value, {attributes}).Wait();
         }}";
             return sourceCode;
         }
         else if (_property.GetMethod is { } getOnlyMethod)
         {
-            var sourceCode = $"        public {_property.Type} {_property.Name} => {getterName}<{_property.Type}>().Result;";
+            var sourceCode = $"        public {_property.Type} {_property.Name} => GetValueAsync<{_property.Type}>({attributes}).Result;";
             return sourceCode;
         }
         else

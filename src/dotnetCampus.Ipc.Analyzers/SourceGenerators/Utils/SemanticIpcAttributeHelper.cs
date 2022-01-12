@@ -1,4 +1,6 @@
-﻿using dotnetCampus.Ipc.CompilerServices.Attributes;
+﻿using System.Globalization;
+
+using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 using Microsoft.CodeAnalysis;
 
@@ -10,6 +12,49 @@ namespace dotnetCampus.Ipc.SourceGenerators.Utils;
 public static class SemanticIpcAttributeHelper
 {
     /// <summary>
+    /// 检查此方法上标记的 <see cref="IpcMethodAttribute"/> 并将其转换为传入 IPC 代理的类型。
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    public static string GetIpcAttributesAsAnInvokingArg(this IMethodSymbol method)
+    {
+        var waitsVoid = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.WaitsVoid));
+        var ignoreIpcException = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.IgnoreIpcException));
+        var defaultReturn = method.GetAttributeValue<IpcMethodAttribute, object?>(nameof(IpcMethodAttribute.DefaultReturn));
+        var timeout = method.GetAttributeValue<IpcMethodAttribute, int>(nameof(IpcMethodAttribute.Timeout));
+        return $"new({Format(defaultReturn)}, {Format(timeout)}, ignoreIpcException: {Format(ignoreIpcException)}, waitsVoid: {Format(waitsVoid)})";
+    }
+
+    /// <summary>
+    /// 检查此方法上标记的 <see cref="IpcMethodAttribute"/> 并将其转换为传入 IPC 代理的类型。
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    public static string GetIpcAttributesAsAnInvokingArg(this IPropertySymbol property)
+    {
+        var isReadonly = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IsReadonly));
+        var ignoreIpcException = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IgnoreIpcException));
+        var defaultReturn = property.GetAttributeValue<IpcPropertyAttribute, object?>(nameof(IpcPropertyAttribute.DefaultReturn));
+        var timeout = property.GetAttributeValue<IpcPropertyAttribute, int>(nameof(IpcPropertyAttribute.Timeout));
+        return $"new({Format(defaultReturn)}, {Format(timeout)}, ignoreIpcException: {Format(ignoreIpcException)}, isReadonly: {Format(isReadonly)})";
+    }
+
+    private static string Format(object? value)
+    {
+        return value?.ToString() ?? "null";
+    }
+
+    private static string Format(bool value)
+    {
+        return value ? "true" : "false";
+    }
+
+    private static string Format(int value)
+    {
+        return value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
     /// 检查此方法是否标记了 <see cref="IpcMethodAttribute.WaitsVoid"/>。
     /// </summary>
     /// <param name="symbol"></param>
@@ -17,75 +62,5 @@ public static class SemanticIpcAttributeHelper
     public static bool CheckIpcWaitingVoid(this IMethodSymbol symbol)
     {
         return symbol.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.WaitsVoid));
-    }
-
-    /// <summary>
-    /// 检查此方法是以 <see cref="IpcMethodAttribute.DefaultReturn"/> 标记的值。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static object? GetIpcDefaultReturn(this IMethodSymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcMethodAttribute, object>(nameof(IpcMemberAttribute.DefaultReturn));
-    }
-
-    /// <summary>
-    /// 检查此方法是否标记了 <see cref="IpcMethodAttribute.IgnoreIpcException"/>。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static bool CheckIpcIgnoreIpcException(this IMethodSymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMemberAttribute.IgnoreIpcException));
-    }
-
-    /// <summary>
-    /// 检查此方法以 <see cref="IpcMethodAttribute.Timeout"/> 标记的超时时间。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static int GetIpcTimeout(this IMethodSymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcMethodAttribute, int>(nameof(IpcMemberAttribute.Timeout));
-    }
-
-    /// <summary>
-    /// 检查此属性是否标记了 <see cref="IpcPropertyAttribute.IsReadonly"/>。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static bool CheckIpcIsReadonly(this IPropertySymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IsReadonly));
-    }
-
-    /// <summary>
-    /// 检查此属性是以 <see cref="IpcMethodAttribute.DefaultReturn"/> 标记的值。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static object? GetIpcDefaultReturn(this IPropertySymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcPropertyAttribute, object>(nameof(IpcMemberAttribute.DefaultReturn));
-    }
-
-    /// <summary>
-    /// 检查此属性是否标记了 <see cref="IpcMethodAttribute.IgnoreIpcException"/>。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static bool CheckIpcIgnoreIpcException(this IPropertySymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcMemberAttribute.IgnoreIpcException));
-    }
-
-    /// <summary>
-    /// 检查此属性以 <see cref="IpcMethodAttribute.Timeout"/> 标记的超时时间。
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public static int GetIpcTimeout(this IPropertySymbol symbol)
-    {
-        return symbol.GetAttributeValue<IpcPropertyAttribute, int>(nameof(IpcMemberAttribute.Timeout));
     }
 }

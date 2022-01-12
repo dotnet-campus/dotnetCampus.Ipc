@@ -5,6 +5,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Nullable>enable</Nullable>
     <RootNamespace>dotnetCampus.Ipc</RootNamespace>
+    <DefineConstants>$(DefineConstants);IPC_ANALYZER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

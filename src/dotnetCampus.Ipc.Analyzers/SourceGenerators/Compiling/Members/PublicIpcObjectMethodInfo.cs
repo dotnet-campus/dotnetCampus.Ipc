@@ -43,45 +43,49 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// <returns>方法源代码。</returns>
     public string GenerateProxyMember()
     {
+        var attributes = _method.GetIpcAttributesAsAnInvokingArg();
         if (_isAsyncMethod)
         {
+            // 异步方法。
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
             var sourceCode = asyncReturnType is null
                 ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
         {{
-            return CallMethodAsync(new object[] {{ {arguments} }});
+            return CallMethodAsync(new object[] {{ {arguments} }}, {attributes});
         }}"
                 : @$"        public System.Threading.Tasks.Task<{asyncReturnType}> {_method.Name}({parameters})
         {{
-            return CallMethodAsync<{asyncReturnType}>(new object[] {{ {arguments} }});
+            return CallMethodAsync<{asyncReturnType}>(new object[] {{ {arguments} }}, {attributes});
         }}";
             return sourceCode;
         }
         else if (_method.ReturnsVoid)
         {
+            // 同步 void 方法。
             var waitVoid = _method.CheckIpcWaitingVoid();
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var sourceCode = waitVoid
                 ? @$"        public void {_method.Name}({parameters})
         {{
-            CallMethod(new object[] {{ {arguments} }}).Wait();
+            CallMethod(new object[] {{ {arguments} }}, {attributes}).Wait();
         }}"
                 : @$"        public void {_method.Name}({parameters})
         {{
-            _ = CallMethod(new object[] {{ {arguments} }});
+            _ = CallMethod(new object[] {{ {arguments} }}, {attributes});
         }}";
             return sourceCode;
         }
         else
         {
+            // 同步带返回值方法。
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
         {{
-            return CallMethod<{_method.ReturnType}>(new object[] {{ {arguments} }}).Result;
+            return CallMethod<{_method.ReturnType}>(new object[] {{ {arguments} }}, {attributes}).Result;
         }}";
             return sourceCode;
         }
