@@ -43,13 +43,13 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// <returns>方法源代码。</returns>
     public string GenerateProxyMember()
     {
-        var attributes = _method.GetIpcAttributesAsAnInvokingArg();
         if (_isAsyncMethod)
         {
             // 异步方法。
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(asyncReturnType);
             var sourceCode = asyncReturnType is null
                 ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
         {{
@@ -67,6 +67,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var waitVoid = _method.CheckIpcWaitingVoid();
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(null);
             var sourceCode = waitVoid
                 ? @$"        public void {_method.Name}({parameters})
         {{
@@ -83,9 +84,11 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             // 同步带返回值方法。
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
+            var @return = _method.ReturnType;
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(@return);
             var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
         {{
-            return CallMethod<{_method.ReturnType}>(new object[] {{ {arguments} }}, {attributes}).Result;
+            return CallMethod<{@return}>(new object[] {{ {arguments} }}, {attributes}).Result;
         }}";
             return sourceCode;
         }
@@ -151,7 +154,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// </summary>
     /// <param name="returnType">此方法返回类型的语义符号。</param>
     /// <returns>返回类型的源代码。</returns>
-    private string? GetAsyncReturnType(ITypeSymbol returnType)
+    private ITypeSymbol? GetAsyncReturnType(ITypeSymbol returnType)
     {
         if (returnType is INamedTypeSymbol namedReturnType)
         {
@@ -160,7 +163,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
                 if (namedReturnType.TypeArguments.FirstOrDefault() is { } returnArgument)
                 {
                     // Task<TResult>
-                    return returnArgument.ToString();
+                    return returnArgument;
                 }
                 else
                 {
@@ -170,12 +173,12 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             }
             else
             {
-                return returnType.ToString();
+                return returnType;
             }
         }
         else
         {
-            return returnType.ToString();
+            return returnType;
         }
     }
 }

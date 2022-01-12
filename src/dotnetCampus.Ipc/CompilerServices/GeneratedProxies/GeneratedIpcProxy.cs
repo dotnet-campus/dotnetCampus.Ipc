@@ -82,7 +82,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns>可异步等待的属性的值。</returns>
         protected async Task<T?> GetValueAsync<T>(IpcProxyMemberAttributes attributes, [CallerMemberName] string propertyName = "")
         {
-            if (attributes.Flags.HasFlag(IpcMemberAttributeFlags.IsReadonly))
+            if (attributes.IsReadonly)
             {
                 // 通过 IPC 访问目标对象上某标记了 IpcPropertyAttribute 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
                 // 当发生并发时，可能导致多次通过 IPC 访问此属性的值，但此方法依然是线程安全的。
@@ -180,7 +180,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout).ConfigureAwait(false)
                     : await Invoker.IpcInvokeAsync<T>(callType, memberName, args).ConfigureAwait(false);
             }
-            catch (IpcRemoteException) when (attributes.Flags.HasFlag(IpcMemberAttributeFlags.IgnoreIpcException))
+            catch (IpcRemoteException) when (attributes.IgnoreIpcException)
             {
                 // 如果目标要求忽略异常，则返回指定值或默认值。
                 return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;

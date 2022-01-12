@@ -34,10 +34,17 @@ public abstract class IpcMemberAttribute : Attribute
 
     /// <summary>
     /// 在指定了 <see cref="IgnoreIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
-    /// <list type="bullet">
+    /// <list type="number">
     /// <item>不指定此值时，会使用属性或返回值类型的默认值（即 default）。</item>
     /// <item>如果此值可使用编译时常量来表示，则直接写在这里即可。</item>
     /// <item>如果此值无法写成编译时常量，请使用字符串形式编写（例如 "IntPtr.Zero" ，含英文引号），编译后会自动将其转为真实代码。</item>
+    /// <item>
+    /// 接上条，如果你确实是一个 object 返回值但默认值是一个字符串，请写成以下两种中的一种：
+    /// <list type="bullet">
+    /// <item>@"""字符串值"""（含“@”及所有的英文引号）</item>
+    /// <item>"\"字符串值\""（含所有的英文引号及斜杠）</item>
+    /// </list>
+    /// </item>
     /// </list>
     /// </summary>
     [DefaultValue(null)]
@@ -63,5 +70,5 @@ public abstract class IpcMemberAttribute : Attribute
     /// 设定此方法执行的超时时间。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
     /// </summary>
     [DefaultValue(null)]
-    public int? Timeout { get; set; }
+    public int Timeout { get; set; }
 }

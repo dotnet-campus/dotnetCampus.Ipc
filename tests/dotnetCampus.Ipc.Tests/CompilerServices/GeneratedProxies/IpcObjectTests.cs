@@ -22,7 +22,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 var (peer, proxy) = await CreateIpcPairAsync("001");
 
                 // 安放。
-                var result = await proxy.ConstructAsync(1, 2, 3, 4);
+                var result = await proxy.AsyncMethodWithStructParametersAndStructReturn(1, 2, 3, 4);
 
                 // 植物。
                 Assert.AreEqual(new ValueTuple<double, uint, int, byte>(1, 2, 3, 4), result);
@@ -34,7 +34,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 var (peer, proxy) = await CreateIpcPairAsync("002");
 
                 // 安放。
-                var result = await proxy.ConvertObjectAsync(new FakeIpcObjectSubModelA(1, 2, 3, 4));
+                var result = await proxy.AsyncMethodWithComplexParametersAndComplexReturn(new FakeIpcObjectSubModelA(1, 2, 3, 4));
 
                 // 植物。
                 Assert.AreEqual((double) 1, result.A);
@@ -49,7 +49,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 var (peer, proxy) = await CreateIpcPairAsync("003");
 
                 // 安放。
-                var result = await proxy.ConvertStringAsync("Test");
+                var result = await proxy.AsyncMethodWithPrimaryParametersAndPrimaryReturn("Test");
 
                 // 植物。
                 Assert.AreEqual("Test", result);

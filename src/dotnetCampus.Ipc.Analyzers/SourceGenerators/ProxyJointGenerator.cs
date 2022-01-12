@@ -138,7 +138,8 @@ using {realTypeCompilation.GetNamespace()};
     /// <returns>格式化的源代码。</returns>
     private string FormatCode(string sourceCode)
     {
-        return CSharpSyntaxTree.ParseText(sourceCode).GetRoot().NormalizeWhitespace().SyntaxTree.GetText().ToString();
+        var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
+        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 
     /// <summary>
