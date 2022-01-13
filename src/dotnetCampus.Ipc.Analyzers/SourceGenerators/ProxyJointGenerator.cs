@@ -105,7 +105,7 @@ namespace {realTypeCompilation.GetNamespace()}
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {realTypeCompilation.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute))}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
         return sourceCode;
     }
 
@@ -137,21 +137,5 @@ using {realTypeCompilation.GetNamespace()};
     {
         var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
         return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
-    }
-
-    /// <summary>
-    /// 获取一个类型作为 Attribute 编写时的编写名称，即去掉末尾的 Attribute 字符串。
-    /// </summary>
-    /// <param name="type">类型。</param>
-    /// <returns>去掉末尾 Attribute 后的字符串。</returns>
-    private string GetAttributeName(Type type)
-    {
-        const string attributePostfix = "Attribute";
-        var typeName = type.FullName;
-        if (typeName.EndsWith(attributePostfix))
-        {
-            return typeName.Substring(0, typeName.Length - attributePostfix.Length);
-        }
-        return typeName;
     }
 }

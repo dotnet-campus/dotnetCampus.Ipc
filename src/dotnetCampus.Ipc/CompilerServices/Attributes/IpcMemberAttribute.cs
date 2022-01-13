@@ -7,7 +7,10 @@ namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 /// 指定成员的 IPC 代理访问方式和对接方式。
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class IpcMemberAttribute : Attribute
+#if !IPC_ANALYZER
+public
+#endif
+abstract class IpcMemberAttribute : Attribute
 {
     /// <summary>
     /// 指定此成员的 IPC 代理访问方式和对接方式。

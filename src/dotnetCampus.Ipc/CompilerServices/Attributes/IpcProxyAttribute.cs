@@ -9,6 +9,9 @@ namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 /// </para>
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-internal class IpcProxyAttribute : Attribute
+#if !IPC_ANALYZER
+public
+#endif
+class IpcProxyAttribute : Attribute
 {
 }

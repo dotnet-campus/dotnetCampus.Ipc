@@ -6,7 +6,10 @@ namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 /// 由编译器自动生成，将 IPC 契约类型与其自动生成的代理和对接类型关联起来。
 /// </summary>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
-public class AssemblyIpcProxyJointAttribute : Attribute
+#if !IPC_ANALYZER
+public
+#endif
+class AssemblyIpcProxyJointAttribute : Attribute
 {
     public AssemblyIpcProxyJointAttribute(Type contractType, Type shapeType, Type proxyType, Type jointType)
     {

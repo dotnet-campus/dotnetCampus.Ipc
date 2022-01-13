@@ -7,7 +7,10 @@ namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 /// 指定此属性的 IPC 代理访问方式和对接方式。
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
-public sealed class IpcPropertyAttribute : IpcMemberAttribute
+#if !IPC_ANALYZER
+public
+#endif
+sealed class IpcPropertyAttribute : IpcMemberAttribute
 {
     /// <summary>
     /// 指定此属性的 IPC 代理访问方式和对接方式。

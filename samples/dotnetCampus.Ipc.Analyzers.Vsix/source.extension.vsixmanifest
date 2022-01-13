@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="dotnetCampus.Ipc.Analyzers.61bea127-51ff-4d50-a72c-bf4dba8589a3" Version="1.0" Language="en-US" Publisher="walterlv"/>
+    <DisplayName>dotnetCampus.Ipc.Analyzers</DisplayName>
+    <Description xml:space="preserve">This extension is only used for Visual Studio debugging and we'll never publish as a VSIX extension. The analyzer should always be used as a NuGet package.</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 17.0)">
+      <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="dotnetCampus.Ipc.Analyzers" Path="|dotnetCampus.Ipc.Analyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="dotnetCampus.Ipc.Analyzers" Path="|dotnetCampus.Ipc.Analyzers|"/>
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[15.0,)" DisplayName="Roslyn Language Services" />
+  </Prerequisites>
+</PackageManifest>

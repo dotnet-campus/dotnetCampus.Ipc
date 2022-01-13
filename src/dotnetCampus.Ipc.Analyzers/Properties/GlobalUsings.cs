@@ -13,4 +13,4 @@ global using dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
 global using Microsoft.CodeAnalysis;
 
 global using static dotnetCampus.Ipc.CodeAnalysis.Core.Diagnostics;
-
+global using static dotnetCampus.Ipc.CodeAnalysis.Utils.AttributeSyntaxHelper;

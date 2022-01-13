@@ -7,7 +7,7 @@ using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
-    [IpcPublic(typeof(IFakeIpcObject))]
+    [IpcPublic(typeof(IFakeIpcObject), Timeout = 100)]
     internal class FakeIpcObject : IFakeIpcObject
     {
         private BindingFlags _enumProperty = BindingFlags.Public;
