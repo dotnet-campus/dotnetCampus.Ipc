@@ -165,4 +165,13 @@
   <data name="DIPC102_Message" xml:space="preserve">
     <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
   </data>
+  <data name="DIPC103" xml:space="preserve">
+    <value>Empty {0} is not needed</value>
+  </data>
+  <data name="DIPC103_Fix" xml:space="preserve">
+    <value>Remove the {0}</value>
+  </data>
+  <data name="DIPC103_Message" xml:space="preserve">
+    <value>Empty {0} does nothing, so there is no need to add it.</value>
+  </data>
 </root>

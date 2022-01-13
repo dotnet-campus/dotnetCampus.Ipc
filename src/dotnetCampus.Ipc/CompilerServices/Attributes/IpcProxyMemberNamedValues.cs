@@ -13,7 +13,7 @@ partial class GeneratedIpcProxy
 #if !IPC_ANALYZER
     protected
 #endif
-    class IpcProxyMemberAttributes
+    class IpcProxyMemberNamedValues
     {
         private IpcMemberAttributeFlags _flags;
 

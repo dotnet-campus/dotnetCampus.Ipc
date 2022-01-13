@@ -203,5 +203,32 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC102_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 Empty {0} is not needed 的本地化字符串。
+        /// </summary>
+        internal static string DIPC103 {
+            get {
+                return ResourceManager.GetString("DIPC103", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove the {0} 的本地化字符串。
+        /// </summary>
+        internal static string DIPC103_Fix {
+            get {
+                return ResourceManager.GetString("DIPC103_Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Empty {0} does nothing, so there is no need to add it. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC103_Message {
+            get {
+                return ResourceManager.GetString("DIPC103_Message", resourceCulture);
+            }
+        }
     }
 }

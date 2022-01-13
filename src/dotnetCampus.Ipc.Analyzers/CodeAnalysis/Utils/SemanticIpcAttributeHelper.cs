@@ -14,7 +14,7 @@ internal static class SemanticIpcAttributeHelper
     /// <param name="returnTypeSymbol">返回值类型，依此来决定如何将 Attribute 里的对象转为字符串。</param>
     /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    internal static IpcProxyMemberAttributes GetIpcAttributesAsAnInvokingArg(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol, INamedTypeSymbol containingType)
+    internal static IpcProxyMemberNamedValues GetIpcNamedValues(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol, INamedTypeSymbol containingType)
     {
         var type = containingType;
         var waitsVoid = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.WaitsVoid));
@@ -25,7 +25,7 @@ internal static class SemanticIpcAttributeHelper
         var timeout = method.GetAttributeValue<IpcMethodAttribute, int>(nameof(IpcMethodAttribute.Timeout))
             ?? type.GetAttributeValue<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout))
             ?? 0;
-        return new IpcProxyMemberAttributes
+        return new IpcProxyMemberNamedValues
         {
             DefaultReturn = defaultReturn,
             Timeout = timeout,
@@ -41,16 +41,16 @@ internal static class SemanticIpcAttributeHelper
     /// <param name="returnTypeSymbol">返回值类型，依此来决定如何将 Attribute 里的对象转为字符串。</param>
     /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    internal static string FormatIpcAttributesAsAnInvokingArg(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol, INamedTypeSymbol containingType)
+    internal static string FormatIpcNamedValuesAsAnInvokingArg(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol, INamedTypeSymbol containingType)
     {
-        var attributes = GetIpcAttributesAsAnInvokingArg(method, returnTypeSymbol, containingType);
+        var namedValues = GetIpcNamedValues(method, returnTypeSymbol, containingType);
         var quoteObject = returnTypeSymbol?.ToString() == "string";
         return $@"new()
 {{
-    DefaultReturn = {Format(attributes.DefaultReturn?.Value, quoteObject)},
-    Timeout = {Format(attributes.Timeout)},
-    IgnoresIpcException = {Format(attributes.IgnoresIpcException)},
-    WaitsVoid = {Format(attributes.WaitsVoid)}
+    DefaultReturn = {Format(namedValues.DefaultReturn?.Value, quoteObject)},
+    Timeout = {Format(namedValues.Timeout)},
+    IgnoresIpcException = {Format(namedValues.IgnoresIpcException)},
+    WaitsVoid = {Format(namedValues.WaitsVoid)}
 }}";
     }
 
@@ -60,7 +60,7 @@ internal static class SemanticIpcAttributeHelper
     /// <param name="property">要查找标记的属性。</param>
     /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    public static IpcProxyMemberAttributes GetIpcAttributesAsAnInvokingArg(this IPropertySymbol property, INamedTypeSymbol containingType)
+    public static IpcProxyMemberNamedValues GetIpcNamedValues(this IPropertySymbol property, INamedTypeSymbol containingType)
     {
         var type = containingType;
         var isReadonly = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IsReadonly));
@@ -71,7 +71,7 @@ internal static class SemanticIpcAttributeHelper
         var timeout = property.GetAttributeValue<IpcPropertyAttribute, int>(nameof(IpcPropertyAttribute.Timeout))
             ?? type.GetAttributeValue<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout))
             ?? 0;
-        return new IpcProxyMemberAttributes
+        return new IpcProxyMemberNamedValues
         {
             DefaultReturn = defaultReturn,
             Timeout = timeout,
@@ -86,16 +86,16 @@ internal static class SemanticIpcAttributeHelper
     /// <param name="property">要查找标记的属性。</param>
     /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    public static string FormatIpcAttributesAsAnInvokingArg(this IPropertySymbol property, INamedTypeSymbol containingType)
+    public static string FormatIpcNamedValuesAsAnInvokingArg(this IPropertySymbol property, INamedTypeSymbol containingType)
     {
-        var attributes = GetIpcAttributesAsAnInvokingArg(property, containingType);
+        var namedValues = GetIpcNamedValues(property, containingType);
         var quoteObject = property.Type.ToString() == "string";
         return $@"new()
 {{
-    DefaultReturn = {Format(attributes.DefaultReturn?.Value, quoteObject)},
-    Timeout = {Format(attributes.Timeout)},
-    IgnoresIpcException = {Format(attributes.IgnoresIpcException)},
-    IsReadonly = {Format(attributes.IsReadonly)}
+    DefaultReturn = {Format(namedValues.DefaultReturn?.Value, quoteObject)},
+    Timeout = {Format(namedValues.Timeout)},
+    IgnoresIpcException = {Format(namedValues.IgnoresIpcException)},
+    IsReadonly = {Format(namedValues.IsReadonly)}
 }}";
     }
 

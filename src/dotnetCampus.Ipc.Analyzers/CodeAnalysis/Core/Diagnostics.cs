@@ -58,6 +58,15 @@ internal static class Diagnostics
         true,
         customTags: new[] { WellKnownDiagnosticTags.Unnecessary });
 
+    public static readonly DiagnosticDescriptor DIPC103_EmptyIpcMemberAttributeIsUnnecessary = new(
+        nameof(DIPC103),
+        Localize(nameof(DIPC103)),
+        Localize(nameof(DIPC103_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { WellKnownDiagnosticTags.Unnecessary });
+
     private static class Categories
     {
         /// <summary>

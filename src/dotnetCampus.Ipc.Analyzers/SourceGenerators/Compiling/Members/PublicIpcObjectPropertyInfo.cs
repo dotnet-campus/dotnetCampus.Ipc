@@ -37,19 +37,19 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateProxyMember()
     {
-        var attributes = _property.FormatIpcAttributesAsAnInvokingArg(_realType);
+        var namedValues = _property.FormatIpcNamedValuesAsAnInvokingArg(_realType);
         if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
         {
             var sourceCode = $@"        public {_property.Type} {_property.Name}
         {{
-            get => GetValueAsync<{_property.Type}>({attributes}).Result;
-            set => SetValueAsync(value, {attributes}).Wait();
+            get => GetValueAsync<{_property.Type}>({namedValues}).Result;
+            set => SetValueAsync(value, {namedValues}).Wait();
         }}";
             return sourceCode;
         }
         else if (_property.GetMethod is { } getOnlyMethod)
         {
-            var sourceCode = $"        public {_property.Type} {_property.Name} => GetValueAsync<{_property.Type}>({attributes}).Result;";
+            var sourceCode = $"        public {_property.Type} {_property.Name} => GetValueAsync<{_property.Type}>({namedValues}).Result;";
             return sourceCode;
         }
         else

@@ -77,12 +77,12 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 通过 IPC 访问目标对象上某属性的值。
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
-        /// <param name="attributes">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
+        /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性的值。</returns>
-        protected async Task<T?> GetValueAsync<T>(IpcProxyMemberAttributes attributes, [CallerMemberName] string propertyName = "")
+        protected async Task<T?> GetValueAsync<T>(IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
         {
-            if (attributes.IsReadonly)
+            if (namedValues.IsReadonly)
             {
                 // 通过 IPC 访问目标对象上某标记了 IpcPropertyAttribute 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
                 // 当发生并发时，可能导致多次通过 IPC 访问此属性的值，但此方法依然是线程安全的。
@@ -92,13 +92,13 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     return (T?) cachedValue;
                 }
                 // 否则，通过 IPC 访问获取此属性的值后设入缓存。（这里可能存在并发情况，会导致浪费的 IPC 访问，但能确保数据一致性）。
-                var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, attributes).ConfigureAwait(false);
+                var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, namedValues).ConfigureAwait(false);
                 _readonlyPropertyValues.TryAdd(propertyName, value);
                 return value;
             }
             else
             {
-                return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, attributes).ConfigureAwait(false);
+                return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, namedValues).ConfigureAwait(false);
             }
         }
 
@@ -107,60 +107,60 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
         /// <param name="value">要设置的属性的值。</param>
-        /// <param name="attributes">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
+        /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性设置。</returns>
-        protected Task SetValueAsync<T>(T value, IpcProxyMemberAttributes attributes, [CallerMemberName] string propertyName = "")
+        protected Task SetValueAsync<T>(T value, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, propertyName, new object?[] { value }, attributes);
+            return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, propertyName, new object?[] { value }, namedValues);
         }
 
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个方法。
         /// </summary>
         /// <param name="args">方法参数列表。</param>
-        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task CallMethod(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
+        protected Task CallMethod(object?[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, args, attributes);
+            return IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, args, namedValues);
         }
 
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个方法。
         /// </summary>
         /// <param name="args">方法参数列表。</param>
-        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task<T?> CallMethod<T>(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
+        protected Task<T?> CallMethod<T>(object?[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, args, attributes);
+            return IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, args, namedValues);
         }
 
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个异步方法。
         /// </summary>
         /// <param name="args">方法参数列表。</param>
-        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task CallMethodAsync(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
+        protected Task CallMethodAsync(object?[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, args, attributes);
+            return IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, args, namedValues);
         }
 
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个异步方法。
         /// </summary>
         /// <param name="args">方法参数列表。</param>
-        /// <param name="attributes">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
+        /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task<T?> CallMethodAsync<T>(object?[]? args, IpcProxyMemberAttributes attributes, [CallerMemberName] string methodName = "")
+        protected Task<T?> CallMethodAsync<T>(object?[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, args, attributes);
+            return IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, args, namedValues);
         }
 
         /// <summary>
@@ -170,26 +170,26 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="callType">调用类型（属性还是方法）。</param>
         /// <param name="memberName">成员名。</param>
         /// <param name="args">调用参数。</param>
-        /// <param name="attributes">包含属性上标记的调用此 IPC 成员的个性化方式。</param>
+        /// <param name="namedValues">包含属性上标记的调用此 IPC 成员的个性化方式。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, object?[]? args, IpcProxyMemberAttributes attributes)
+        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, object?[]? args, IpcProxyMemberNamedValues namedValues)
         {
             try
             {
-                return attributes.Timeout is int timeout && timeout > 0
+                return namedValues.Timeout is int timeout && timeout > 0
                     ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout,
-                        attributes.IgnoresIpcException, attributes.DefaultReturn).ConfigureAwait(false)
+                        namedValues.IgnoresIpcException, namedValues.DefaultReturn).ConfigureAwait(false)
                     : await Invoker.IpcInvokeAsync<T>(callType, memberName, args).ConfigureAwait(false);
             }
-            catch (IpcRemoteException) when (attributes.IgnoresIpcException)
+            catch (IpcRemoteException) when (namedValues.IgnoresIpcException)
             {
                 // 如果目标要求忽略异常，则返回指定值或默认值。
-                return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+                return namedValues.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
             }
             catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is IpcRemoteException)
             {
                 // 如果目标要求忽略异常，则返回指定值或默认值。
-                return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+                return namedValues.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
             }
             catch (Exception)
             {
