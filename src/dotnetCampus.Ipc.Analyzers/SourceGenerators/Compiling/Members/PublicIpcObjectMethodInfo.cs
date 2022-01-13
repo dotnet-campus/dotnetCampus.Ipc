@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-using dotnetCampus.Ipc.SourceGenerators.Utils;
-
-using Microsoft.CodeAnalysis;
+using dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
 

@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-using Microsoft.CodeAnalysis;
-
-namespace dotnetCampus.Ipc.SourceGenerators.Utils;
+﻿namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 /// <summary>
 /// 包含语义分析的辅助扩展方法。

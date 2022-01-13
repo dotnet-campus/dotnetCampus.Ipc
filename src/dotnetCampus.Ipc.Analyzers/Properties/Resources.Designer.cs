@@ -131,5 +131,23 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC004_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 IgnoresIpcException is recommended 的本地化字符串。
+        /// </summary>
+        internal static string DIPC101 {
+            get {
+                return ResourceManager.GetString("DIPC101", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC101_Message {
+            get {
+                return ResourceManager.GetString("DIPC101_Message", resourceCulture);
+            }
+        }
     }
 }

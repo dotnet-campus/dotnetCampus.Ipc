@@ -141,4 +141,10 @@
   <data name="DIPC004_Message" xml:space="preserve">
     <value>不支持的 IPC 属性 {0}。IPC 类型只支持读写属性或只读属性。</value>
   </data>
+  <data name="DIPC101" xml:space="preserve">
+    <value>建议设置 IgnoresIpcException 属性</value>
+  </data>
+  <data name="DIPC101_Message" xml:space="preserve">
+    <value>为了更好的可读性，建议设置 IgnoresIpcException 以便开发者知道这里原本是存在 IPC 异常的。</value>
+  </data>
 </root>

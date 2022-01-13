@@ -1,14 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 
-using dotnetCampus.Ipc.CompilerServices.Attributes;
-using dotnetCampus.Ipc.Core;
-
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using static dotnetCampus.Ipc.Core.Diagnostics;
 
 namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 

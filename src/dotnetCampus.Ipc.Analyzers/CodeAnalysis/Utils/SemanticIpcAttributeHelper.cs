@@ -1,10 +1,4 @@
-﻿using System.Globalization;
-
-using dotnetCampus.Ipc.CompilerServices.Attributes;
-
-using Microsoft.CodeAnalysis;
-
-namespace dotnetCampus.Ipc.SourceGenerators.Utils;
+﻿namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 /// <summary>
 /// 包含 <see cref="IpcMemberAttribute"/> 相关语义分析的辅助扩展方法。

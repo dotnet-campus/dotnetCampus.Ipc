@@ -1,10 +1,8 @@
 ﻿using dotnetCampus.Ipc.Properties;
 
-using Microsoft.CodeAnalysis;
-
 using static dotnetCampus.Ipc.Properties.Resources;
 
-namespace dotnetCampus.Ipc.Core;
+namespace dotnetCampus.Ipc.CodeAnalysis.Core;
 
 /// <summary>
 /// 包含 IPC 框架分析器中的所有诊断。
@@ -15,7 +13,7 @@ internal static class Diagnostics
         nameof(DIPC001),
         Localize(nameof(DIPC001)),
         Localize(nameof(DIPC001_Message)),
-        Categories.Syntax,
+        Categories.Compiler,
         DiagnosticSeverity.Error,
         true);
 
@@ -23,7 +21,7 @@ internal static class Diagnostics
         nameof(DIPC002),
         Localize(nameof(DIPC002)),
         Localize(nameof(DIPC002_Message)),
-        Categories.Syntax,
+        Categories.Compiler,
         DiagnosticSeverity.Error,
         true);
 
@@ -31,7 +29,7 @@ internal static class Diagnostics
         nameof(DIPC003),
         Localize(nameof(DIPC003)),
         Localize(nameof(DIPC003_Message)),
-        Categories.Syntax,
+        Categories.Compiler,
         DiagnosticSeverity.Error,
         true);
 
@@ -39,13 +37,29 @@ internal static class Diagnostics
         nameof(DIPC004),
         Localize(nameof(DIPC004)),
         Localize(nameof(DIPC004_Message)),
-        Categories.Syntax,
+        Categories.Compiler,
         DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor DIPC101_IgnoresIpcExceptionIsRecommended = new(
+        nameof(DIPC101),
+        Localize(nameof(DIPC101)),
+        Localize(nameof(DIPC101_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Warning,
         true);
 
     private static class Categories
     {
-        public const string Syntax = "dotnetCampus.Syntax";
+        /// <summary>
+        /// 因为编译要求而必须满足的条件没有满足，则报告此诊断。
+        /// </summary>
+        public const string Compiler = "dotnetCampus.Compiler";
+
+        /// <summary>
+        /// 为了代码可读性，使之更易于理解、方便调试，则报告此诊断。
+        /// </summary>
+        public const string Readable = "dotnetCampus.Readable";
     }
 
     private static LocalizableString Localize(string key) => new LocalizableResourceString(key, ResourceManager, typeof(Resources));

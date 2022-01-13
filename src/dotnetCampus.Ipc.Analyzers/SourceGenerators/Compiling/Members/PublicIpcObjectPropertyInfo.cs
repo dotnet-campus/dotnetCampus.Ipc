@@ -1,9 +1,4 @@
-﻿using dotnetCampus.Ipc.Core;
-using dotnetCampus.Ipc.SourceGenerators.Utils;
-
-using Microsoft.CodeAnalysis;
-
-namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
+﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
 
 internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPublicIpcObjectJointMatchGenerator
 {

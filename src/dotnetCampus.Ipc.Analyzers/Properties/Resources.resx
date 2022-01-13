@@ -141,4 +141,10 @@
   <data name="DIPC004_Message" xml:space="preserve">
     <value>Unknown IPC property {0}. Only get or get-set property is supported.</value>
   </data>
+  <data name="DIPC101" xml:space="preserve">
+    <value>IgnoresIpcException is recommended</value>
+  </data>
+  <data name="DIPC101_Message" xml:space="preserve">
+    <value>For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here.</value>
+  </data>
 </root>

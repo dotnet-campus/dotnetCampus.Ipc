@@ -1,9 +1,4 @@
-﻿using dotnetCampus.Ipc.Core;
-using dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
-
-using Microsoft.CodeAnalysis;
-
-namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
+﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 /// <summary>
 /// 辅助生成契约接口中每一个成员对应的 IPC 代理和对接。
