@@ -14,6 +14,11 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     private readonly INamedTypeSymbol _contractType;
 
     /// <summary>
+    /// 真实类型的语义符号。
+    /// </summary>
+    private readonly INamedTypeSymbol _realType;
+
+    /// <summary>
     /// 此成员在类型实现中的语义符号。
     /// </summary>
     private readonly IMethodSymbol _method;
@@ -27,11 +32,13 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// 创建 IPC 对象的其中一个成员信息。
     /// </summary>
     /// <param name="contractType">契约接口的语义符号。</param>
+    /// <param name="realType">真实类型的语义符号。</param>
     /// <param name="interfaceMember">此成员在接口定义中的语义符号。</param>
     /// <param name="implementationMember">此成员在类型实现中的语义符号。</param>
-    public PublicIpcObjectMethodInfo(INamedTypeSymbol contractType, IMethodSymbol interfaceMember, IMethodSymbol implementationMember)
+    public PublicIpcObjectMethodInfo(INamedTypeSymbol contractType, INamedTypeSymbol realType, IMethodSymbol interfaceMember, IMethodSymbol implementationMember)
     {
         _contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
+        _realType = realType ?? throw new ArgumentNullException(nameof(realType));
         _method = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
         var returnType = interfaceMember.ReturnType.OriginalDefinition.ToString();
         _isAsyncMethod = returnType is "System.Threading.Tasks.Task" or "System.Threading.Tasks.Task<TResult>";
@@ -49,7 +56,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(asyncReturnType);
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(asyncReturnType, _realType);
             var sourceCode = asyncReturnType is null
                 ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
         {{
@@ -67,7 +74,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var waitVoid = _method.CheckIpcWaitingVoid();
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(null);
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(null, _realType);
             var sourceCode = waitVoid
                 ? @$"        public void {_method.Name}({parameters})
         {{
@@ -85,7 +92,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var @return = _method.ReturnType;
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(@return);
+            var attributes = _method.GetIpcAttributesAsAnInvokingArg(@return, _realType);
             var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
         {{
             return CallMethod<{@return}>(new object[] {{ {arguments} }}, {attributes}).Result;

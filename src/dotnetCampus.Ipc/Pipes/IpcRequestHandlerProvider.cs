@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Diagnostics;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Utils.Extensions;
@@ -135,6 +136,10 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 // Cannot access a closed pipe.
                 // [正常现象] 在对方发完消息等待我方回复时退出。
+            }
+            catch (IpcRemoteException)
+            {
+                // [正常现象] 因为 IPC 对方已断开连接，所以已无法回复。
             }
             catch (Exception ex)
             {

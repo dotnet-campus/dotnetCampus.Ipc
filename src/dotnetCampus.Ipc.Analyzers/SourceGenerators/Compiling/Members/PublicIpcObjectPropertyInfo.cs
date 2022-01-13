@@ -18,14 +18,21 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     private readonly INamedTypeSymbol _contractType;
 
     /// <summary>
+    /// 真实类型的语义符号。
+    /// </summary>
+    private readonly INamedTypeSymbol _realType;
+
+    /// <summary>
     /// 创建 IPC 对象的其中一个成员信息。
     /// </summary>
     /// <param name="contractType">契约接口的语义符号。</param>
+    /// <param name="realType">真实类型的语义符号。</param>
     /// <param name="interfaceMember">此成员在接口定义中的语义符号。</param>
     /// <param name="implementationMember">此成员在类型实现中的语义符号。</param>
-    public PublicIpcObjectPropertyInfo(INamedTypeSymbol contractType, IPropertySymbol interfaceMember, IPropertySymbol implementationMember)
+    public PublicIpcObjectPropertyInfo(INamedTypeSymbol contractType, INamedTypeSymbol realType, IPropertySymbol interfaceMember, IPropertySymbol implementationMember)
     {
         _contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
+        _realType = realType ?? throw new ArgumentNullException(nameof(realType));
         _property = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
     }
 
@@ -35,7 +42,7 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateProxyMember()
     {
-        var attributes = _property.GetIpcAttributesAsAnInvokingArg();
+        var attributes = _property.GetIpcAttributesAsAnInvokingArg(_realType);
         if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
         {
             var sourceCode = $@"        public {_property.Type} {_property.Name}

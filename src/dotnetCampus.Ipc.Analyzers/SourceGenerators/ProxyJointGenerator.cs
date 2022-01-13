@@ -108,7 +108,7 @@ namespace {realTypeCompilation.GetNamespace()}
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {realTypeCompilation.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute))}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute))}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
         return sourceCode;
     }
 

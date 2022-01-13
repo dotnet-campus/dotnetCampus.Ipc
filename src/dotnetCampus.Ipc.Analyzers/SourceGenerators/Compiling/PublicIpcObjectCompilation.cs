@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.Core;
@@ -14,6 +15,7 @@ namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 /// <summary>
 /// 提供 PublicIpcObject 的语法和语义分析。
 /// </summary>
+[DebuggerDisplay("{RealType.Name,nq} : {ContractType.Name,nq}")]
 internal class PublicIpcObjectCompilation
 {
     /// <summary>
@@ -83,7 +85,7 @@ internal class PublicIpcObjectCompilation
 
             if (RealType.FindImplementationForInterfaceMember(member) is ISymbol implementationMember)
             {
-                yield return new PublicIpcObjectMemberProxyJointGenerator(ContractType, member, implementationMember);
+                yield return new PublicIpcObjectMemberProxyJointGenerator(ContractType, RealType, member, implementationMember);
             }
         }
     }

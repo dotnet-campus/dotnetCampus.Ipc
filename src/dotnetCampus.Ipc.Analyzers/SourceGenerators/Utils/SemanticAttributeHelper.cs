@@ -40,6 +40,31 @@ internal static class SemanticAttributeHelper
         throw new NotSupportedException("尚不支持读取其他类型的特性。");
     }
 
+#nullable disable
+    public static T? GetAttributeValueOrDefault<TAttribute, T>(this ISymbol symbol, string namedArgumentName)
+        where T : struct
+    {
+        var value = GetAttributeValue(symbol, typeof(TAttribute).FullName, namedArgumentName);
+        if (value == null)
+        {
+            return default;
+        }
+        if (typeof(T) == typeof(object))
+        {
+            return (T?) value;
+        }
+        if (typeof(T) == typeof(bool))
+        {
+            return (T) (object) Convert.ToBoolean(value);
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            return (T) (object) Convert.ToInt32(value);
+        }
+        throw new NotSupportedException("尚不支持读取其他类型的特性。");
+    }
+#nullable restore
+
     /// <summary>
     /// 检查此成员的 <paramref name="attributeTypeName"/> 类型特性的 <paramref name="namedArgumentName"/> 名字的参数的值。
     /// </summary>

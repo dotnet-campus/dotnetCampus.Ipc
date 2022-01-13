@@ -51,7 +51,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             EnumProperty = BindingFlags.Public | BindingFlags.Instance;
         }
 
-        [IpcMethod(IgnoreIpcException = true)]
+        [IpcMethod(IgnoresIpcException = true)]
         public Task MethodThatIgnoresIpcException()
         {
             Thread.Sleep(100);
@@ -70,21 +70,21 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return Task.Delay(150);
         }
 
-        [IpcMethod(DefaultReturn = "default1", IgnoreIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
         public async Task<string> MethodThatHasDefaultReturn()
         {
             await Task.Delay(250);
             return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = "default", IgnoreIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default", IgnoresIpcException = true, Timeout = 100)]
         public async Task<object> MethodThatHasObjectWithObjectDefaultReturn()
         {
             await Task.Delay(250);
             return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = @"""default1""", IgnoreIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = @"""default1""", IgnoresIpcException = true, Timeout = 100)]
         public async Task<object> MethodThatHasObjectWithStringDefaultReturn()
         {
             await Task.Delay(250);
@@ -92,14 +92,14 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
         // 请不要将这里的 String 改为 string，这是为了测试代码生成器能否处理类型而非关键字。
-        [IpcMethod(DefaultReturn = "default1", IgnoreIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
         public async Task<String> MethodThatHasStringDefaultReturn()
         {
             await Task.Delay(250);
             return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = "new IntPtr(1)", IgnoreIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "new IntPtr(1)", IgnoresIpcException = true, Timeout = 100)]
         public async Task<IntPtr> MethodThatHasCustomDefaultReturn()
         {
             await Task.Delay(150);

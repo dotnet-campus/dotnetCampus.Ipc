@@ -25,7 +25,7 @@ partial class GeneratedIpcProxy
         protected internal int? Timeout { get; set; }
 
         /// <summary>
-        /// 在指定了 <see cref="IgnoreIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
+        /// 在指定了 <see cref="IgnoresIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
         /// <list type="number">
         /// <item>不指定此值时，会使用属性或返回值类型的默认值（即 default）。</item>
         /// <item>如果此值可使用编译时常量来表示，则直接写在这里即可。</item>
@@ -54,12 +54,12 @@ partial class GeneratedIpcProxy
         /// <item>另外，如果 IPC 框架内部出现了 bug 导致了异常，也不会因此而忽略。</item>
         /// </list>
         /// </remarks>
-        protected internal bool IgnoreIpcException
+        protected internal bool IgnoresIpcException
         {
-            get => _flags.HasFlag(IpcMemberAttributeFlags.IgnoreIpcException);
+            get => _flags.HasFlag(IpcMemberAttributeFlags.IgnoresIpcException);
             set => _flags = value
-                ? _flags | IpcMemberAttributeFlags.IgnoreIpcException
-                : _flags & ~IpcMemberAttributeFlags.IgnoreIpcException;
+                ? _flags | IpcMemberAttributeFlags.IgnoresIpcException
+                : _flags & ~IpcMemberAttributeFlags.IgnoresIpcException;
         }
 
         /// <summary>
@@ -103,9 +103,9 @@ partial class GeneratedIpcProxy
         None = 0x0000_0000,
 
         /// <summary>
-        /// 参见 <see cref="IpcMemberAttribute.IgnoreIpcException"/>。
+        /// 参见 <see cref="IpcMemberAttribute.IgnoresIpcException"/>。
         /// </summary>
-        IgnoreIpcException = 0x0000_0001,
+        IgnoresIpcException = 0x0000_0001,
 
         /// <summary>
         /// 参见 <see cref="IpcPropertyAttribute.IsReadonly"/>。

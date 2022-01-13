@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -179,13 +178,22 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             {
                 return attributes.Timeout is int timeout && timeout > 0
                     ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout,
-                        attributes.IgnoreIpcException, attributes.DefaultReturn).ConfigureAwait(false)
+                        attributes.IgnoresIpcException, attributes.DefaultReturn).ConfigureAwait(false)
                     : await Invoker.IpcInvokeAsync<T>(callType, memberName, args).ConfigureAwait(false);
             }
-            catch (IpcRemoteException) when (attributes.IgnoreIpcException)
+            catch (IpcRemoteException) when (attributes.IgnoresIpcException)
             {
                 // 如果目标要求忽略异常，则返回指定值或默认值。
                 return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+            }
+            catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is IpcRemoteException)
+            {
+                // 如果目标要求忽略异常，则返回指定值或默认值。
+                return attributes.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -203,12 +211,30 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             else if (ignoreException)
             {
                 // 任务超时（不抛异常）。
+                IgnoreTaskExceptionsAsync(ipcTask);
                 return defaultReturn is null ? default : (T) defaultReturn;
             }
             else
             {
                 // 任务超时（抛异常）。
+                IgnoreTaskExceptionsAsync(ipcTask);
                 throw new IpcInvokingTimeoutException(memberName, TimeSpan.FromMilliseconds(millisecondsTimeout));
+            }
+        }
+
+        /// <summary>
+        /// 吞掉业务上已不再需要返回值的异常，防止异常泄漏到后台线程或 Task 中。
+        /// </summary>
+        /// <param name="task">要吞掉异常的任务。</param>
+        private async void IgnoreTaskExceptionsAsync(Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch
+            {
+                // 吞掉业务上已不再需要返回值的异常，防止异常泄漏到后台线程或 Task 中。
             }
         }
     }

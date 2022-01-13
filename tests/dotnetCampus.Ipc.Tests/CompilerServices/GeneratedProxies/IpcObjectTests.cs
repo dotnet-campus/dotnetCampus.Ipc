@@ -1,11 +1,14 @@
 ﻿#nullable enable
 using System;
+using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -314,6 +317,31 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 {
                     await task;
                 });
+            });
+
+            "IPC 代理生成：成员上没有标记忽略异常，但是类型上标记了，也要忽略异常".Test(async () =>
+            {
+                // 准备。
+                var name = $"{nameof(FakeIpcObjectWithTypeAttributes)}.{nameof(FakeIpcObject.MethodThatThrowsIpcException)}";
+                var aName = $"IpcObjectTests.IpcTests.{name}.A";
+                var bName = $"IpcObjectTests.IpcTests.{name}.B";
+                var aProvider = new IpcProvider(aName);
+                var bProvider = new IpcProvider(bName);
+                aProvider.StartServer();
+                bProvider.StartServer();
+                var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(new FakeIpcObjectWithTypeAttributes());
+                var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
+                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObjectWithTypeAttributes>(aPeer);
+
+                // 安放植物。
+                // 没有发生异常。
+                var task = bProxy.MethodThatThrowsIpcException();
+                await Task.Run(async () =>
+                {
+                    await Task.Delay(20);
+                    aProvider.Dispose();
+                });
+                await task;
             });
         }
 

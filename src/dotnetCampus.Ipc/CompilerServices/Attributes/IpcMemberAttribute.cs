@@ -33,7 +33,7 @@ public abstract class IpcMemberAttribute : Attribute
     public Type? ContractType { get; }
 
     /// <summary>
-    /// 在指定了 <see cref="IgnoreIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
+    /// 在指定了 <see cref="IgnoresIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
     /// <list type="number">
     /// <item>不指定此值时，会使用属性或返回值类型的默认值（即 default）。</item>
     /// <item>如果此值可使用编译时常量来表示，则直接写在这里即可。</item>
@@ -64,11 +64,16 @@ public abstract class IpcMemberAttribute : Attribute
     /// </list>
     /// </remarks>
     [DefaultValue(false)]
-    public bool IgnoreIpcException { get; set; }
+    public bool IgnoresIpcException { get; set; }
 
     /// <summary>
-    /// 设定此方法执行的超时时间。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
+    /// 设定此成员执行的超时时间。如果自此成员执行开始直至超时时间后依然没有返回，则：
+    /// <list type="bullet">
+    /// <item>默认会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。</item>
+    /// <item>通过在类型或成员上设置 <see cref="IgnoresIpcException"/> 可阻止引发超时异常而改为返回默认值。</item>
+    /// </list>
+    /// 如果类型上已经标记了超时但不希望某个成员设置超时，可单独在此成员上标记 Timeout = 0。
     /// </summary>
-    [DefaultValue(null)]
+    [DefaultValue(0)]
     public int Timeout { get; set; }
 }

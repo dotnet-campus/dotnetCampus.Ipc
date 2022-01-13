@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
@@ -17,19 +16,25 @@ public static class SemanticIpcAttributeHelper
     /// </summary>
     /// <param name="method"></param>
     /// <param name="returnTypeSymbol">返回值类型，依此来决定如何将 Attribute 里的对象转为字符串。</param>
+    /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    public static string GetIpcAttributesAsAnInvokingArg(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol)
+    public static string GetIpcAttributesAsAnInvokingArg(this IMethodSymbol method, ITypeSymbol? returnTypeSymbol, INamedTypeSymbol containingType)
     {
+        var type = containingType;
         var waitsVoid = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.WaitsVoid));
-        var ignoreIpcException = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.IgnoreIpcException));
+        var ignoresIpcException = method.GetAttributeValueOrDefault<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.IgnoresIpcException))
+            ?? type.GetAttributeValueOrDefault<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException))
+            ?? false;
         var defaultReturn = method.GetAttributeValue<IpcMethodAttribute, object?>(nameof(IpcMethodAttribute.DefaultReturn));
-        var timeout = method.GetAttributeValue<IpcMethodAttribute, int>(nameof(IpcMethodAttribute.Timeout));
+        var timeout = method.GetAttributeValueOrDefault<IpcMethodAttribute, int>(nameof(IpcMethodAttribute.Timeout))
+            ?? type.GetAttributeValueOrDefault<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout))
+            ?? 0;
         var quoteObject = returnTypeSymbol?.ToString() == "string";
         return $@"new()
 {{
     DefaultReturn = {Format(defaultReturn, quoteObject)},
     Timeout = {Format(timeout)},
-    IgnoreIpcException = {Format(ignoreIpcException)},
+    IgnoresIpcException = {Format(ignoresIpcException)},
     WaitsVoid = {Format(waitsVoid)}
 }}";
     }
@@ -37,20 +42,26 @@ public static class SemanticIpcAttributeHelper
     /// <summary>
     /// 检查此方法上标记的 <see cref="IpcMethodAttribute"/> 并将其转换为传入 IPC 代理的类型。
     /// </summary>
-    /// <param name="property"></param>
+    /// <param name="property">要查找标记的属性。</param>
+    /// <param name="containingType">要查找标记的类型。注意，当此属性来自于继承类时，属性所在的类型和真实要分析的类型不相同。</param>
     /// <returns></returns>
-    public static string GetIpcAttributesAsAnInvokingArg(this IPropertySymbol property)
+    public static string GetIpcAttributesAsAnInvokingArg(this IPropertySymbol property, INamedTypeSymbol containingType)
     {
+        var type = containingType;
         var isReadonly = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IsReadonly));
-        var ignoreIpcException = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IgnoreIpcException));
+        var ignoresIpcException = property.GetAttributeValueOrDefault<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IgnoresIpcException))
+            ?? type.GetAttributeValueOrDefault<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException))
+            ?? false;
         var defaultReturn = property.GetAttributeValue<IpcPropertyAttribute, object?>(nameof(IpcPropertyAttribute.DefaultReturn));
-        var timeout = property.GetAttributeValue<IpcPropertyAttribute, int>(nameof(IpcPropertyAttribute.Timeout));
+        var timeout = property.GetAttributeValueOrDefault<IpcPropertyAttribute, int>(nameof(IpcPropertyAttribute.Timeout))
+            ?? type.GetAttributeValueOrDefault<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout))
+            ?? 0;
         var quoteObject = property.Type.ToString() == "string";
         return $@"new()
 {{
     DefaultReturn = {Format(defaultReturn, quoteObject)},
     Timeout = {Format(timeout)},
-    IgnoreIpcException = {Format(ignoreIpcException)},
+    IgnoresIpcException = {Format(ignoresIpcException)},
     IsReadonly = {Format(isReadonly)}
 }}";
     }

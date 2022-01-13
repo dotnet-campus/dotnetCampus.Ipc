@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Utils.Caching;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
@@ -19,24 +20,29 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
     public static class GeneratedIpcFactory
     {
         /// <summary>
-        /// 真实类型到代理对接的缓存。
+        /// 编译期契约与傀儡类型到代理对接的缓存。
         /// </summary>
-        internal static CachePool<Type, (Type? contractType, Type? proxyType, Type? jointType)> RealTypeToProxyJointCache { get; } = new(ConvertTypeToProxyJointTypes, true);
+        internal static CachePool<(Type contractType, Type shapeType), (Type? proxyType, Type? jointType)> ShapeTypeToProxyJointCache { get; } = new(ConvertShapeTypeToProxyJointTypes, true);
+
+        /// <summary>
+        /// 运行时真实类型到代理对接的缓存。
+        /// </summary>
+        internal static CachePool<Type, (Type contractType, Type? proxyType, Type? jointType)> RealTypeToProxyJointCache { get; } = new(ConvertRealTypeToProxyJointTypes, true);
 
         /// <summary>
         /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
         /// </summary>
         /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
-        /// <typeparam name="TRealType">IPC 实现对象的类型。</typeparam>
+        /// <typeparam name="TShapeType">IPC 实现对象的类型（标记了 <see cref="IpcPublicAttribute"/>），或没有实现空有声明的傀儡类型或傀儡接口（标记了 <see cref="IpcProxyAttribute"/>）。</typeparam>
         /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
         /// <param name="peer">IPC 远端。</param>
         /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
         /// <returns>契约类型。</returns>
-        public static TContract CreateIpcProxy<TContract, TRealType>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
+        public static TContract CreateIpcProxy<TContract, TShapeType>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
             where TContract : class
-            where TRealType : TContract
+            where TShapeType : TContract
         {
-            if (RealTypeToProxyJointCache[typeof(TRealType)].proxyType is { } proxyType)
+            if (ShapeTypeToProxyJointCache[(typeof(TContract), typeof(TShapeType))].proxyType is { } proxyType)
             {
                 var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
                 proxy.Context = GetContext(ipcProvider);
@@ -46,7 +52,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
             else
             {
-                throw new ArgumentException($"类型 {typeof(TRealType).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TRealType));
+                throw new ArgumentException($"类型 {typeof(TShapeType).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TShapeType));
             }
         }
 
@@ -61,7 +67,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             where TContract : class
         {
             var realType = realInstance.GetType();
-            if (RealTypeToProxyJointCache[realType].jointType is { } jointType)
+            if (ShapeTypeToProxyJointCache[(typeof(TContract), realType)].jointType is { } jointType)
             {
                 var joint = (GeneratedIpcJoint<TContract>) Activator.CreateInstance(jointType)!;
                 joint.SetInstance(realInstance);
@@ -78,22 +84,52 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             => ipcProvider.IpcContext.GeneratedProxyJointIpcContext;
 
         /// <summary>
-        /// 真实类型到代理对接的转换。
+        /// 编译期契约与傀儡类型到代理对接的转换。
+        /// </summary>
+        /// <param name="types">契约类型，以及真实类型或傀儡类型。</param>
+        /// <returns>IPC 类型。</returns>
+        private static (Type? proxyType, Type? jointType) ConvertShapeTypeToProxyJointTypes((Type contractType, Type? shapeType) types)
+        {
+            var (contractType, shapeType) = types;
+            if (shapeType?.IsDefined(typeof(IpcPublicAttribute)) is true)
+            {
+                var attribute = shapeType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>()
+                    .FirstOrDefault(x => x.ContractType == contractType && x.ShapeType == shapeType);
+                if (attribute is null)
+                {
+                    throw new NotSupportedException($"因为编译时没有生成“{shapeType.Name} : {contractType.Name}”类型的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                }
+                return (attribute.ProxyType, attribute.JointType);
+            }
+            return (null, null);
+        }
+
+        /// <summary>
+        /// 运行时真实类型到代理对接的转换。
         /// </summary>
         /// <param name="realType">真实类型。</param>
         /// <returns>IPC 类型。</returns>
-        private static (Type? contractType, Type? proxyType, Type? jointType) ConvertTypeToProxyJointTypes(Type? realType)
+        private static (Type? contractType, Type? proxyType, Type? jointType) ConvertRealTypeToProxyJointTypes(Type realType)
         {
             if (realType?.IsDefined(typeof(IpcPublicAttribute)) is true)
             {
-                var contractType = realType.GetCustomAttribute<IpcPublicAttribute>()!.ContractType;
+                var contractTypes = realType.GetCustomAttributes<IpcPublicAttribute>()
+                    .Select(x => x.ContractType)
+                    .Distinct()
+                    .ToList();
+                if (contractTypes.Count > 1)
+                {
+                    throw new IpcAmbiguousMatchException($"因为类型 {realType.FullName} 上声明了多个 {typeof(IpcPublicAttribute).Name}，所以无法确定应该以哪一种契约类型进行 IPC 传输。");
+                }
+
+                var contractType = contractTypes[0];
                 var attribute = realType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>()
                     .FirstOrDefault(x => x.ContractType == contractType);
                 if (attribute is null)
                 {
                     throw new NotSupportedException($"因为编译时没有生成“{realType.Name} : {contractType.Name}”类型的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
                 }
-                return (attribute.ContractType, attribute.ProxyType, attribute.JointType);
+                return (contractType, attribute.ProxyType, attribute.JointType);
             }
             return (null, null, null);
         }

@@ -17,18 +17,20 @@ internal class PublicIpcObjectMemberProxyJointGenerator
     /// 创建 IPC 对象的其中一个成员信息。
     /// </summary>
     /// <param name="contractType">契约接口的语义符号。</param>
+    /// <param name="realType">真实类型的语义符号。</param>
     /// <param name="interfaceMember">此成员在接口定义中的语义符号。</param>
     /// <param name="implementationMember">此成员在类型实现中的语义符号。</param>
-    public PublicIpcObjectMemberProxyJointGenerator(INamedTypeSymbol contractType, ISymbol interfaceMember, ISymbol implementationMember)
+    public PublicIpcObjectMemberProxyJointGenerator(INamedTypeSymbol contractType, INamedTypeSymbol realType, ISymbol interfaceMember, ISymbol implementationMember)
     {
         contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
+        realType = realType ?? throw new ArgumentNullException(nameof(realType));
         interfaceMember = interfaceMember ?? throw new ArgumentNullException(nameof(interfaceMember));
         implementationMember = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
 
         _proxyMemberGenerator = interfaceMember switch
         {
-            IMethodSymbol methodSymbol => new PublicIpcObjectMethodInfo(contractType, methodSymbol, (IMethodSymbol) implementationMember),
-            IPropertySymbol propertySymbol => new PublicIpcObjectPropertyInfo(contractType, propertySymbol, (IPropertySymbol) implementationMember),
+            IMethodSymbol methodSymbol => new PublicIpcObjectMethodInfo(contractType, realType, methodSymbol, (IMethodSymbol) implementationMember),
+            IPropertySymbol propertySymbol => new PublicIpcObjectPropertyInfo(contractType, realType, propertySymbol, (IPropertySymbol) implementationMember),
             _ => throw new DiagnosticException(
                 DIPC003_OnlyMethodOrPropertyIsSupported,
                 implementationMember.Locations.FirstOrDefault(),
