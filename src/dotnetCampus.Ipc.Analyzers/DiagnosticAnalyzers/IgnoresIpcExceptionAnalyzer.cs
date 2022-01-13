@@ -28,7 +28,12 @@ public class IgnoresIpcExceptionAnalyzer : DiagnosticAnalyzer
     {
         var classDeclarationNode = (ClassDeclarationSyntax) context.Node;
         var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationNode);
-        var ignoresIpcException = typeSymbol.GetAttributeValueOrDefault<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException));
+        if (typeSymbol is null)
+        {
+            return;
+        }
+
+        var ignoresIpcException = typeSymbol.GetAttributeValue<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException));
         if (ignoresIpcException is null && classDeclarationNode.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
         {
             string? attributeName = x.Name switch

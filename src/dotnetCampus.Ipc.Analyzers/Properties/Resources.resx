@@ -153,4 +153,16 @@
   <data name="DIPC101_Message" xml:space="preserve">
     <value>For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here.</value>
   </data>
+  <data name="DIPC102" xml:space="preserve">
+    <value>The DefaultReturn is useless</value>
+  </data>
+  <data name="DIPC102_Fix1" xml:space="preserve">
+    <value>Remove the DefaultReturn</value>
+  </data>
+  <data name="DIPC102_Fix2" xml:space="preserve">
+    <value>Set IgnoresIpcException to true</value>
+  </data>
+  <data name="DIPC102_Message" xml:space="preserve">
+    <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
+  </data>
 </root>

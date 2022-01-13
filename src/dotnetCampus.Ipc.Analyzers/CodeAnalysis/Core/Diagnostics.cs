@@ -49,10 +49,19 @@ internal static class Diagnostics
         DiagnosticSeverity.Warning,
         true);
 
+    public static readonly DiagnosticDescriptor DIPC102_DefaultReturnDependsOnIgnoresIpcException = new(
+        nameof(DIPC102),
+        Localize(nameof(DIPC102)),
+        Localize(nameof(DIPC102_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { WellKnownDiagnosticTags.Unnecessary });
+
     private static class Categories
     {
         /// <summary>
-        /// 因为编译要求而必须满足的条件没有满足，则报告此诊断。
+        /// 因编译要求而必须满足的条件没有满足，则报告此诊断。
         /// </summary>
         public const string Compiler = "dotnetCampus.Compiler";
 
@@ -60,6 +69,11 @@ internal static class Diagnostics
         /// 为了代码可读性，使之更易于理解、方便调试，则报告此诊断。
         /// </summary>
         public const string Readable = "dotnetCampus.Readable";
+
+        /// <summary>
+        /// 编写了无法生效的代码，则报告此诊断。
+        /// </summary>
+        public const string Useless = "dotnetCampus.Useless";
     }
 
     private static LocalizableString Localize(string key) => new LocalizableResourceString(key, ResourceManager, typeof(Resources));

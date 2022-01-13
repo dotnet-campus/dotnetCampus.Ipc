@@ -65,7 +65,7 @@ internal class PublicIpcObjectCompilation
     /// 以契约接口类型为准，查找所有成员。
     /// </summary>
     /// <returns>所有成员信息。</returns>
-    public IEnumerable<PublicIpcObjectMemberProxyJointGenerator> EnumerateMembersByContractType()
+    public IEnumerable<(INamedTypeSymbol contractType, INamedTypeSymbol realType, ISymbol member, ISymbol implementationMember)> EnumerateMembersByContractType()
     {
         var members = ContractType.AllInterfaces.SelectMany(x => x.GetMembers())
             .Concat(ContractType.GetMembers());
@@ -79,7 +79,7 @@ internal class PublicIpcObjectCompilation
 
             if (RealType.FindImplementationForInterfaceMember(member) is ISymbol implementationMember)
             {
-                yield return new PublicIpcObjectMemberProxyJointGenerator(ContractType, RealType, member, implementationMember);
+                yield return new (ContractType, RealType, member, implementationMember);
             }
         }
     }

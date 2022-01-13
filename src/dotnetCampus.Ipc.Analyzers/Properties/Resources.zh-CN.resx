@@ -153,4 +153,16 @@
   <data name="DIPC101_Message" xml:space="preserve">
     <value>为了更好的可读性，建议设置 IgnoresIpcException 以便开发者知道这里原本是存在 IPC 异常的。</value>
   </data>
+  <data name="DIPC102" xml:space="preserve">
+    <value>IPC 默认值不起作用</value>
+  </data>
+  <data name="DIPC102_Fix1" xml:space="preserve">
+    <value>去掉此成员的 IPC 默认值</value>
+  </data>
+  <data name="DIPC102_Fix2" xml:space="preserve">
+    <value>忽略此成员抛出的 IPC 连接和超时异常</value>
+  </data>
+  <data name="DIPC102_Message" xml:space="preserve">
+    <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
+  </data>
 </root>

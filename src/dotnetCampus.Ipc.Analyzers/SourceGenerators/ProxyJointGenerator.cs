@@ -51,6 +51,7 @@ public class ProxyJointGenerator : ISourceGenerator
         var members = string.Join(
             Environment.NewLine + Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
+            .Select(x => new PublicIpcObjectMemberProxyJointGenerator(x.contractType, x.realType, x.member, x.implementationMember))
             .Select(x => x.GenerateProxyMember()));
         var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -77,6 +78,7 @@ namespace {realTypeCompilation.GetNamespace()}
         var matches = string.Join(
             Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
+            .Select(x => new PublicIpcObjectMemberProxyJointGenerator(x.contractType, x.realType, x.member, x.implementationMember))
             .Select(x => x.GenerateJointMatch(realInstanceName)));
         var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;

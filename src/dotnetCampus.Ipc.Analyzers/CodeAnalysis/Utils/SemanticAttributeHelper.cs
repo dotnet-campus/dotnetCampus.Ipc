@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
+﻿using System.Diagnostics;
+
+namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 /// <summary>
 /// 包含语义分析的辅助扩展方法。
@@ -14,52 +16,42 @@ internal static class SemanticAttributeHelper
     /// <param name="namedArgumentName">参数名称。</param>
     /// <returns>参数的值。</returns>
     [return: MaybeNull]
-    public static T? GetAttributeValue<TAttribute, T>(this ISymbol symbol, string namedArgumentName)
+    public static Assignable<T>? GetAttributeValue<TAttribute, T>(this ISymbol symbol, string namedArgumentName)
     {
-        var value = GetAttributeValue(symbol, typeof(TAttribute).FullName, namedArgumentName);
-        if (value == null)
-        {
-            return default;
-        }
-        if (typeof(T) == typeof(object))
-        {
-            return (T?) value;
-        }
-        if (typeof(T) == typeof(bool))
-        {
-            return (T) (object) Convert.ToBoolean(value);
-        }
-        else if (typeof(T) == typeof(int))
-        {
-            return (T) (object) Convert.ToInt32(value);
-        }
-        throw new NotSupportedException("尚不支持读取其他类型的特性。");
-    }
+        var assignable = GetAttributeValue(symbol, typeof(TAttribute).FullName, namedArgumentName);
 
-#nullable disable
-    public static T? GetAttributeValueOrDefault<TAttribute, T>(this ISymbol symbol, string namedArgumentName)
-        where T : struct
-    {
-        var value = GetAttributeValue(symbol, typeof(TAttribute).FullName, namedArgumentName);
-        if (value == null)
+        // 未赋值。
+        if (assignable is null)
         {
-            return default;
+            return null;
         }
+
+        // 引用类型已赋值。
         if (typeof(T) == typeof(object))
         {
-            return (T?) value;
+            return new((T?) assignable.Value);
         }
+
+        // null 已赋值。
+        var value = assignable.Value.Value;
+        if (value is null)
+        {
+            return new(default);
+        }
+
+        // 值类型已复制。
         if (typeof(T) == typeof(bool))
         {
-            return (T) (object) Convert.ToBoolean(value);
+            return new((T) (object) Convert.ToBoolean(value));
         }
         else if (typeof(T) == typeof(int))
         {
-            return (T) (object) Convert.ToInt32(value);
+            return new((T) (object) Convert.ToInt32(value));
         }
+
+        // 其他已赋值。
         throw new NotSupportedException("尚不支持读取其他类型的特性。");
     }
-#nullable restore
 
     /// <summary>
     /// 检查此成员的 <paramref name="attributeTypeName"/> 类型特性的 <paramref name="namedArgumentName"/> 名字的参数的值。
@@ -68,16 +60,19 @@ internal static class SemanticAttributeHelper
     /// <param name="attributeTypeName">特性类型的名称。</param>
     /// <param name="namedArgumentName">参数名称。</param>
     /// <returns>参数的值。</returns>
-    private static object? GetAttributeValue(ISymbol symbol, string attributeTypeName, string namedArgumentName)
+    private static Assignable<object?>? GetAttributeValue(ISymbol symbol, string attributeTypeName, string namedArgumentName)
     {
         if (symbol.GetAttributes().FirstOrDefault(x => string.Equals(
              x.AttributeClass?.ToString(),
              attributeTypeName,
              StringComparison.Ordinal)) is { } ipcMethodAttribute)
         {
-            var value = ipcMethodAttribute.NamedArguments
-                .FirstOrDefault(x => x.Key == namedArgumentName).Value;
-            return value.Value;
+            var argumentPair = ipcMethodAttribute.NamedArguments
+                .FirstOrDefault(x => x.Key == namedArgumentName);
+            if (argumentPair.Key is not null)
+            {
+                return new(argumentPair.Value.Value);
+            }
         }
         return null;
     }

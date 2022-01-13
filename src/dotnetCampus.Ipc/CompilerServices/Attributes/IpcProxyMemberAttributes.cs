@@ -1,8 +1,6 @@
 ﻿#pragma warning disable format
 using System;
 
-using dotnetCampus.Ipc.CompilerServices.Attributes;
-
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 #if !IPC_ANALYZER
@@ -22,7 +20,7 @@ partial class GeneratedIpcProxy
         /// <summary>
         /// 设定此方法执行的超时时间。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
         /// </summary>
-        protected internal int? Timeout { get; set; }
+        protected internal int Timeout { get; set; }
 
         /// <summary>
         /// 在指定了 <see cref="IgnoresIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
@@ -39,7 +37,13 @@ partial class GeneratedIpcProxy
         /// </item>
         /// </list>
         /// </summary>
-        protected internal object? DefaultReturn { get; set; }
+        protected internal
+#if !IPC_ANALYZER
+            object?
+#else
+            Assignable<object?>?
+#endif
+            DefaultReturn { get; set; }
 
         /// <summary>
         /// 如果指定为 true，则在 IPC 发生异常时会忽略这些异常，并返回默认值。

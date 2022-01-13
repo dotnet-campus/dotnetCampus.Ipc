@@ -54,7 +54,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(asyncReturnType, _realType);
+            var attributes = _method.FormatIpcAttributesAsAnInvokingArg(asyncReturnType, _realType);
             var sourceCode = asyncReturnType is null
                 ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
         {{
@@ -72,7 +72,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var waitVoid = _method.CheckIpcWaitingVoid();
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(null, _realType);
+            var attributes = _method.FormatIpcAttributesAsAnInvokingArg(null, _realType);
             var sourceCode = waitVoid
                 ? @$"        public void {_method.Name}({parameters})
         {{
@@ -90,7 +90,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var @return = _method.ReturnType;
-            var attributes = _method.GetIpcAttributesAsAnInvokingArg(@return, _realType);
+            var attributes = _method.FormatIpcAttributesAsAnInvokingArg(@return, _realType);
             var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
         {{
             return CallMethod<{@return}>(new object[] {{ {arguments} }}, {attributes}).Result;

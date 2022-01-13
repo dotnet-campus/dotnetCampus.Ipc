@@ -167,5 +167,41 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC101_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn is useless 的本地化字符串。
+        /// </summary>
+        internal static string DIPC102 {
+            get {
+                return ResourceManager.GetString("DIPC102", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove the DefaultReturn 的本地化字符串。
+        /// </summary>
+        internal static string DIPC102_Fix1 {
+            get {
+                return ResourceManager.GetString("DIPC102_Fix1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
+        /// </summary>
+        internal static string DIPC102_Fix2 {
+            get {
+                return ResourceManager.GetString("DIPC102_Fix2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn only works with the situation in which IgnoresIpcException is set to true. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC102_Message {
+            get {
+                return ResourceManager.GetString("DIPC102_Message", resourceCulture);
+            }
+        }
     }
 }
