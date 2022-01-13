@@ -31,6 +31,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         Task<String> MethodThatHasStringDefaultReturn();
         Task MethodThatHasTimeout();
         Task MethodThatIgnoresIpcException();
+        Task MethodThatThrowsIpcException();
         void MethodWithStructParameters(BindingFlags flags);
         bool MethodWithStructReturn();
         void NonWaitsVoidMethod();

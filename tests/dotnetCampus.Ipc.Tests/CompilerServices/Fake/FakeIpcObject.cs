@@ -11,6 +11,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
     internal class FakeIpcObject : IFakeIpcObject
     {
         private BindingFlags _enumProperty = BindingFlags.Public;
+        private bool _ipcReadonlyProperty = true;
 
 #nullable enable
         public string? NullableStringProperty { get; set; } = "Title";
@@ -27,7 +28,12 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
         [IpcProperty(IsReadonly = true)]
-        public bool IpcReadonlyProperty { get; } = true;
+        public bool IpcReadonlyProperty => _ipcReadonlyProperty;
+
+        public void SetIpcReadonlyProperty(bool value)
+        {
+            _ipcReadonlyProperty = value;
+        }
 
         public IntPtr IntPtrProperty { get; } = new IntPtr(1);
 
@@ -41,11 +47,20 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         [IpcMethod(WaitsVoid = false)]
         public void NonWaitsVoidMethod()
         {
+            Thread.Sleep(100);
+            EnumProperty = BindingFlags.Public | BindingFlags.Instance;
         }
 
         [IpcMethod(IgnoreIpcException = true)]
         public Task MethodThatIgnoresIpcException()
         {
+            Thread.Sleep(100);
+            return Task.CompletedTask;
+        }
+
+        public Task MethodThatThrowsIpcException()
+        {
+            Thread.Sleep(100);
             return Task.CompletedTask;
         }
 
@@ -55,21 +70,21 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return Task.Delay(150);
         }
 
-        [IpcMethod(DefaultReturn = "default1", Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default1", IgnoreIpcException = true, Timeout = 100)]
         public async Task<string> MethodThatHasDefaultReturn()
         {
             await Task.Delay(250);
             return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = "default", Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default", IgnoreIpcException = true, Timeout = 100)]
         public async Task<object> MethodThatHasObjectWithObjectDefaultReturn()
         {
             await Task.Delay(250);
-            return null;
+            return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = @"""default1""", Timeout = 100)]
+        [IpcMethod(DefaultReturn = @"""default1""", IgnoreIpcException = true, Timeout = 100)]
         public async Task<object> MethodThatHasObjectWithStringDefaultReturn()
         {
             await Task.Delay(250);
@@ -77,18 +92,18 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
         // 请不要将这里的 String 改为 string，这是为了测试代码生成器能否处理类型而非关键字。
-        [IpcMethod(DefaultReturn = "default1", Timeout = 100)]
+        [IpcMethod(DefaultReturn = "default1", IgnoreIpcException = true, Timeout = 100)]
         public async Task<String> MethodThatHasStringDefaultReturn()
         {
             await Task.Delay(250);
             return "xxx";
         }
 
-        [IpcMethod(DefaultReturn = "IntPtr.Zero", Timeout = 100)]
+        [IpcMethod(DefaultReturn = "new IntPtr(1)", IgnoreIpcException = true, Timeout = 100)]
         public async Task<IntPtr> MethodThatHasCustomDefaultReturn()
         {
             await Task.Delay(150);
-            return new IntPtr(1);
+            return IntPtr.Zero;
         }
 
         [IpcMethod(DefaultReturn = "default1")]

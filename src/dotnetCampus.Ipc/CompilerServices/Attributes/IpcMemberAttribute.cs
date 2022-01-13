@@ -59,7 +59,7 @@ public abstract class IpcMemberAttribute : Attribute
     /// <remarks>
     /// 请注意：
     /// <list type="bullet">
-    /// <item>此特性仅忽略 IPC 异常（例如进程退出、连接断开等），而不会忽略普通业务异常（例如业务实现中抛出了 <see cref="NullReferenceException"/> 等）。</item>
+    /// <item>此特性仅忽略 IPC 连接异常和 IPC 超时异常（例如进程退出、连接断开等），而不会忽略普通业务异常（例如业务实现中抛出了 <see cref="NullReferenceException"/> 等）。</item>
     /// <item>另外，如果 IPC 框架内部出现了 bug 导致了异常，也不会因此而忽略。</item>
     /// </list>
     /// </remarks>

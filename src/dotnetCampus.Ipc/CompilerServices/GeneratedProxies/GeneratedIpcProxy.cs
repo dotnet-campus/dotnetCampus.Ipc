@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -177,7 +178,8 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             try
             {
                 return attributes.Timeout is int timeout && timeout > 0
-                    ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout).ConfigureAwait(false)
+                    ? await InvokeWithTimeoutAsync<T>(callType, memberName, args, timeout,
+                        attributes.IgnoreIpcException, attributes.DefaultReturn).ConfigureAwait(false)
                     : await Invoker.IpcInvokeAsync<T>(callType, memberName, args).ConfigureAwait(false);
             }
             catch (IpcRemoteException) when (attributes.IgnoreIpcException)
@@ -187,7 +189,8 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private async Task<T?> InvokeWithTimeoutAsync<T>(MemberInvokingType callType, string memberName, object?[]? args, int millisecondsTimeout)
+        private async Task<T?> InvokeWithTimeoutAsync<T>(MemberInvokingType callType, string memberName, object?[]? args,
+            int millisecondsTimeout, bool ignoreException, object? defaultReturn)
         {
             var ipcTask = Invoker.IpcInvokeAsync<T>(callType, memberName, args);
             var timeoutTask = Task.Delay(millisecondsTimeout);
@@ -197,9 +200,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 // 任务正常完成。
                 return ipcTask.Result;
             }
+            else if (ignoreException)
+            {
+                // 任务超时（不抛异常）。
+                return defaultReturn is null ? default : (T) defaultReturn;
+            }
             else
             {
-                // 任务超时。
+                // 任务超时（抛异常）。
                 throw new IpcInvokingTimeoutException(memberName, TimeSpan.FromMilliseconds(millisecondsTimeout));
             }
         }
