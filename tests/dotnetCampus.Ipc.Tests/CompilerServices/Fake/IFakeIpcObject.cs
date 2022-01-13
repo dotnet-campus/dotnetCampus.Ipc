@@ -6,14 +6,8 @@ using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
-    internal interface IFakeIpcObject
+    internal interface IFakeIpcObject : IFakeIpcObjectBase
     {
-#nullable enable
-        string? NullableStringProperty { get; set; }
-#nullable restore
-#nullable disable
-        string? NonNullableStringProperty { get; set; }
-#nullable restore
         BindingFlags EnumProperty { get; set; }
         bool IpcReadonlyProperty { get; }
         IntPtr IntPtrProperty { get; }

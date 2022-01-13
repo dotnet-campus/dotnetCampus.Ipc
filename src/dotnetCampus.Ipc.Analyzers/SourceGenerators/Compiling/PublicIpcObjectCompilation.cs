@@ -67,7 +67,8 @@ internal class PublicIpcObjectCompilation
     /// <returns>所有成员信息。</returns>
     public IEnumerable<PublicIpcObjectMemberProxyJointGenerator> EnumerateMembersByContractType()
     {
-        var members = ContractType.GetMembers();
+        var members = ContractType.AllInterfaces.SelectMany(x => x.GetMembers())
+            .Concat(ContractType.GetMembers());
         foreach (var member in members)
         {
             if (member is IMethodSymbol method && method.MethodKind is MethodKind.PropertyGet or MethodKind.PropertySet)
