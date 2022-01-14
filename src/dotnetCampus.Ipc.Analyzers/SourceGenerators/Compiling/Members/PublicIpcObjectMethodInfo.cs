@@ -15,11 +15,12 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// 真实类型的语义符号。
     /// </summary>
     private readonly INamedTypeSymbol _realType;
+    private readonly IMethodSymbol _interfaceMethod;
 
     /// <summary>
     /// 此成员在类型实现中的语义符号。
     /// </summary>
-    private readonly IMethodSymbol _method;
+    private readonly IMethodSymbol _implementedMethod;
 
     /// <summary>
     /// 如果此成员是一个异步方法，则此值为 true；否则为 false。
@@ -37,7 +38,8 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     {
         _contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
         _realType = realType ?? throw new ArgumentNullException(nameof(realType));
-        _method = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
+        _interfaceMethod = interfaceMember ?? throw new ArgumentNullException(nameof(interfaceMember));
+        _implementedMethod = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
         var returnType = interfaceMember.ReturnType.OriginalDefinition.ToString();
         _isAsyncMethod = returnType is "System.Threading.Tasks.Task" or "System.Threading.Tasks.Task<TResult>";
     }
@@ -51,34 +53,33 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
         if (_isAsyncMethod)
         {
             // 异步方法。
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
-            var namedValues = _method.GetIpcNamedValues(asyncReturnType, _realType);
+            var parameters = GenerateMethodParameters(_interfaceMethod.Parameters);
+            var arguments = GenerateMethodArguments(_interfaceMethod.Parameters);
+            var asyncReturnType = GetAsyncReturnType(_interfaceMethod.ReturnType);
+            var namedValues = _implementedMethod.GetIpcNamedValues(asyncReturnType, _realType);
             var sourceCode = asyncReturnType is null
-                ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
+                ? @$"System.Threading.Tasks.Task {_interfaceMethod.ContainingType.Name}.{_interfaceMethod.Name}({parameters})
         {{
             return CallMethodAsync(new object[] {{ {arguments} }}, {namedValues});
         }}"
-                : @$"        public System.Threading.Tasks.Task<{asyncReturnType}> {_method.Name}({parameters})
+                : @$"System.Threading.Tasks.Task<{asyncReturnType}> {_interfaceMethod.ContainingType.Name}.{_interfaceMethod.Name}({parameters})
         {{
             return CallMethodAsync<{asyncReturnType}>(new object[] {{ {arguments} }}, {namedValues});
         }}";
             return sourceCode;
         }
-        else if (_method.ReturnsVoid)
+        else if (_implementedMethod.ReturnsVoid)
         {
             // 同步 void 方法。
-            var waitVoid = _method.GetIpcNamedValues(null, _realType).WaitsVoid;
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var namedValues = _method.GetIpcNamedValues(null, _realType);
-            var sourceCode = waitVoid
-                ? @$"        public void {_method.Name}({parameters})
+            var parameters = GenerateMethodParameters(_interfaceMethod.Parameters);
+            var arguments = GenerateMethodArguments(_interfaceMethod.Parameters);
+            var namedValues = _implementedMethod.GetIpcNamedValues(null, _realType);
+            var sourceCode = namedValues.WaitsVoid
+                ? @$"void {_interfaceMethod.ContainingType.Name}.{_interfaceMethod.Name}({parameters})
         {{
             CallMethod(new object[] {{ {arguments} }}, {namedValues}).Wait();
         }}"
-                : @$"        public void {_method.Name}({parameters})
+                : @$"void {_interfaceMethod.ContainingType.Name}.{_interfaceMethod.Name}({parameters})
         {{
             _ = CallMethod(new object[] {{ {arguments} }}, {namedValues});
         }}";
@@ -87,11 +88,11 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
         else
         {
             // 同步带返回值方法。
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var @return = _method.ReturnType;
-            var namedValues = _method.GetIpcNamedValues(@return, _realType);
-            var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
+            var parameters = GenerateMethodParameters(_interfaceMethod.Parameters);
+            var arguments = GenerateMethodArguments(_interfaceMethod.Parameters);
+            var @return = _interfaceMethod.ReturnType;
+            var namedValues = _implementedMethod.GetIpcNamedValues(@return, _realType);
+            var sourceCode = @$"{_interfaceMethod.ReturnType} {_interfaceMethod.ContainingType.Name}.{_interfaceMethod.Name}({parameters})
         {{
             return CallMethod<{@return}>(new object[] {{ {arguments} }}, {namedValues}).Result;
         }}";
@@ -106,20 +107,20 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
     /// <returns>方法源代码。</returns>
     public string GenerateJointMatch(string real)
     {
-        if (_method.ReturnsVoid)
+        if (_implementedMethod.ReturnsVoid)
         {
-            var arguments = GenerateMethodArguments(_method.Parameters);
+            var arguments = GenerateMethodArguments(_interfaceMethod.Parameters);
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_contractType}.{_method.Name}), new System.Action(() => {real}.{_method.Name}()));"
-                : $"MatchMethod(nameof({_contractType}.{_method.Name}), new System.Action<{GenerateMethodParameterTypes(_method.Parameters)}>(({arguments}) => {real}.{_method.Name}({arguments})));";
+                ? $"MatchMethod(nameof({_contractType}.{_interfaceMethod.Name}), new System.Action({real}.{_interfaceMethod.Name}));"
+                : $"MatchMethod(nameof({_contractType}.{_interfaceMethod.Name}), new System.Action<{GenerateMethodParameterTypes(_interfaceMethod.Parameters)}>({real}.{_interfaceMethod.Name}));";
             return sourceCode;
         }
         else
         {
-            var arguments = GenerateMethodArguments(_method.Parameters);
+            var arguments = GenerateMethodArguments(_interfaceMethod.Parameters);
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_contractType}.{_method.Name}), new System.Func<{_method.ReturnType}>(() => {real}.{_method.Name}()));"
-                : $"MatchMethod(nameof({_contractType}.{_method.Name}), new System.Func<{GenerateMethodParameterTypes(_method.Parameters)}, {_method.ReturnType}>(({arguments}) => {real}.{_method.Name}({arguments})));";
+                ? $"MatchMethod(nameof({_contractType}.{_interfaceMethod.Name}), new System.Func<{_interfaceMethod.ReturnType}>({real}.{_interfaceMethod.Name}));"
+                : $"MatchMethod(nameof({_contractType}.{_interfaceMethod.Name}), new System.Func<{GenerateMethodParameterTypes(_interfaceMethod.Parameters)}, {_interfaceMethod.ReturnType}>({real}.{_interfaceMethod.Name}));";
             return sourceCode;
         }
     }

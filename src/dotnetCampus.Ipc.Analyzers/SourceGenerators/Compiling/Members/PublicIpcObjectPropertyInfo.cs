@@ -5,7 +5,7 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <summary>
     /// 此成员在类型实现中的语义符号。
     /// </summary>
-    private readonly IPropertySymbol _property;
+    private readonly IPropertySymbol _implementedProperty;
 
     /// <summary>
     /// 契约接口的语义符号。
@@ -13,9 +13,14 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     private readonly INamedTypeSymbol _contractType;
 
     /// <summary>
-    /// 真实类型的语义符号。
+    /// 真实类型中的属性语义符号。
     /// </summary>
     private readonly INamedTypeSymbol _realType;
+
+    /// <summary>
+    /// 接口中的属性语义符号。
+    /// </summary>
+    private readonly IPropertySymbol _interfaceProperty;
 
     /// <summary>
     /// 创建 IPC 对象的其中一个成员信息。
@@ -28,7 +33,8 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     {
         _contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
         _realType = realType ?? throw new ArgumentNullException(nameof(realType));
-        _property = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
+        _interfaceProperty = interfaceMember ?? throw new ArgumentNullException(nameof(interfaceMember));
+        _implementedProperty = implementationMember ?? throw new ArgumentNullException(nameof(implementationMember));
     }
 
     /// <summary>
@@ -37,27 +43,27 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateProxyMember()
     {
-        var namedValues = _property.GetIpcNamedValues(_realType);
-        if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
+        var namedValues = _implementedProperty.GetIpcNamedValues(_realType);
+        if (_interfaceProperty.GetMethod is { } getMethod && _interfaceProperty.SetMethod is { } setMethod)
         {
-            var sourceCode = $@"        public {_property.Type} {_property.Name}
+            var sourceCode = $@"{_interfaceProperty.Type} {_interfaceProperty.ContainingType.Name}.{_interfaceProperty.Name}
         {{
-            get => GetValueAsync<{_property.Type}>({namedValues}).Result;
+            get => GetValueAsync<{_interfaceProperty.Type}>({namedValues}).Result;
             set => SetValueAsync(value, {namedValues}).Wait();
         }}";
             return sourceCode;
         }
-        else if (_property.GetMethod is { } getOnlyMethod)
+        else if (_interfaceProperty.GetMethod is { } getOnlyMethod)
         {
-            var sourceCode = $"        public {_property.Type} {_property.Name} => GetValueAsync<{_property.Type}>({namedValues}).Result;";
+            var sourceCode = $"{_interfaceProperty.Type} {_interfaceProperty.ContainingType.Name}.{_interfaceProperty.Name} => GetValueAsync<{_implementedProperty.Type}>({namedValues}).Result;";
             return sourceCode;
         }
         else
         {
             throw new DiagnosticException(
                 DIPC004_OnlyGetOrGetSetPropertyIsSupported,
-                _property.Locations.FirstOrDefault(),
-                _property.Name);
+                _implementedProperty.Locations.FirstOrDefault(),
+                _implementedProperty.Name);
         }
     }
 
@@ -68,22 +74,22 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateJointMatch(string real)
     {
-        if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
+        if (_interfaceProperty.GetMethod is { } getMethod && _interfaceProperty.SetMethod is { } setMethod)
         {
-            var sourceCode = $"MatchProperty(nameof({_contractType}.{_property.Name}), new System.Func<{_property.Type}>(() => {real}.{_property.Name}), new System.Action<{_property.Type}>(value => {real}.{_property.Name} = value));";
+            var sourceCode = $"MatchProperty(nameof({_contractType}.{_interfaceProperty.Name}), new System.Func<{_interfaceProperty.Type}>(() => {real}.{_interfaceProperty.Name}), new System.Action<{_implementedProperty.Type}>(value => {real}.{_implementedProperty.Name} = value));";
             return sourceCode;
         }
-        else if (_property.GetMethod is { } getOnlyMethod)
+        else if (_interfaceProperty.GetMethod is { } getOnlyMethod)
         {
-            var sourceCode = $"MatchProperty(nameof({_contractType}.{_property.Name}), new System.Func<{_property.Type}>(() => {real}.{_property.Name}));";
+            var sourceCode = $"MatchProperty(nameof({_contractType}.{_interfaceProperty.Name}), new System.Func<{_interfaceProperty.Type}>(() => {real}.{_interfaceProperty.Name}));";
             return sourceCode;
         }
         else
         {
             throw new DiagnosticException(
                 DIPC004_OnlyGetOrGetSetPropertyIsSupported,
-                _property.Locations.FirstOrDefault(),
-                _property.Name);
+                _implementedProperty.Locations.FirstOrDefault(),
+                _implementedProperty.Name);
         }
     }
 }
