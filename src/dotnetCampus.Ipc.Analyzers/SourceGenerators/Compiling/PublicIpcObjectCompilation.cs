@@ -81,6 +81,14 @@ internal class PublicIpcObjectCompilation
             {
                 yield return new (ContractType, RealType, member, implementationMember);
             }
+            else
+            {
+                throw new DiagnosticException(
+                    DIPC104_IpcContractTypeDismatchWithInterface,
+                    RealType.Locations.FirstOrDefault(),
+                    RealType.Name,
+                    ContractType.Name);
+            }
         }
     }
 

@@ -230,5 +230,23 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC103_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 IPC contract type dismatches with interface 的本地化字符串。
+        /// </summary>
+        internal static string DIPC104 {
+            get {
+                return ResourceManager.GetString("DIPC104", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 {0} does not implement the contract type {1} that the IpcPublic marked. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC104_Message {
+            get {
+                return ResourceManager.GetString("DIPC104_Message", resourceCulture);
+            }
+        }
     }
 }

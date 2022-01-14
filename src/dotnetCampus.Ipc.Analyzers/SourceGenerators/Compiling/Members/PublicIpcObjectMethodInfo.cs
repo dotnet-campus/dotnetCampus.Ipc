@@ -54,7 +54,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
-            var namedValues = _method.FormatIpcNamedValuesAsAnInvokingArg(asyncReturnType, _realType);
+            var namedValues = _method.GetIpcNamedValues(asyncReturnType, _realType);
             var sourceCode = asyncReturnType is null
                 ? @$"        public System.Threading.Tasks.Task {_method.Name}({parameters})
         {{
@@ -69,10 +69,10 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
         else if (_method.ReturnsVoid)
         {
             // 同步 void 方法。
-            var waitVoid = _method.CheckIpcWaitingVoid();
+            var waitVoid = _method.GetIpcNamedValues(null, _realType).WaitsVoid;
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
-            var namedValues = _method.FormatIpcNamedValuesAsAnInvokingArg(null, _realType);
+            var namedValues = _method.GetIpcNamedValues(null, _realType);
             var sourceCode = waitVoid
                 ? @$"        public void {_method.Name}({parameters})
         {{
@@ -90,7 +90,7 @@ internal class PublicIpcObjectMethodInfo : IPublicIpcObjectProxyMemberGenerator,
             var parameters = GenerateMethodParameters(_method.Parameters);
             var arguments = GenerateMethodArguments(_method.Parameters);
             var @return = _method.ReturnType;
-            var namedValues = _method.FormatIpcNamedValuesAsAnInvokingArg(@return, _realType);
+            var namedValues = _method.GetIpcNamedValues(@return, _realType);
             var sourceCode = @$"        public {_method.ReturnType} {_method.Name}({parameters})
         {{
             return CallMethod<{@return}>(new object[] {{ {arguments} }}, {namedValues}).Result;

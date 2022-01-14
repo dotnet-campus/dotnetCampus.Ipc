@@ -1,19 +1,15 @@
 ﻿#pragma warning disable format
 using System;
+using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
-#if !IPC_ANALYZER
 partial class GeneratedIpcProxy
 {
-#endif
     /// <summary>
     /// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
     /// </summary>
-#if !IPC_ANALYZER
-    protected
-#endif
-    class IpcProxyMemberNamedValues
+    protected class IpcProxyMemberNamedValues
     {
         private IpcMemberAttributeFlags _flags;
 
@@ -37,13 +33,7 @@ partial class GeneratedIpcProxy
         /// </item>
         /// </list>
         /// </summary>
-        protected internal
-#if !IPC_ANALYZER
-            object?
-#else
-            Assignable<object?>?
-#endif
-            DefaultReturn { get; set; }
+        protected internal object? DefaultReturn { get; set; }
 
         /// <summary>
         /// 如果指定为 true，则在 IPC 发生异常时会忽略这些异常，并返回默认值。
@@ -95,11 +85,7 @@ partial class GeneratedIpcProxy
     /// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含所有参数合为一体的标记位。
     /// </summary>
     [Flags]
-
-#if !IPC_ANALYZER
-    protected
-#endif
-    enum IpcMemberAttributeFlags
+    protected enum IpcMemberAttributeFlags
     {
         /// <summary>
         /// 没有任何标记。
@@ -121,6 +107,4 @@ partial class GeneratedIpcProxy
         /// </summary>
         WaitsVoid = 0x0000_0004,
     }
-#if !IPC_ANALYZER
 }
-#endif

@@ -1,4 +1,6 @@
-﻿using dotnetCampus.Ipc.SourceGenerators.Compiling;
+﻿using System.Diagnostics;
+
+using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;

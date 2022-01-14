@@ -14,7 +14,7 @@ using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace dotnetCampus.Ipc.CodeFixeProviders;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(IgnoresIpcExceptionCodeFixProvider)), Shared]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(IgnoresIpcExceptionIsRecommendedCodeFixProvider)), Shared]
 public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixProvider
 {
     public DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider()

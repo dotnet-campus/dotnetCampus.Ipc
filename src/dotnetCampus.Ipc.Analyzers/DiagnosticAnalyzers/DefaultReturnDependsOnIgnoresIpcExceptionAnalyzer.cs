@@ -35,7 +35,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
             return;
         }
 
-        foreach (var (attribute, namedValues) in IpcMemberAttributeHelper.TryFindAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
         {
             // 设置了默认值却没有忽略异常。
             if (!namedValues.IgnoresIpcException && namedValues.DefaultReturn is not null)

@@ -15,7 +15,8 @@ internal static class Diagnostics
         Localize(nameof(DIPC001_Message)),
         Categories.Compiler,
         DiagnosticSeverity.Error,
-        true);
+        true,
+        customTags: new[] { WellKnownDiagnosticTags.AnalyzerException });
 
     public static readonly DiagnosticDescriptor DIPC002_ContractTypeNotSpecified = new(
         nameof(DIPC002),
@@ -23,7 +24,8 @@ internal static class Diagnostics
         Localize(nameof(DIPC002_Message)),
         Categories.Compiler,
         DiagnosticSeverity.Error,
-        true);
+        true,
+        customTags: new[] { WellKnownDiagnosticTags.AnalyzerException });
 
     public static readonly DiagnosticDescriptor DIPC003_OnlyMethodOrPropertyIsSupported = new(
         nameof(DIPC003),
@@ -31,7 +33,8 @@ internal static class Diagnostics
         Localize(nameof(DIPC003_Message)),
         Categories.Compiler,
         DiagnosticSeverity.Error,
-        true);
+        true,
+        customTags: new[] { WellKnownDiagnosticTags.AnalyzerException });
 
     public static readonly DiagnosticDescriptor DIPC004_OnlyGetOrGetSetPropertyIsSupported = new(
         nameof(DIPC004),
@@ -67,12 +70,25 @@ internal static class Diagnostics
         true,
         customTags: new[] { WellKnownDiagnosticTags.Unnecessary });
 
+    public static readonly DiagnosticDescriptor DIPC104_IpcContractTypeDismatchWithInterface = new(
+        nameof(DIPC104),
+        Localize(nameof(DIPC104)),
+        Localize(nameof(DIPC104_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
     private static class Categories
     {
         /// <summary>
         /// 因编译要求而必须满足的条件没有满足，则报告此诊断。
         /// </summary>
         public const string Compiler = "dotnetCampus.Compiler";
+
+        /// <summary>
+        /// 因 IPC 库内的机制限制，必须满足此要求 IPC 才可正常工作，则报告此诊断。
+        /// </summary>
+        public const string Mechanism = "dotnetCampus.Mechanism";
 
         /// <summary>
         /// 为了代码可读性，使之更易于理解、方便调试，则报告此诊断。

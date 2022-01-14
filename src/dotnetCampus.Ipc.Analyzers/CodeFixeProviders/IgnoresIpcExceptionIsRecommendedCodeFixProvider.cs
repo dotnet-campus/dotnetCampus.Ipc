@@ -14,10 +14,10 @@ using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace dotnetCampus.Ipc.CodeFixeProviders;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(IgnoresIpcExceptionCodeFixProvider)), Shared]
-public class IgnoresIpcExceptionCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(IgnoresIpcExceptionIsRecommendedCodeFixProvider)), Shared]
+public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
 {
-    public IgnoresIpcExceptionCodeFixProvider()
+    public IgnoresIpcExceptionIsRecommendedCodeFixProvider()
     {
         FixableDiagnosticIds = ImmutableArray.Create(DIPC101_IgnoresIpcExceptionIsRecommended.Id);
     }

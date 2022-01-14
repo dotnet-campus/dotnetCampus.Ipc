@@ -174,4 +174,10 @@
   <data name="DIPC103_Message" xml:space="preserve">
     <value>Empty {0} does nothing, so there is no need to add it.</value>
   </data>
+  <data name="DIPC104" xml:space="preserve">
+    <value>IPC contract type dismatches with interface</value>
+  </data>
+  <data name="DIPC104_Message" xml:space="preserve">
+    <value>{0} does not implement the contract type {1} that the IpcPublic marked.</value>
+  </data>
 </root>

@@ -1,4 +1,4 @@
-﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿using dotnetCampus.Ipc.CodeAnalysis.Models;
 using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -6,9 +6,36 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
-internal static class IpcMemberAttributeHelper
+internal static class IpcAttributeHelper
 {
-    public static IEnumerable<(AttributeSyntax? attribute, IpcProxyMemberNamedValues namedValues)> TryFindAttributes(
+    public static IEnumerable<(AttributeSyntax attribute, IpcAttributeNamedValues namedValues)> TryFindClassAttributes(
+        SemanticModel semanticModel, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (typeSymbol is null)
+        {
+            yield break;
+        }
+
+        if (classDeclarationSyntax.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
+        {
+            string? attributeName = x.Name switch
+            {
+                IdentifierNameSyntax identifierName => identifierName.ToString(),
+                QualifiedNameSyntax qualifiedName => qualifiedName.ChildNodes().OfType<IdentifierNameSyntax>().LastOrDefault()?.ToString(),
+                _ => null,
+            };
+            return attributeName is not null &&
+                (attributeName.Equals(nameof(IpcPublicAttribute), StringComparison.Ordinal)
+                || attributeName.Equals(GetAttributeName(nameof(IpcPublicAttribute)), StringComparison.Ordinal));
+        }) is { } attribute)
+        {
+            var namedValues = typeSymbol.GetIpcNamedValues();
+            yield return (attribute, namedValues);
+        }
+    }
+
+    public static IEnumerable<(AttributeSyntax? attribute, IpcAttributeNamedValues namedValues)> TryFindMemberAttributes(
         SemanticModel semanticModel, ClassDeclarationSyntax classDeclarationSyntax)
     {
         if (TryFindIpcPublicType(semanticModel, classDeclarationSyntax, out var compilation))

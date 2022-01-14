@@ -35,7 +35,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        foreach (var (attribute, _) in IpcMemberAttributeHelper.TryFindAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attribute, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
         {
             // 没有设置任何属性。
             if (attribute?.ArgumentList?.Arguments is { } arguments && arguments.Count is 0

@@ -37,7 +37,7 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
     /// <returns>属性源代码。</returns>
     public string GenerateProxyMember()
     {
-        var namedValues = _property.FormatIpcNamedValuesAsAnInvokingArg(_realType);
+        var namedValues = _property.GetIpcNamedValues(_realType);
         if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
         {
             var sourceCode = $@"        public {_property.Type} {_property.Name}
