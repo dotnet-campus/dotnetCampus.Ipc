@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
@@ -186,10 +187,20 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 // 如果目标要求忽略异常，则返回指定值或默认值。
                 return namedValues.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
             }
-            catch (AggregateException ex) when (ex.InnerExceptions.Count == 1 && ex.InnerExceptions[0] is IpcRemoteException)
+            catch (AggregateException ex) when (ex.InnerExceptions.Count >= 1)
             {
-                // 如果目标要求忽略异常，则返回指定值或默认值。
-                return namedValues.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+                var innerException = ex.InnerExceptions[0];
+                if (innerException is IpcRemoteException)
+                {
+                    // 如果目标要求忽略异常，则返回指定值或默认值。
+                    return namedValues.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default;
+                }
+                else
+                {
+                    // 尽量不抛出难以捕获的 AggregateException 而改用内部异常。
+                    ExceptionDispatchInfo.Capture(innerException).Throw();
+                    throw;
+                }
             }
             catch (Exception)
             {
