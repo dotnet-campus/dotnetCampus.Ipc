@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
+
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,16 +19,23 @@ internal class PublicIpcObjectCompilation
     private readonly CompilationUnitSyntax _compilationUnitSyntax;
 
     /// <summary>
+    /// 整个项目的语义模型。
+    /// </summary>
+    private readonly SemanticModel _semanticModel;
+
+    /// <summary>
     /// 创建 PublicIpcObject 的语法和语义分析。
     /// </summary>
     /// <param name="syntaxTree">IPC 真实类型整个文件的语法树。</param>
+    /// <param name="semanticModel">语义模型。</param>
     /// <param name="realType">IPC 真实类型的语义符号。</param>
     /// <param name="contractType">IPC 契约接口的语义符号。</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public PublicIpcObjectCompilation(SyntaxTree syntaxTree,
+    public PublicIpcObjectCompilation(SyntaxTree syntaxTree, SemanticModel semanticModel,
         INamedTypeSymbol realType, INamedTypeSymbol contractType)
     {
         _compilationUnitSyntax = syntaxTree.GetCompilationUnitRoot();
+        _semanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
         RealType = realType ?? throw new ArgumentNullException(nameof(realType));
         ContractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
     }
@@ -79,13 +88,14 @@ internal class PublicIpcObjectCompilation
 
             if (RealType.FindImplementationForInterfaceMember(member) is ISymbol implementationMember)
             {
-                yield return new (ContractType, RealType, member, implementationMember);
+                yield return new(ContractType, RealType, member, implementationMember);
             }
             else
             {
+                var attribute = RealType.TryGetClassDeclarationWithIpcAttribute(_semanticModel);
                 throw new DiagnosticException(
                     DIPC104_IpcContractTypeDismatchWithInterface,
-                    RealType.Locations.FirstOrDefault(),
+                    attribute?.ArgumentList?.Arguments.FirstOrDefault()?.GetLocation(),
                     RealType.Name,
                     ContractType.Name);
             }
@@ -110,8 +120,8 @@ internal class PublicIpcObjectCompilation
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         foreach (var classDeclarationSyntax in classDeclarationSyntaxes)
         {
-            if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax) is { } classDeclarationSymbol
-                && classDeclarationSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
+            if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax) is { } typeSymbol
+                && typeSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
                      x.AttributeClass?.ToString(),
                      typeof(IpcPublicAttribute).FullName,
                      StringComparison.Ordinal)) is { } ipcPublicAttribute)
@@ -121,16 +131,30 @@ internal class PublicIpcObjectCompilation
                     if (ipcPublicAttribute.ConstructorArguments[0] is TypedConstant typedConstant
                         && typedConstant.Value is INamedTypeSymbol contractType)
                     {
-                        result.Add(new PublicIpcObjectCompilation(syntaxTree, classDeclarationSymbol, contractType));
+                        if (contractType.TypeKind == TypeKind.Interface)
+                        {
+                            result.Add(new PublicIpcObjectCompilation(syntaxTree, semanticModel, typeSymbol, contractType));
+                        }
+                        else
+                        {
+                            var (attribute, _) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationSyntax).FirstOrDefault();
+                            if (attribute is not null)
+                            {
+                                throw new DiagnosticException(
+                                    DIPC105_ContractTypeMustBeAnInterface,
+                                    attribute.ArgumentList?.Arguments.FirstOrDefault()?.GetLocation(),
+                                    contractType.Name);
+                            }
+                        }
                     }
                     else
                     {
-                        throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, classDeclarationSymbol.Locations.FirstOrDefault());
+                        throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, typeSymbol.Locations.FirstOrDefault());
                     }
                 }
                 else
                 {
-                    throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, classDeclarationSymbol.Locations.FirstOrDefault());
+                    throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, typeSymbol.Locations.FirstOrDefault());
                 }
             }
         }

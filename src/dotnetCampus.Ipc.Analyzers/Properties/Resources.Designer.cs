@@ -248,5 +248,41 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC104_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 IPC contract type must be an interface 的本地化字符串。
+        /// </summary>
+        internal static string DIPC105 {
+            get {
+                return ResourceManager.GetString("DIPC105", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IPC contract type must be an interface but {0} is not. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC105_Message {
+            get {
+                return ResourceManager.GetString("DIPC105_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IPC timeout can&apos;t be negative 的本地化字符串。
+        /// </summary>
+        internal static string DIPC106 {
+            get {
+                return ResourceManager.GetString("DIPC106", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IPC timeout can&apos;t be negative, but it is set to {0}ms. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC106_Message {
+            get {
+                return ResourceManager.GetString("DIPC106_Message", resourceCulture);
+            }
+        }
     }
 }

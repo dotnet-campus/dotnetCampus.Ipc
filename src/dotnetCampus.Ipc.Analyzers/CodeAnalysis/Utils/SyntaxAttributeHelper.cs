@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
-internal static class AttributeSyntaxHelper
+internal static class SyntaxAttributeHelper
 {
     /// <summary>
     /// 获取一个类型作为 Attribute 编写时的编写名称，即去掉末尾的 Attribute 字符串。

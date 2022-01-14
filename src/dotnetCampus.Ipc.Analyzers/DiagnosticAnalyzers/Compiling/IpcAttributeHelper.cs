@@ -99,7 +99,7 @@ internal static class IpcAttributeHelper
                 && ipcPublicAttribute.ConstructorArguments[0] is TypedConstant typedConstant
                 && typedConstant.Value is INamedTypeSymbol contractType)
             {
-                publicIpcObjectCompilation = new PublicIpcObjectCompilation(classDeclarationNode.SyntaxTree, classDeclarationSymbol, contractType);
+                publicIpcObjectCompilation = new PublicIpcObjectCompilation(classDeclarationNode.SyntaxTree, semanticModel, classDeclarationSymbol, contractType);
                 return true;
             }
         }

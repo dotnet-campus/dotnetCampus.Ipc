@@ -5,7 +5,7 @@ namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 /// <summary>
 /// 包含 <see cref="IpcMemberAttribute"/> 相关语义分析的辅助扩展方法。
 /// </summary>
-internal static class SemanticIpcAttributeHelper
+internal static class IpcSemanticAttributeHelper
 {
     /// <summary>
     /// 检查此类型上标记的 <see cref="IpcPublicAttribute"/> 并将其转换为传入 IPC 代理的类型。

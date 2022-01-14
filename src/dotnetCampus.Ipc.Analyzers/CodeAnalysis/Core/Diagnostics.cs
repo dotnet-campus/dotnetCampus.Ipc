@@ -78,6 +78,22 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         true);
 
+    public static readonly DiagnosticDescriptor DIPC105_ContractTypeMustBeAnInterface = new(
+        nameof(DIPC105),
+        Localize(nameof(DIPC105)),
+        Localize(nameof(DIPC105_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor DIPC106_TimeoutCantBeNegative = new(
+        nameof(DIPC106),
+        Localize(nameof(DIPC106)),
+        Localize(nameof(DIPC106_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
     private static class Categories
     {
         /// <summary>

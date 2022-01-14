@@ -20,26 +20,37 @@ public class ProxyJointGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        foreach (var ipcObjectType in FindIpcPublicObjects(context.Compilation))
+        try
         {
-            try
+            foreach (var ipcObjectType in FindIpcPublicObjects(context.Compilation))
             {
-                var realType = ipcObjectType.RealType;
-                var proxySource = GenerateProxySource(ipcObjectType);
-                var jointSource = GenerateJointSource(ipcObjectType);
-                var assemblySource = GenerateAssemblySource(ipcObjectType);
-                context.AddSource($"{realType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                context.AddSource($"{realType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
-                context.AddSource($"{realType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                try
+                {
+                    var realType = ipcObjectType.RealType;
+                    var proxySource = GenerateProxySource(ipcObjectType);
+                    var jointSource = GenerateJointSource(ipcObjectType);
+                    var assemblySource = GenerateAssemblySource(ipcObjectType);
+                    context.AddSource($"{realType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                    context.AddSource($"{realType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                    context.AddSource($"{realType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                }
+                catch (DiagnosticException ex)
+                {
+                    context.ReportDiagnostic(ex.ToDiagnostic());
+                }
+                catch (Exception ex)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
+                }
             }
-            catch (DiagnosticException ex)
-            {
-                context.ReportDiagnostic(ex.ToDiagnostic());
-            }
-            catch (Exception ex)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
-            }
+        }
+        catch (DiagnosticException ex)
+        {
+            context.ReportDiagnostic(ex.ToDiagnostic());
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
         }
     }
 

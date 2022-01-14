@@ -180,4 +180,16 @@
   <data name="DIPC104_Message" xml:space="preserve">
     <value>IpcPublic 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
   </data>
+  <data name="DIPC105" xml:space="preserve">
+    <value>IPC 契约类型必须是接口</value>
+  </data>
+  <data name="DIPC105_Message" xml:space="preserve">
+    <value>IPC 契约类型必须是接口，但 {0} 不是。</value>
+  </data>
+  <data name="DIPC106" xml:space="preserve">
+    <value>IPC 超时时间不可设为负数</value>
+  </data>
+  <data name="DIPC106_Message" xml:space="preserve">
+    <value>IPC 超时时间不可设为负数，但这里被设为 {0} 毫秒。</value>
+  </data>
 </root>
