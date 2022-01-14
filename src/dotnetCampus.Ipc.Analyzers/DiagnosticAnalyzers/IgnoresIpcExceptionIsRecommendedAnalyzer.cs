@@ -14,7 +14,7 @@ public class IgnoresIpcExceptionIsRecommendedAnalyzer : DiagnosticAnalyzer
 {
     public IgnoresIpcExceptionIsRecommendedAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC101_IgnoresIpcExceptionIsRecommended);
+        SupportedDiagnostics = ImmutableArray.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -33,7 +33,7 @@ public class IgnoresIpcExceptionIsRecommendedAnalyzer : DiagnosticAnalyzer
         {
             if (namedValues.IgnoresIpcException is null)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DIPC101_IgnoresIpcExceptionIsRecommended, attribute.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attribute.GetLocation()));
             }
         }
     }

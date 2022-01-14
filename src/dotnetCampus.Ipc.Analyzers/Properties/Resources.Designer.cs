@@ -97,7 +97,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Only method or property is supported 的本地化字符串。
+        ///   查找类似 IPC contract type must be an interface 的本地化字符串。
         /// </summary>
         internal static string DIPC003 {
             get {
@@ -106,7 +106,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Unknown IPC member {0}. IPC object only supports methods and properties. 的本地化字符串。
+        ///   查找类似 IPC contract type must be an interface but {0} is not. 的本地化字符串。
         /// </summary>
         internal static string DIPC003_Message {
             get {
@@ -115,7 +115,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Set-only property is not supported 的本地化字符串。
+        ///   查找类似 IPC contract type dismatches with interface 的本地化字符串。
         /// </summary>
         internal static string DIPC004 {
             get {
@@ -124,11 +124,119 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Unknown IPC property {0}. Only get or get-set property is supported. 的本地化字符串。
+        ///   查找类似 {0} does not implement the contract type {1} that the IpcPublic marked. 的本地化字符串。
         /// </summary>
         internal static string DIPC004_Message {
             get {
                 return ResourceManager.GetString("DIPC004_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IPC Proxy cannot be generated 的本地化字符串。
+        /// </summary>
+        internal static string DIPC010 {
+            get {
+                return ResourceManager.GetString("DIPC010", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 There is no type in this assembly implements the IPC contract interface {0}, so you need to set one explicitly as the second type argument. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC010_Message {
+            get {
+                return ResourceManager.GetString("DIPC010_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC proxy type does not match the IPC contract type 的本地化字符串。
+        /// </summary>
+        internal static string DIPC011 {
+            get {
+                return ResourceManager.GetString("DIPC011", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC proxy type {0} does not match the IPC contract type {1}. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC011_Message {
+            get {
+                return ResourceManager.GetString("DIPC011_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC joint type does not match the IPC contract type 的本地化字符串。
+        /// </summary>
+        internal static string DIPC012 {
+            get {
+                return ResourceManager.GetString("DIPC012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC joint type {0} does not match the IPC contract type {1}. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC012_Message {
+            get {
+                return ResourceManager.GetString("DIPC012_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Only method or property is supported 的本地化字符串。
+        /// </summary>
+        internal static string DIPC020 {
+            get {
+                return ResourceManager.GetString("DIPC020", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Unknown IPC member {0}. IPC object only supports methods and properties. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC020_Message {
+            get {
+                return ResourceManager.GetString("DIPC020_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Event is not supported for an IPC object 的本地化字符串。
+        /// </summary>
+        internal static string DIPC021 {
+            get {
+                return ResourceManager.GetString("DIPC021", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Event {0} is not supported for an IPC object. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC021_Message {
+            get {
+                return ResourceManager.GetString("DIPC021_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set-only property is not supported 的本地化字符串。
+        /// </summary>
+        internal static string DIPC022 {
+            get {
+                return ResourceManager.GetString("DIPC022", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Unknown IPC property {0}. Only get or get-set property is supported. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC022_Message {
+            get {
+                return ResourceManager.GetString("DIPC022_Message", resourceCulture);
             }
         }
         
@@ -169,7 +277,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 The DefaultReturn is useless 的本地化字符串。
+        ///   查找类似 IPC timeout can&apos;t be negative 的本地化字符串。
         /// </summary>
         internal static string DIPC102 {
             get {
@@ -178,25 +286,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Remove the DefaultReturn 的本地化字符串。
-        /// </summary>
-        internal static string DIPC102_Fix1 {
-            get {
-                return ResourceManager.GetString("DIPC102_Fix1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
-        /// </summary>
-        internal static string DIPC102_Fix2 {
-            get {
-                return ResourceManager.GetString("DIPC102_Fix2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The DefaultReturn only works with the situation in which IgnoresIpcException is set to true. 的本地化字符串。
+        ///   查找类似 IPC timeout can&apos;t be negative, but it is set to {0}ms. 的本地化字符串。
         /// </summary>
         internal static string DIPC102_Message {
             get {
@@ -205,7 +295,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Empty {0} is not needed 的本地化字符串。
+        ///   查找类似 The timeout is zero 的本地化字符串。
         /// </summary>
         internal static string DIPC103 {
             get {
@@ -214,16 +304,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Remove the {0} 的本地化字符串。
-        /// </summary>
-        internal static string DIPC103_Fix {
-            get {
-                return ResourceManager.GetString("DIPC103_Fix", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Empty {0} does nothing, so there is no need to add it. 的本地化字符串。
+        ///   查找类似 A timeout with zero milliseconds does nothing so there is no need to assign this property. 的本地化字符串。
         /// </summary>
         internal static string DIPC103_Message {
             get {
@@ -232,74 +313,209 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 IPC contract type dismatches with interface 的本地化字符串。
+        ///   查找类似 The DefaultReturn is useless 的本地化字符串。
         /// </summary>
-        internal static string DIPC104 {
+        internal static string DIPC120 {
             get {
-                return ResourceManager.GetString("DIPC104", resourceCulture);
+                return ResourceManager.GetString("DIPC120", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 {0} does not implement the contract type {1} that the IpcPublic marked. 的本地化字符串。
+        ///   查找类似 Remove the DefaultReturn 的本地化字符串。
         /// </summary>
-        internal static string DIPC104_Message {
+        internal static string DIPC120_Fix1 {
             get {
-                return ResourceManager.GetString("DIPC104_Message", resourceCulture);
+                return ResourceManager.GetString("DIPC120_Fix1", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC contract type must be an interface 的本地化字符串。
+        ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
         /// </summary>
-        internal static string DIPC105 {
+        internal static string DIPC120_Fix2 {
             get {
-                return ResourceManager.GetString("DIPC105", resourceCulture);
+                return ResourceManager.GetString("DIPC120_Fix2", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC contract type must be an interface but {0} is not. 的本地化字符串。
+        ///   查找类似 The DefaultReturn only works with the situation in which IgnoresIpcException is set to true. 的本地化字符串。
         /// </summary>
-        internal static string DIPC105_Message {
+        internal static string DIPC120_Message {
             get {
-                return ResourceManager.GetString("DIPC105_Message", resourceCulture);
+                return ResourceManager.GetString("DIPC120_Message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC timeout can&apos;t be negative 的本地化字符串。
+        ///   查找类似 Empty {0} is not needed 的本地化字符串。
         /// </summary>
-        internal static string DIPC106 {
+        internal static string DIPC121 {
             get {
-                return ResourceManager.GetString("DIPC106", resourceCulture);
+                return ResourceManager.GetString("DIPC121", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC timeout can&apos;t be negative, but it is set to {0}ms. 的本地化字符串。
+        ///   查找类似 Remove the {0} 的本地化字符串。
         /// </summary>
-        internal static string DIPC106_Message {
+        internal static string DIPC121_Fix {
             get {
-                return ResourceManager.GetString("DIPC106_Message", resourceCulture);
+                return ResourceManager.GetString("DIPC121_Fix", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC 对象不支持事件成员 的本地化字符串。
+        ///   查找类似 Empty {0} does nothing, so there is no need to add it. 的本地化字符串。
         /// </summary>
-        internal static string DIPC107 {
+        internal static string DIPC121_Message {
             get {
-                return ResourceManager.GetString("DIPC107", resourceCulture);
+                return ResourceManager.GetString("DIPC121_Message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 IPC 对象不支持事件成员 {0}。 的本地化字符串。
+        ///   查找类似 WaitsVoid is recommended 的本地化字符串。
         /// </summary>
-        internal static string DIPC107_Message {
+        internal static string DIPC122 {
             get {
-                return ResourceManager.GetString("DIPC107_Message", resourceCulture);
+                return ResourceManager.GetString("DIPC122", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Commonly, developers can hardly determin whether a waiting is happened during an IPC call if a method returns void. So it&apos;s recommended to assign WaitsVoid to the value you want instead of keeping it as false by default. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC122_Message {
+            get {
+                return ResourceManager.GetString("DIPC122_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IsReadonly is unnecessary 的本地化字符串。
+        /// </summary>
+        internal static string DIPC123 {
+            get {
+                return ResourceManager.GetString("DIPC123", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IsReadonly is set to false by default, so there is no need to assign it to false manully. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC123_Message {
+            get {
+                return ResourceManager.GetString("DIPC123_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn type does not match the property type 的本地化字符串。
+        /// </summary>
+        internal static string DIPC124 {
+            get {
+                return ResourceManager.GetString("DIPC124", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC DefaultReturn type {0} does not match the property type {1}. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC124_Message {
+            get {
+                return ResourceManager.GetString("DIPC124_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn type does not match the method return type 的本地化字符串。
+        /// </summary>
+        internal static string DIPC125 {
+            get {
+                return ResourceManager.GetString("DIPC125", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The IPC DefaultReturn type {0} does not match the method return type {1}. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC125_Message {
+            get {
+                return ResourceManager.GetString("DIPC125_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn value for a void method is useless 的本地化字符串。
+        /// </summary>
+        internal static string DIPC126 {
+            get {
+                return ResourceManager.GetString("DIPC126", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The DefaultReturn value for a void method {0} is useless. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC126_Message {
+            get {
+                return ResourceManager.GetString("DIPC126_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string is treated as a code snippet 的本地化字符串。
+        /// </summary>
+        internal static string DIPC127 {
+            get {
+                return ResourceManager.GetString("DIPC127", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @&quot;&quot;&quot;{0}&quot;&quot;&quot; instead. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC127_Message {
+            get {
+                return ResourceManager.GetString("DIPC127_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string is treated as a code snippet 的本地化字符串。
+        /// </summary>
+        internal static string DIPC128 {
+            get {
+                return ResourceManager.GetString("DIPC128", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string {0} is treated as a code snippet and will be set to a {1} type. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC128_Message {
+            get {
+                return ResourceManager.GetString("DIPC128_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string is treated as a code snippet but cannot be compiled 的本地化字符串。
+        /// </summary>
+        internal static string DIPC129 {
+            get {
+                return ResourceManager.GetString("DIPC129", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string {0} is treated as a code snippet but cannot be compiled. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC129_Message {
+            get {
+                return ResourceManager.GetString("DIPC129_Message", resourceCulture);
             }
         }
     }

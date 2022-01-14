@@ -97,7 +97,7 @@ internal class PublicIpcObjectCompilation
                 // IPC 不支持事件。
                 var eventSyntax = eventSymbol.TryGetMemberDeclaration();
                 throw new DiagnosticException(
-                    DIPC107_EventIsNotSupportedForIpcObject,
+                    DIPC021_EventIsNotSupportedForIpcObject,
                     eventSyntax?.GetLocation(),
                     RealType.Name,
                     ContractType.Name);
@@ -111,7 +111,7 @@ internal class PublicIpcObjectCompilation
             {
                 var attribute = RealType.TryGetClassDeclarationWithIpcAttribute(_semanticModel);
                 throw new DiagnosticException(
-                    DIPC104_IpcContractTypeDismatchWithInterface,
+                    DIPC004_ContractTypeDismatchWithInterface,
                     attribute?.ArgumentList?.Arguments.FirstOrDefault()?.GetLocation(),
                     RealType.Name,
                     ContractType.Name);
@@ -158,7 +158,7 @@ internal class PublicIpcObjectCompilation
                             if (attribute is not null)
                             {
                                 throw new DiagnosticException(
-                                    DIPC105_ContractTypeMustBeAnInterface,
+                                    DIPC003_ContractTypeMustBeAnInterface,
                                     attribute.ArgumentList?.Arguments.FirstOrDefault()?.GetLocation(),
                                     contractType.Name);
                             }
@@ -166,12 +166,12 @@ internal class PublicIpcObjectCompilation
                     }
                     else
                     {
-                        throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, typeSymbol.Locations.FirstOrDefault());
+                        throw new DiagnosticException(DIPC002_ContractTypeIsNotSpecified, typeSymbol.Locations.FirstOrDefault());
                     }
                 }
                 else
                 {
-                    throw new DiagnosticException(DIPC002_ContractTypeNotSpecified, typeSymbol.Locations.FirstOrDefault());
+                    throw new DiagnosticException(DIPC002_ContractTypeIsNotSpecified, typeSymbol.Locations.FirstOrDefault());
                 }
             }
         }

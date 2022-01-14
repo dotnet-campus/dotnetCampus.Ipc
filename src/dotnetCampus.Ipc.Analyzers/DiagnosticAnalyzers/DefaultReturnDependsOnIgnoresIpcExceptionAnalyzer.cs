@@ -13,7 +13,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
 {
     public DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC102_DefaultReturnDependsOnIgnoresIpcException);
+        SupportedDiagnostics = ImmutableArray.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -43,7 +43,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
                 if (attribute?.ArgumentList?.Arguments.FirstOrDefault(x =>
                     x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn)) is { } argument)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DIPC102_DefaultReturnDependsOnIgnoresIpcException, argument.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException, argument.GetLocation()));
                 }
             }
         }

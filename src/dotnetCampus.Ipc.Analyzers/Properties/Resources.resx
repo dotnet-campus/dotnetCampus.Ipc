@@ -130,15 +130,51 @@
     <value>IpcPublic attribute must have a contract type as its first argument.</value>
   </data>
   <data name="DIPC003" xml:space="preserve">
-    <value>Only method or property is supported</value>
+    <value>IPC contract type must be an interface</value>
   </data>
   <data name="DIPC003_Message" xml:space="preserve">
-    <value>Unknown IPC member {0}. IPC object only supports methods and properties.</value>
+    <value>IPC contract type must be an interface but {0} is not.</value>
   </data>
   <data name="DIPC004" xml:space="preserve">
-    <value>Set-only property is not supported</value>
+    <value>IPC contract type dismatches with interface</value>
   </data>
   <data name="DIPC004_Message" xml:space="preserve">
+    <value>{0} does not implement the contract type {1} that the IpcPublic marked.</value>
+  </data>
+  <data name="DIPC010" xml:space="preserve">
+    <value>IPC Proxy cannot be generated</value>
+  </data>
+  <data name="DIPC010_Message" xml:space="preserve">
+    <value>There is no type in this assembly implements the IPC contract interface {0}, so you need to set one explicitly as the second type argument.</value>
+  </data>
+  <data name="DIPC011" xml:space="preserve">
+    <value>The IPC proxy type does not match the IPC contract type</value>
+  </data>
+  <data name="DIPC011_Message" xml:space="preserve">
+    <value>The IPC proxy type {0} does not match the IPC contract type {1}.</value>
+  </data>
+  <data name="DIPC012" xml:space="preserve">
+    <value>The IPC joint type does not match the IPC contract type</value>
+  </data>
+  <data name="DIPC012_Message" xml:space="preserve">
+    <value>The IPC joint type {0} does not match the IPC contract type {1}.</value>
+  </data>
+  <data name="DIPC020" xml:space="preserve">
+    <value>Only method or property is supported</value>
+  </data>
+  <data name="DIPC020_Message" xml:space="preserve">
+    <value>Unknown IPC member {0}. IPC object only supports methods and properties.</value>
+  </data>
+  <data name="DIPC021" xml:space="preserve">
+    <value>Event is not supported for an IPC object</value>
+  </data>
+  <data name="DIPC021_Message" xml:space="preserve">
+    <value>Event {0} is not supported for an IPC object.</value>
+  </data>
+  <data name="DIPC022" xml:space="preserve">
+    <value>Set-only property is not supported</value>
+  </data>
+  <data name="DIPC022_Message" xml:space="preserve">
     <value>Unknown IPC property {0}. Only get or get-set property is supported.</value>
   </data>
   <data name="DIPC101" xml:space="preserve">
@@ -154,48 +190,84 @@
     <value>For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here.</value>
   </data>
   <data name="DIPC102" xml:space="preserve">
-    <value>The DefaultReturn is useless</value>
-  </data>
-  <data name="DIPC102_Fix1" xml:space="preserve">
-    <value>Remove the DefaultReturn</value>
-  </data>
-  <data name="DIPC102_Fix2" xml:space="preserve">
-    <value>Set IgnoresIpcException to true</value>
-  </data>
-  <data name="DIPC102_Message" xml:space="preserve">
-    <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
-  </data>
-  <data name="DIPC103" xml:space="preserve">
-    <value>Empty {0} is not needed</value>
-  </data>
-  <data name="DIPC103_Fix" xml:space="preserve">
-    <value>Remove the {0}</value>
-  </data>
-  <data name="DIPC103_Message" xml:space="preserve">
-    <value>Empty {0} does nothing, so there is no need to add it.</value>
-  </data>
-  <data name="DIPC104" xml:space="preserve">
-    <value>IPC contract type dismatches with interface</value>
-  </data>
-  <data name="DIPC104_Message" xml:space="preserve">
-    <value>{0} does not implement the contract type {1} that the IpcPublic marked.</value>
-  </data>
-  <data name="DIPC105" xml:space="preserve">
-    <value>IPC contract type must be an interface</value>
-  </data>
-  <data name="DIPC105_Message" xml:space="preserve">
-    <value>IPC contract type must be an interface but {0} is not.</value>
-  </data>
-  <data name="DIPC106" xml:space="preserve">
     <value>IPC timeout can't be negative</value>
   </data>
-  <data name="DIPC106_Message" xml:space="preserve">
+  <data name="DIPC102_Message" xml:space="preserve">
     <value>IPC timeout can't be negative, but it is set to {0}ms.</value>
   </data>
-  <data name="DIPC107" xml:space="preserve">
-    <value>IPC 对象不支持事件成员</value>
+  <data name="DIPC103" xml:space="preserve">
+    <value>The timeout is zero</value>
   </data>
-  <data name="DIPC107_Message" xml:space="preserve">
-    <value>IPC 对象不支持事件成员 {0}。</value>
+  <data name="DIPC103_Message" xml:space="preserve">
+    <value>A timeout with zero milliseconds does nothing so there is no need to assign this property.</value>
+  </data>
+  <data name="DIPC120" xml:space="preserve">
+    <value>The DefaultReturn is useless</value>
+  </data>
+  <data name="DIPC120_Fix1" xml:space="preserve">
+    <value>Remove the DefaultReturn</value>
+  </data>
+  <data name="DIPC120_Fix2" xml:space="preserve">
+    <value>Set IgnoresIpcException to true</value>
+  </data>
+  <data name="DIPC120_Message" xml:space="preserve">
+    <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
+  </data>
+  <data name="DIPC121" xml:space="preserve">
+    <value>Empty {0} is not needed</value>
+  </data>
+  <data name="DIPC121_Fix" xml:space="preserve">
+    <value>Remove the {0}</value>
+  </data>
+  <data name="DIPC121_Message" xml:space="preserve">
+    <value>Empty {0} does nothing, so there is no need to add it.</value>
+  </data>
+  <data name="DIPC122" xml:space="preserve">
+    <value>WaitsVoid is recommended</value>
+  </data>
+  <data name="DIPC122_Message" xml:space="preserve">
+    <value>Commonly, developers can hardly determin whether a waiting is happened during an IPC call if a method returns void. So it's recommended to assign WaitsVoid to the value you want instead of keeping it as false by default.</value>
+  </data>
+  <data name="DIPC123" xml:space="preserve">
+    <value>IsReadonly is unnecessary</value>
+  </data>
+  <data name="DIPC123_Message" xml:space="preserve">
+    <value>IsReadonly is set to false by default, so there is no need to assign it to false manully.</value>
+  </data>
+  <data name="DIPC124" xml:space="preserve">
+    <value>The DefaultReturn type does not match the property type</value>
+  </data>
+  <data name="DIPC124_Message" xml:space="preserve">
+    <value>The IPC DefaultReturn type {0} does not match the property type {1}.</value>
+  </data>
+  <data name="DIPC125" xml:space="preserve">
+    <value>The DefaultReturn type does not match the method return type</value>
+  </data>
+  <data name="DIPC125_Message" xml:space="preserve">
+    <value>The IPC DefaultReturn type {0} does not match the method return type {1}.</value>
+  </data>
+  <data name="DIPC126" xml:space="preserve">
+    <value>The DefaultReturn value for a void method is useless</value>
+  </data>
+  <data name="DIPC126_Message" xml:space="preserve">
+    <value>The DefaultReturn value for a void method {0} is useless.</value>
+  </data>
+  <data name="DIPC127" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="DIPC127_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @"""{0}""" instead.</value>
+  </data>
+  <data name="DIPC128" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="DIPC128_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to a {1} type.</value>
+  </data>
+  <data name="DIPC129" xml:space="preserve">
+    <value>The string is treated as a code snippet but cannot be compiled</value>
+  </data>
+  <data name="DIPC129_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
   </data>
 </root>

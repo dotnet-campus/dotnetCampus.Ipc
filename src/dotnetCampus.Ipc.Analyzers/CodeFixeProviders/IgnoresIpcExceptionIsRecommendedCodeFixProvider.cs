@@ -19,7 +19,7 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
 {
     public IgnoresIpcExceptionIsRecommendedCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC101_IgnoresIpcExceptionIsRecommended.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }

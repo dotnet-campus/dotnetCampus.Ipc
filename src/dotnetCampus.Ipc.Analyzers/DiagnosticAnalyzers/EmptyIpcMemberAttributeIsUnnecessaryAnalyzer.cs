@@ -13,7 +13,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
 {
     public EmptyIpcMemberAttributeIsUnnecessaryAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC103_EmptyIpcMemberAttributeIsUnnecessary);
+        SupportedDiagnostics = ImmutableArray.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -42,7 +42,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
                 && attribute.Parent is AttributeListSyntax attributeList)
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DIPC103_EmptyIpcMemberAttributeIsUnnecessary,
+                    Diagnostic.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
                     attributeList.Attributes.Count is 1
                         ? attributeList.GetLocation()
                         : attribute.GetLocation(),

@@ -19,7 +19,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
 {
     public DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC102_DefaultReturnDependsOnIgnoresIpcException.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -46,15 +46,15 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC102_Fix1,
+                        title: Resources.DIPC120_Fix1,
                         createChangedSolution: c => RemoveDefaultReturn(context.Document, attributeSyntax, c),
-                        equivalenceKey: Resources.DIPC102_Fix1),
+                        equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC102_Fix2,
+                        title: Resources.DIPC120_Fix1,
                         createChangedSolution: c => SetIgnoresIpcException(context.Document, attributeSyntax, c),
-                        equivalenceKey: Resources.DIPC102_Fix2),
+                        equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
             }
         }

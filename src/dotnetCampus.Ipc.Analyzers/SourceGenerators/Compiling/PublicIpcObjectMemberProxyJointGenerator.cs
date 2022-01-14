@@ -27,7 +27,7 @@ internal class PublicIpcObjectMemberProxyJointGenerator
             IMethodSymbol methodSymbol => new PublicIpcObjectMethodInfo(contractType, realType, methodSymbol, (IMethodSymbol) implementationMember),
             IPropertySymbol propertySymbol => new PublicIpcObjectPropertyInfo(contractType, realType, propertySymbol, (IPropertySymbol) implementationMember),
             _ => throw new DiagnosticException(
-                DIPC003_OnlyMethodOrPropertyIsSupported,
+                DIPC020_OnlyPropertiesAndMethodsAreSupportedForIpcObject,
                 implementationMember.Locations.FirstOrDefault(),
                 interfaceMember.Name),
         };

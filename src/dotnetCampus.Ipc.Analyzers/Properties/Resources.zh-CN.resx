@@ -130,15 +130,51 @@
     <value>指定 IpcPublic 特性时，必须指定契约类型作为第一个参数。</value>
   </data>
   <data name="DIPC003" xml:space="preserve">
-    <value>IPC 类型只支持方法和属性</value>
+    <value>IPC 契约类型必须是接口</value>
   </data>
   <data name="DIPC003_Message" xml:space="preserve">
-    <value>不支持的 IPC 类型成员 {0}。IPC 类型只支持方法和属性。</value>
+    <value>IPC 契约类型必须是接口，但 {0} 不是。</value>
   </data>
   <data name="DIPC004" xml:space="preserve">
-    <value>IPC 类型不支持只写属性</value>
+    <value>IPC 契约类型与实现的接口不匹配</value>
   </data>
   <data name="DIPC004_Message" xml:space="preserve">
+    <value>IpcPublic 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
+  </data>
+  <data name="DIPC010" xml:space="preserve">
+    <value>无法生成 IPC 代理</value>
+  </data>
+  <data name="DIPC010_Message" xml:space="preserve">
+    <value>因为当前程序集中没有此 IPC 契约类型（{0}）的实现，因此你必须显式指定一个 IPC 实现或傀儡来辅助生成代理。</value>
+  </data>
+  <data name="DIPC011" xml:space="preserve">
+    <value>IPC 契约类型与代理类型不匹配</value>
+  </data>
+  <data name="DIPC011_Message" xml:space="preserve">
+    <value>获取 IPC 代理时，要获取的契约类型 {0} 与实现或傀儡标记的 IPC 契约类型 {1} 不匹配。</value>
+  </data>
+  <data name="DIPC012" xml:space="preserve">
+    <value>IPC 契约类型与对接类型不匹配</value>
+  </data>
+  <data name="DIPC012_Message" xml:space="preserve">
+    <value>设置 IPC 对接时，要设置的契约类型 {0} 与实现 {2} 标记的 IPC 契约类型 {1} 不匹配。</value>
+  </data>
+  <data name="DIPC020" xml:space="preserve">
+    <value>IPC 类型只支持方法和属性</value>
+  </data>
+  <data name="DIPC020_Message" xml:space="preserve">
+    <value>不支持的 IPC 类型成员 {0}。IPC 类型只支持方法和属性。</value>
+  </data>
+  <data name="DIPC021" xml:space="preserve">
+    <value>IPC 对象不支持事件成员</value>
+  </data>
+  <data name="DIPC021_Message" xml:space="preserve">
+    <value>IPC 对象不支持事件成员 {0}。</value>
+  </data>
+  <data name="DIPC022" xml:space="preserve">
+    <value>IPC 类型不支持只写属性</value>
+  </data>
+  <data name="DIPC022_Message" xml:space="preserve">
     <value>不支持的 IPC 属性 {0}。IPC 类型只支持读写属性或只读属性。</value>
   </data>
   <data name="DIPC101" xml:space="preserve">
@@ -154,42 +190,84 @@
     <value>为了更好的可读性，建议设置 IgnoresIpcException 以便开发者知道这里原本是存在 IPC 异常的。</value>
   </data>
   <data name="DIPC102" xml:space="preserve">
-    <value>IPC 默认值不起作用</value>
-  </data>
-  <data name="DIPC102_Fix1" xml:space="preserve">
-    <value>去掉此成员的 IPC 默认值</value>
-  </data>
-  <data name="DIPC102_Fix2" xml:space="preserve">
-    <value>忽略此成员抛出的 IPC 连接和超时异常</value>
-  </data>
-  <data name="DIPC102_Message" xml:space="preserve">
-    <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
-  </data>
-  <data name="DIPC103" xml:space="preserve">
-    <value>空的 {0} 没有任何用途</value>
-  </data>
-  <data name="DIPC103_Fix" xml:space="preserve">
-    <value>删除 {0}</value>
-  </data>
-  <data name="DIPC103_Message" xml:space="preserve">
-    <value>空的 {0} 没有任何用途，因此完全可以将其删除。</value>
-  </data>
-  <data name="DIPC104" xml:space="preserve">
-    <value>IPC 契约类型与实现的接口不匹配</value>
-  </data>
-  <data name="DIPC104_Message" xml:space="preserve">
-    <value>IpcPublic 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
-  </data>
-  <data name="DIPC105" xml:space="preserve">
-    <value>IPC 契约类型必须是接口</value>
-  </data>
-  <data name="DIPC105_Message" xml:space="preserve">
-    <value>IPC 契约类型必须是接口，但 {0} 不是。</value>
-  </data>
-  <data name="DIPC106" xml:space="preserve">
     <value>IPC 超时时间不可设为负数</value>
   </data>
-  <data name="DIPC106_Message" xml:space="preserve">
+  <data name="DIPC102_Message" xml:space="preserve">
     <value>IPC 超时时间不可设为负数，但这里被设为 {0} 毫秒。</value>
+  </data>
+  <data name="DIPC103" xml:space="preserve">
+    <value>超时时间为零</value>
+  </data>
+  <data name="DIPC103_Message" xml:space="preserve">
+    <value>0 毫秒的超时时间相当于不设置超时，因此不需要设置此属性。</value>
+  </data>
+  <data name="DIPC120" xml:space="preserve">
+    <value>IPC 默认值不起作用</value>
+  </data>
+  <data name="DIPC120_Fix1" xml:space="preserve">
+    <value>去掉此成员的 IPC 默认值</value>
+  </data>
+  <data name="DIPC120_Fix2" xml:space="preserve">
+    <value>忽略此成员抛出的 IPC 连接和超时异常</value>
+  </data>
+  <data name="DIPC120_Message" xml:space="preserve">
+    <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
+  </data>
+  <data name="DIPC121" xml:space="preserve">
+    <value>空的 {0} 没有任何用途</value>
+  </data>
+  <data name="DIPC121_Fix" xml:space="preserve">
+    <value>删除 {0}</value>
+  </data>
+  <data name="DIPC121_Message" xml:space="preserve">
+    <value>空的 {0} 没有任何用途，因此完全可以将其删除。</value>
+  </data>
+  <data name="DIPC122" xml:space="preserve">
+    <value>推荐设置 WaitsVoid 属性</value>
+  </data>
+  <data name="DIPC122_Message" xml:space="preserve">
+    <value>在 IPC 访问中难以得知 void 方法调用时是否会等待其返回。虽然默认是不等待，但仍建议显式设置 WaitsVoid 属性以增强此代码的可读性。</value>
+  </data>
+  <data name="DIPC123" xml:space="preserve">
+    <value>不需要设置 IsReadonly 属性</value>
+  </data>
+  <data name="DIPC123_Message" xml:space="preserve">
+    <value>不需要设置 IsReadonly 属性为 false，因为默认如此。</value>
+  </data>
+  <data name="DIPC124" xml:space="preserve">
+    <value>默认值类型与属性类型不匹配</value>
+  </data>
+  <data name="DIPC124_Message" xml:space="preserve">
+    <value>IPC 默认值 {0} 与 {1} 属性的类型不匹配。</value>
+  </data>
+  <data name="DIPC125" xml:space="preserve">
+    <value>默认值类型与方法返回值类型不匹配</value>
+  </data>
+  <data name="DIPC125_Message" xml:space="preserve">
+    <value>IPC 默认值 {0} 与 {1} 方法的返回值类型不匹配。</value>
+  </data>
+  <data name="DIPC126" xml:space="preserve">
+    <value>void 方法的 IPC 默认值不起作用</value>
+  </data>
+  <data name="DIPC126_Message" xml:space="preserve">
+    <value>{0} 方法没有返回值，因此无需设置其 IPC 默认值。</value>
+  </data>
+  <data name="DIPC127" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="DIPC127_Message" xml:space="preserve">
+    <value>试图将 object 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段，如需使用字符串，请修改为“@"""{0}"""”。</value>
+  </data>
+  <data name="DIPC128" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="DIPC128_Message" xml:space="preserve">
+    <value>试图将 {1} 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段。</value>
+  </data>
+  <data name="DIPC129" xml:space="preserve">
+    <value>字符串编译的代码片段无法被解析</value>
+  </data>
+  <data name="DIPC129_Message" xml:space="preserve">
+    <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
   </data>
 </root>

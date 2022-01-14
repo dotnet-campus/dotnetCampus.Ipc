@@ -61,7 +61,7 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
         else
         {
             throw new DiagnosticException(
-                DIPC004_OnlyGetOrGetSetPropertyIsSupported,
+                DIPC022_SetOnlyPropertyIsNotSupportedForIpcObject,
                 _implementedProperty.Locations.FirstOrDefault(),
                 _implementedProperty.Name);
         }
@@ -87,7 +87,7 @@ internal class PublicIpcObjectPropertyInfo : IPublicIpcObjectProxyMemberGenerato
         else
         {
             throw new DiagnosticException(
-                DIPC004_OnlyGetOrGetSetPropertyIsSupported,
+                DIPC022_SetOnlyPropertyIsNotSupportedForIpcObject,
                 _implementedProperty.Locations.FirstOrDefault(),
                 _implementedProperty.Name);
         }

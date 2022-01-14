@@ -19,7 +19,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
 {
     public EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC103_EmptyIpcMemberAttributeIsUnnecessary.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -44,7 +44,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
             var node = root.FindNode(diagnosticSpan);
             if (node is AttributeSyntax attributeSyntax)
             {
-                var fix = string.Format(Resources.DIPC103_Fix, attributeSyntax.Name);
+                var fix = string.Format(Resources.DIPC121_Fix, attributeSyntax.Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
@@ -54,7 +54,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
             }
             else if (node is AttributeListSyntax attributeListSyntax)
             {
-                var fix = string.Format(Resources.DIPC103_Fix, attributeListSyntax.Attributes[0].Name);
+                var fix = string.Format(Resources.DIPC121_Fix, attributeListSyntax.Attributes[0].Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
