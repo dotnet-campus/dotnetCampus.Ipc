@@ -284,5 +284,23 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC106_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 IPC 对象不支持事件成员 的本地化字符串。
+        /// </summary>
+        internal static string DIPC107 {
+            get {
+                return ResourceManager.GetString("DIPC107", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 IPC 对象不支持事件成员 {0}。 的本地化字符串。
+        /// </summary>
+        internal static string DIPC107_Message {
+            get {
+                return ResourceManager.GetString("DIPC107_Message", resourceCulture);
+            }
+        }
     }
 }

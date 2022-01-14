@@ -192,4 +192,10 @@
   <data name="DIPC106_Message" xml:space="preserve">
     <value>IPC timeout can't be negative, but it is set to {0}ms.</value>
   </data>
+  <data name="DIPC107" xml:space="preserve">
+    <value>IPC 对象不支持事件成员</value>
+  </data>
+  <data name="DIPC107_Message" xml:space="preserve">
+    <value>IPC 对象不支持事件成员 {0}。</value>
+  </data>
 </root>

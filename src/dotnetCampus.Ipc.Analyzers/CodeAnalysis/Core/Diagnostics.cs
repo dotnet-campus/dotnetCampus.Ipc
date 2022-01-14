@@ -94,6 +94,14 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         true);
 
+    public static readonly DiagnosticDescriptor DIPC107_EventIsNotSupportedForIpcObject = new(
+        nameof(DIPC107),
+        Localize(nameof(DIPC107)),
+        Localize(nameof(DIPC107_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
     private static class Categories
     {
         /// <summary>

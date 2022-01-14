@@ -86,6 +86,23 @@ internal class PublicIpcObjectCompilation
                 continue;
             }
 
+            if (member is INamedTypeSymbol)
+            {
+                // 接口中如果定义有其他嵌套类型/枚举/接口/结构，也忽略。
+                continue;
+            }
+
+            if (member is IEventSymbol eventSymbol)
+            {
+                // IPC 不支持事件。
+                var eventSyntax = eventSymbol.TryGetMemberDeclaration();
+                throw new DiagnosticException(
+                    DIPC107_EventIsNotSupportedForIpcObject,
+                    eventSyntax?.GetLocation(),
+                    RealType.Name,
+                    ContractType.Name);
+            }
+
             if (RealType.FindImplementationForInterfaceMember(member) is ISymbol implementationMember)
             {
                 yield return new(ContractType, RealType, member, implementationMember);
