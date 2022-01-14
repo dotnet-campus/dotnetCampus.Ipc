@@ -33,7 +33,7 @@ internal class IpcInvokingTimeoutException : IpcLocalException
     public string MemberName { get; set; }
 
     /// <summary>
-    /// 获取本次调用所设置的超时时间。
+    /// 获取本次调用所设置的超时时间（毫秒）。
     /// </summary>
     public TimeSpan Timeout { get; set; }
 

@@ -14,7 +14,7 @@ partial class GeneratedIpcProxy
         private IpcMemberAttributeFlags _flags;
 
         /// <summary>
-        /// 设定此方法执行的超时时间。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
+        /// 设定此方法执行的超时时间（毫秒）。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
         /// </summary>
         public int Timeout { get; set; }
 

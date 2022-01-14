@@ -70,7 +70,7 @@ abstract class IpcMemberAttribute : Attribute
     public bool IgnoresIpcException { get; set; }
 
     /// <summary>
-    /// 设定此成员执行的超时时间。如果自此成员执行开始直至超时时间后依然没有返回，则：
+    /// 设定此成员执行的超时时间（毫秒）。如果自此成员执行开始直至超时时间后依然没有返回，则：
     /// <list type="bullet">
     /// <item>默认会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。</item>
     /// <item>通过在类型或成员上设置 <see cref="IgnoresIpcException"/> 可阻止引发超时异常而改为返回默认值。</item>
