@@ -37,16 +37,18 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
 
         foreach (var (attribute, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
         {
-            // 没有设置任何属性。
-            if (attribute?.ArgumentList?.Arguments is { } arguments && arguments.Count is 0
-                && attribute.Parent is AttributeListSyntax attributeList)
+            if (attribute?.Parent is AttributeListSyntax attributeList)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
-                    attributeList.Attributes.Count is 1
-                        ? attributeList.GetLocation()
-                        : attribute.GetLocation(),
-                    attribute.Name));
+                // 没有设置任何参数（即连括号都没打），或者设置了 0 个参数（即打了括号但括号里没内容）。
+                if (attribute.ArgumentList is null || attribute.ArgumentList.Arguments.Count is 0)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
+                        attributeList.Attributes.Count is 1
+                            ? attributeList.GetLocation()
+                            : attribute.GetLocation(),
+                        attribute.Name));
+                }
             }
         }
     }
