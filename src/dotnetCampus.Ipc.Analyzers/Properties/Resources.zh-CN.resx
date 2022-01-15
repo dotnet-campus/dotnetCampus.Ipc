@@ -270,4 +270,10 @@
   <data name="DIPC129_Message" xml:space="preserve">
     <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
   </data>
+  <data name="DIPC130" xml:space="preserve">
+    <value>WaitsVoid 不起作用</value>
+  </data>
+  <data name="DIPC130_Message" xml:space="preserve">
+    <value>方法 {0} 有返回值，因此 WaitsVoid 对其不起作用。</value>
+  </data>
 </root>

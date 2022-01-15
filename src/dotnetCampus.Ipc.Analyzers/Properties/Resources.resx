@@ -270,4 +270,10 @@
   <data name="DIPC129_Message" xml:space="preserve">
     <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
   </data>
+  <data name="DIPC130" xml:space="preserve">
+    <value>The WaitsVoid is useless</value>
+  </data>
+  <data name="DIPC130_Message" xml:space="preserve">
+    <value>This method has a return value so WaitsVoid does not work for it.</value>
+  </data>
 </root>

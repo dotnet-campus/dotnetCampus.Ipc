@@ -518,5 +518,23 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("DIPC129_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 The WaitsVoid is useless 的本地化字符串。
+        /// </summary>
+        internal static string DIPC130 {
+            get {
+                return ResourceManager.GetString("DIPC130", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 This method has a return value so WaitsVoid does not work for it. 的本地化字符串。
+        /// </summary>
+        internal static string DIPC130_Message {
+            get {
+                return ResourceManager.GetString("DIPC130_Message", resourceCulture);
+            }
+        }
     }
 }

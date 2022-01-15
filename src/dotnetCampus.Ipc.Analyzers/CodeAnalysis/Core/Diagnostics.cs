@@ -210,6 +210,15 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         true);
 
+    public static DiagnosticDescriptor DIPC130_IpcMember_WaitsVoidIsUseless { get; } = new(
+        nameof(DIPC130),
+        Localize(nameof(DIPC130)),
+        Localize(nameof(DIPC130_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
     private static class Categories
     {
         /// <summary>
