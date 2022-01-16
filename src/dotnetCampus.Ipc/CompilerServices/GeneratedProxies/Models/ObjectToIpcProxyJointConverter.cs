@@ -4,6 +4,8 @@ using System.Reflection;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
+using static dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory;
+
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
 {
     /// <summary>
@@ -26,12 +28,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
             IPeerProxy peerProxy, string? assemblyQualifiedName, string? objectId,
             [NotNullWhen(true)] out object? proxy)
         {
-            if (assemblyQualifiedName is { } typeName
-                && Type.GetType(assemblyQualifiedName) is { } instanceType
-                && instanceType.IsDefined(typeof(IpcPublicAttribute))
-                && instanceType.GetCustomAttribute<IpcPublicAttribute>() is { } attribute)
+            if (assemblyQualifiedName is not null
+                && Type.GetType(assemblyQualifiedName) is { } realType
+                && RealTypeToProxyJointCache[realType].proxyType is { } proxyType)
             {
-                var proxyType = attribute.ProxyType;
                 var proxyInstance = (GeneratedIpcProxy) Activator.CreateInstance(proxyType)!;
                 proxyInstance.Context = context;
                 proxyInstance.PeerProxy = peerProxy;
@@ -43,21 +43,32 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
             return false;
         }
 
+        /// <summary>
+        /// 当试图返回一个 IPC 对象时，创建此对象的 IPC 对接，然后将此对接转换为可被 IPC 传输的对象信息。
+        /// </summary>
+        /// <param name="context">基于 .NET 类型进行 IPC 传输的上下文信息。</param>
+        /// <param name="realInstance">IPC 本地对接。</param>
+        /// <param name="objectId">如果可能有同一个契约类型的多个对象，则在此传入此对象的 IPC 访问 Id。</param>
+        /// <param name="assemblyQualifiedName">对象真实实例的类型名称。</param>
+        /// <returns></returns>
         public static bool TryCreateSerializationInfoFromIpcRealInstance(this GeneratedProxyJointIpcContext context,
             object? realInstance,
             [NotNullWhen(true)] out string? objectId,
             [NotNullWhen(true)] out string? assemblyQualifiedName)
         {
-            if (realInstance?.GetType() is { } type
-                && type.IsDefined(typeof(IpcPublicAttribute))
-                && type.GetCustomAttribute<IpcPublicAttribute>() is { } attribute)
+            if (realInstance is not null)
             {
-                objectId = Guid.NewGuid().ToString();
-                var jointInstance = (GeneratedIpcJoint) Activator.CreateInstance(attribute.JointType)!;
-                jointInstance.SetInstance(realInstance);
-                context.JointManager.AddPublicIpcObject(attribute.ContractType, jointInstance, objectId);
-                assemblyQualifiedName = type.AssemblyQualifiedName!;
-                return true;
+                var realType = realInstance.GetType();
+                var (contractType, _, jointType) = RealTypeToProxyJointCache[realType];
+                if (contractType is not null && jointType is not null)
+                {
+                    objectId = Guid.NewGuid().ToString();
+                    var jointInstance = (GeneratedIpcJoint) Activator.CreateInstance(jointType)!;
+                    jointInstance.SetInstance(realInstance);
+                    context.JointManager.AddPublicIpcObject(contractType, jointInstance, objectId);
+                    assemblyQualifiedName = realType.AssemblyQualifiedName!;
+                    return true;
+                }
             }
             objectId = null;
             assemblyQualifiedName = null;

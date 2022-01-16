@@ -1,28 +1,75 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
-    [IpcPublic(typeof(IFakeIpcObject), typeof(FakeIpcObjectIpcProxy), typeof(FakeIpcObjectIpcJoint))]
+    [IpcPublic(typeof(IFakeIpcObject))]
     internal class FakeIpcObject : IFakeIpcObject
     {
-        public async Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d)
+        private BindingFlags _bindingFlags = BindingFlags.Public;
+
+#nullable enable
+        public string? Title { get; set; } = "Title";
+#nullable restore
+
+#nullable disable
+        public string? Description { get; set; } = "Description";
+#nullable restore
+
+        public BindingFlags BindingFlags
         {
-            return (a, b, c, d);
+            get => _bindingFlags;
+            set => _bindingFlags = value;
         }
 
-        public async Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model)
+        [IpcProperty(IsReadonly = true)]
+        public bool IsFake { get; } = true;
+
+        public IntPtr Handle { get; } = new IntPtr(1);
+
+        [IpcMethod(WaitsVoid = true)]
+        public void Activate()
         {
-            return new FakeIpcObjectSubModelA(model.A, model.B, model.C, model.D);
+            Thread.Sleep(100);
+            BindingFlags = BindingFlags.Public | BindingFlags.Instance;
         }
 
-        public async Task<string> ConvertStringAsync(string source)
+        [IpcMethod(WaitsVoid = false)]
+        public void Deactivate()
         {
-            return source;
+        }
+
+        public void Call(BindingFlags flags)
+        {
+        }
+
+        public bool CheckFake()
+        {
+            return IsFake;
+        }
+
+        public Task DoSomethingAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d)
+        {
+            return Task.FromResult((a, b, c, d));
+        }
+
+        public Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model)
+        {
+            return Task.FromResult(new FakeIpcObjectSubModelA(model.A, model.B, model.C, model.D));
+        }
+
+        public Task<string> ConvertStringAsync(string source)
+        {
+            return Task.FromResult(source);
         }
     }
 }

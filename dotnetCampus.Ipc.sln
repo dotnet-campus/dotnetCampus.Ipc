@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc", "src\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj", "{F7ED61F4-920C-49EB-8DC1-74B2BE6AF272}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5035AC84-F775-422F-BB5F-E3713404DCB2} = {5035AC84-F775-422F-BB5F-E3713404DCB2}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C0B9B0B5-D172-4309-A8C4-2C8B77E470CD}"
 EndProject
@@ -25,14 +28,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "dotnetCampus.Ipc.PipeMvcSha
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11767A0B-CBFB-4323-BCEE-DE1CDD6C4B4B}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
+		.github\workflows\dotnet-format.yml = .github\workflows\dotnet-format.yml
+		.github\workflows\nuget-tag-publish.yml = .github\workflows\nuget-tag-publish.yml
 		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PipeMvcDemo", "PipeMvcDemo", "{507383E8-66AA-4646-8AE1-C067AE94DA57}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipeMvcClientDemo", "demo\PipeMvc\PipeMvcClientDemo\PipeMvcClientDemo.csproj", "{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipeMvcServerDemo", "demo\PipeMvc\PipeMvcServerDemo\PipeMvcServerDemo.csproj", "{C27DAF0D-5951-4158-8301-3921EDC34A1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc.Analyzers", "src\dotnetCampus.Ipc.Analyzers\dotnetCampus.Ipc.Analyzers.csproj", "{5035AC84-F775-422F-BB5F-E3713404DCB2}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -121,30 +124,18 @@ Global
 		{1ACE3261-CC3D-4442-8C83-516721B3DA46}.Release|x64.Build.0 = Release|Any CPU
 		{1ACE3261-CC3D-4442-8C83-516721B3DA46}.Release|x86.ActiveCfg = Release|Any CPU
 		{1ACE3261-CC3D-4442-8C83-516721B3DA46}.Release|x86.Build.0 = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|x64.Build.0 = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Debug|x86.Build.0 = Debug|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|x64.ActiveCfg = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|x64.Build.0 = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|x86.ActiveCfg = Release|Any CPU
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105}.Release|x86.Build.0 = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|x64.Build.0 = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Debug|x86.Build.0 = Debug|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|x64.ActiveCfg = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|x64.Build.0 = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|x86.ActiveCfg = Release|Any CPU
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D}.Release|x86.Build.0 = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|x64.Build.0 = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Debug|x86.Build.0 = Debug|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|x64.ActiveCfg = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|x64.Build.0 = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|x86.ActiveCfg = Release|Any CPU
+		{5035AC84-F775-422F-BB5F-E3713404DCB2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,9 +147,6 @@ Global
 		{0F6B9C0C-7A64-4B21-BC28-E52565245A1A} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
 		{1ACE3261-CC3D-4442-8C83-516721B3DA46} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
 		{05ACE3BB-61E5-4592-AC73-747850DB1081} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
-		{507383E8-66AA-4646-8AE1-C067AE94DA57} = {716AC4F5-1A7F-4469-9418-24FB2990AC6E}
-		{09A9CDDD-33CA-4030-AFC9-ED3DD50B2105} = {507383E8-66AA-4646-8AE1-C067AE94DA57}
-		{C27DAF0D-5951-4158-8301-3921EDC34A1D} = {507383E8-66AA-4646-8AE1-C067AE94DA57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8828641-2F8C-4B6A-BF1D-F8F3C8C8454D}

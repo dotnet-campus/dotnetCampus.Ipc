@@ -78,7 +78,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         }
 
         /// <summary>
-        /// 通过 IPC 访问目标对象上某标记了 <see cref="IpcReadonlyAttribute"/> 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
+        /// 通过 IPC 访问目标对象上某标记了 <see cref="IpcPropertyAttribute"/> 的属性。如果曾访问过，会将这个值缓存下来供下次无 IPC 访问。
         /// 当发生并发时，可能导致多次通过 IPC 访问此属性的值，但此方法依然是线程安全的。
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>

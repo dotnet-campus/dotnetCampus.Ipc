@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -66,9 +64,9 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
             var bProvider = new IpcProvider(bName);
             aProvider.StartServer();
             bProvider.StartServer();
-            var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject, FakeIpcObjectIpcJoint>(new FakeIpcObject());
+            var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(new FakeIpcObject());
             var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
-            var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObjectIpcProxy>(aPeer);
+            var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObject>(aPeer);
             return (aPeer, bProxy);
         }
     }
