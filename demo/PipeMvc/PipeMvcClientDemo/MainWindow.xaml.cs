@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +17,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using dotnetCampus.Ipc.PipeMvcClient;
+
+using PipeMvcServerDemo;
 
 namespace PipeMvcClientDemo;
 
@@ -44,14 +48,14 @@ public partial class MainWindow : Window
 
     private async void GetFooButton_Click(object sender, RoutedEventArgs e)
     {
-        if(_ipcPipeMvcClient is null)
+        if (_ipcPipeMvcClient is null)
         {
             return;
         }
 
-        Log($"[Request] IpcPipeMvcServer://api/Foo");
+        Log($"[Request][Get] IpcPipeMvcServer://api/Foo");
         var response = await _ipcPipeMvcClient.GetStringAsync("api/Foo");
-        Log($"[Response] IpcPipeMvcServer://api/Foo {response}");
+        Log($"[Response][Get] IpcPipeMvcServer://api/Foo {response}");
     }
 
     private void Log(string message)
@@ -65,5 +69,51 @@ public partial class MainWindow : Window
                 TraceTextBlock.Text = TraceTextBlock.Text[5000..];
             }
         });
+    }
+
+    private async void GetFooWithArgumentButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_ipcPipeMvcClient is null)
+        {
+            return;
+        }
+
+        Log($"[Request][Get] IpcPipeMvcServer://api/Foo/Add");
+        var response = await _ipcPipeMvcClient.GetStringAsync("api/Foo/Add?a=1&b=1");
+        Log($"[Response][Get] IpcPipeMvcServer://api/Foo/Add {response}");
+    }
+
+    private async void PostFooButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_ipcPipeMvcClient is null)
+        {
+            return;
+        }
+
+        Log($"[Request][Post] IpcPipeMvcServer://api/Foo");
+        var response = await _ipcPipeMvcClient.PostAsync("api/Foo", new StringContent(""));
+        var m = await response.Content.ReadAsStringAsync();
+        Log($"[Response][Post] IpcPipeMvcServer://api/Foo {response.StatusCode} {m}");
+    }
+
+    private async void PostFooWithArgumentButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_ipcPipeMvcClient is null)
+        {
+            return;
+        }
+
+        Log($"[Request][Post] IpcPipeMvcServer://api/Foo");
+
+        var json = JsonSerializer.Serialize(new FooContent
+        {
+            Foo1 = "Foo PostFooWithArgumentButton",
+            Foo2 = null,
+        });
+        StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _ipcPipeMvcClient.PostAsync("api/Foo/PostFoo", content);
+        var m = await response.Content.ReadAsStringAsync();
+        Log($"[Response][Post] IpcPipeMvcServer://api/Foo/PostFoo {response.StatusCode} {m}");
     }
 }

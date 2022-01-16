@@ -13,6 +13,9 @@
         </Grid.RowDefinitions>
         <StackPanel Margin="10,10,10,10" Orientation="Horizontal">
             <Button x:Name="GetFooButton" Margin="10,10,10,10" Click="GetFooButton_Click">Get</Button>
+            <Button x:Name="GetFooWithArgumentButton" Margin="10,10,10,10" Click="GetFooWithArgumentButton_Click">Get With Argument</Button>
+            <Button x:Name="PostFooButton" Margin="10,10,10,10" Click="PostFooButton_Click">Post</Button>
+            <Button x:Name="PostFooWithArgumentButton" Margin="10,10,10,10" Click="PostFooWithArgumentButton_Click">Post With Argument</Button>
         </StackPanel>
         <Grid Grid.Row="1" ClipToBounds="True">
             <TextBlock x:Name="TraceTextBlock" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
