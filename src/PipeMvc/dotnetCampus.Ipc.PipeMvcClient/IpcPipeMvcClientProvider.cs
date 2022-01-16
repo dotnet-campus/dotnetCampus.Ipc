@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.PipeMvcServer.IpcFramework;
@@ -34,6 +33,5 @@ namespace dotnetCampus.Ipc.PipeMvcClient
                 BaseAddress = new Uri(IpcPipeMvcContext.BaseAddressUrl),
             };
         }
-
     }
 }
