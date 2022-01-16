@@ -11,27 +11,22 @@ namespace PipeMvcServerDemo;
 
 public class Program
 {
+    [STAThread]
     static void Main(string[] args)
     {
+        Task.Run(() => RunMvc(args));
         RunWpf();
-        RunMvc(args);
     }
 
     private static void RunWpf()
     {
-        Thread wpfUIThread = new Thread(() =>
+        Application application = new Application();
+        application.Startup += (s, e) =>
         {
-            Application application = new Application();
-            application.Startup += (s, e) =>
-            {
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-            };
-            application.Run();
-        });
-        wpfUIThread.IsBackground = true;
-        wpfUIThread.SetApartmentState(ApartmentState.STA);
-        wpfUIThread.Start();
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+        };
+        application.Run();
     }
 
     private static void RunMvc(string[] args)
