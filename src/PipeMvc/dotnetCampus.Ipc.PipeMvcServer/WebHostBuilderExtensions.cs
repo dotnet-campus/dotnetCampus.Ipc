@@ -20,7 +20,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer
     public static class WebHostBuilderExtensions
     {
         /// <summary>
-        /// Enables the <see cref="IpcServer" /> service.
+        /// Enables the <see cref="IpcServer" /> service. 启用命名管道IPC服务
         /// </summary>
         /// <param name="builder">The <see cref="IWebHostBuilder"/>.</param>
         /// <param name="ipcPipeName">设置 Ipc 服务的管道名</param>
