@@ -54,6 +54,9 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 
         public JContainer Headers { set; get; }
 
-        public JContainer ContentHeaders { set; get; }
+        /// <summary>
+        /// 使用 <see cref="JContainer"/> 表示的 <see cref="ContentHeaders"/> 内容。特意命名和基类型相同，这样序列化时可以自动转换
+        /// </summary>
+        public new JContainer ContentHeaders { set; get; }
     }
 }
