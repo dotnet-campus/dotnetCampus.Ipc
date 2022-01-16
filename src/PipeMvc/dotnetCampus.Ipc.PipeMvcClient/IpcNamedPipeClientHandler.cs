@@ -10,13 +10,13 @@ namespace dotnetCampus.Ipc.PipeMvcClient
 {
     class IpcNamedPipeClientHandler : HttpMessageHandler
     {
-        public IpcNamedPipeClientHandler(PeerProxy client, IpcProvider? clientIpcProvider)
+        public IpcNamedPipeClientHandler(PeerProxy serverProxy, IpcProvider? clientIpcProvider)
         {
-            Client = client;
+            ServerProxy = serverProxy;
             ClientIpcProvider = clientIpcProvider;
         }
 
-        private PeerProxy Client { get; }
+        private PeerProxy ServerProxy { get; }
 
         /// <summary>
         /// 客户端的 IPC 服务
@@ -37,7 +37,7 @@ namespace dotnetCampus.Ipc.PipeMvcClient
             // 控制器处理完成之后，将由 MVC 框架层将控制器的输出交给 PipeMvcServer 层
             // 在 PipeMvcServer 层收到控制器的输出之后，将通过 IPC 框架，将输出返回给 PipeMvcClient 端
             // 当 PipeMvcClient 收到输出返回值后，以下的 await 方法将会返回
-            var response = await Client.GetResponseAsync(new IpcMessage(ipcMessageTag, message));
+            var response = await ServerProxy.GetResponseAsync(new IpcMessage(ipcMessageTag, message));
 
             return HttpMessageSerializer.DeserializeToResponse(response.Body);
         }
