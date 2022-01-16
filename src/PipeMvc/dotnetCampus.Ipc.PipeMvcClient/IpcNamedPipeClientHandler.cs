@@ -36,7 +36,7 @@ namespace dotnetCampus.Ipc.PipeMvcClient
 
         protected override void Dispose(bool disposing)
         {
-            ClientIpcProvider.Dispose();
+            ClientIpcProvider?.Dispose();
             base.Dispose(disposing);
         }
     }
