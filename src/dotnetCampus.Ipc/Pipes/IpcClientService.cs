@@ -136,6 +136,8 @@ namespace dotnetCampus.Ipc.Pipes
         /// </remarks>
         internal async Task WriteMessageAsync(IpcMessageTracker<IpcBufferMessageContext> tracker)
         {
+            VerifyNotDisposed();
+
             try
             {
                 await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner).ConfigureAwait(false);
@@ -151,6 +153,11 @@ namespace dotnetCampus.Ipc.Pipes
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
 
                 // 追踪、校验消息。
@@ -183,10 +190,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </remarks>
         internal async Task WriteMessageAsync(IpcMessageTracker<IpcMessageBody> tracker)
         {
+            VerifyNotDisposed();
+
             await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner);
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
 
                 // 追踪、校验消息。
@@ -227,10 +241,17 @@ namespace dotnetCampus.Ipc.Pipes
         public async Task WriteMessageAsync(byte[] buffer, int offset, int count,
             [CallerMemberName] string tag = null!)
         {
+            VerifyNotDisposed();
+
             await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner);
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var currentTag = tag;
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
                 await IpcMessageConverter.WriteAsync
@@ -319,6 +340,14 @@ namespace dotnetCampus.Ipc.Pipes
         }
 
         private bool IsDisposed { set; get; }
+
+        private void VerifyNotDisposed()
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(IpcClientService));
+            }
+        }
 
         Task IClientMessageWriter.WriteMessageAsync(in IpcBufferMessageContext ipcBufferMessageContext)
         {
