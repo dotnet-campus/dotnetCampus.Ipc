@@ -214,7 +214,7 @@
     <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
   </data>
   <data name="DIPC121" xml:space="preserve">
-    <value>空的 {0} 没有任何用途</value>
+    <value>空的 IPC 特性没有任何用途</value>
   </data>
   <data name="DIPC121_Fix" xml:space="preserve">
     <value>删除 {0}</value>

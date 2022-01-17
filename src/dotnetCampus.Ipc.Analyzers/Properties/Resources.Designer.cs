@@ -349,7 +349,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 Empty {0} is not needed 的本地化字符串。
+        ///   查找类似 Empty IPC member attribute is not needed 的本地化字符串。
         /// </summary>
         internal static string DIPC121 {
             get {

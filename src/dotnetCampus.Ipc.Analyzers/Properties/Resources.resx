@@ -214,7 +214,7 @@
     <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
   </data>
   <data name="DIPC121" xml:space="preserve">
-    <value>Empty {0} is not needed</value>
+    <value>Empty IPC member attribute is not needed</value>
   </data>
   <data name="DIPC121_Fix" xml:space="preserve">
     <value>Remove the {0}</value>
