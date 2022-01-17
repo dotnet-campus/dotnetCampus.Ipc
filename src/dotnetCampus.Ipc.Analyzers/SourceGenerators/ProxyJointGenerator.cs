@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Reflection;
 
 using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
@@ -36,7 +36,7 @@ public class ProxyJointGenerator : ISourceGenerator
                 }
                 catch (DiagnosticException ex)
                 {
-                    context.ReportDiagnostic(ex.ToDiagnostic());
+                    ReportDiagnosticsThatHaveNotBeenReported(context, ex);
                 }
                 catch (Exception ex)
                 {
@@ -46,11 +46,37 @@ public class ProxyJointGenerator : ISourceGenerator
         }
         catch (DiagnosticException ex)
         {
-            context.ReportDiagnostic(ex.ToDiagnostic());
+            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
         }
         catch (Exception ex)
         {
             context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
+        }
+    }
+
+    /// <summary>
+    /// 在代码生成器中报告那些分析器中没有报告的编译错误。
+    /// <para>注意：虽然代码生成器和分析器都能报告编译错误，但只有分析器才能在 Visual Studio 中画波浪线。所以我们会考虑将一些需要立即觉察的错误放到分析器中报告。</para>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="ex"></param>
+    private void ReportDiagnosticsThatHaveNotBeenReported(GeneratorExecutionContext context, DiagnosticException ex)
+    {
+        var diagnosticsThatHaveBeenReported = new List<DiagnosticDescriptor>
+        {
+            // 这些诊断将仅在分析器中报告，凡在生成器中发生的这些诊断都将自动忽略。
+            DIPC003_ContractTypeMustBeAnInterface,
+            DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended,
+            DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException,
+            DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
+        };
+        if (diagnosticsThatHaveBeenReported.Find(x => x.Id == ex.Diagnostic.Id) is { } diagnostic)
+        {
+            // 已被分析器报告。
+        }
+        else
+        {
+            context.ReportDiagnostic(ex.ToDiagnostic());
         }
     }
 

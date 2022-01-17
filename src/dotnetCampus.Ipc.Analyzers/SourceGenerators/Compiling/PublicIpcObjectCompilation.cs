@@ -154,14 +154,7 @@ internal class PublicIpcObjectCompilation
                         }
                         else
                         {
-                            var (attribute, _) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationSyntax).FirstOrDefault();
-                            if (attribute is not null)
-                            {
-                                throw new DiagnosticException(
-                                    DIPC003_ContractTypeMustBeAnInterface,
-                                    attribute.ArgumentList?.Arguments.FirstOrDefault()?.GetLocation(),
-                                    contractType.Name);
-                            }
+                            throw new DiagnosticException(DIPC003_ContractTypeMustBeAnInterface);
                         }
                     }
                     else

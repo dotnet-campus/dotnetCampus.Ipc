@@ -7,6 +7,13 @@ internal class DiagnosticException : Exception
 {
     private readonly object?[]? _messageArgs;
 
+    public DiagnosticException(DiagnosticDescriptor diagnostic)
+    {
+        Diagnostic = diagnostic;
+        Location = null;
+        _messageArgs = null;
+    }
+
     public DiagnosticException(DiagnosticDescriptor diagnostic, Location? location, params object?[]? messageArgs)
     {
         Diagnostic = diagnostic;
