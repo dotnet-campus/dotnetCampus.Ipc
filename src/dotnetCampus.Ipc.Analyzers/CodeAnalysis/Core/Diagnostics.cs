@@ -10,6 +10,9 @@ namespace dotnetCampus.Ipc.CodeAnalysis.Core;
 /// </summary>
 internal static class Diagnostics
 {
+    /// <summary>
+    /// 生成器未知错误，由生成器抛出，无法得知错误代码所在位置。
+    /// </summary>
     public static DiagnosticDescriptor DIPC001_UnknownError { get; } = new(
         nameof(DIPC001),
         Localize(nameof(DIPC001)),
@@ -19,6 +22,9 @@ internal static class Diagnostics
         true,
         customTags: new[] { AnalyzerException, NotConfigurable });
 
+    /// <summary>
+    /// 生成器错误，未指定契约类型。由于这种代码本身就无法编译通过，所以直接由生成器抛出就够了。
+    /// </summary>
     public static DiagnosticDescriptor DIPC002_ContractTypeIsNotSpecified { get; } = new(
         nameof(DIPC002),
         Localize(nameof(DIPC002)),
@@ -28,6 +34,9 @@ internal static class Diagnostics
         true,
         customTags: new[] { NotConfigurable });
 
+    /// <summary>
+    /// 生成器错误，契约类型不是接口。由于编译器无法提前报错，所以由分析器报告此错误。
+    /// </summary>
     public static DiagnosticDescriptor DIPC003_ContractTypeMustBeAnInterface { get; } = new(
         nameof(DIPC003),
         Localize(nameof(DIPC003)),
@@ -37,6 +46,9 @@ internal static class Diagnostics
         true,
         customTags: new[] { NotConfigurable });
 
+    /// <summary>
+    /// 生成器错误，契约类型与接口不匹配。由于编译器无法提前报错，所以由分析器报告此错误。
+    /// </summary>
     public static DiagnosticDescriptor DIPC004_ContractTypeDismatchWithInterface { get; } = new(
         nameof(DIPC004),
         Localize(nameof(DIPC004)),
@@ -105,7 +117,7 @@ internal static class Diagnostics
         Localize(nameof(DIPC101)),
         Localize(nameof(DIPC101_Message)),
         Categories.Readable,
-        DiagnosticSeverity.Warning,
+        DiagnosticSeverity.Info,
         true);
 
     public static DiagnosticDescriptor DIPC102_IpcPublic_TimeoutCannotBeNegative { get; } = new(

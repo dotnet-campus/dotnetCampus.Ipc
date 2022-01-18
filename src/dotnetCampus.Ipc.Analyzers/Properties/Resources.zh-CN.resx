@@ -178,7 +178,7 @@
     <value>不支持的 IPC 属性 {0}。IPC 类型只支持读写属性或只读属性。</value>
   </data>
   <data name="DIPC101" xml:space="preserve">
-    <value>建议设置 IgnoresIpcException 属性</value>
+    <value>显式允许或忽略 IPC 异常</value>
   </data>
   <data name="DIPC101_Fix1" xml:space="preserve">
     <value>此类型忽略 IPC 连接和超时异常</value>
