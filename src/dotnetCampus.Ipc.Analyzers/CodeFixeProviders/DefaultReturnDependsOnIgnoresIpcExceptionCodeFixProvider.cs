@@ -47,25 +47,25 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC120_Fix1,
-                        createChangedSolution: c => RemoveDefaultReturn(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => RemoveDefaultReturn(context.Document, attributeSyntax, c),
                         equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC120_Fix1,
-                        createChangedSolution: c => SetIgnoresIpcException(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, c),
                         equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
             }
         }
     }
 
-    private async Task<Solution> RemoveDefaultReturn(Document document, AttributeSyntax syntax, CancellationToken cancellationToken)
+    private async Task<Document> RemoveDefaultReturn(Document document, AttributeSyntax syntax, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null || syntax.ArgumentList is null)
         {
-            return document.Project.Solution;
+            return document;
         }
 
         var argument = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
@@ -78,18 +78,18 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
         if (newAttributeSyntax is not null)
         {
             var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
-            return document.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot);
+            return document.WithSyntaxRoot(newRoot);
         }
 
-        return document.Project.Solution;
+        return document;
     }
 
-    private async Task<Solution> SetIgnoresIpcException(Document document, AttributeSyntax syntax, CancellationToken cancellationToken)
+    private async Task<Document> SetIgnoresIpcException(Document document, AttributeSyntax syntax, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null || syntax.ArgumentList is null)
         {
-            return document.Project.Solution;
+            return document;
         }
 
         var argument = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
@@ -108,9 +108,9 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
         if (newAttributeSyntax is not null)
         {
             var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
-            return document.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot);
+            return document.WithSyntaxRoot(newRoot);
         }
 
-        return document.Project.Solution;
+        return document;
     }
 }

@@ -46,25 +46,25 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC101_Fix1,
-                        createChangedSolution: c => SetIgnoresIpcException(context.Document, attributeSyntax, true, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, true, c),
                         equivalenceKey: Resources.DIPC101_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC101_Fix2,
-                        createChangedSolution: c => SetIgnoresIpcException(context.Document, attributeSyntax, false, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, false, c),
                         equivalenceKey: Resources.DIPC101_Fix2),
                     diagnostic);
             }
         }
     }
 
-    private async Task<Solution> SetIgnoresIpcException(Document document, AttributeSyntax syntax, bool value, CancellationToken cancellationToken)
+    private async Task<Document> SetIgnoresIpcException(Document document, AttributeSyntax syntax, bool value, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null || syntax.ArgumentList is null)
         {
-            return document.Project.Solution;
+            return document;
         }
 
         var newAttributeSyntax = syntax.ArgumentList.AddArguments(
@@ -76,6 +76,6 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
                 SF.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)));
 
         var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
-        return document.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot);
+        return document.WithSyntaxRoot(newRoot);
     }
 }

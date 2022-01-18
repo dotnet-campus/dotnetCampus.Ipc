@@ -124,6 +124,24 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
+        ///   查找类似 Change the contract type to {0} 的本地化字符串。
+        /// </summary>
+        internal static string DIPC004_Fix1 {
+            get {
+                return ResourceManager.GetString("DIPC004_Fix1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Let {0} implement {1} 的本地化字符串。
+        /// </summary>
+        internal static string DIPC004_Fix2 {
+            get {
+                return ResourceManager.GetString("DIPC004_Fix2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 {0} does not implement the contract type {1} that the IpcPublic marked. 的本地化字符串。
         /// </summary>
         internal static string DIPC004_Message {

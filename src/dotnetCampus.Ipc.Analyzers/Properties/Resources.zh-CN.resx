@@ -138,6 +138,12 @@
   <data name="DIPC004" xml:space="preserve">
     <value>IPC 契约类型与实现的接口不匹配</value>
   </data>
+  <data name="DIPC004_Fix1" xml:space="preserve">
+    <value>修改契约类型为 {0}</value>
+  </data>
+  <data name="DIPC004_Fix2" xml:space="preserve">
+    <value>使 {0} 实现 {1} 接口</value>
+  </data>
   <data name="DIPC004_Message" xml:space="preserve">
     <value>IpcPublic 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
   </data>

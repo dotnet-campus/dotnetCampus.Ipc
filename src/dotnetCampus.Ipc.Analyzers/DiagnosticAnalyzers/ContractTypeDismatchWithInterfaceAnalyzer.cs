@@ -46,11 +46,22 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
             if (realType.AllInterfaces.Length is 0
                 || realType.AllInterfaces.All(x => !SymbolEqualityComparer.Default.Equals(x, contractType)))
             {
+                // 在契约类型上报告。
                 var typeLocation = (attribute.ArgumentList?.Arguments.FirstOrDefault()?.Expression as TypeOfExpressionSyntax)?.Type.GetLocation();
                 context.ReportDiagnostic(
                     Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
                     typeLocation,
                     realType.Name, contractType.Name));
+
+                // 在真实类型上报告。
+                if (attribute.Parent is AttributeListSyntax attributeListSyntax
+                    && attributeListSyntax.Parent is ClassDeclarationSyntax classDeclarationSyntax)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
+                        classDeclarationSyntax.Identifier.GetLocation(),
+                        realType.Name, contractType.Name));
+                }
             }
         }
     }

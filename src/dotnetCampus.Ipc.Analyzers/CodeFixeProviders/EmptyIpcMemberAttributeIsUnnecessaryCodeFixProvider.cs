@@ -48,7 +48,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
-                        createChangedSolution: c => RemoveAttribute(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => RemoveAttribute(context.Document, attributeSyntax, c),
                         equivalenceKey: fix),
                     diagnostic);
             }
@@ -58,19 +58,19 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
-                        createChangedSolution: c => RemoveAttribute(context.Document, attributeListSyntax, c),
+                        createChangedDocument: c => RemoveAttribute(context.Document, attributeListSyntax, c),
                         equivalenceKey: fix),
                     diagnostic);
             }
         }
     }
 
-    private async Task<Solution> RemoveAttribute(Document document, SyntaxNode syntax, CancellationToken cancellationToken)
+    private async Task<Document> RemoveAttribute(Document document, SyntaxNode syntax, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null || syntax.Parent is null)
         {
-            return document.Project.Solution;
+            return document;
         }
 
         var newAttributeSyntax = syntax.Parent.RemoveNode(syntax, SyntaxRemoveOptions.AddElasticMarker);
@@ -78,9 +78,9 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
         if (newAttributeSyntax is not null)
         {
             var newRoot = root.ReplaceNode(syntax.Parent, newAttributeSyntax);
-            return document.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot);
+            return document.WithSyntaxRoot(newRoot);
         }
 
-        return document.Project.Solution;
+        return document;
     }
 }
