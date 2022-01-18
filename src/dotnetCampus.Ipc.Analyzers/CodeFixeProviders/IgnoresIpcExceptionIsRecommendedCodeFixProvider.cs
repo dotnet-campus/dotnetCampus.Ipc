@@ -41,18 +41,18 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            if (root.FindNode(diagnosticSpan) is AttributeSyntax attributeSyntax)
+            if (root.FindNode(diagnosticSpan) is AttributeSyntax attributeNode)
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC101_Fix1,
-                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, true, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, true, c),
                         equivalenceKey: Resources.DIPC101_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC101_Fix2,
-                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, false, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, false, c),
                         equivalenceKey: Resources.DIPC101_Fix2),
                     diagnostic);
             }
@@ -67,7 +67,7 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        var newAttributeSyntax = syntax.ArgumentList.AddArguments(
+        var newAttributeNode = syntax.ArgumentList.AddArguments(
             // IgnoresIpcException = true/false
             SF.AttributeArgument(
                 SF.NameEquals(
@@ -75,7 +75,7 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
                 null,
                 SF.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)));
 
-        var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
+        var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeNode);
         return document.WithSyntaxRoot(newRoot);
     }
 }

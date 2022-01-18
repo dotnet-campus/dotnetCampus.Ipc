@@ -35,19 +35,19 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        foreach (var (attribute, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attributeNode, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
         {
-            if (attribute?.Parent is AttributeListSyntax attributeList)
+            if (attributeNode?.Parent is AttributeListSyntax attributeList)
             {
                 // 没有设置任何参数（即连括号都没打），或者设置了 0 个参数（即打了括号但括号里没内容）。
-                if (attribute.ArgumentList is null || attribute.ArgumentList.Arguments.Count is 0)
+                if (attributeNode.ArgumentList is null || attributeNode.ArgumentList.Arguments.Count is 0)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
                         attributeList.Attributes.Count is 1
                             ? attributeList.GetLocation()
-                            : attribute.GetLocation(),
-                        attribute.Name));
+                            : attributeNode.GetLocation(),
+                        attributeNode.Name));
                 }
             }
         }

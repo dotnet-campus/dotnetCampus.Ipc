@@ -35,15 +35,15 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
             return;
         }
 
-        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
         {
             // 设置了默认值却没有忽略异常。
             if (!namedValues.IgnoresIpcException && namedValues.DefaultReturn is not null)
             {
-                if (attribute?.ArgumentList?.Arguments.FirstOrDefault(x =>
-                    x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn)) is { } argument)
+                if (attributeNode?.ArgumentList?.Arguments.FirstOrDefault(x =>
+                    x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn)) is { } attributeArgumentNode)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException, argument.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException, attributeArgumentNode.GetLocation()));
                 }
             }
         }

@@ -49,16 +49,10 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
 
         foreach (var diagnostic in context.Diagnostics)
         {
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
-            if (root.FindNode(diagnosticSpan) is TypeSyntax typeOfTypeSyntax
-                && typeOfTypeSyntax.Parent is TypeOfExpressionSyntax typeOfExpressionSyntax
-                && typeOfExpressionSyntax.Parent is AttributeArgumentSyntax attributeArgumentSyntax
-                && attributeArgumentSyntax.Parent is AttributeArgumentListSyntax attributeArgumentListSyntax
-                && attributeArgumentListSyntax.Parent is AttributeSyntax attributeSyntax
-                && attributeSyntax.Parent is AttributeListSyntax attributeListSyntax
-                && attributeListSyntax.Parent is ClassDeclarationSyntax classDeclarationSyntax)
+            var (classDeclarationNode, contractTypeNode) = FindClassDeclarationNodeFromDiagnostic(root, diagnostic);
+            if (classDeclarationNode is not null && contractTypeNode is not null)
             {
-                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationSyntax).FirstOrDefault();
+                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
                 if (namedValues.RealType is { } realType)
                 {
                     if (realType.AllInterfaces.Length is 0)
@@ -73,7 +67,7 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 title: fix,
-                                createChangedDocument: c => ChangeContractType(context.Document, typeOfTypeSyntax, @interface, c),
+                                createChangedDocument: c => ChangeContractType(context.Document, contractTypeNode, @interface, c),
                                 equivalenceKey: fix),
                             diagnostic);
                     }
@@ -83,7 +77,7 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
     }
 
     private async Task<Document> ChangeContractType(Document document,
-        TypeSyntax typeOfTypeSyntax, INamedTypeSymbol interfaceSymbol,
+        TypeSyntax contractTypeNode, INamedTypeSymbol interfaceSymbol,
         CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -92,11 +86,28 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        var newTypeSyntax = SF.ParseTypeName(interfaceSymbol.Name);
+        var newContractTypeNode = SF.ParseTypeName(interfaceSymbol.Name);
         var newRoot = root.ReplaceNodeWithUsings(
-            typeOfTypeSyntax, newTypeSyntax,
+            contractTypeNode, newContractTypeNode,
             interfaceSymbol);
 
         return document.WithSyntaxRoot(newRoot);
+    }
+
+    private (ClassDeclarationSyntax? classDeclarationNode, TypeSyntax? typeNode) FindClassDeclarationNodeFromDiagnostic(
+        SyntaxNode root, Diagnostic diagnostic)
+    {
+        var diagnosticSpan = diagnostic.Location.SourceSpan;
+        if (root.FindNode(diagnosticSpan) is TypeSyntax typeNode
+            && typeNode.Parent is TypeOfExpressionSyntax typeOfExpressionNode
+            && typeOfExpressionNode.Parent is AttributeArgumentSyntax attributeArgumentNode
+            && attributeArgumentNode.Parent is AttributeArgumentListSyntax attributeArgumentListNode
+            && attributeArgumentListNode.Parent is AttributeSyntax attributeNode
+            && attributeNode.Parent is AttributeListSyntax attributeListNode
+            && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode1)
+        {
+            return (classDeclarationNode1, typeNode);
+        }
+        return (null, null);
     }
 }

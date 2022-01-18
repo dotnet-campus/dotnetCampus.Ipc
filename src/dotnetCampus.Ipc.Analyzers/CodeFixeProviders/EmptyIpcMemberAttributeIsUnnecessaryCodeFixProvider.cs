@@ -42,23 +42,23 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             var node = root.FindNode(diagnosticSpan);
-            if (node is AttributeSyntax attributeSyntax)
+            if (node is AttributeSyntax attributeNode)
             {
-                var fix = string.Format(Resources.DIPC121_Fix, attributeSyntax.Name);
+                var fix = string.Format(Resources.DIPC121_Fix, attributeNode.Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
-                        createChangedDocument: c => RemoveAttribute(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => RemoveAttribute(context.Document, attributeNode, c),
                         equivalenceKey: fix),
                     diagnostic);
             }
-            else if (node is AttributeListSyntax attributeListSyntax)
+            else if (node is AttributeListSyntax attributeListNode)
             {
-                var fix = string.Format(Resources.DIPC121_Fix, attributeListSyntax.Attributes[0].Name);
+                var fix = string.Format(Resources.DIPC121_Fix, attributeListNode.Attributes[0].Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
-                        createChangedDocument: c => RemoveAttribute(context.Document, attributeListSyntax, c),
+                        createChangedDocument: c => RemoveAttribute(context.Document, attributeListNode, c),
                         equivalenceKey: fix),
                     diagnostic);
             }
@@ -73,11 +73,11 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
             return document;
         }
 
-        var newAttributeSyntax = syntax.Parent.RemoveNode(syntax, SyntaxRemoveOptions.AddElasticMarker);
+        var newAttributeNode = syntax.Parent.RemoveNode(syntax, SyntaxRemoveOptions.AddElasticMarker);
 
-        if (newAttributeSyntax is not null)
+        if (newAttributeNode is not null)
         {
-            var newRoot = root.ReplaceNode(syntax.Parent, newAttributeSyntax);
+            var newRoot = root.ReplaceNode(syntax.Parent, newAttributeNode);
             return document.WithSyntaxRoot(newRoot);
         }
 

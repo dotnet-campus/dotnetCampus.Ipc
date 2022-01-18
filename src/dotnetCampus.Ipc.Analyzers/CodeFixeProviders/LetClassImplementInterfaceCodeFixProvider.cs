@@ -49,16 +49,16 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
 
         foreach (var diagnostic in context.Diagnostics)
         {
-            if (FindClassDeclarationSyntaxFromDiagnostic(root, diagnostic) is { } classDeclarationSyntax)
+            if (FindClassDeclarationSyntaxFromDiagnostic(root, diagnostic) is { } classDeclarationNode)
             {
-                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationSyntax).FirstOrDefault();
+                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
                 if (namedValues.RealType is { } realType && namedValues.ContractType is { } contractType)
                 {
                     var fix = string.Format(Resources.DIPC004_Fix2, realType.Name, contractType.Name);
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             title: fix,
-                            createChangedDocument: c => ImplementInterface(context.Document, classDeclarationSyntax, contractType, c),
+                            createChangedDocument: c => ImplementInterface(context.Document, classDeclarationNode, contractType, c),
                             equivalenceKey: fix),
                         diagnostic);
                 }
@@ -67,7 +67,7 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
     }
 
     private async Task<Document> ImplementInterface(Document document,
-        ClassDeclarationSyntax classDeclarationSyntax, INamedTypeSymbol interfaceSymbol, CancellationToken cancellationToken)
+        ClassDeclarationSyntax classDeclarationNode, INamedTypeSymbol interfaceSymbol, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null)
@@ -75,9 +75,9 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        var newClassDeclarationSyntax = classDeclarationSyntax.AddBaseListTypes(SF.SimpleBaseType(SF.ParseTypeName(interfaceSymbol.Name)));
+        var newClassDeclarationNode = classDeclarationNode.AddBaseListTypes(SF.SimpleBaseType(SF.ParseTypeName(interfaceSymbol.Name)));
         var newRoot = root.ReplaceNodeWithUsings(
-            classDeclarationSyntax, newClassDeclarationSyntax,
+            classDeclarationNode, newClassDeclarationNode,
             interfaceSymbol);
         return document.WithSyntaxRoot(newRoot);
     }
@@ -85,19 +85,19 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
     private ClassDeclarationSyntax? FindClassDeclarationSyntaxFromDiagnostic(SyntaxNode root, Diagnostic diagnostic)
     {
         var diagnosticSpan = diagnostic.Location.SourceSpan;
-        if (root.FindNode(diagnosticSpan) is TypeSyntax typeOfTypeSyntax
-            && typeOfTypeSyntax.Parent is TypeOfExpressionSyntax typeOfExpressionSyntax
-            && typeOfExpressionSyntax.Parent is AttributeArgumentSyntax attributeArgumentSyntax
-            && attributeArgumentSyntax.Parent is AttributeArgumentListSyntax attributeArgumentListSyntax
-            && attributeArgumentListSyntax.Parent is AttributeSyntax attributeSyntax
-            && attributeSyntax.Parent is AttributeListSyntax attributeListSyntax
-            && attributeListSyntax.Parent is ClassDeclarationSyntax classDeclarationSyntax1)
+        if (root.FindNode(diagnosticSpan) is TypeSyntax typeNode
+            && typeNode.Parent is TypeOfExpressionSyntax typeOfExpressionNode
+            && typeOfExpressionNode.Parent is AttributeArgumentSyntax attributeArgumentNode
+            && attributeArgumentNode.Parent is AttributeArgumentListSyntax attributeArgumentListNode
+            && attributeArgumentListNode.Parent is AttributeSyntax attributeNode
+            && attributeNode.Parent is AttributeListSyntax attributeListNode
+            && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode1)
         {
-            return classDeclarationSyntax1;
+            return classDeclarationNode1;
         }
-        else if (root.FindNode(diagnosticSpan) is ClassDeclarationSyntax classDeclarationSyntax2)
+        else if (root.FindNode(diagnosticSpan) is ClassDeclarationSyntax classDeclarationNode2)
         {
-            return classDeclarationSyntax2;
+            return classDeclarationNode2;
         }
         return null;
     }

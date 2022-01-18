@@ -14,9 +14,9 @@ internal static class IpcSemanticSyntaxHelper
     /// <returns></returns>
     public static AttributeSyntax? TryGetClassDeclarationWithIpcAttribute(this INamedTypeSymbol typeSymbol, SemanticModel semanticModel)
     {
-        if (typeSymbol.TryGetClassDeclaration() is { } classDeclarationSyntax)
+        if (typeSymbol.TryGetClassDeclaration() is { } classDeclarationNode)
         {
-            var (attribute, _) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationSyntax).FirstOrDefault();
+            var (attribute, _) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
             if (attribute is not null)
             {
                 return attribute;

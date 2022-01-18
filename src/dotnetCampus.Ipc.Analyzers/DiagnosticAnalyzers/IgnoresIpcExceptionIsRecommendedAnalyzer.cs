@@ -29,11 +29,11 @@ public class IgnoresIpcExceptionIsRecommendedAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
     {
-        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
+        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
         {
             if (namedValues.IgnoresIpcException is null)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attribute.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attributeNode.GetLocation()));
             }
         }
     }

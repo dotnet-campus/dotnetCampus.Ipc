@@ -41,19 +41,19 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            if (root.FindNode(diagnosticSpan) is AttributeArgumentSyntax argument
-                && argument.Parent?.Parent is AttributeSyntax attributeSyntax)
+            if (root.FindNode(diagnosticSpan) is AttributeArgumentSyntax argumentNode
+                && argumentNode.Parent?.Parent is AttributeSyntax attributeNode)
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC120_Fix1,
-                        createChangedDocument: c => RemoveDefaultReturn(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => RemoveDefaultReturn(context.Document, attributeNode, c),
                         equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: Resources.DIPC120_Fix1,
-                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeSyntax, c),
+                        createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, c),
                         equivalenceKey: Resources.DIPC120_Fix1),
                     diagnostic);
             }
@@ -68,16 +68,16 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
             return document;
         }
 
-        var argument = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
+        var argumentNode = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
             x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn));
 
-        var newAttributeSyntax = argument is null
+        var newAttributeNode = argumentNode is null
             ? null
-            : syntax.ArgumentList.RemoveNode(argument, SyntaxRemoveOptions.KeepNoTrivia);
+            : syntax.ArgumentList.RemoveNode(argumentNode, SyntaxRemoveOptions.KeepNoTrivia);
 
-        if (newAttributeSyntax is not null)
+        if (newAttributeNode is not null)
         {
-            var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
+            var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeNode);
             return document.WithSyntaxRoot(newRoot);
         }
 
@@ -92,10 +92,10 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
             return document;
         }
 
-        var argument = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
+        var argumentNode = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
             x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.IgnoresIpcException));
 
-        var newAttributeSyntax = argument is null
+        var newAttributeNode = argumentNode is null
             ? syntax.ArgumentList.AddArguments(
                 // IgnoresIpcException = true/false
                 SF.AttributeArgument(
@@ -103,11 +103,11 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
                         SF.IdentifierName(nameof(IpcPublicAttribute.IgnoresIpcException))),
                     null,
                     SF.LiteralExpression(SyntaxKind.TrueLiteralExpression)))
-            : syntax.ArgumentList.RemoveNode(argument, SyntaxRemoveOptions.KeepNoTrivia);
+            : syntax.ArgumentList.RemoveNode(argumentNode, SyntaxRemoveOptions.KeepNoTrivia);
 
-        if (newAttributeSyntax is not null)
+        if (newAttributeNode is not null)
         {
-            var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeSyntax);
+            var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeNode);
             return document.WithSyntaxRoot(newRoot);
         }
 

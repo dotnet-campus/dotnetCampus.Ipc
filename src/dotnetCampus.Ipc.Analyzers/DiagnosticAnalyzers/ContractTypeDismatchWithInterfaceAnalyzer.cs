@@ -28,7 +28,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
     {
-        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
+        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
         {
             var contractType = namedValues.ContractType;
             var realType = namedValues.RealType;
@@ -47,19 +47,19 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
                 || realType.AllInterfaces.All(x => !SymbolEqualityComparer.Default.Equals(x, contractType)))
             {
                 // 在契约类型上报告。
-                var typeLocation = (attribute.ArgumentList?.Arguments.FirstOrDefault()?.Expression as TypeOfExpressionSyntax)?.Type.GetLocation();
+                var typeLocation = (attributeNode.ArgumentList?.Arguments.FirstOrDefault()?.Expression as TypeOfExpressionSyntax)?.Type.GetLocation();
                 context.ReportDiagnostic(
                     Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
                     typeLocation,
                     realType.Name, contractType.Name));
 
                 // 在真实类型上报告。
-                if (attribute.Parent is AttributeListSyntax attributeListSyntax
-                    && attributeListSyntax.Parent is ClassDeclarationSyntax classDeclarationSyntax)
+                if (attributeNode.Parent is AttributeListSyntax attributeListNode
+                    && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
-                        classDeclarationSyntax.Identifier.GetLocation(),
+                        classDeclarationNode.Identifier.GetLocation(),
                         realType.Name, contractType.Name));
                 }
             }

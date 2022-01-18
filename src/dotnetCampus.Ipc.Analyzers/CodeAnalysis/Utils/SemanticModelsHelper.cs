@@ -46,7 +46,7 @@ internal static class SemanticModelsHelper
 
         // 替换节点。
         var annotatedOldSyntaxNode = newRoot.GetAnnotatedNodes(annotation).First();
-        newRoot = newRoot.ReplaceNode(annotatedOldSyntaxNode, newSyntaxNode);
+        newRoot = newRoot.ReplaceNode(annotatedOldSyntaxNode, newSyntaxNode.WithoutAnnotations());
 
         // 返回替换后的节点。
         return newRoot;
