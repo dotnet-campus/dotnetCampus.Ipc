@@ -44,7 +44,7 @@ internal class IpcProxyInvokingHelper
     /// </summary>
     internal string? ObjectId { get; set; }
 
-    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, object?[]? args)
+    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, Garm<object?>[]? args)
     {
         if (PeerProxy is null)
         {
@@ -74,10 +74,10 @@ internal class IpcProxyInvokingHelper
 
         if (returnModel.Return is { } model
             && Context.TryCreateProxyFromSerializationInfo(PeerProxy,
-                model.AssemblyQualifiedName, model.Id, out var proxyInstance))
+                model.IpcTypeFullName, model.Id, out var proxyInstance))
         {
             // 如果远端返回 IPC 公开的对象，则本地获取此对象的代理并返回。
-            return (T) proxyInstance;
+            return (T?) proxyInstance;
         }
 
         // 其他情况直接使用反序列化的值返回。
@@ -113,20 +113,20 @@ internal class IpcProxyInvokingHelper
         return (T?) arg;
     }
 
-    private GeneratedProxyObjectModel? SerializeArg(object? arg)
+    private GeneratedProxyObjectModel? SerializeArg(Garm<object?> argModel)
     {
         if (PeerProxy is null)
         {
             return null;
         }
 
-        if (Context.TryCreateSerializationInfoFromIpcRealInstance(arg, out var objectId, out var assemblyQualifiedName))
+        if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var assemblyQualifiedName))
         {
             // 如果此参数是一个 IPC 对象。
             return new GeneratedProxyObjectModel
             {
                 Id = objectId,
-                AssemblyQualifiedName = assemblyQualifiedName,
+                IpcTypeFullName = assemblyQualifiedName,
             };
         }
         else
@@ -134,7 +134,7 @@ internal class IpcProxyInvokingHelper
             // 如果此参数只是一个普通对象。
             return new GeneratedProxyObjectModel
             {
-                Value = KnownTypeConverter.Convert(arg),
+                Value = KnownTypeConverter.Convert(argModel.Value),
             };
         }
     }

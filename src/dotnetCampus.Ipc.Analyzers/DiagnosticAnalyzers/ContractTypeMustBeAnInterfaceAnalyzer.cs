@@ -29,7 +29,7 @@ internal class ContractTypeMustBeAnInterfaceAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
     {
-        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
+        foreach (var (attribute, namedValues) in IpcAttributeHelper.TryFindIpcShapeAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
         {
             var contractType = namedValues.ContractType;
             if (contractType == null)

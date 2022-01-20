@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
+using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Pipes;
@@ -277,7 +278,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 bProvider.StartServer();
                 var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(new FakeIpcObject());
                 var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
-                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObject>(aPeer);
+                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer);
 
                 // 安放植物。
                 // 没有发生异常。
@@ -302,7 +303,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 bProvider.StartServer();
                 var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(new FakeIpcObject());
                 var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
-                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObject>(aPeer);
+                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer);
 
                 // 安放。
                 var task = bProxy.MethodThatThrowsIpcException();
@@ -331,7 +332,10 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 bProvider.StartServer();
                 var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(new FakeIpcObjectWithTypeAttributes());
                 var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
-                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObjectWithTypeAttributes>(aPeer);
+                var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer, new IpcProxyConfigs
+                {
+                    IgnoresIpcException = true,
+                });
 
                 // 安放植物。
                 // 没有发生异常。
@@ -355,7 +359,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
             bProvider.StartServer();
             var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(instance ?? new FakeIpcObject());
             var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
-            var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject, FakeIpcObject>(aPeer);
+            var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer);
             // 这里的延迟是为了暂时缓解死锁 bug @lindexi
             await Task.Delay(100);
             return (aPeer, bProxy);

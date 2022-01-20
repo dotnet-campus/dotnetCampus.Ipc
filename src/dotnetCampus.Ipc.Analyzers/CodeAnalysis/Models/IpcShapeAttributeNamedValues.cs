@@ -1,27 +1,23 @@
 ﻿namespace dotnetCampus.Ipc.CodeAnalysis.Models;
 
 /// <summary>
-/// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
+/// 仅供 GeneratedIpcProxy 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
 /// </summary>
-internal class IpcAttributeNamedValues
+internal class IpcPublicAttributeNamedValues
 {
-    public IpcAttributeNamedValues(INamedTypeSymbol? contractType, INamedTypeSymbol? realType)
+    public IpcPublicAttributeNamedValues(INamedTypeSymbol? ipcType)
     {
-        ContractType = contractType;
-        RealType = realType;
+        IpcType = ipcType;
     }
 
-    public IpcAttributeNamedValues(INamedTypeSymbol? contractType, INamedTypeSymbol? realType, ISymbol? member, ITypeSymbol? memberReturnType)
+    public IpcPublicAttributeNamedValues(INamedTypeSymbol? ipcType, ISymbol? member, ITypeSymbol? memberReturnType)
     {
-        ContractType = contractType;
-        RealType = realType;
+        IpcType = ipcType;
         Member = member;
         MemberReturnType = memberReturnType;
     }
 
-    public INamedTypeSymbol? ContractType { get; }
-
-    public INamedTypeSymbol? RealType { get; }
+    public INamedTypeSymbol? IpcType { get; }
 
     public ISymbol? Member { get; }
 

@@ -4,10 +4,10 @@ namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 internal static class SemanticSyntaxHelper
 {
-    public static ClassDeclarationSyntax? TryGetClassDeclaration(this INamedTypeSymbol type)
+    public static TypeDeclarationSyntax? TryGetTypeDeclaration(this INamedTypeSymbol type)
     {
         return type.Locations.FirstOrDefault() is Location location
-            ? location.SourceTree?.GetRoot()?.FindNode(location.SourceSpan) as ClassDeclarationSyntax
+            ? location.SourceTree?.GetRoot()?.FindNode(location.SourceSpan) as TypeDeclarationSyntax
             : null;
     }
 

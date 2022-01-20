@@ -6,10 +6,10 @@ using Microsoft.CodeAnalysis.Text;
 namespace dotnetCampus.Ipc;
 
 /// <summary>
-/// 为 IPC 对象生成对应的代理（Proxy）和对接（Joint）。
+/// 为 IPC 接口生成对应的代理（Proxy）和对接（Joint）。
 /// </summary>
 [Generator]
-public class ProxyJointGenerator : ISourceGenerator
+public class IpcPublicGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -20,11 +20,11 @@ public class ProxyJointGenerator : ISourceGenerator
     {
         try
         {
-            foreach (var ipcObjectType in FindIpcPublicObjects(context.Compilation))
+            foreach (var ipcObjectType in FindIpcPublicInterfaces(context.Compilation))
             {
                 try
                 {
-                    var realType = ipcObjectType.RealType;
+                    var realType = ipcObjectType.IpcType;
                     var proxySource = GenerateProxySource(ipcObjectType);
                     var jointSource = GenerateJointSource(ipcObjectType);
                     var assemblySource = GenerateAssemblySource(ipcObjectType);
@@ -83,19 +83,20 @@ public class ProxyJointGenerator : ISourceGenerator
     /// </summary>
     /// <param name="realTypeCompilation">真实对象的编译信息。</param>
     /// <returns>代理类的源代码。</returns>
-    private string GenerateProxySource(PublicIpcObjectCompilation realTypeCompilation)
+    private string GenerateProxySource(IpcPublicCompilation realTypeCompilation)
     {
         var members = string.Join(
             Environment.NewLine + Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
-            .Select(x => new PublicIpcObjectMemberProxyJointGenerator(x.contractType, x.realType, x.member, x.implementationMember))
+            .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
             .Select(x => x.GenerateProxyMember()));
         var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
+using System.Threading.Tasks;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 namespace {realTypeCompilation.GetNamespace()}
 {{
-    internal class {realTypeCompilation.RealType.Name}IpcProxy : GeneratedIpcProxy<{realTypeCompilation.ContractType.Name}>, {realTypeCompilation.ContractType.Name}
+    internal class __{realTypeCompilation.IpcType.Name}IpcProxy : GeneratedIpcProxy<{realTypeCompilation.IpcType.Name}>, {realTypeCompilation.IpcType.Name}
     {{
 {members}
     }}
@@ -109,22 +110,23 @@ namespace {realTypeCompilation.GetNamespace()}
     /// </summary>
     /// <param name="realTypeCompilation">真实对象的编译信息。</param>
     /// <returns>对接类的源代码。</returns>
-    private string GenerateJointSource(PublicIpcObjectCompilation realTypeCompilation)
+    private string GenerateJointSource(IpcPublicCompilation realTypeCompilation)
     {
         const string realInstanceName = "real";
         var matches = string.Join(
             Environment.NewLine,
             realTypeCompilation.EnumerateMembersByContractType()
-            .Select(x => new PublicIpcObjectMemberProxyJointGenerator(x.contractType, x.realType, x.member, x.implementationMember))
+            .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
             .Select(x => x.GenerateJointMatch(realInstanceName)));
         var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
+using System.Threading.Tasks;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 namespace {realTypeCompilation.GetNamespace()}
 {{
-    internal class {realTypeCompilation.RealType.Name}IpcJoint : GeneratedIpcJoint<{realTypeCompilation.ContractType.Name}>
+    internal class __{realTypeCompilation.IpcType.Name}IpcJoint : GeneratedIpcJoint<{realTypeCompilation.IpcType.Name}>
     {{
-        protected override void MatchMembers({realTypeCompilation.ContractType.Name} {realInstanceName})
+        protected override void MatchMembers({realTypeCompilation.IpcType.Name} {realInstanceName})
         {{
 {matches}
         }}
@@ -139,12 +141,12 @@ namespace {realTypeCompilation.GetNamespace()}
     /// </summary>
     /// <param name="realTypeCompilation">真实对象的编译信息。</param>
     /// <returns>程序集特性的源代码。</returns>
-    private string GenerateAssemblySource(PublicIpcObjectCompilation realTypeCompilation)
+    private string GenerateAssemblySource(IpcPublicCompilation realTypeCompilation)
     {
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {realTypeCompilation.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({realTypeCompilation.ContractType}), typeof({realTypeCompilation.RealType}), typeof({realTypeCompilation.RealType.Name}IpcProxy), typeof({realTypeCompilation.RealType.Name}IpcJoint))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({realTypeCompilation.IpcType}), typeof(__{realTypeCompilation.IpcType.Name}IpcProxy), typeof(__{realTypeCompilation.IpcType.Name}IpcJoint))]";
         return sourceCode;
     }
 
@@ -153,11 +155,11 @@ using {realTypeCompilation.GetNamespace()};
     /// </summary>
     /// <param name="compilation">整个项目的编译信息。</param>
     /// <returns>所有 IPC 真实对象的编译信息</returns>
-    private IEnumerable<PublicIpcObjectCompilation> FindIpcPublicObjects(Compilation compilation)
+    private IEnumerable<IpcPublicCompilation> FindIpcPublicInterfaces(Compilation compilation)
     {
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
-            if (PublicIpcObjectCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
+            if (IpcPublicCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
             {
                 foreach (var publicIpcObject in publicIpcObjectCompilations)
                 {

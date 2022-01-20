@@ -69,7 +69,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
         }
 
         var argumentNode = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
-            x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn));
+            x.NameEquals?.Name.ToString() == nameof(IpcMethodAttribute.DefaultReturn));
 
         var newAttributeNode = argumentNode is null
             ? null

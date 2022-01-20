@@ -52,16 +52,16 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
             var (classDeclarationNode, contractTypeNode) = FindClassDeclarationNodeFromDiagnostic(root, diagnostic);
             if (classDeclarationNode is not null && contractTypeNode is not null)
             {
-                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
-                if (namedValues.RealType is { } realType)
+                var (_, namedValues) = IpcAttributeHelper.TryFindIpcShapeAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
+                if (namedValues.IpcType is { } ipcType)
                 {
-                    if (realType.AllInterfaces.Length is 0)
+                    if (ipcType.AllInterfaces.Length is 0)
                     {
                         // 没有实现任何接口，此修改器无法给出任何建议。
                         continue;
                     }
 
-                    foreach (var @interface in realType.AllInterfaces)
+                    foreach (var @interface in ipcType.AllInterfaces)
                     {
                         var fix = string.Format(Resources.DIPC004_Fix1, @interface.Name);
                         context.RegisterCodeFix(

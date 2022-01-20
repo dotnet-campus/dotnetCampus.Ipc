@@ -69,11 +69,11 @@ internal class IpcShapeGenerator : ISourceGenerator
     /// </summary>
     /// <param name="compilation">整个项目的编译信息。</param>
     /// <returns>所有 IPC 真实对象的编译信息</returns>
-    private IEnumerable<PublicIpcObjectCompilation> FindIpcPublicObjects(Compilation compilation)
+    private IEnumerable<IpcPublicCompilation> FindIpcPublicObjects(Compilation compilation)
     {
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
-            if (PublicIpcObjectCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
+            if (IpcPublicCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
             {
                 foreach (var publicIpcObject in publicIpcObjectCompilations)
                 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Diagnostics;
 
 using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
@@ -24,16 +23,30 @@ public class IgnoresIpcExceptionIsRecommendedAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        context.RegisterSyntaxNodeAction(AnalyzeTypeIpcAttributes, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeIpcAttributes, SyntaxKind.ClassDeclaration | SyntaxKind.InterfaceDeclaration);
     }
 
     private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
     {
-        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
+        if (context.Node is InterfaceDeclarationSyntax interfaceDeclarationNode)
         {
-            if (namedValues.IgnoresIpcException is null)
+            foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindIpcPublicAttributes(context.SemanticModel, interfaceDeclarationNode))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attributeNode.GetLocation()));
+                if (namedValues.IgnoresIpcException is null)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attributeNode.GetLocation()));
+                }
+            }
+        }
+
+        if (context.Node is ClassDeclarationSyntax classDeclarationNode)
+        {
+            foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindIpcShapeAttributes(context.SemanticModel, classDeclarationNode))
+            {
+                if (namedValues.IgnoresIpcException is null)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended, attributeNode.GetLocation()));
+                }
             }
         }
     }

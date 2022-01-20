@@ -28,10 +28,10 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
     {
-        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindClassAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
+        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindIpcShapeAttributes(context.SemanticModel, (ClassDeclarationSyntax) context.Node))
         {
             var contractType = namedValues.ContractType;
-            var realType = namedValues.RealType;
+            var realType = namedValues.IpcType;
             if (contractType is null || realType is null)
             {
                 // 无需报告诊断，因为缺少构造函数参数必然编译不通过。
@@ -53,7 +53,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
                     typeLocation,
                     realType.Name, contractType.Name));
 
-                // 在真实类型上报告。
+                // 在代理壳类型上报告。
                 if (attributeNode.Parent is AttributeListSyntax attributeListNode
                     && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode)
                 {

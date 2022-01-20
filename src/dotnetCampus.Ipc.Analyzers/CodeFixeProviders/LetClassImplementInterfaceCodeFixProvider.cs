@@ -51,8 +51,8 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
         {
             if (FindClassDeclarationSyntaxFromDiagnostic(root, diagnostic) is { } classDeclarationNode)
             {
-                var (_, namedValues) = IpcAttributeHelper.TryFindClassAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
-                if (namedValues.RealType is { } realType && namedValues.ContractType is { } contractType)
+                var (_, namedValues) = IpcAttributeHelper.TryFindIpcShapeAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
+                if (namedValues.IpcType is { } realType && namedValues.ContractType is { } contractType)
                 {
                     var fix = string.Format(Resources.DIPC004_Fix2, realType.Name, contractType.Name);
                     context.RegisterCodeFix(

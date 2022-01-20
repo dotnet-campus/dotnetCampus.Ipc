@@ -1,15 +1,11 @@
 ﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
 
-internal interface IPublicIpcObjectMemberGenerator
-{
-}
-
-internal interface IPublicIpcObjectProxyMemberGenerator : IPublicIpcObjectMemberGenerator
+internal interface IPublicIpcObjectProxyMemberGenerator
 {
     string GenerateProxyMember();
 }
 
-internal interface IPublicIpcObjectJointMatchGenerator : IPublicIpcObjectMemberGenerator
+internal interface IPublicIpcObjectJointMatchGenerator
 {
     string GenerateJointMatch(string real);
 }

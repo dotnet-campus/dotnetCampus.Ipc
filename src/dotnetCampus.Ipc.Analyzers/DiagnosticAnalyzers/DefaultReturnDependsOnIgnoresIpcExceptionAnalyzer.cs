@@ -41,7 +41,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
             if (!namedValues.IgnoresIpcException && namedValues.DefaultReturn is not null)
             {
                 if (attributeNode?.ArgumentList?.Arguments.FirstOrDefault(x =>
-                    x.NameEquals?.Name.ToString() == nameof(IpcMemberAttribute.DefaultReturn)) is { } attributeArgumentNode)
+                    x.NameEquals?.Name.ToString() == nameof(IpcMethodAttribute.DefaultReturn)) is { } attributeArgumentNode)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException, attributeArgumentNode.GetLocation()));
                 }

@@ -8,16 +8,16 @@ namespace dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 internal static class IpcAttributeHelper
 {
-    public static IEnumerable<(AttributeSyntax attributeNode, IpcAttributeNamedValues namedValues)> TryFindClassAttributes(
-        SemanticModel semanticModel, ClassDeclarationSyntax classDeclarationNode)
+    public static IEnumerable<(AttributeSyntax attributeNode, IpcPublicAttributeNamedValues namedValues)> TryFindIpcPublicAttributes(
+        SemanticModel semanticModel, InterfaceDeclarationSyntax typeDeclarationNode)
     {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclarationNode);
+        var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclarationNode);
         if (typeSymbol is null)
         {
             yield break;
         }
 
-        if (classDeclarationNode.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
+        if (typeDeclarationNode.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
         {
             string? attributeName = x.Name switch
             {
@@ -30,22 +30,49 @@ internal static class IpcAttributeHelper
                 || attributeName.Equals(GetAttributeName(nameof(IpcPublicAttribute)), StringComparison.Ordinal));
         }) is { } attributeNode)
         {
-            var namedValues = typeSymbol.GetIpcNamedValues();
+            var namedValues = typeSymbol.GetIpcPublicNamedValues();
             yield return (attributeNode, namedValues);
         }
     }
 
-    public static IEnumerable<(AttributeSyntax? attributeNode, IpcAttributeNamedValues namedValues)> TryFindMemberAttributes(
-        SemanticModel semanticModel, ClassDeclarationSyntax classDeclarationNode)
+    public static IEnumerable<(AttributeSyntax attributeNode, IpcShapeAttributeNamedValues namedValues)> TryFindIpcShapeAttributes(
+        SemanticModel semanticModel, ClassDeclarationSyntax typeDeclarationNode)
     {
-        if (TryFindIpcPublicType(semanticModel, classDeclarationNode, out var compilation))
+        var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclarationNode);
+        if (typeSymbol is null)
         {
-            foreach (var (contractType, realType, member, implementationMember) in compilation.EnumerateMembersByContractType())
+            yield break;
+        }
+
+        if (typeDeclarationNode.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
+        {
+            string? attributeName = x.Name switch
             {
-                var namedValues = implementationMember switch
+                IdentifierNameSyntax identifierName => identifierName.ToString(),
+                QualifiedNameSyntax qualifiedName => qualifiedName.ChildNodes().OfType<IdentifierNameSyntax>().LastOrDefault()?.ToString(),
+                _ => null,
+            };
+            return attributeName is not null &&
+                (attributeName.Equals(nameof(IpcShapeAttribute), StringComparison.Ordinal)
+                || attributeName.Equals(GetAttributeName(nameof(IpcShapeAttribute)), StringComparison.Ordinal));
+        }) is { } attributeNode)
+        {
+            var namedValues = typeSymbol.GetIpcShapeNamedValues();
+            yield return (attributeNode, namedValues);
+        }
+    }
+
+    public static IEnumerable<(AttributeSyntax? attributeNode, IpcPublicAttributeNamedValues namedValues)> TryFindMemberAttributes(
+        SemanticModel semanticModel, ClassDeclarationSyntax typeDeclarationNode)
+    {
+        if (TryFindIpcPublicType(semanticModel, typeDeclarationNode, out var compilation))
+        {
+            foreach (var (contractType, member) in compilation.EnumerateMembersByContractType())
+            {
+                var namedValues = member switch
                 {
-                    IPropertySymbol propertySymbol => propertySymbol.GetIpcNamedValues(realType),
-                    IMethodSymbol methodSymbol => methodSymbol.GetIpcNamedValues(null, realType),
+                    IPropertySymbol propertySymbol => propertySymbol.GetIpcNamedValues(contractType),
+                    IMethodSymbol methodSymbol => methodSymbol.GetIpcNamedValues(null, contractType),
                     _ => null,
                 };
                 if (namedValues is null)
@@ -53,12 +80,12 @@ internal static class IpcAttributeHelper
                     continue;
                 }
 
-                var memberNode = classDeclarationNode.DescendantNodes()
+                var memberNode = typeDeclarationNode.DescendantNodes()
                     .Where(x => x is PropertyDeclarationSyntax or MethodDeclarationSyntax)
                     .FirstOrDefault(x => x switch
                     {
-                        PropertyDeclarationSyntax propertyDeclarationSyntax => SymbolEqualityComparer.Default.Equals(implementationMember, semanticModel.GetDeclaredSymbol(propertyDeclarationSyntax)),
-                        MethodDeclarationSyntax methodDeclarationSyntax => SymbolEqualityComparer.Default.Equals(implementationMember, semanticModel.GetDeclaredSymbol(methodDeclarationSyntax)),
+                        PropertyDeclarationSyntax propertyDeclarationSyntax => SymbolEqualityComparer.Default.Equals(member, semanticModel.GetDeclaredSymbol(propertyDeclarationSyntax)),
+                        MethodDeclarationSyntax methodDeclarationSyntax => SymbolEqualityComparer.Default.Equals(member, semanticModel.GetDeclaredSymbol(methodDeclarationSyntax)),
                         _ => false,
                     }) as MemberDeclarationSyntax;
                 if (memberNode is not null && memberNode.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x =>
@@ -86,22 +113,17 @@ internal static class IpcAttributeHelper
         }
     }
 
-    private static bool TryFindIpcPublicType(SemanticModel semanticModel, ClassDeclarationSyntax classDeclarationNode,
-        [NotNullWhen(true)] out PublicIpcObjectCompilation? publicIpcObjectCompilation)
+    private static bool TryFindIpcPublicType(SemanticModel semanticModel, TypeDeclarationSyntax typeDeclarationNode,
+        [NotNullWhen(true)] out IpcPublicCompilation? publicIpcObjectCompilation)
     {
-        if (semanticModel.GetDeclaredSymbol(classDeclarationNode) is { } classDeclarationSymbol
-            && classDeclarationSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
+        if (semanticModel.GetDeclaredSymbol(typeDeclarationNode) is { } typeDeclarationSymbol
+            && typeDeclarationSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
                 x.AttributeClass?.ToString(),
                 typeof(IpcPublicAttribute).FullName,
                 StringComparison.Ordinal)) is { } ipcPublicAttribute)
         {
-            if (ipcPublicAttribute.ConstructorArguments.Length == 1
-                && ipcPublicAttribute.ConstructorArguments[0] is TypedConstant typedConstant
-                && typedConstant.Value is INamedTypeSymbol contractType)
-            {
-                publicIpcObjectCompilation = new PublicIpcObjectCompilation(classDeclarationNode.SyntaxTree, semanticModel, classDeclarationSymbol, contractType);
-                return true;
-            }
+            publicIpcObjectCompilation = new(typeDeclarationNode.SyntaxTree, semanticModel, typeDeclarationSymbol);
+            return true;
         }
         publicIpcObjectCompilation = null;
         return false;
