@@ -33,27 +33,68 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
         /// </summary>
         /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
-        /// <typeparam name="TShapeType">IPC 实现对象的类型（标记了 <see cref="IpcPublicAttribute"/>），或没有实现空有声明的傀儡类型或傀儡接口（标记了 <see cref="IpcProxyAttribute"/>）。</typeparam>
         /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
         /// <param name="peer">IPC 远端。</param>
         /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
         /// <returns>契约类型。</returns>
-        public static TContract CreateIpcProxy<TContract, TShapeType>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
             where TContract : class
-            where TShapeType : TContract
         {
-            if (ShapeTypeToProxyJointCache[(typeof(TContract), typeof(TShapeType))].proxyType is { } proxyType)
-            {
-                var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
-                proxy.Context = GetContext(ipcProvider);
-                proxy.PeerProxy = peer;
-                proxy.ObjectId = ipcObjectId;
-                return (TContract) (object) proxy;
-            }
-            else
-            {
-                throw new ArgumentException($"类型 {typeof(TShapeType).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TShapeType));
-            }
+            return null;
+        }
+
+        /// <summary>
+        /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
+        /// </summary>
+        /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
+        /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
+        /// <param name="peer">IPC 远端。</param>
+        /// <param name="ipcShape">指定一个 IPC 代理傀儡对象，这个对象的类型和成员上均标注了各自的 IPC 调用方法。</param>
+        /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
+        /// <returns>契约类型。</returns>
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, TContract? ipcShape, string? ipcObjectId = null)
+            where TContract : class
+        {
+            //if (ShapeTypeToProxyJointCache[(typeof(TContract), typeof(TShapeType))].proxyType is { } proxyType)
+            //{
+            //    var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
+            //    proxy.Context = GetContext(ipcProvider);
+            //    proxy.PeerProxy = peer;
+            //    proxy.ObjectId = ipcObjectId;
+            //    return (TContract) (object) proxy;
+            //}
+            //else
+            //{
+            //    throw new ArgumentException($"类型 {typeof(TShapeType).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TShapeType));
+            //}
+            return null;
+        }
+
+        /// <summary>
+        /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
+        /// </summary>
+        /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
+        /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
+        /// <param name="peer">IPC 远端。</param>
+        /// <param name="ipcProxyInvokingConfigs">指定创建的 IPC 代理在进行 IPC 通信时应使用的相关配置。</param>
+        /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
+        /// <returns>契约类型。</returns>
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, IpcProxyInvokingConfigs? ipcProxyInvokingConfigs, string? ipcObjectId = null)
+            where TContract : class
+        {
+            //if (ShapeTypeToProxyJointCache[(typeof(TContract), typeof(TShapeType))].proxyType is { } proxyType)
+            //{
+            //    var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
+            //    proxy.Context = GetContext(ipcProvider);
+            //    proxy.PeerProxy = peer;
+            //    proxy.ObjectId = ipcObjectId;
+            //    return (TContract) (object) proxy;
+            //}
+            //else
+            //{
+            //    throw new ArgumentException($"类型 {typeof(TShapeType).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TShapeType));
+            //}
+            return null;
         }
 
         /// <summary>
