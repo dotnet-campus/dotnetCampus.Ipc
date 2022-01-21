@@ -34,6 +34,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
         public IntPtr IntPtrProperty { get; } = new IntPtr(1);
+        public IntPtr? NullableIntPtrProperty { get; }
 
         public void WaitsVoidMethod()
         {
@@ -63,6 +64,20 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         {
             return Task.Delay(150);
         }
+
+#nullable enable
+        public async Task<string?> MethodThatHasAsyncNullableReturn()
+        {
+            return null;
+        }
+#nullable restore
+
+#nullable enable
+        public async Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn()
+        {
+            return null;
+        }
+#nullable restore
 
         public async Task<string> MethodThatHasDefaultReturn()
         {
@@ -115,10 +130,19 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return Task.CompletedTask;
         }
 
-        public Task<(double a, uint b, int c, byte d)> AsyncMethodWithStructParametersAndStructReturn(double a, uint b, int c, byte d)
+#nullable enable
+        public Task<(double a, uint b, int? c, byte d)> AsyncMethodWithStructParametersAndStructReturn(double a, uint b, int? c, byte d)
         {
             return Task.FromResult((a, b, c, d));
         }
+#nullable restore
+
+#nullable enable
+        public Task<(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d)> AsyncMethodWithComplexValueTupleParametersAndComplexValueTupleReturn(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d)
+        {
+            return Task.FromResult((new FakeIpcObjectSubModelA(), (FakeIpcObjectSubModelA?) null, IntPtr.Zero, (IntPtr?) null));
+        }
+#nullable restore
 
         public Task<FakeIpcObjectSubModelA> AsyncMethodWithComplexParametersAndComplexReturn(FakeIpcObjectSubModelA model)
         {

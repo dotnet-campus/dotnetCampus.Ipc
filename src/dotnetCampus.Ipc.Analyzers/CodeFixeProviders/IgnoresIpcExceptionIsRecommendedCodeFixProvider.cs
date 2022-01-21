@@ -1,14 +1,7 @@
-﻿using System.Collections.Immutable;
-using System.Composition;
-using System.Threading;
-using System.Threading.Tasks;
-
-using dotnetCampus.Ipc.Properties;
+﻿using dotnetCampus.Ipc.Properties;
 
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -19,7 +12,7 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
 {
     public IgnoresIpcExceptionIsRecommendedCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(IPC131_IpcMembers_IgnoresIpcExceptionIsRecommended.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -45,37 +38,45 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC101_Fix1,
+                        title: Resources.IPC131_Fix1,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, true, c),
-                        equivalenceKey: Resources.DIPC101_Fix1),
+                        equivalenceKey: Resources.IPC131_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC101_Fix2,
+                        title: Resources.IPC131_Fix2,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, false, c),
-                        equivalenceKey: Resources.DIPC101_Fix2),
+                        equivalenceKey: Resources.IPC131_Fix2),
                     diagnostic);
             }
         }
     }
 
-    private async Task<Document> SetIgnoresIpcException(Document document, AttributeSyntax syntax, bool value, CancellationToken cancellationToken)
+    private async Task<Document> SetIgnoresIpcException(Document document, AttributeSyntax attributeNode, bool value, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-        if (root is null || syntax.ArgumentList is null)
+        if (root is null)
         {
             return document;
         }
 
-        var newAttributeNode = syntax.ArgumentList.AddArguments(
-            // IgnoresIpcException = true/false
-            SF.AttributeArgument(
-                SF.NameEquals(
-                    SF.IdentifierName(nameof(IpcPublicAttribute.IgnoresIpcException))),
-                null,
-                SF.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)));
+        var newArgumentNode = SF.AttributeArgument(
+            SF.NameEquals(
+                SF.IdentifierName(nameof(IpcPublicAttribute.IgnoresIpcException))),
+            null,
+            SF.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression));
 
-        var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeNode);
-        return document.WithSyntaxRoot(newRoot);
+        if (attributeNode.ArgumentList is { } argumentList)
+        {
+            var newArgumentListNode = argumentList.AddArguments(newArgumentNode);
+            var newRoot = root.ReplaceNode(argumentList, newArgumentListNode);
+            return document.WithSyntaxRoot(newRoot);
+        }
+        else
+        {
+            var newAttributeNode = attributeNode.AddArgumentListArguments(newArgumentNode);
+            var newRoot = root.ReplaceNode(attributeNode, newAttributeNode);
+            return document.WithSyntaxRoot(newRoot);
+        }
     }
 }

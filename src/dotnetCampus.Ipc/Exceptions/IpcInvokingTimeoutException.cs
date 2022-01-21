@@ -51,7 +51,7 @@ internal class IpcInvokingTimeoutException : IpcLocalException
     {
         if (timeout <= TimeSpan.Zero)
         {
-            throw new ArgumentException($"超时时间不能为 0 或负值，当前为 {timeout}。", nameof(timeout));
+            throw new ArgumentException($"超时时间不能为 0 或负值，当前为 {timeout} 毫秒。", nameof(timeout));
         }
 
         return timeout;

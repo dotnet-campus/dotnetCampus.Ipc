@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CSharp;
-using System.Diagnostics;
-using System.Threading;
-using dotnetCampus.Ipc.SourceGenerators.Compiling;
+using Microsoft.CodeAnalysis.Text;
+
+using static dotnetCampus.Ipc.SourceGenerators.Utils.GeneratorHelper;
 
 namespace dotnetCampus.Ipc;
 
 /// <summary>
-/// 为没有真实实现类型的 IPC 调用生成傀儡代理。
+/// 为 IPC 代理壳生成对应的代理（Proxy）。
 /// </summary>
 [Generator]
-internal class IpcShapeGenerator : ISourceGenerator
+public class IpcShapeGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -23,45 +19,52 @@ internal class IpcShapeGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var ipcPublicObjectsInCurrentAssembly = FindIpcPublicObjects(context.Compilation).ToList();
-        var ipcProxyUsages = FindIpcProxyUsages(context.Compilation, "CreateIpcProxy", context.CancellationToken).ToList();
-
-        //ipcProxyUsages.Where(x=>x.)
-
+        try
+        {
+            foreach (var ipcObjectType in FindIpcShapeClasses(context.Compilation))
+            {
+                try
+                {
+                    var ipcType = ipcObjectType.IpcType;
+                    var proxySource = GenerateProxySource(ipcObjectType);
+                    var jointSource = GenerateJointSource(ipcObjectType);
+                    var assemblySource = GenerateAssemblySource(ipcObjectType);
+                    context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                    context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                    context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                }
+                catch (DiagnosticException ex)
+                {
+                    ReportDiagnosticsThatHaveNotBeenReported(context, ex);
+                }
+                catch (Exception ex)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
+                }
+            }
+        }
+        catch (DiagnosticException ex)
+        {
+            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
+        }
     }
 
     /// <summary>
-    /// 查找当前程序集里所有调用了名为 <paramref name="methodName"/> 方法的代码，并返回这个调用语法以及被调用的方法。
+    /// 生成代理对接关系信息。
     /// </summary>
-    /// <param name="compilation">整个项目的编译信息。</param>
-    /// <param name="methodName">方法名。</param>
-    /// <param name="cancellationToken">取消。</param>
-    /// <returns>
-    /// <list type="bullet">
-    /// <item>accessSyntax: 调用此方法的语法节点。</item>
-    /// <item>methodSymbol: 所调用的方法。</item>
-    /// </list>
-    /// </returns>
-    public IEnumerable<IpcProxyInvokingInfo> FindIpcProxyUsages(
-        Compilation compilation, string methodName, CancellationToken cancellationToken = default)
+    /// <param name="sc">真实对象的编译信息。</param>
+    /// <returns>程序集特性的源代码。</returns>
+    private string GenerateAssemblySource(IpcShapeCompilation sc)
     {
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var infos = from node in syntaxTree.GetRoot().DescendantNodes()
-                        where node.IsKind(SyntaxKind.InvocationExpression)
-                        let invocation = (InvocationExpressionSyntax) node
-                        where invocation.Expression is MemberAccessExpressionSyntax
-                        let memberAccessNode = (MemberAccessExpressionSyntax) invocation.Expression
-                        where memberAccessNode.Name.Identifier.ValueText.Contains(methodName)
-                        let info = IpcProxyInvokingInfo.TryCreateIpcProxyInvokingInfo(semanticModel, memberAccessNode, cancellationToken)
-                        where info is not null
-                        select (IpcProxyInvokingInfo) info;
-            foreach (var info in infos)
-            {
-                yield return info;
-            }
-        }
+        var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
+using {sc.GetNamespace()};
+
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}, typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]";
+        return sourceCode;
     }
 
     /// <summary>
@@ -69,15 +72,15 @@ internal class IpcShapeGenerator : ISourceGenerator
     /// </summary>
     /// <param name="compilation">整个项目的编译信息。</param>
     /// <returns>所有 IPC 真实对象的编译信息</returns>
-    private IEnumerable<IpcPublicCompilation> FindIpcPublicObjects(Compilation compilation)
+    private IEnumerable<IpcShapeCompilation> FindIpcShapeClasses(Compilation compilation)
     {
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
-            if (IpcPublicCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
+            if (IpcShapeCompilation.TryFindIpcShapeCpmpilations(compilation, syntaxTree, out var ipcShapeCompilations))
             {
-                foreach (var publicIpcObject in publicIpcObjectCompilations)
+                foreach (var ipcShapeCompilation in ipcShapeCompilations)
                 {
-                    yield return publicIpcObject;
+                    yield return ipcShapeCompilation;
                 }
             }
         }

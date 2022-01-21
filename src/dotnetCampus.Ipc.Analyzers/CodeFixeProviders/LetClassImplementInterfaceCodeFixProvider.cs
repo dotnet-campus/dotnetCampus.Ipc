@@ -23,7 +23,7 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
 {
     public LetClassImplementInterfaceCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC004_ContractTypeDismatchWithInterface.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(IPC161_IpcShape_ContractTypeDismatchWithInterface.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -54,7 +54,7 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
                 var (_, namedValues) = IpcAttributeHelper.TryFindIpcShapeAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
                 if (namedValues.IpcType is { } realType && namedValues.ContractType is { } contractType)
                 {
-                    var fix = string.Format(Resources.DIPC004_Fix2, realType.Name, contractType.Name);
+                    var fix = string.Format(Resources.IPC161_Fix2, realType.Name, contractType.Name);
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             title: fix,

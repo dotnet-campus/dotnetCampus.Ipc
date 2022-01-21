@@ -1,11 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics;
-
-using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers;
 
@@ -14,7 +7,7 @@ internal class ContractTypeMustBeAnInterfaceAnalyzer : DiagnosticAnalyzer
 {
     public ContractTypeMustBeAnInterfaceAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC003_ContractTypeMustBeAnInterface);
+        SupportedDiagnostics = ImmutableArray.Create(IPC160_IpcShape_ContractTypeMustBeAnInterface);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -42,7 +35,7 @@ internal class ContractTypeMustBeAnInterfaceAnalyzer : DiagnosticAnalyzer
             if (contractType.TypeKind != TypeKind.Interface)
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DIPC003_ContractTypeMustBeAnInterface,
+                    Diagnostic.Create(IPC160_IpcShape_ContractTypeMustBeAnInterface,
                     typeLocation,
                     contractType.Name));
             }

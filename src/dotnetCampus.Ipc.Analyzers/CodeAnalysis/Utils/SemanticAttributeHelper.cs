@@ -50,7 +50,7 @@ internal static class SemanticAttributeHelper
         }
 
         // 其他已赋值。
-        throw new NotSupportedException("尚不支持读取其他类型的特性。");
+        throw new NotSupportedException($"尚不支持读取 {typeof(T).Name} 类型的特性。");
     }
 
     /// <summary>

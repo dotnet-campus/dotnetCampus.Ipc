@@ -1,10 +1,4 @@
-﻿using System.Collections.Immutable;
-
-using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers;
 
@@ -13,7 +7,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
 {
     public DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException);
+        SupportedDiagnostics = ImmutableArray.Create(IPC242_IpcProperty_DefaultReturnDependsOnIgnoresIpcException);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -23,19 +17,20 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        context.RegisterSyntaxNodeAction(AnalyzeTypeIpcAttributes, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeIpcTypeAttributes, SyntaxKind.InterfaceDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeIpcTypeAttributes, SyntaxKind.ClassDeclaration);
     }
 
-    private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
+    private void AnalyzeIpcTypeAttributes(SyntaxNodeAnalysisContext context)
     {
-        var classDeclarationNode = (ClassDeclarationSyntax) context.Node;
-        var memberSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationNode);
+        var typeDeclarationNode = (TypeDeclarationSyntax) context.Node;
+        var memberSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclarationNode);
         if (memberSymbol is null)
         {
             return;
         }
 
-        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attributeNode, namedValues) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, typeDeclarationNode))
         {
             // 设置了默认值却没有忽略异常。
             if (!namedValues.IgnoresIpcException && namedValues.DefaultReturn is not null)
@@ -43,7 +38,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionAnalyzer : DiagnosticAnaly
                 if (attributeNode?.ArgumentList?.Arguments.FirstOrDefault(x =>
                     x.NameEquals?.Name.ToString() == nameof(IpcMethodAttribute.DefaultReturn)) is { } attributeArgumentNode)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException, attributeArgumentNode.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(IPC242_IpcProperty_DefaultReturnDependsOnIgnoresIpcException, attributeArgumentNode.GetLocation()));
                 }
             }
         }

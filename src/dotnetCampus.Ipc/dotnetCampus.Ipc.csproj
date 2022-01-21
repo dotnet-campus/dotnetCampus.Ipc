@@ -36,10 +36,6 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(Configuration)' == 'Debug'">
-    <PackageReference Include="dotnetCampus.UsingMSBuildCopyOutputFileToFastDebug" Version="1.3.217" PrivateAssets="all" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.1.0" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.5">

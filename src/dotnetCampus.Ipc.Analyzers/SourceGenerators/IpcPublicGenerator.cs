@@ -1,7 +1,8 @@
 ﻿using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+
+using static dotnetCampus.Ipc.SourceGenerators.Utils.GeneratorHelper;
 
 namespace dotnetCampus.Ipc;
 
@@ -20,17 +21,17 @@ public class IpcPublicGenerator : ISourceGenerator
     {
         try
         {
-            foreach (var ipcObjectType in FindIpcPublicInterfaces(context.Compilation))
+            foreach (var ipcPublicCompilation in FindIpcPublicInterfaces(context.Compilation))
             {
                 try
                 {
-                    var realType = ipcObjectType.IpcType;
-                    var proxySource = GenerateProxySource(ipcObjectType);
-                    var jointSource = GenerateJointSource(ipcObjectType);
-                    var assemblySource = GenerateAssemblySource(ipcObjectType);
-                    context.AddSource($"{realType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                    context.AddSource($"{realType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
-                    context.AddSource($"{realType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+                    var ipcType = ipcPublicCompilation.IpcType;
+                    var proxySource = GenerateProxySource(ipcPublicCompilation);
+                    var jointSource = GenerateJointSource(ipcPublicCompilation);
+                    var assemblySource = GenerateAssemblySource(ipcPublicCompilation);
+                    context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+                    context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+                    context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
                 }
                 catch (DiagnosticException ex)
                 {
@@ -38,7 +39,7 @@ public class IpcPublicGenerator : ISourceGenerator
                 }
                 catch (Exception ex)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
+                    context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
                 }
             }
         }
@@ -48,105 +49,21 @@ public class IpcPublicGenerator : ISourceGenerator
         }
         catch (Exception ex)
         {
-            context.ReportDiagnostic(Diagnostic.Create(DIPC001_UnknownError, null, ex));
+            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
         }
-    }
-
-    /// <summary>
-    /// 在代码生成器中报告那些分析器中没有报告的编译错误。
-    /// <para>注意：虽然代码生成器和分析器都能报告编译错误，但只有分析器才能在 Visual Studio 中画波浪线。所以我们会考虑将一些需要立即觉察的错误放到分析器中报告。</para>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="ex"></param>
-    private void ReportDiagnosticsThatHaveNotBeenReported(GeneratorExecutionContext context, DiagnosticException ex)
-    {
-        var diagnosticsThatHaveBeenReported = new List<DiagnosticDescriptor>
-        {
-            // 这些诊断将仅在分析器中报告，凡在生成器中发生的这些诊断都将自动忽略。
-            DIPC003_ContractTypeMustBeAnInterface,
-            DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended,
-            DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException,
-            DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
-        };
-        if (diagnosticsThatHaveBeenReported.Find(x => x.Id == ex.Diagnostic.Id) is { } diagnostic)
-        {
-            // 已被分析器报告。
-        }
-        else
-        {
-            context.ReportDiagnostic(ex.ToDiagnostic());
-        }
-    }
-
-    /// <summary>
-    /// 生成代理类。
-    /// </summary>
-    /// <param name="realTypeCompilation">真实对象的编译信息。</param>
-    /// <returns>代理类的源代码。</returns>
-    private string GenerateProxySource(IpcPublicCompilation realTypeCompilation)
-    {
-        var members = string.Join(
-            Environment.NewLine + Environment.NewLine,
-            realTypeCompilation.EnumerateMembersByContractType()
-            .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
-            .Select(x => x.GenerateProxyMember()));
-        var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
-using System.Threading.Tasks;
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
-
-namespace {realTypeCompilation.GetNamespace()}
-{{
-    internal class __{realTypeCompilation.IpcType.Name}IpcProxy : GeneratedIpcProxy<{realTypeCompilation.IpcType.Name}>, {realTypeCompilation.IpcType.Name}
-    {{
-{members}
-    }}
-}}
-");
-        return sourceCode;
-    }
-
-    /// <summary>
-    /// 生成对接类。
-    /// </summary>
-    /// <param name="realTypeCompilation">真实对象的编译信息。</param>
-    /// <returns>对接类的源代码。</returns>
-    private string GenerateJointSource(IpcPublicCompilation realTypeCompilation)
-    {
-        const string realInstanceName = "real";
-        var matches = string.Join(
-            Environment.NewLine,
-            realTypeCompilation.EnumerateMembersByContractType()
-            .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
-            .Select(x => x.GenerateJointMatch(realInstanceName)));
-        var sourceCode = FormatCode(@$"{realTypeCompilation.GetUsing()}
-using System.Threading.Tasks;
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
-
-namespace {realTypeCompilation.GetNamespace()}
-{{
-    internal class __{realTypeCompilation.IpcType.Name}IpcJoint : GeneratedIpcJoint<{realTypeCompilation.IpcType.Name}>
-    {{
-        protected override void MatchMembers({realTypeCompilation.IpcType.Name} {realInstanceName})
-        {{
-{matches}
-        }}
-    }}
-}}
-");
-        return sourceCode;
     }
 
     /// <summary>
     /// 生成代理对接关系信息。
     /// </summary>
-    /// <param name="realTypeCompilation">真实对象的编译信息。</param>
+    /// <param name="pc">真实对象的编译信息。</param>
     /// <returns>程序集特性的源代码。</returns>
-    private string GenerateAssemblySource(IpcPublicCompilation realTypeCompilation)
+    private string GenerateAssemblySource(IpcPublicCompilation pc)
     {
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
-using {realTypeCompilation.GetNamespace()};
+using {pc.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({realTypeCompilation.IpcType}), typeof(__{realTypeCompilation.IpcType.Name}IpcProxy), typeof(__{realTypeCompilation.IpcType.Name}IpcJoint))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({pc.IpcType}), typeof(__{pc.IpcType.Name}IpcProxy), typeof(__{pc.IpcType.Name}IpcJoint))]";
         return sourceCode;
     }
 
@@ -159,24 +76,13 @@ using {realTypeCompilation.GetNamespace()};
     {
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
-            if (IpcPublicCompilation.TryFind(compilation, syntaxTree, out var publicIpcObjectCompilations))
+            if (IpcPublicCompilation.TryFindIpcPublicCompilations(compilation, syntaxTree, out var ipcPublicCompilations))
             {
-                foreach (var publicIpcObject in publicIpcObjectCompilations)
+                foreach (var ipcPublicCompilation in ipcPublicCompilations)
                 {
-                    yield return publicIpcObject;
+                    yield return ipcPublicCompilation;
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// 格式化代码。
-    /// </summary>
-    /// <param name="sourceCode">未格式化的源代码。</param>
-    /// <returns>格式化的源代码。</returns>
-    private string FormatCode(string sourceCode)
-    {
-        var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
-        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 }

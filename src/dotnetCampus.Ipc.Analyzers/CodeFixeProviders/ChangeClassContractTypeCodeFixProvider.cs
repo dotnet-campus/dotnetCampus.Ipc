@@ -22,8 +22,8 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
     public ChangeClassContractTypeCodeFixProvider()
     {
         FixableDiagnosticIds = ImmutableArray.Create(
-            DIPC003_ContractTypeMustBeAnInterface.Id,
-            DIPC004_ContractTypeDismatchWithInterface.Id);
+            IPC160_IpcShape_ContractTypeMustBeAnInterface.Id,
+            IPC161_IpcShape_ContractTypeDismatchWithInterface.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -63,7 +63,7 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
 
                     foreach (var @interface in ipcType.AllInterfaces)
                     {
-                        var fix = string.Format(Resources.DIPC004_Fix1, @interface.Name);
+                        var fix = string.Format(Resources.IPC161_Fix1, @interface.Name);
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 title: fix,

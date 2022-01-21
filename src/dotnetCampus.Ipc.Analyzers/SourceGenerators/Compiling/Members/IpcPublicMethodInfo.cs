@@ -1,8 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using dotnetCampus.Ipc.SourceGenerators.Models;
 
 namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
 
-internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPublicIpcObjectJointMatchGenerator
+internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPublicIpcObjectShapeMemberGenerator, IPublicIpcObjectJointMatchGenerator
 {
     /// <summary>
     /// IPC 类型的语义符号。
@@ -35,104 +35,138 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     /// <summary>
     /// 生成此方法在 IPC 代理中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <returns>方法源代码。</returns>
-    public string GenerateProxyMember()
+    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder)
     {
-        if (_isAsyncMethod)
-        {
-            // 异步方法。
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
-            var namedValues = _method.GetIpcNamedValues(asyncReturnType, _ipcType);
-            var sourceCode = asyncReturnType is null
-                ? @$"System.Threading.Tasks.Task {_method.ContainingType.Name}.{_method.Name}({parameters})
-        {{
-            return CallMethodAsync(new Garm<object?>[] {{ {arguments} }}, {namedValues});
-        }}"
-                : @$"System.Threading.Tasks.Task<{asyncReturnType}> {_method.ContainingType.Name}.{_method.Name}({parameters})
-        {{
-            return CallMethodAsync<{asyncReturnType}>(new Garm<object?>[] {{ {arguments} }}, {namedValues});
-        }}";
-            return sourceCode;
-        }
-        else if (_method.ReturnsVoid)
-        {
-            // 同步 void 方法。
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var namedValues = _method.GetIpcNamedValues(null, _ipcType);
-            var sourceCode = namedValues.WaitsVoid
-                ? @$"void {_method.ContainingType.Name}.{_method.Name}({parameters})
-        {{
-            CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Wait();
-        }}"
-                : @$"void {_method.ContainingType.Name}.{_method.Name}({parameters})
-        {{
-            _ = CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues});
-        }}";
-            return sourceCode;
-        }
-        else
-        {
-            // 同步带返回值方法。
-            var parameters = GenerateMethodParameters(_method.Parameters);
-            var arguments = GenerateMethodArguments(_method.Parameters);
-            var @return = _method.ReturnType;
-            var namedValues = _method.GetIpcNamedValues(@return, _ipcType);
-            var sourceCode = @$"{_method.ReturnType} {_method.ContainingType.Name}.{_method.Name}({parameters})
-        {{
-            return CallMethod<{@return}>(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Result;
-        }}";
-            return sourceCode;
-        }
+        var parameters = GenerateMethodParameters(builder, _method.Parameters);
+        var arguments = GenerateMethodArguments(_method.Parameters);
+        var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
+        var returnTypeName = asyncReturnType is null ? "void" : builder.SimplifyNameByAddUsing(asyncReturnType);
+        var methodContainingTypeName = builder.SimplifyNameByAddUsing(_method.ContainingType);
+        var isAsync = _isAsyncMethod;
+        var returnsVoid = _method.ReturnsVoid || asyncReturnType is null;
+        var namedValues = _method.GetIpcNamedValues(asyncReturnType, _ipcType);
+
+        return new(
+            builder.AddUsing("System.Threading.Tasks"),
+            (isAsync, returnsVoid) switch
+            {
+                // 异步 Task 方法。
+                (true, true) => $@"
+
+Task {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    return CallMethodAsync(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+}}
+
+                ",
+                // 异步 Task<T> 方法。
+                (true, _) => $@"
+
+Task<{returnTypeName}> {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    return CallMethodAsync<{returnTypeName}>(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+}}
+
+                ",
+                // 同步 void 方法。
+                (false, true) => namedValues.WaitsVoid
+                    ? @$"
+void {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Wait();
+}}"
+                    : @$"
+void {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    _ = CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+}}",
+
+                // 同步 T 方法。
+                (false, _) => $@"
+{returnTypeName} {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    return CallMethod<{returnTypeName}>(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Result;
+}}
+                ",
+            }
+        );
+    }
+
+    /// <summary>
+    /// 生成此成员在 IPC 代理壳中的源代码。
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns>成员源代码。</returns>
+    public MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder)
+    {
+        var parameters = GenerateMethodParameters(builder, _method.Parameters);
+        var returnTypeName = builder.SimplifyNameByAddUsing(_method.ReturnType);
+        var methodContainingTypeName = builder.SimplifyNameByAddUsing(_method.ContainingType);
+        return new(
+            builder,
+            @$"
+[IpcMethod]
+{returnTypeName} {methodContainingTypeName}.{_method.Name}({parameters})
+{{
+    throw null;
+}}
+        ");
     }
 
     /// <summary>
     /// 生成此方法在 IPC 对接中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <param name="real">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>方法源代码。</returns>
-    public string GenerateJointMatch(string real)
+    public string GenerateJointMatch(SourceTextBuilder builder, string real)
     {
+        var containingTypeName = builder.SimplifyNameByAddUsing(_method.ContainingType);
+        var parameterTypes = GenerateMethodParameterTypes(builder, _method.Parameters);
         var arguments = GenerateMethodArguments(_method.Parameters);
-        var asyncReturn = GetAsyncReturnType(_method.ReturnType);
-        if (_method.ReturnsVoid)
+        var asyncReturnType = GetAsyncReturnType(_method.ReturnType);
+        var returnTypeName = asyncReturnType is null ? "void" : builder.SimplifyNameByAddUsing(asyncReturnType);
+        var isAsync = _isAsyncMethod;
+        var returnsVoid = _method.ReturnsVoid || asyncReturnType is null;
+
+        if (isAsync && returnsVoid)
         {
-            // void 同步方法。
+            // 异步 Task 方法。
             var call = $"{real}.{_method.Name}({arguments})";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Action(() => {call}));"
-                : $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Action<{GenerateMethodParameterTypes(_method.Parameters)}>(({arguments}) => {call}));";
+                ? $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<Task>(() => {call}));"
+                : $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<{parameterTypes}, Task>(({arguments}) => {call}));";
             return sourceCode;
         }
-        else if (!_isAsyncMethod)
+        else if (isAsync && !returnsVoid)
         {
-            // T 同步方法。
-            var @return = $"Garm<{_method.ReturnType}>";
-            var call = $"new Garm<{_method.ReturnType}>({real}.{_method.Name}({arguments}))";
+            // 异步 Task<T> 方法。
+            var @return = $"Task<Garm<{returnTypeName}>>";
+            var call = $"new Garm<{asyncReturnType}>(await {real}.{_method.Name}({arguments}).ConfigureAwait(false))";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<{@return}>(() => {call}));"
-                : $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<{GenerateMethodParameterTypes(_method.Parameters)}, {@return}>(({arguments}) => {call}));";
+                ? $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<{@return}>(async () => {call}));"
+                : $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<{parameterTypes}, {@return}>(async ({arguments}) => {call}));";
             return sourceCode;
         }
-        else if (asyncReturn is null)
+        else if (!isAsync && returnsVoid)
         {
-            // Task 异步方法。
+            // 同步 void 方法。
             var call = $"{real}.{_method.Name}({arguments})";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<Task>(() => {call}));"
-                : $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<{GenerateMethodParameterTypes(_method.Parameters)}, Task>(({arguments}) => {call}));";
+                ? $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Action(() => {call}));"
+                : $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Action<{parameterTypes}>(({arguments}) => {call}));";
             return sourceCode;
         }
         else
         {
-            // Task<T> 异步方法。
-            var @return = $"Task<Garm<{asyncReturn}>>";
-            var call = $"new Garm<{asyncReturn}>(await {real}.{_method.Name}({arguments}).ConfigureAwait(false))";
+            // 同步 T 方法。
+            var @return = $"Garm<{returnTypeName}>";
+            var call = $"new Garm<{returnTypeName}>({real}.{_method.Name}({arguments}))";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<{@return}>(async () => {call}));"
-                : $"MatchMethod(nameof({_ipcType}.{_method.Name}), new System.Func<{GenerateMethodParameterTypes(_method.Parameters)}, {@return}>(async ({arguments}) => {call}));";
+                ? $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<{@return}>(() => {call}));"
+                : $"MatchMethod(nameof({containingTypeName}.{_method.Name}), new Func<{parameterTypes}, {@return}>(({arguments}) => {call}));";
             return sourceCode;
         }
     }
@@ -140,21 +174,27 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     /// <summary>
     /// 根据参数列表生成方法形参列表字符串。
     /// </summary>
+    /// <param name="builder"></param>
     /// <param name="parameters">方法参数列表。</param>
     /// <returns>方法形参列表字符串。</returns>
-    private string GenerateMethodParameters(ImmutableArray<IParameterSymbol> parameters)
+    private string GenerateMethodParameters(SourceTextBuilder builder, ImmutableArray<IParameterSymbol> parameters)
     {
-        return string.Join(", ", parameters.Select(x => $"{x.Type} {x.Name}"));
+        return string.Join(
+            ", ",
+            parameters.Select(x => $"{builder.SimplifyNameByAddUsing(x.Type)} {x.Name}"));
     }
 
     /// <summary>
     /// 根据参数列表生成方法参数类型列表字符串。
     /// </summary>
+    /// <param name="builder"></param>
     /// <param name="parameters">方法参数列表。</param>
     /// <returns>方法参数类型列表字符串。</returns>
-    private string GenerateMethodParameterTypes(ImmutableArray<IParameterSymbol> parameters)
+    private string GenerateMethodParameterTypes(SourceTextBuilder builder, ImmutableArray<IParameterSymbol> parameters)
     {
-        return string.Join(", ", parameters.Select(x => $"{x.Type}"));
+        return string.Join(
+            ", ",
+            parameters.Select(x => builder.SimplifyNameByAddUsing(x.Type)));
     }
 
     /// <summary>
@@ -164,7 +204,9 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     /// <returns>方法实参列表字符串。</returns>
     private string GenerateMethodArguments(ImmutableArray<IParameterSymbol> parameters)
     {
-        return string.Join(", ", parameters.Select(x => $"{x.Name}"));
+        return string.Join(
+            ", ",
+            parameters.Select(x => $"{x.Name}"));
     }
 
     /// <summary>

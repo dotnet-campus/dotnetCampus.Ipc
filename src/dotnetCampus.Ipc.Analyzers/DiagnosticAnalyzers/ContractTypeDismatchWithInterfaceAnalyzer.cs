@@ -1,10 +1,4 @@
-﻿using System.Collections.Immutable;
-
-using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers;
 
@@ -13,7 +7,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
 {
     public ContractTypeDismatchWithInterfaceAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC004_ContractTypeDismatchWithInterface);
+        SupportedDiagnostics = ImmutableArray.Create(IPC161_IpcShape_ContractTypeDismatchWithInterface);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -49,7 +43,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
                 // 在契约类型上报告。
                 var typeLocation = (attributeNode.ArgumentList?.Arguments.FirstOrDefault()?.Expression as TypeOfExpressionSyntax)?.Type.GetLocation();
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
+                    Diagnostic.Create(IPC161_IpcShape_ContractTypeDismatchWithInterface,
                     typeLocation,
                     realType.Name, contractType.Name));
 
@@ -58,7 +52,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
                     && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(DIPC004_ContractTypeDismatchWithInterface,
+                        Diagnostic.Create(IPC161_IpcShape_ContractTypeDismatchWithInterface,
                         classDeclarationNode.Identifier.GetLocation(),
                         realType.Name, contractType.Name));
                 }

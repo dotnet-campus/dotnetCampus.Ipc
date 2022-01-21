@@ -1,10 +1,4 @@
-﻿using System.Collections.Immutable;
-
-using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers;
 
@@ -13,7 +7,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
 {
     public EmptyIpcMemberAttributeIsUnnecessaryAnalyzer()
     {
-        SupportedDiagnostics = ImmutableArray.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary);
+        SupportedDiagnostics = ImmutableArray.Create(IPC201_IpcMember_EmptyIpcMemberAttributeIsUnnecessary);
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -23,19 +17,19 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        context.RegisterSyntaxNodeAction(AnalyzeTypeIpcAttributes, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeIpcPublicAttributes, SyntaxKind.InterfaceDeclaration);
     }
 
-    private void AnalyzeTypeIpcAttributes(SyntaxNodeAnalysisContext context)
+    private void AnalyzeIpcPublicAttributes(SyntaxNodeAnalysisContext context)
     {
-        var classDeclarationNode = (ClassDeclarationSyntax) context.Node;
-        var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationNode);
+        var interfaceDeclarationNode = (InterfaceDeclarationSyntax) context.Node;
+        var typeSymbol = context.SemanticModel.GetDeclaredSymbol(interfaceDeclarationNode);
         if (typeSymbol is null)
         {
             return;
         }
 
-        foreach (var (attributeNode, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, classDeclarationNode))
+        foreach (var (attributeNode, _) in IpcAttributeHelper.TryFindMemberAttributes(context.SemanticModel, interfaceDeclarationNode))
         {
             if (attributeNode?.Parent is AttributeListSyntax attributeList)
             {
@@ -43,7 +37,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryAnalyzer : DiagnosticAnalyzer
                 if (attributeNode.ArgumentList is null || attributeNode.ArgumentList.Arguments.Count is 0)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
+                        Diagnostic.Create(IPC201_IpcMember_EmptyIpcMemberAttributeIsUnnecessary,
                         attributeList.Attributes.Count is 1
                             ? attributeList.GetLocation()
                             : attributeNode.GetLocation(),

@@ -1,6 +1,8 @@
-﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
+﻿using dotnetCampus.Ipc.SourceGenerators.Models;
 
-internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPublicIpcObjectJointMatchGenerator
+namespace dotnetCampus.Ipc.SourceGenerators.Compiling.Members;
+
+internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPublicIpcObjectShapeMemberGenerator, IPublicIpcObjectJointMatchGenerator
 {
     /// <summary>
     /// IPC 类型的语义符号。
@@ -26,57 +28,100 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     /// <summary>
     /// 生成此属性在 IPC 代理中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <returns>属性源代码。</returns>
-    public string GenerateProxyMember()
+    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder)
     {
+        var propertyTypeName = builder.SimplifyNameByAddUsing(_property.Type);
+        var containingTypeName = builder.SimplifyNameByAddUsing(_property.ContainingType);
         var namedValues = _property.GetIpcNamedValues(_ipcType);
-        if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
-        {
-            var sourceCode = $@"{_property.Type} {_property.ContainingType.Name}.{_property.Name}
-        {{
-            get => GetValueAsync<{_property.Type}>({namedValues}).Result;
-            set => SetValueAsync<{_property.Type}>(value, {namedValues}).Wait();
-        }}";
-            return sourceCode;
-        }
-        else if (_property.GetMethod is { } getOnlyMethod)
-        {
-            var sourceCode = $"{_property.Type} {_property.ContainingType.Name}.{_property.Name} => GetValueAsync<{_property.Type}>({namedValues}).Result;";
-            return sourceCode;
-        }
-        else
-        {
-            throw new DiagnosticException(
-                DIPC022_SetOnlyPropertyIsNotSupportedForIpcObject,
-                _property.Locations.FirstOrDefault(),
-                _property.Name);
-        }
+        var (hasGet, hasSet) = (_property.GetMethod is not null, _property.SetMethod is not null);
+        return new(
+            builder,
+            (hasGet, hasSet) switch
+            {
+                // get/set 属性。
+                (true, true) => $@"
+
+{propertyTypeName} {containingTypeName}.{_property.Name}
+{{
+    get => GetValueAsync<{propertyTypeName}>({namedValues}).Result;
+    set => SetValueAsync<{propertyTypeName}>(value, {namedValues}).Wait();
+}}
+
+                ",
+                // get 属性。
+                (true, false) => $@"
+
+{propertyTypeName} {containingTypeName}.{_property.Name} => GetValueAsync<{propertyTypeName}>({namedValues}).Result;
+
+                ",
+                // 不支持 set 属性。
+                _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
+            }
+);
+    }
+
+    /// <summary>
+    /// 生成此成员在 IPC 代理壳中的源代码。
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns>成员源代码。</returns>
+    public MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder)
+    {
+        var propertyTypeName = builder.SimplifyNameByAddUsing(_property.Type);
+        var containingTypeName = builder.SimplifyNameByAddUsing(_property.ContainingType);
+        var (hasGet, hasSet) = (_property.GetMethod is not null, _property.SetMethod is not null);
+        return new(
+            builder,
+            (hasGet, hasSet) switch
+            {
+                // get/set 属性。
+                (true, true) => $@"
+
+[IpcProperty]
+{propertyTypeName} {containingTypeName}.{_property.Name} {{ get; set; }}
+
+                ",
+                // get 属性。
+                (true, false) => $@"
+
+[IpcProperty]
+{propertyTypeName} {containingTypeName}.{_property.Name} {{ get; }}
+
+                ",
+                // 不支持 set 属性。
+                _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
+            }
+);
     }
 
     /// <summary>
     /// 生成此属性在 IPC 对接中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <param name="real">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>属性源代码。</returns>
-    public string GenerateJointMatch(string real)
+    public string GenerateJointMatch(SourceTextBuilder builder, string real)
     {
-        var propertyType = $"Garm<{_property.Type}>";
-        if (_property.GetMethod is { } getMethod && _property.SetMethod is { } setMethod)
+        var containingTypeName = builder.SimplifyNameByAddUsing(_property.ContainingType);
+        var propertyTypeName = builder.SimplifyNameByAddUsing(_property.Type);
+        var garmPropertyTypeName = $"Garm<{propertyTypeName}>";
+        var (hasGet, hasSet) = (_property.GetMethod is not null, _property.SetMethod is not null);
+        if (hasGet && hasSet)
         {
-            var sourceCode = $"MatchProperty(nameof({_ipcType}.{_property.Name}), new System.Func<{propertyType}>(() => {real}.{_property.Name}), new System.Action<{_property.Type}>(value => {real}.{_property.Name} = value));";
+            var sourceCode = $"MatchProperty(nameof({containingTypeName}.{_property.Name}), new Func<{garmPropertyTypeName}>(() => {real}.{_property.Name}), new Action<{propertyTypeName}>(value => {real}.{_property.Name} = value));";
             return sourceCode;
         }
-        else if (_property.GetMethod is { } getOnlyMethod)
+        else if (hasGet)
         {
-            var sourceCode = $"MatchProperty(nameof({_ipcType}.{_property.Name}), new System.Func<{propertyType}>(() => {real}.{_property.Name}));";
+            var sourceCode = $"MatchProperty(nameof({containingTypeName}.{_property.Name}), new Func<{garmPropertyTypeName}>(() => {real}.{_property.Name}));";
             return sourceCode;
         }
         else
         {
-            throw new DiagnosticException(
-                DIPC022_SetOnlyPropertyIsNotSupportedForIpcObject,
-                _property.Locations.FirstOrDefault(),
-                _property.Name);
+            // 不支持只写属性。
+            throw new DiagnosticException(IPC002_KnownDiagnosticError);
         }
     }
 }

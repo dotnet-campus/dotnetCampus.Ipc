@@ -1,25 +1,15 @@
-﻿using System.Diagnostics;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
+﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 /// <summary>
 /// 提供 IPC 对象（契约接口）的语法和语义分析。
 /// </summary>
-[DebuggerDisplay("IpcPublic : {ContractType.Name,nq}")]
+[DebuggerDisplay("IpcPublic : {IpcType.Name,nq}")]
 internal class IpcPublicCompilation
 {
     /// <summary>
     /// IPC 对象文件的编译信息。
     /// </summary>
     private readonly CompilationUnitSyntax _compilationUnitSyntax;
-
-    /// <summary>
-    /// 整个项目的语义模型。
-    /// </summary>
-    private readonly SemanticModel _semanticModel;
 
     /// <summary>
     /// 创建 IPC 对象的语法和语义分析。
@@ -31,9 +21,14 @@ internal class IpcPublicCompilation
         INamedTypeSymbol ipcType)
     {
         _compilationUnitSyntax = syntaxTree.GetCompilationUnitRoot();
-        _semanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
+        SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
         IpcType = ipcType ?? throw new ArgumentNullException(nameof(ipcType));
     }
+
+    /// <summary>
+    /// 整个项目的语义模型。
+    /// </summary>
+    public SemanticModel SemanticModel { get; }
 
     /// <summary>
     /// IPC 对象（即标记了 <see cref="IpcPublicAttribute"/> 的接口类型）的语义符号。
@@ -64,7 +59,7 @@ internal class IpcPublicCompilation
     /// 查找 IPC 对象的所有成员。
     /// </summary>
     /// <returns>所有成员信息。</returns>
-    public IEnumerable<(INamedTypeSymbol ipcType, ISymbol member)> EnumerateMembersByContractType()
+    public virtual IEnumerable<(INamedTypeSymbol ipcType, ISymbol member)> EnumerateMembers()
     {
         var members = IpcType.AllInterfaces.SelectMany(x => x.GetMembers())
             .Concat(IpcType.GetMembers());
@@ -87,7 +82,7 @@ internal class IpcPublicCompilation
                 // IPC 不支持事件。
                 var eventSyntax = eventSymbol.TryGetMemberDeclaration();
                 throw new DiagnosticException(
-                    DIPC021_EventIsNotSupportedForIpcObject,
+                    IPCTMP1_IpcMembers_EventIsNotSupported,
                     eventSyntax?.GetLocation(),
                     eventSymbol.Name);
             }
@@ -103,7 +98,7 @@ internal class IpcPublicCompilation
     /// <param name="syntaxTree">单个文件的语法树。</param>
     /// <param name="publicIpcObjectCompilations">如果找到了 IPC 对象，则此参数为此语法树中的所有 IPC 对象；如果没有找到，则为空集合。</param>
     /// <returns>如果找到了 IPC 类型，则返回 true；如果没有找到，则返回 false。</returns>
-    public static bool TryFind(Compilation compilation, SyntaxTree syntaxTree,
+    public static bool TryFindIpcPublicCompilations(Compilation compilation, SyntaxTree syntaxTree,
         out IReadOnlyList<IpcPublicCompilation> publicIpcObjectCompilations)
     {
         var result = new List<IpcPublicCompilation>();

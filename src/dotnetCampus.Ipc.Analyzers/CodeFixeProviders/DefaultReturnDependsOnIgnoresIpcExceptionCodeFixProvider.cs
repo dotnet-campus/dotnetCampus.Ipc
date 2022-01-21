@@ -19,7 +19,7 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
 {
     public DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider()
     {
-        FixableDiagnosticIds = ImmutableArray.Create(DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException.Id);
+        FixableDiagnosticIds = ImmutableArray.Create(IPC242_IpcProperty_DefaultReturnDependsOnIgnoresIpcException.Id);
     }
 
     public override ImmutableArray<string> FixableDiagnosticIds { get; }
@@ -46,39 +46,53 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC120_Fix1,
+                        title: Resources.IPC242_Fix1,
                         createChangedDocument: c => RemoveDefaultReturn(context.Document, attributeNode, c),
-                        equivalenceKey: Resources.DIPC120_Fix1),
+                        equivalenceKey: Resources.IPC242_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.DIPC120_Fix1,
+                        title: Resources.IPC242_Fix2,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, c),
-                        equivalenceKey: Resources.DIPC120_Fix1),
+                        equivalenceKey: Resources.IPC242_Fix2),
                     diagnostic);
             }
         }
     }
 
-    private async Task<Document> RemoveDefaultReturn(Document document, AttributeSyntax syntax, CancellationToken cancellationToken)
+    private async Task<Document> RemoveDefaultReturn(Document document, AttributeSyntax attributeNode, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-        if (root is null || syntax.ArgumentList is null)
+        if (root is null || attributeNode.ArgumentList is null)
         {
             return document;
         }
 
-        var argumentNode = syntax.ArgumentList.Arguments.FirstOrDefault(x =>
-            x.NameEquals?.Name.ToString() == nameof(IpcMethodAttribute.DefaultReturn));
-
-        var newAttributeNode = argumentNode is null
-            ? null
-            : syntax.ArgumentList.RemoveNode(argumentNode, SyntaxRemoveOptions.KeepNoTrivia);
-
-        if (newAttributeNode is not null)
+        if (attributeNode.ArgumentList.Arguments.Count <= 1)
         {
-            var newRoot = root.ReplaceNode(syntax.ArgumentList, newAttributeNode);
-            return document.WithSyntaxRoot(newRoot);
+            // 只设了这一个属性。
+            var newAttributeNode = attributeNode.RemoveNode(attributeNode.ArgumentList, SyntaxRemoveOptions.KeepNoTrivia);
+            if (newAttributeNode is not null)
+            {
+                var newRoot = root.ReplaceNode(attributeNode, newAttributeNode);
+                return document.WithSyntaxRoot(newRoot);
+            }
+        }
+        else
+        {
+            // 还设了其他属性。
+            var argumentNode = attributeNode.ArgumentList.Arguments.FirstOrDefault(x =>
+                x.NameEquals?.Name.ToString() == nameof(IpcMethodAttribute.DefaultReturn));
+
+            var newAttributeNode = argumentNode is null
+                ? null
+                : attributeNode.ArgumentList.RemoveNode(argumentNode, SyntaxRemoveOptions.KeepNoTrivia);
+
+            if (newAttributeNode is not null)
+            {
+                var newRoot = root.ReplaceNode(attributeNode.ArgumentList, newAttributeNode);
+                return document.WithSyntaxRoot(newRoot);
+            }
         }
 
         return document;

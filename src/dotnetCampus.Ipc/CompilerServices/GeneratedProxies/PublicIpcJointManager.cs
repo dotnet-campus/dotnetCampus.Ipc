@@ -176,7 +176,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 }
                 else
                 {
-                    args[i] = new Garm<object?>(argModel?.Value);
+                    args[i] = argModel?.Value;
                 }
             }
             return args;
@@ -203,7 +203,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
             else
             {
-                return new GeneratedProxyMemberReturnModel(returnModel);
+                return new GeneratedProxyMemberReturnModel(returnModel.Value);
             }
         }
 

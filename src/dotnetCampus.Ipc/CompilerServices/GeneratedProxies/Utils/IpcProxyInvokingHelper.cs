@@ -100,7 +100,7 @@ internal class IpcProxyInvokingHelper
         }
         else
         {
-            throw new NotSupportedException("请谨慎对待此异常！无法处理 IPC 代理调用的返回值。");
+            throw new NotSupportedException($"请谨慎对待此异常！无法处理 IPC 代理调用的返回值。RequestMessage 为：{requestMessage}");
         }
     }
 

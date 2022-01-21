@@ -1,9 +1,6 @@
 ﻿using dotnetCampus.Ipc.CodeAnalysis.Models;
 using dotnetCampus.Ipc.SourceGenerators.Compiling;
 
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 
 internal static class IpcAttributeHelper
@@ -63,11 +60,11 @@ internal static class IpcAttributeHelper
     }
 
     public static IEnumerable<(AttributeSyntax? attributeNode, IpcPublicAttributeNamedValues namedValues)> TryFindMemberAttributes(
-        SemanticModel semanticModel, ClassDeclarationSyntax typeDeclarationNode)
+        SemanticModel semanticModel, TypeDeclarationSyntax typeDeclarationNode)
     {
         if (TryFindIpcPublicType(semanticModel, typeDeclarationNode, out var compilation))
         {
-            foreach (var (contractType, member) in compilation.EnumerateMembersByContractType())
+            foreach (var (contractType, member) in compilation.EnumerateMembers())
             {
                 var namedValues = member switch
                 {

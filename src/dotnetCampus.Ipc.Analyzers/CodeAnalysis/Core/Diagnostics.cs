@@ -11,228 +11,377 @@ namespace dotnetCampus.Ipc.CodeAnalysis.Core;
 internal static class Diagnostics
 {
     /// <summary>
-    /// 生成器未知错误，由生成器抛出，无法得知错误代码所在位置。
+    /// 生成代码时出现未知错误。
     /// </summary>
-    public static DiagnosticDescriptor DIPC001_UnknownError { get; } = new(
-        nameof(DIPC001),
-        Localize(nameof(DIPC001)),
-        Localize(nameof(DIPC001_Message)),
+    public static DiagnosticDescriptor IPC000_UnknownError { get; } = new(
+        nameof(IPC000),
+        Localize(nameof(IPC000)),
+        Localize(nameof(IPC000_Message)),
         Categories.Compiler,
         DiagnosticSeverity.Error,
         true,
         customTags: new[] { AnalyzerException, NotConfigurable });
 
     /// <summary>
-    /// 生成器错误，未指定契约类型。由于这种代码本身就无法编译通过，所以直接由生成器抛出就够了。
+    /// 生成代码时出现已知错误。本生成器不会报告此错误，因为后续编译器会准确报告之。
     /// </summary>
-    public static DiagnosticDescriptor DIPC002_ContractTypeIsNotSpecified { get; } = new(
-        nameof(DIPC002),
-        Localize(nameof(DIPC002)),
-        Localize(nameof(DIPC002_Message)),
+    public static DiagnosticDescriptor IPC001_KnownCompilerError { get; } = new(
+        nameof(IPC001),
+        Localize(nameof(IPC001)),
+        Localize(nameof(IPC001_Message)),
         Categories.Compiler,
-        DiagnosticSeverity.Error,
+        DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { NotConfigurable });
 
     /// <summary>
-    /// 生成器错误，契约类型不是接口。由于编译器无法提前报错，所以由分析器报告此错误。
+    /// 生成代码时出现已知错误。本生成器不会报告此错误，因为分析器会准确报告之。
     /// </summary>
-    public static DiagnosticDescriptor DIPC003_ContractTypeMustBeAnInterface { get; } = new(
-        nameof(DIPC003),
-        Localize(nameof(DIPC003)),
-        Localize(nameof(DIPC003_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
+    public static DiagnosticDescriptor IPC002_KnownDiagnosticError { get; } = new(
+        nameof(IPC002),
+        Localize(nameof(IPC002)),
+        Localize(nameof(IPC002_Message)),
+        Categories.Compiler,
+        DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { NotConfigurable });
 
-    /// <summary>
-    /// 生成器错误，契约类型与接口不匹配。由于编译器无法提前报错，所以由分析器报告此错误。
-    /// </summary>
-    public static DiagnosticDescriptor DIPC004_ContractTypeDismatchWithInterface { get; } = new(
-        nameof(DIPC004),
-        Localize(nameof(DIPC004)),
-        Localize(nameof(DIPC004_Message)),
-        Categories.Mechanism,
+    public static DiagnosticDescriptor IPC101_IpcType_TimeoutCannotBeNegative { get; } = new(
+        nameof(IPC101),
+        Localize(nameof(IPC101)),
+        Localize(nameof(IPC101_Message)),
+        Categories.Useless,
         DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
+        true);
 
-    public static DiagnosticDescriptor DIPC010_NoIpcShapeFound { get; } = new(
-        nameof(DIPC010),
-        Localize(nameof(DIPC010)),
-        Localize(nameof(DIPC010_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
+    public static DiagnosticDescriptor IPC102_IpcType_TimeoutZeroIsUnnecessary { get; } = new(
+        nameof(IPC102),
+        Localize(nameof(IPC102)),
+        Localize(nameof(IPC102_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: new[] { Unnecessary });
 
-    public static DiagnosticDescriptor DIPC011_IpcProxyDismatchWithContractType { get; } = new(
-        nameof(DIPC011),
-        Localize(nameof(DIPC011)),
-        Localize(nameof(DIPC011_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
-
-    public static DiagnosticDescriptor DIPC012_IpcJointDismatchWithContractType { get; } = new(
-        nameof(DIPC012),
-        Localize(nameof(DIPC012)),
-        Localize(nameof(DIPC012_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
-
-    public static DiagnosticDescriptor DIPC020_OnlyPropertiesAndMethodsAreSupportedForIpcObject { get; } = new(
-        nameof(DIPC020),
-        Localize(nameof(DIPC020)),
-        Localize(nameof(DIPC020_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
-
-    public static DiagnosticDescriptor DIPC021_EventIsNotSupportedForIpcObject { get; } = new(
-        nameof(DIPC021),
-        Localize(nameof(DIPC021)),
-        Localize(nameof(DIPC021_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
-
-    public static DiagnosticDescriptor DIPC022_SetOnlyPropertyIsNotSupportedForIpcObject { get; } = new(
-        nameof(DIPC022),
-        Localize(nameof(DIPC022)),
-        Localize(nameof(DIPC022_Message)),
-        Categories.Mechanism,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { NotConfigurable });
-
-    public static DiagnosticDescriptor DIPC101_IpcPublic_IgnoresIpcExceptionIsRecommended { get; } = new(
-        nameof(DIPC101),
-        Localize(nameof(DIPC101)),
-        Localize(nameof(DIPC101_Message)),
+    public static DiagnosticDescriptor IPC131_IpcMembers_IgnoresIpcExceptionIsRecommended { get; } = new(
+        nameof(IPC131),
+        Localize(nameof(IPC131)),
+        Localize(nameof(IPC131_Message)),
         Categories.Readable,
         DiagnosticSeverity.Info,
         true);
 
-    public static DiagnosticDescriptor DIPC102_IpcPublic_TimeoutCannotBeNegative { get; } = new(
-        nameof(DIPC102),
-        Localize(nameof(DIPC102)),
-        Localize(nameof(DIPC102_Message)),
-        Categories.Useless,
+    public static DiagnosticDescriptor IPC160_IpcShape_ContractTypeMustBeAnInterface { get; } = new(
+        nameof(IPC160),
+        Localize(nameof(IPC160)),
+        Localize(nameof(IPC160_Message)),
+        Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: new[] { NotConfigurable });
 
-    public static DiagnosticDescriptor DIPC103_IpcPublic_TimeoutZeroIsUnnecessary { get; } = new(
-        nameof(DIPC103),
-        Localize(nameof(DIPC103)),
-        Localize(nameof(DIPC103_Message)),
+    public static DiagnosticDescriptor IPC161_IpcShape_ContractTypeDismatchWithInterface { get; } = new(
+        nameof(IPC161),
+        Localize(nameof(IPC161)),
+        Localize(nameof(IPC161_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC162_IpcShape_AllMembersShouldBeMarkedAsIpcMembers { get; } = new(
+        nameof(IPC162),
+        Localize(nameof(IPC162)),
+        Localize(nameof(IPC162_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static DiagnosticDescriptor IPC200_IpcMembers_OnlyPropertiesMethodsAndEventsAreSupported { get; } = new(
+        nameof(IPC200),
+        Localize(nameof(IPC200)),
+        Localize(nameof(IPC200_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC201_IpcMember_EmptyIpcMemberAttributeIsUnnecessary { get; } = new(
+        nameof(IPC201),
+        Localize(nameof(IPC201)),
+        Localize(nameof(IPC201_Message)),
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { Unnecessary });
 
-    public static DiagnosticDescriptor DIPC120_IpcMember_DefaultReturnDependsOnIgnoresIpcException { get; } = new(
-        nameof(DIPC120),
-        Localize(nameof(DIPC120)),
-        Localize(nameof(DIPC120_Message)),
+    public static DiagnosticDescriptor IPC202_IpcMember_AllMembersShouldBeMarkedAsIpcMembers { get; } = new(
+        nameof(IPC202),
+        Localize(nameof(IPC202)),
+        Localize(nameof(IPC202_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static DiagnosticDescriptor IPC240_IpcProperty_IpcPropertyIsNotRecommended { get; } = new(
+        nameof(IPC240),
+        Localize(nameof(IPC240)),
+        Localize(nameof(IPC240_Message)),
+        Categories.AvoidBugs,
+        DiagnosticSeverity.Info,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC241_IpcProperty_SetOnlyPropertyIsNotSupported { get; } = new(
+        nameof(IPC241),
+        Localize(nameof(IPC241)),
+        Localize(nameof(IPC241_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC242_IpcProperty_DefaultReturnDependsOnIgnoresIpcException { get; } = new(
+        nameof(IPC242),
+        Localize(nameof(IPC242)),
+        Localize(nameof(IPC242_Message)),
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { Unnecessary });
 
-    public static DiagnosticDescriptor DIPC121_IpcMember_EmptyIpcMemberAttributeIsUnnecessary { get; } = new(
-        nameof(DIPC121),
-        Localize(nameof(DIPC121)),
-        Localize(nameof(DIPC121_Message)),
+    public static DiagnosticDescriptor IPC243_IpcProperty_IsReadonlyFalseIsUnnecessary { get; } = new(
+        nameof(IPC243),
+        Localize(nameof(IPC243)),
+        Localize(nameof(IPC243_Message)),
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { Unnecessary });
 
-    public static DiagnosticDescriptor DIPC122_IpcMember_WaitsVoidIsRecommended { get; } = new(
-        nameof(DIPC122),
-        Localize(nameof(DIPC122)),
-        Localize(nameof(DIPC122_Message)),
+    public static DiagnosticDescriptor IPC244_IpcProperty_DefaultReturnDismatchWithPropertyType { get; } = new(
+        nameof(IPC244),
+        Localize(nameof(IPC244)),
+        Localize(nameof(IPC244_Message)),
+        Categories.RuntimeException,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static DiagnosticDescriptor IPC245_IpcProperty_DefaultReturnsStringForAnObjectType { get; } = new(
+        nameof(IPC245),
+        Localize(nameof(IPC245)),
+        Localize(nameof(IPC245_Message)),
         Categories.Readable,
         DiagnosticSeverity.Warning,
         true);
 
-    public static DiagnosticDescriptor DIPC123_IpcMember_IsReadonlyFalseIsUnnecessary { get; } = new(
-        nameof(DIPC123),
-        Localize(nameof(DIPC123)),
-        Localize(nameof(DIPC123_Message)),
-        Categories.Useless,
-        DiagnosticSeverity.Hidden,
-        true,
-        customTags: new[] { Unnecessary });
-
-    public static DiagnosticDescriptor DIPC124_IpcMember_DefaultReturnDismatchWithPropertyType { get; } = new(
-        nameof(DIPC124),
-        Localize(nameof(DIPC124)),
-        Localize(nameof(DIPC124_Message)),
-        Categories.RuntimeException,
-        DiagnosticSeverity.Error,
-        true);
-
-    public static DiagnosticDescriptor DIPC125_IpcMember_DefaultReturnDismatchWithMethodReturnType { get; } = new(
-        nameof(DIPC125),
-        Localize(nameof(DIPC125)),
-        Localize(nameof(DIPC125_Message)),
-        Categories.RuntimeException,
-        DiagnosticSeverity.Error,
-        true);
-
-    public static DiagnosticDescriptor DIPC126_IpcMember_DefaultReturnIsUselessForAVoidMethod { get; } = new(
-        nameof(DIPC126),
-        Localize(nameof(DIPC126)),
-        Localize(nameof(DIPC126_Message)),
-        Categories.Useless,
-        DiagnosticSeverity.Error,
-        true,
-        customTags: new[] { Unnecessary });
-
-    public static DiagnosticDescriptor DIPC127_IpcMember_DefaultReturnsStringForAnObjectType { get; } = new(
-        nameof(DIPC127),
-        Localize(nameof(DIPC127)),
-        Localize(nameof(DIPC127_Message)),
+    public static DiagnosticDescriptor IPC246_IpcProperty_DefaultReturnsStringForANonStringType { get; } = new(
+        nameof(IPC246),
+        Localize(nameof(IPC246)),
+        Localize(nameof(IPC246_Message)),
         Categories.Readable,
         DiagnosticSeverity.Hidden,
         true);
 
-    public static DiagnosticDescriptor DIPC128_IpcMember_DefaultReturnsStringForANonStringType { get; } = new(
-        nameof(DIPC128),
-        Localize(nameof(DIPC128)),
-        Localize(nameof(DIPC128_Message)),
-        Categories.Readable,
-        DiagnosticSeverity.Hidden,
-        true);
-
-    public static DiagnosticDescriptor DIPC129_IpcMember_DefaultReturnsStringCannotBeCompiledAsACodeSnippet { get; } = new(
-        nameof(DIPC129),
-        Localize(nameof(DIPC129)),
-        Localize(nameof(DIPC129_Message)),
+    public static DiagnosticDescriptor IPC247_IpcProperty_DefaultReturnsStringCannotBeCompiledAsACodeSnippet { get; } = new(
+        nameof(IPC247),
+        Localize(nameof(IPC247)),
+        Localize(nameof(IPC247_Message)),
         Categories.Compiler,
         DiagnosticSeverity.Error,
         true);
 
-    public static DiagnosticDescriptor DIPC130_IpcMember_WaitsVoidIsUseless { get; } = new(
-        nameof(DIPC130),
-        Localize(nameof(DIPC130)),
-        Localize(nameof(DIPC130_Message)),
+    public static DiagnosticDescriptor IPC260_IpcMethod_SyncMethodIsNotRecommended { get; } = new(
+        nameof(IPC260),
+        Localize(nameof(IPC260)),
+        Localize(nameof(IPC260_Message)),
+        Categories.AvoidBugs,
+        DiagnosticSeverity.Info,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC261_IpcMethod_DefaultReturnDependsOnIgnoresIpcException { get; } = new(
+        nameof(IPC261),
+        Localize(nameof(IPC261)),
+        Localize(nameof(IPC261_Message)),
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
         customTags: new[] { Unnecessary });
 
+    public static DiagnosticDescriptor IPC262_IpcMethod_WaitsVoidIsRecommended { get; } = new(
+        nameof(IPC262),
+        Localize(nameof(IPC262)),
+        Localize(nameof(IPC262_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static DiagnosticDescriptor IPC263_IpcMethod_WaitsVoidIsUseless { get; } = new(
+        nameof(IPC263),
+        Localize(nameof(IPC263)),
+        Localize(nameof(IPC263_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC264_IpcMethod_DefaultReturnDismatchWithMethodReturnType { get; } = new(
+        nameof(IPC264),
+        Localize(nameof(IPC264)),
+        Localize(nameof(IPC264_Message)),
+        Categories.RuntimeException,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static DiagnosticDescriptor IPC265_IpcMethod_DefaultReturnIsUselessForAVoidMethod { get; } = new(
+        nameof(IPC265),
+        Localize(nameof(IPC265)),
+        Localize(nameof(IPC265_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC266_IpcMethod_DefaultReturnIsUselessForATaskMethod { get; } = new(
+        nameof(IPC266),
+        Localize(nameof(IPC266)),
+        Localize(nameof(IPC266_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC267_IpcMethod_DefaultReturnsStringForAnObjectType { get; } = new(
+        nameof(IPC267),
+        Localize(nameof(IPC267)),
+        Localize(nameof(IPC267_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static DiagnosticDescriptor IPC268_IpcMethod_DefaultReturnsStringForANonStringType { get; } = new(
+        nameof(IPC268),
+        Localize(nameof(IPC268)),
+        Localize(nameof(IPC268_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Hidden,
+        true);
+
+    public static DiagnosticDescriptor IPC269_IpcMethod_DefaultReturnsStringCannotBeCompiledAsACodeSnippet { get; } = new(
+        nameof(IPC269),
+        Localize(nameof(IPC269)),
+        Localize(nameof(IPC269_Message)),
+        Categories.Compiler,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static DiagnosticDescriptor IPC301_CreateIpcProxy_AddIpcProxyConfigs { get; } = new(
+        nameof(IPC301),
+        Localize(nameof(IPC301)),
+        Localize(nameof(IPC301_Message)),
+        Categories.CodeFixOnly,
+        DiagnosticSeverity.Hidden,
+        true);
+
+    public static DiagnosticDescriptor IPC302_CreateIpcProxy_AddIpcShape { get; } = new(
+        nameof(IPC302),
+        Localize(nameof(IPC302)),
+        Localize(nameof(IPC302_Message)),
+        Categories.CodeFixOnly,
+        DiagnosticSeverity.Hidden,
+        true);
+
+    public static DiagnosticDescriptor IPC303_CreateIpcProxy_AddIpcProxyConfigs { get; } = new(
+        nameof(IPC303),
+        Localize(nameof(IPC303)),
+        Localize(nameof(IPC303_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static DiagnosticDescriptor IPC304_CreateIpcProxy_RemoveIpcProxyConfigs { get; } = new(
+        nameof(IPC304),
+        Localize(nameof(IPC304)),
+        Localize(nameof(IPC304_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC305_CreateIpcProxy_IgnoresIpcExceptionIsRecommended { get; } = new(
+        nameof(IPC305),
+        Localize(nameof(IPC305)),
+        Localize(nameof(IPC305_Message)),
+        Categories.Readable,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static DiagnosticDescriptor IPC306_CreateIpcProxy_IgnoresIpcExceptionIsUseless { get; } = new(
+        nameof(IPC306),
+        Localize(nameof(IPC306)),
+        Localize(nameof(IPC306_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC307_CreateIpcProxy_TimeoutIsRecommended { get; } = new(
+        nameof(IPC307),
+        Localize(nameof(IPC307)),
+        Localize(nameof(IPC307_Message)),
+        Categories.CodeFixOnly,
+        DiagnosticSeverity.Hidden,
+        true);
+
+    public static DiagnosticDescriptor IPC308_CreateIpcProxy_TimeoutIsUseless { get; } = new(
+        nameof(IPC308),
+        Localize(nameof(IPC308)),
+        Localize(nameof(IPC308_Message)),
+        Categories.Useless,
+        DiagnosticSeverity.Hidden,
+        true,
+        customTags: new[] { Unnecessary });
+
+    public static DiagnosticDescriptor IPC309_CreateIpcProxy_IpcShapeIsNotValid { get; } = new(
+        nameof(IPC309),
+        Localize(nameof(IPC309)),
+        Localize(nameof(IPC309_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC310_CreateIpcProxy_IpcShapeDismatchWithContractType { get; } = new(
+        nameof(IPC310),
+        Localize(nameof(IPC310)),
+        Localize(nameof(IPC310_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPCTMP1_IpcMembers_EventIsNotSupported { get; } = new(
+        "IPCTMP1",
+        "IPC 成员暂不支持事件",
+        "IPC 成员暂不支持事件",
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
     private static class Categories
     {
+        /// <summary>
+        /// 可能产生 bug，则报告此诊断。
+        /// </summary>
+        public const string AvoidBugs = "dotnetCampus.AvoidBugs";
+
+        /// <summary>
+        /// 为了提供代码生成能力，则报告此诊断。
+        /// </summary>
+        public const string CodeFixOnly = "dotnetCampus.CodeFixOnly";
+
         /// <summary>
         /// 因编译要求而必须满足的条件没有满足，则报告此诊断。
         /// </summary>

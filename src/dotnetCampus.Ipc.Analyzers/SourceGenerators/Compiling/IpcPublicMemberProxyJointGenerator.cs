@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
+﻿using dotnetCampus.Ipc.SourceGenerators.Models;
+
+namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
 
 /// <summary>
 /// 辅助生成契约接口中每一个成员对应的 IPC 代理和对接。
@@ -6,6 +8,7 @@
 internal class IpcPublicMemberProxyJointGenerator
 {
     private readonly IPublicIpcObjectProxyMemberGenerator _proxyMemberGenerator;
+    private readonly IPublicIpcObjectShapeMemberGenerator _shapeMemberGenerator;
     private readonly IPublicIpcObjectJointMatchGenerator _jointMatchGenerator;
 
     /// <summary>
@@ -23,23 +26,33 @@ internal class IpcPublicMemberProxyJointGenerator
             IMethodSymbol methodSymbol => new IpcPublicMethodInfo(ipcType, methodSymbol),
             IPropertySymbol propertySymbol => new IpcPublicPropertyInfo(ipcType, propertySymbol),
             _ => throw new DiagnosticException(
-                DIPC020_OnlyPropertiesAndMethodsAreSupportedForIpcObject,
+                IPC200_IpcMembers_OnlyPropertiesMethodsAndEventsAreSupported,
                 member.Locations.FirstOrDefault(),
                 member.Name),
         };
+        _shapeMemberGenerator = (IPublicIpcObjectShapeMemberGenerator) _proxyMemberGenerator;
         _jointMatchGenerator = (IPublicIpcObjectJointMatchGenerator) _proxyMemberGenerator;
     }
 
     /// <summary>
     /// 生成此成员在 IPC 代理中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <returns>成员源代码。</returns>
-    public string GenerateProxyMember() => _proxyMemberGenerator.GenerateProxyMember();
+    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder) => _proxyMemberGenerator.GenerateProxyMember(builder);
+
+    /// <summary>
+    /// 生成此成员在 IPC 代理壳中的源代码。
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns>成员源代码。</returns>
+    internal MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder) => _shapeMemberGenerator.GenerateShapeMember(builder);
 
     /// <summary>
     /// 生成此成员在 IPC 对接中的源代码。
     /// </summary>
+    /// <param name="builder"></param>
     /// <param name="realInstanceVariableName">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>成员源代码。</returns>
-    public string GenerateJointMatch(string realInstanceVariableName) => _jointMatchGenerator.GenerateJointMatch(realInstanceVariableName);
+    public string GenerateJointMatch(SourceTextBuilder builder, string realInstanceVariableName) => _jointMatchGenerator.GenerateJointMatch(builder, realInstanceVariableName);
 }
