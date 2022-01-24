@@ -258,6 +258,12 @@
   <data name="IPC247_Message" xml:space="preserve">
     <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
   </data>
+  <data name="IPC248" xml:space="preserve">
+    <value>The property type is not supported</value>
+  </data>
+  <data name="IPC248_Message" xml:space="preserve">
+    <value>The type {1} of the property {0} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC property types.</value>
+  </data>
   <data name="IPC260" xml:space="preserve">
     <value>IPC sync method is not recommended</value>
   </data>
@@ -323,6 +329,24 @@
   </data>
   <data name="IPC269_Message" xml:space="preserve">
     <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
+  </data>
+  <data name="IPC270" xml:space="preserve">
+    <value>Generic methods are not supported</value>
+  </data>
+  <data name="IPC270_Message" xml:space="preserve">
+    <value>Generic methods are not supported, because we cannot determine a generic type at runtime which should have been determined at compile time.</value>
+  </data>
+  <data name="IPC271" xml:space="preserve">
+    <value>The method parameter type is not supported</value>
+  </data>
+  <data name="IPC271_Message" xml:space="preserve">
+    <value>The type {2} of the method {0} pamameter {1} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types.</value>
+  </data>
+  <data name="IPC272" xml:space="preserve">
+    <value>The method return type is not supported</value>
+  </data>
+  <data name="IPC272_Message" xml:space="preserve">
+    <value>The type {1} of the method {0} return is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types.</value>
   </data>
   <data name="IPC301" xml:space="preserve">
     <value>Add IpcProxyConfigs</value>

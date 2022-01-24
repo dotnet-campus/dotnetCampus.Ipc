@@ -484,6 +484,24 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
+        ///   查找类似 The property type is not supported 的本地化字符串。
+        /// </summary>
+        internal static string IPC248 {
+            get {
+                return ResourceManager.GetString("IPC248", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The type {1} of the property {0} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC property types. 的本地化字符串。
+        /// </summary>
+        internal static string IPC248_Message {
+            get {
+                return ResourceManager.GetString("IPC248_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 IPC sync method is not recommended 的本地化字符串。
         /// </summary>
         internal static string IPC260 {
@@ -678,6 +696,60 @@ namespace dotnetCampus.Ipc.Properties {
         internal static string IPC269_Message {
             get {
                 return ResourceManager.GetString("IPC269_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Generic methods are not supported 的本地化字符串。
+        /// </summary>
+        internal static string IPC270 {
+            get {
+                return ResourceManager.GetString("IPC270", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Generic methods are not supported, because we cannot determine a generic type at runtime which should have been determined at compile time. 的本地化字符串。
+        /// </summary>
+        internal static string IPC270_Message {
+            get {
+                return ResourceManager.GetString("IPC270_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The method parameter type is not supported 的本地化字符串。
+        /// </summary>
+        internal static string IPC271 {
+            get {
+                return ResourceManager.GetString("IPC271", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The type {2} of the method {0} pamameter {1} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types. 的本地化字符串。
+        /// </summary>
+        internal static string IPC271_Message {
+            get {
+                return ResourceManager.GetString("IPC271_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The method return type is not supported 的本地化字符串。
+        /// </summary>
+        internal static string IPC272 {
+            get {
+                return ResourceManager.GetString("IPC272", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The type {1} of the method {0} return is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types. 的本地化字符串。
+        /// </summary>
+        internal static string IPC272_Message {
+            get {
+                return ResourceManager.GetString("IPC272_Message", resourceCulture);
             }
         }
         

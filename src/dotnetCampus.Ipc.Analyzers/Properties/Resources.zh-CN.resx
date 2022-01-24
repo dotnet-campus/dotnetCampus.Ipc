@@ -258,6 +258,12 @@
   <data name="IPC247_Message" xml:space="preserve">
     <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
   </data>
+  <data name="IPC248" xml:space="preserve">
+    <value>不支持的 IPC 属性类型</value>
+  </data>
+  <data name="IPC248_Message" xml:space="preserve">
+    <value>属性 {0} 的类型 {1} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
+  </data>
   <data name="IPC260" xml:space="preserve">
     <value>不建议使用 IPC 同步方法</value>
   </data>
@@ -323,6 +329,24 @@
   </data>
   <data name="IPC269_Message" xml:space="preserve">
     <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
+  </data>
+  <data name="IPC270" xml:space="preserve">
+    <value>不支持泛型 IPC 方法</value>
+  </data>
+  <data name="IPC270_Message" xml:space="preserve">
+    <value>泛型方法无法成为 IPC 成员，因为无法在运行时协商原本应该在编译时确定的泛型类型。</value>
+  </data>
+  <data name="IPC271" xml:space="preserve">
+    <value>不支持的 IPC 方法参数类型</value>
+  </data>
+  <data name="IPC271_Message" xml:space="preserve">
+    <value>方法 {0} 参数 {1} 的类型 {2} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
+  </data>
+  <data name="IPC272" xml:space="preserve">
+    <value>不支持的 IPC 方法返回值类型</value>
+  </data>
+  <data name="IPC272_Message" xml:space="preserve">
+    <value>方法 {0} 的返回值类型 {1} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
   </data>
   <data name="IPC301" xml:space="preserve">
     <value>通过 IPC 配置项配置 IPC 代理行为</value>

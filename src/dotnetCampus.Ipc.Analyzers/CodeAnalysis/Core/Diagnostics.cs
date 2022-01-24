@@ -191,6 +191,14 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         true);
 
+    public static DiagnosticDescriptor IPC248_IpcProperty_PropertyTypeIsNotSupportedForIpc { get; } = new(
+        nameof(IPC248),
+        Localize(nameof(IPC248)),
+        Localize(nameof(IPC248_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
     public static DiagnosticDescriptor IPC260_IpcMethod_SyncMethodIsNotRecommended { get; } = new(
         nameof(IPC260),
         Localize(nameof(IPC260)),
@@ -273,6 +281,31 @@ internal static class Diagnostics
         Localize(nameof(IPC269)),
         Localize(nameof(IPC269_Message)),
         Categories.Compiler,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static DiagnosticDescriptor IPC270_IpcMethod_GenericMethodIsNotSupportedForIpc { get; } = new(
+        nameof(IPC270),
+        Localize(nameof(IPC270)),
+        Localize(nameof(IPC270_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true,
+        customTags: new[] { NotConfigurable });
+
+    public static DiagnosticDescriptor IPC271_IpcMethod_MethodParameterTypeIsNotSupportedForIpc { get; } = new(
+        nameof(IPC271),
+        Localize(nameof(IPC271)),
+        Localize(nameof(IPC271_Message)),
+        Categories.Mechanism,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static DiagnosticDescriptor IPC272_IpcMethod_MethodReturnTypeIsNotSupportedForIpc { get; } = new(
+        nameof(IPC272),
+        Localize(nameof(IPC272)),
+        Localize(nameof(IPC272_Message)),
+        Categories.Mechanism,
         DiagnosticSeverity.Error,
         true);
 
