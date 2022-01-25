@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
+using dotnetCampus.Ipc.CompilerServices.Attributes;
+
 using Newtonsoft.Json.Linq;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
@@ -27,10 +29,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
         }
 
         /// <summary>
-        /// 远端对象的类型名称（含命名空间，不含 Token）。
+        /// 远端对象类型（即标记了 <see cref="IpcPublicAttribute"/> 的类型，不支持 <see cref="IpcShapeAttribute"/>）的名称。
         /// </summary>
         [DataMember(Name = "t")]
-        public string? AssemblyQualifiedName { get; set; }
+        public string? IpcTypeFullName { get; set; }
 
         [DataMember(Name = "v")]
         public JToken? Value { get; set; }

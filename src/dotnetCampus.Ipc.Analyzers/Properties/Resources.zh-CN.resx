@@ -117,28 +117,301 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DIPC001" xml:space="preserve">
+  <data name="IPC000" xml:space="preserve">
     <value>IPC 未知错误</value>
   </data>
-  <data name="DIPC001_Message" xml:space="preserve">
+  <data name="IPC000_Message" xml:space="preserve">
     <value>生成 IPC 代理和对接代码时遇到未知错误：{0}</value>
   </data>
-  <data name="DIPC002" xml:space="preserve">
-    <value>未指定 IPC 契约类型</value>
+  <data name="IPC001" xml:space="preserve">
+    <value>IPC 已知编译错误</value>
   </data>
-  <data name="DIPC002_Message" xml:space="preserve">
-    <value>指定 IpcPublic 特性时，必须指定契约类型作为第一个参数。</value>
+  <data name="IPC001_Message" xml:space="preserve">
+    <value>生成代码时出现已知错误。本生成器不会报告此错误，因为后续编译器会准确报告之。</value>
   </data>
-  <data name="DIPC003" xml:space="preserve">
-    <value>IPC 类型只支持方法和属性</value>
+  <data name="IPC002" xml:space="preserve">
+    <value>IPC 已知诊断错误</value>
   </data>
-  <data name="DIPC003_Message" xml:space="preserve">
-    <value>不支持的 IPC 类型成员 {0}。IPC 类型只支持方法和属性。</value>
+  <data name="IPC002_Message" xml:space="preserve">
+    <value>生成代码时出现已知错误。本生成器不会报告此错误，因为分析器会准确报告之。</value>
   </data>
-  <data name="DIPC004" xml:space="preserve">
+  <data name="IPC101" xml:space="preserve">
+    <value>IPC 超时时间不可设为负数</value>
+  </data>
+  <data name="IPC101_Message" xml:space="preserve">
+    <value>IPC 超时时间不可设为负数，但这里被设为 {0} 毫秒。</value>
+  </data>
+  <data name="IPC102" xml:space="preserve">
+    <value>超时时间为零</value>
+  </data>
+  <data name="IPC102_Message" xml:space="preserve">
+    <value>0 毫秒的超时时间相当于不设置超时，因此不需要设置此属性。</value>
+  </data>
+  <data name="IPC131" xml:space="preserve">
+    <value>显式允许或忽略 IPC 异常</value>
+  </data>
+  <data name="IPC131_Fix1" xml:space="preserve">
+    <value>忽略 IPC 连接和超时异常</value>
+  </data>
+  <data name="IPC131_Fix2" xml:space="preserve">
+    <value>允许抛出 IPC 连接和超时异常</value>
+  </data>
+  <data name="IPC131_Message" xml:space="preserve">
+    <value>建议显式设置 IgnoresIpcException 以明确处理这里可能出现的 IPC 连接和超时异常。</value>
+  </data>
+  <data name="IPC160" xml:space="preserve">
+    <value>IPC 契约类型必须是接口</value>
+  </data>
+  <data name="IPC160_Message" xml:space="preserve">
+    <value>IPC 契约类型必须是接口，但 {0} 不是。</value>
+  </data>
+  <data name="IPC161" xml:space="preserve">
+    <value>IPC 契约类型与实现的接口不匹配</value>
+  </data>
+  <data name="IPC161_Fix1" xml:space="preserve">
+    <value>修改契约类型为 {0}</value>
+  </data>
+  <data name="IPC161_Fix2" xml:space="preserve">
+    <value>使 {0} 实现 {1} 接口</value>
+  </data>
+  <data name="IPC161_Message" xml:space="preserve">
+    <value>IpcShape 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
+  </data>
+  <data name="IPC162" xml:space="preserve">
+    <value>显式标记所有 IPC 成员</value>
+  </data>
+  <data name="IPC162_Message" xml:space="preserve">
+    <value>IPC 代理壳应显式标记所有成员的 IPC 行为，因为其无法继承契约接口的代理配置。</value>
+  </data>
+  <data name="IPC200" xml:space="preserve">
+    <value>IPC 成员仅支持属性、方法和事件</value>
+  </data>
+  <data name="IPC200_Message" xml:space="preserve">
+    <value>不支持的 IPC 成员 {0}。IPC 成员仅支持属性、方法和事件，不支持其他类型。</value>
+  </data>
+  <data name="IPC201" xml:space="preserve">
+    <value>空的 IPC 特性没有任何用途</value>
+  </data>
+  <data name="IPC201_Fix" xml:space="preserve">
+    <value>删除 {0}</value>
+  </data>
+  <data name="IPC201_Message" xml:space="preserve">
+    <value>空的 {0} 没有任何用途，因此完全可以将其删除。</value>
+  </data>
+  <data name="IPC202" xml:space="preserve">
+    <value>标记 IPC 成员</value>
+  </data>
+  <data name="IPC202_Message" xml:space="preserve">
+    <value>建议为 IPC 代理壳的 {0} 成员配置代理行为。</value>
+  </data>
+  <data name="IPC240" xml:space="preserve">
+    <value>不建议使用 IPC 属性</value>
+  </data>
+  <data name="IPC240_Message" xml:space="preserve">
+    <value>不建议在 IPC 类型中使用属性。应改用异步方法，以避免同步访问属性可能引发的卡顿和死锁风险。</value>
+  </data>
+  <data name="IPC241" xml:space="preserve">
     <value>IPC 类型不支持只写属性</value>
   </data>
-  <data name="DIPC004_Message" xml:space="preserve">
-    <value>不支持的 IPC 属性 {0}。IPC 类型只支持读写属性或只读属性。</value>
+  <data name="IPC241_Message" xml:space="preserve">
+    <value>不支持只写属性 {0}。IPC 类型只支持读写属性或只读属性。</value>
+  </data>
+  <data name="IPC242" xml:space="preserve">
+    <value>IPC 默认值不起作用</value>
+  </data>
+  <data name="IPC242_Fix1" xml:space="preserve">
+    <value>去掉此成员的 IPC 默认值</value>
+  </data>
+  <data name="IPC242_Fix2" xml:space="preserve">
+    <value>忽略此成员抛出的 IPC 连接和超时异常</value>
+  </data>
+  <data name="IPC242_Message" xml:space="preserve">
+    <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
+  </data>
+  <data name="IPC243" xml:space="preserve">
+    <value>不需要设置 IsReadonly 属性</value>
+  </data>
+  <data name="IPC243_Message" xml:space="preserve">
+    <value>不需要设置 IsReadonly 属性为 false，因为默认如此。</value>
+  </data>
+  <data name="IPC244" xml:space="preserve">
+    <value>默认值类型与属性类型不匹配</value>
+  </data>
+  <data name="IPC244_Message" xml:space="preserve">
+    <value>IPC 默认值 {0} 与 {1} 属性的类型不匹配。</value>
+  </data>
+  <data name="IPC245" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="IPC245_Message" xml:space="preserve">
+    <value>试图将 object 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段，如需使用字符串，请修改为“@"""{0}"""”。</value>
+  </data>
+  <data name="IPC246" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="IPC246_Message" xml:space="preserve">
+    <value>试图将 {1} 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段。</value>
+  </data>
+  <data name="IPC247" xml:space="preserve">
+    <value>字符串编译的代码片段无法被解析</value>
+  </data>
+  <data name="IPC247_Message" xml:space="preserve">
+    <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
+  </data>
+  <data name="IPC248" xml:space="preserve">
+    <value>不支持的 IPC 属性类型</value>
+  </data>
+  <data name="IPC248_Message" xml:space="preserve">
+    <value>属性 {0} 的类型 {1} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
+  </data>
+  <data name="IPC260" xml:space="preserve">
+    <value>不建议使用 IPC 同步方法</value>
+  </data>
+  <data name="IPC260_Message" xml:space="preserve">
+    <value>不建议在 IPC 类型中使用同步。应改用异步方法，以避免同步调用可能引发的卡顿和死锁风险。</value>
+  </data>
+  <data name="IPC261" xml:space="preserve">
+    <value>IPC 默认值不起作用</value>
+  </data>
+  <data name="IPC261_Fix1" xml:space="preserve">
+    <value>去掉此成员的 IPC 默认值</value>
+  </data>
+  <data name="IPC261_Fix2" xml:space="preserve">
+    <value>忽略此成员抛出的 IPC 连接和超时异常</value>
+  </data>
+  <data name="IPC261_Message" xml:space="preserve">
+    <value>不需要设置默认值。IPC 默认值仅在忽略了 IPC 连接和超时异常的情况下才会生效。</value>
+  </data>
+  <data name="IPC262" xml:space="preserve">
+    <value>推荐设置 WaitsVoid 属性</value>
+  </data>
+  <data name="IPC262_Message" xml:space="preserve">
+    <value>在 IPC 访问中难以得知 void 方法调用时是否会等待其返回。虽然默认是不等待，但仍建议显式设置 WaitsVoid 属性以增强此代码的可读性。</value>
+  </data>
+  <data name="IPC263" xml:space="preserve">
+    <value>WaitsVoid 不起作用</value>
+  </data>
+  <data name="IPC263_Message" xml:space="preserve">
+    <value>方法 {0} 有返回值，因此 WaitsVoid 对其不起作用。</value>
+  </data>
+  <data name="IPC264" xml:space="preserve">
+    <value>默认值类型与方法返回值类型不匹配</value>
+  </data>
+  <data name="IPC264_Message" xml:space="preserve">
+    <value>IPC 默认值 {0} 与 {1} 方法的返回值类型不匹配。</value>
+  </data>
+  <data name="IPC265" xml:space="preserve">
+    <value>void 方法的 IPC 默认值不起作用</value>
+  </data>
+  <data name="IPC265_Message" xml:space="preserve">
+    <value>方法 {0} 没有返回值，因此无需设置其 IPC 默认值。</value>
+  </data>
+  <data name="IPC266" xml:space="preserve">
+    <value>异步方法 {0} 没有返回值，因此无需设置其 IPC 默认值。</value>
+  </data>
+  <data name="IPC266_Message" xml:space="preserve">
+    <value>Task 返回值方法的 IPC 默认值不起作用</value>
+  </data>
+  <data name="IPC267" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="IPC267_Message" xml:space="preserve">
+    <value>试图将 object 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段，如需使用字符串，请修改为“@"""{0}"""”。</value>
+  </data>
+  <data name="IPC268" xml:space="preserve">
+    <value>字符串将被编译为代码片段</value>
+  </data>
+  <data name="IPC268_Message" xml:space="preserve">
+    <value>试图将 {1} 类型的默认值设置为代码片段 {0}。请注意，这里的字符串将被编译为代码片段。</value>
+  </data>
+  <data name="IPC269" xml:space="preserve">
+    <value>字符串编译的代码片段无法被解析</value>
+  </data>
+  <data name="IPC269_Message" xml:space="preserve">
+    <value>字符串中的代码片段 {0} 在当前上下文下无法被解析。</value>
+  </data>
+  <data name="IPC270" xml:space="preserve">
+    <value>不支持泛型 IPC 方法</value>
+  </data>
+  <data name="IPC270_Message" xml:space="preserve">
+    <value>泛型方法无法成为 IPC 成员，因为无法在运行时协商原本应该在编译时确定的泛型类型。</value>
+  </data>
+  <data name="IPC271" xml:space="preserve">
+    <value>不支持的 IPC 方法参数类型</value>
+  </data>
+  <data name="IPC271_Message" xml:space="preserve">
+    <value>方法 {0} 参数 {1} 的类型 {2} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
+  </data>
+  <data name="IPC272" xml:space="preserve">
+    <value>不支持的 IPC 方法返回值类型</value>
+  </data>
+  <data name="IPC272_Message" xml:space="preserve">
+    <value>方法 {0} 的返回值类型 {1} 不支持通过 IPC 传输。请确保类型是基础类型、可被 Json 序列化的类型或标记了 IpcPublic 的 IPC 公开类型。</value>
+  </data>
+  <data name="IPC301" xml:space="preserve">
+    <value>通过 IPC 配置项配置 IPC 代理行为</value>
+  </data>
+  <data name="IPC301_Message" xml:space="preserve">
+    <value>通过 IPC 配置项配置 IPC 代理行为。</value>
+  </data>
+  <data name="IPC302" xml:space="preserve">
+    <value>通过 IPC 代理壳配置代理行为</value>
+  </data>
+  <data name="IPC302_Fix1" xml:space="preserve">
+    <value>为 {0} 生成 IPC 代理壳</value>
+  </data>
+  <data name="IPC302_Fix2" xml:space="preserve">
+    <value>在新文件中为 {0} 生成 IPC 代理壳</value>
+  </data>
+  <data name="IPC302_Message" xml:space="preserve">
+    <value>通过 IPC 代理壳配置代理行为。</value>
+  </data>
+  <data name="IPC303" xml:space="preserve">
+    <value>传入 IPC 配置项来配置 IPC 代理行为</value>
+  </data>
+  <data name="IPC303_Message" xml:space="preserve">
+    <value>IPC 契约类型上没有指定代理行为，可以通过在这里传入 IPC 配置项来配置。</value>
+  </data>
+  <data name="IPC304" xml:space="preserve">
+    <value>无需传入 IPC 配置项</value>
+  </data>
+  <data name="IPC304_Message" xml:space="preserve">
+    <value>IPC 契约类型上指定的代理行为已经覆盖了这里的所有 IPC 配置项，因此这里无需额外传入。</value>
+  </data>
+  <data name="IPC305" xml:space="preserve">
+    <value>建议显式设置 IgnoresIpcException</value>
+  </data>
+  <data name="IPC305_Message" xml:space="preserve">
+    <value>建议显式设置 IgnoresIpcException 以明确处理这里可能出现的 IPC 连接和超时异常。</value>
+  </data>
+  <data name="IPC306" xml:space="preserve">
+    <value>无需设置 IgnoresIpcException</value>
+  </data>
+  <data name="IPC306_Message" xml:space="preserve">
+    <value>无需设置 IgnoresIpcException，因为 IPC 契约类型上已经设置了此属性。</value>
+  </data>
+  <data name="IPC307" xml:space="preserve">
+    <value>显式设置 Timeout</value>
+  </data>
+  <data name="IPC307_Message" xml:space="preserve">
+    <value>显式设置 Timeout。</value>
+  </data>
+  <data name="IPC308" xml:space="preserve">
+    <value>无需设置 Timeout</value>
+  </data>
+  <data name="IPC308_Message" xml:space="preserve">
+    <value>无需设置 Timeout，因为 IPC 契约类型上已经设置了此属性。</value>
+  </data>
+  <data name="IPC309" xml:space="preserve">
+    <value>不是有效的 IPC 代理壳</value>
+  </data>
+  <data name="IPC309_Message" xml:space="preserve">
+    <value>指定的 IpcShape 参数 {0} 不是有效的 IPC 代理壳。</value>
+  </data>
+  <data name="IPC310" xml:space="preserve">
+    <value>契约接口与代理壳不匹配</value>
+  </data>
+  <data name="IPC310_Message" xml:space="preserve">
+    <value>指定的 IpcShape 参数 {0} 不是针对 {1} 的 IPC 代理壳。</value>
   </data>
 </root>

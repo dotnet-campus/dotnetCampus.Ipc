@@ -170,7 +170,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             for (var i = 0; i < args.Length; i++)
             {
                 var argModel = argModels[i];
-                if (argModel is not null && _context.TryCreateProxyFromSerializationInfo(peer, argModel.AssemblyQualifiedName, argModel.Id, out var proxy))
+                if (argModel is not null && _context.TryCreateProxyFromSerializationInfo(peer, argModel.IpcTypeFullName, argModel.Id, out var proxy))
                 {
                     args[i] = proxy;
                 }
@@ -186,28 +186,28 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 处理一个 IPC 对接的返回值。
         /// 额外的，如果其返回的是一个 IPC 公开的类型，则将其加入到新的 IPC 对接管理中。
         /// </summary>
-        /// <param name="returnValue">真实的返回值或返回实例。</param>
+        /// <param name="returnModel">真实的返回值或返回实例。</param>
         /// <returns>可被序列化进行 IPC 传输的返回值模型。</returns>
-        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(object? returnValue)
+        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(Garm<object?> returnModel)
         {
-            if (_context.TryCreateSerializationInfoFromIpcRealInstance(returnValue, out var objectId, out var assemblyQualifiedName))
+            if (_context.TryCreateSerializationInfoFromIpcRealInstance(returnModel, out var objectId, out var ipcTypeFullName))
             {
                 return new GeneratedProxyMemberReturnModel
                 {
                     Return = new GeneratedProxyObjectModel
                     {
                         Id = objectId,
-                        AssemblyQualifiedName = assemblyQualifiedName,
+                        IpcTypeFullName = ipcTypeFullName,
                     }
                 };
             }
             else
             {
-                return new GeneratedProxyMemberReturnModel(returnValue);
+                return new GeneratedProxyMemberReturnModel(returnModel.Value);
             }
         }
 
-        private static async Task<object?> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, string memberName, object?[]? args)
+        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, string memberName, object?[]? args)
         {
             return callType switch
             {
@@ -215,7 +215,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 MemberInvokingType.SetProperty => joint.SetProperty(memberName, args?.FirstOrDefault()),
                 MemberInvokingType.Method => joint.CallMethod(memberName, args),
                 MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberName, args).ConfigureAwait(false),
-                _ => null,
+                _ => new Garm<object?>(null),
             };
         }
     }

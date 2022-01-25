@@ -2,38 +2,79 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
+using dotnetCampus.Ipc.CompilerServices.Attributes;
+
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
-    internal interface IFakeIpcObject
+    [IpcPublic]
+    internal interface IFakeIpcObject : IFakeIpcObjectBase
     {
+        BindingFlags EnumProperty { get; set; }
+
+        [IpcProperty(IsReadonly = true)]
+        bool IpcReadonlyProperty { get; }
+
+        IntPtr IntPtrProperty { get; }
+
+        IntPtr? NullableIntPtrProperty { get; }
+
+        [IpcMethod(WaitsVoid = true)]
+        void WaitsVoidMethod();
+
+        [IpcMethod(WaitsVoid = false)]
+        void NonWaitsVoidMethod();
+
+        [IpcMethod(IgnoresIpcException = true)]
+        Task MethodThatIgnoresIpcException();
+
+        Task MethodThatThrowsIpcException();
+
+        [IpcMethod(Timeout = 100)]
+        Task MethodThatHasTimeout();
+
 #nullable enable
-        string? Title { get; set; }
+        Task<string?> MethodThatHasAsyncNullableReturn();
 #nullable restore
 
-#nullable disable
-        string? Description { get; set; }
+#nullable enable
+        Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn();
 #nullable restore
 
-        BindingFlags BindingFlags { get; set; }
+        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
+        Task<string> MethodThatHasDefaultReturn();
 
-        bool IsFake { get; }
+        [IpcMethod(DefaultReturn = "default", IgnoresIpcException = true, Timeout = 100)]
+        Task<object> MethodThatHasObjectWithObjectDefaultReturn();
 
-        IntPtr Handle { get; }
+        [IpcMethod(DefaultReturn = @"""default1""", IgnoresIpcException = true, Timeout = 100)]
+        Task<object> MethodThatHasObjectWithStringDefaultReturn();
 
-        void Activate();
+        // 请不要将这里的 String 改为 string，这是为了测试代码生成器能否处理类型而非关键字。
+        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
+        Task<String> MethodThatHasStringDefaultReturn();
 
-        void Deactivate();
+        [IpcMethod(DefaultReturn = "new System.IntPtr(1)", IgnoresIpcException = true, Timeout = 100)]
+        Task<IntPtr> MethodThatHasCustomDefaultReturn();
 
-        bool CheckFake();
+        [IpcMethod(DefaultReturn = "default1")]
+        Task<string> MethodThatCannotBeCompiled_MustSetOtherAttributes();
 
-        void Call(BindingFlags flags);
+        void MethodWithStructParameters(BindingFlags flags);
 
-        Task DoSomethingAsync();
+        bool MethodWithStructReturn();
 
-        Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d);
+        Task AsyncMethod();
 
-        Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model);
+#nullable enable
+        Task<(double a, uint b, int? c, byte d)> AsyncMethodWithStructParametersAndStructReturn(double a, uint b, int? c, byte d);
+#nullable restore
 
-        Task<string> ConvertStringAsync(string source);
+#nullable enable
+        Task<(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d)> AsyncMethodWithComplexValueTupleParametersAndComplexValueTupleReturn(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d);
+#nullable restore
+
+        Task<FakeIpcObjectSubModelA> AsyncMethodWithComplexParametersAndComplexReturn(FakeIpcObjectSubModelA model);
+
+        Task<string> AsyncMethodWithPrimaryParametersAndPrimaryReturn(string source);
     }
 }

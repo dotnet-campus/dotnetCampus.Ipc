@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Diagnostics;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Utils;
@@ -133,10 +136,28 @@ namespace dotnetCampus.Ipc.Pipes
         /// </remarks>
         internal async Task WriteMessageAsync(IpcMessageTracker<IpcBufferMessageContext> tracker)
         {
-            await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner).ConfigureAwait(false);
+            VerifyNotDisposed();
+
+            try
+            {
+                await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner).ConfigureAwait(false);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // 这里的 InvalidOperationException 对应 DoubleBufferTask.AddTask 里抛出的异常。
+                // 在逻辑上确实是使用错误，抛出 InvalidOperationException 是合适的；
+                // 但因为 IPC 的断开发生在任何时刻，根本无法提前规避，所以实际上这里指的是 IPC 远端异常。
+                throw new IpcRemoteException($"因为已无法连接对方，所以 IPC 消息发送失败。Tag={tracker.Tag}", ex);
+                // @lindexi，这里违背了异常处理原则里的“不应捕获使用异常”的原则，所以 DoubleBufferTask 的设计需要修改，加一个 TryAddTaskAsync 以应对并发场景。
+            }
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
 
                 // 追踪、校验消息。
@@ -169,10 +190,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </remarks>
         internal async Task WriteMessageAsync(IpcMessageTracker<IpcMessageBody> tracker)
         {
+            VerifyNotDisposed();
+
             await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner);
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
 
                 // 追踪、校验消息。
@@ -213,10 +241,17 @@ namespace dotnetCampus.Ipc.Pipes
         public async Task WriteMessageAsync(byte[] buffer, int offset, int count,
             [CallerMemberName] string tag = null!)
         {
+            VerifyNotDisposed();
+
             await DoubleBufferTask.AddTaskAsync(WriteMessageAsyncInner);
 
             async Task WriteMessageAsyncInner()
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var currentTag = tag;
                 var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
                 await IpcMessageConverter.WriteAsync
@@ -305,6 +340,14 @@ namespace dotnetCampus.Ipc.Pipes
         }
 
         private bool IsDisposed { set; get; }
+
+        private void VerifyNotDisposed()
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(IpcClientService));
+            }
+        }
 
         Task IClientMessageWriter.WriteMessageAsync(in IpcBufferMessageContext ipcBufferMessageContext)
         {
