@@ -11,7 +11,7 @@
     <Description>本机内多进程通讯库，稳定 IPC 通讯库</Description>
 
     <RepositoryType>git</RepositoryType>
-    <Copyright>Copyright © 2020-2021 dotnet campus, All Rights Reserved.</Copyright>
+    <Copyright>Copyright © 2020-2022 dotnet campus, All Rights Reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
