@@ -117,28 +117,301 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DIPC001" xml:space="preserve">
+  <data name="IPC000" xml:space="preserve">
     <value>IPC unknown error</value>
   </data>
-  <data name="DIPC001_Message" xml:space="preserve">
-    <value>An unknown error occured when generating IPC types. The error is: {0}</value>
+  <data name="IPC000_Message" xml:space="preserve">
+    <value>An unknown error occurred when generating IPC types. The error is: {0}</value>
   </data>
-  <data name="DIPC002" xml:space="preserve">
-    <value>Contract type not specified</value>
+  <data name="IPC001" xml:space="preserve">
+    <value>IPC known compiler error</value>
   </data>
-  <data name="DIPC002_Message" xml:space="preserve">
-    <value>IpcPublic attribute must have a contract type as its first argument.</value>
+  <data name="IPC001_Message" xml:space="preserve">
+    <value>An known compiler error occurred when generating IPC types. We'll not report it because the compiler will do this.</value>
   </data>
-  <data name="DIPC003" xml:space="preserve">
-    <value>Only method or property is supported</value>
+  <data name="IPC002" xml:space="preserve">
+    <value>IPC known diagnostic error</value>
   </data>
-  <data name="DIPC003_Message" xml:space="preserve">
-    <value>Unknown IPC member {0}. IPC object only supports methods and properties.</value>
+  <data name="IPC002_Message" xml:space="preserve">
+    <value>An known diagnostic error occurred when generating IPC types. We'll not report it because the analyzer will do this.</value>
   </data>
-  <data name="DIPC004" xml:space="preserve">
+  <data name="IPC101" xml:space="preserve">
+    <value>IPC timeout can't be negative</value>
+  </data>
+  <data name="IPC101_Message" xml:space="preserve">
+    <value>IPC timeout can't be negative, but it is set to {0}ms.</value>
+  </data>
+  <data name="IPC102" xml:space="preserve">
+    <value>The timeout is zero</value>
+  </data>
+  <data name="IPC102_Message" xml:space="preserve">
+    <value>A timeout with zero milliseconds does nothing so there is no need to assign this property.</value>
+  </data>
+  <data name="IPC131" xml:space="preserve">
+    <value>IgnoresIpcException is recommended</value>
+  </data>
+  <data name="IPC131_Fix1" xml:space="preserve">
+    <value>Set IgnoresIpcException to true</value>
+  </data>
+  <data name="IPC131_Fix2" xml:space="preserve">
+    <value>Set IgnoresIpcException to false</value>
+  </data>
+  <data name="IPC131_Message" xml:space="preserve">
+    <value>For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here.</value>
+  </data>
+  <data name="IPC160" xml:space="preserve">
+    <value>IPC contract type must be an interface</value>
+  </data>
+  <data name="IPC160_Message" xml:space="preserve">
+    <value>IPC contract type must be an interface but {0} is not.</value>
+  </data>
+  <data name="IPC161" xml:space="preserve">
+    <value>IPC contract type dismatches with interface</value>
+  </data>
+  <data name="IPC161_Fix1" xml:space="preserve">
+    <value>Change the contract type to {0}</value>
+  </data>
+  <data name="IPC161_Fix2" xml:space="preserve">
+    <value>Let {0} implement {1}</value>
+  </data>
+  <data name="IPC161_Message" xml:space="preserve">
+    <value>{0} does not implement the contract type {1} that the IpcShape marked.</value>
+  </data>
+  <data name="IPC162" xml:space="preserve">
+    <value>Mark all members as IPC members</value>
+  </data>
+  <data name="IPC162_Message" xml:space="preserve">
+    <value>An IPC shape should mark all the members as IPC members, because it cannot use any behaviors from the original contract type.</value>
+  </data>
+  <data name="IPC200" xml:space="preserve">
+    <value>Only properties, methods and events are supported</value>
+  </data>
+  <data name="IPC200_Message" xml:space="preserve">
+    <value>Unknown IPC member {0}. IPC object only supports properties, methods and events.</value>
+  </data>
+  <data name="IPC201" xml:space="preserve">
+    <value>Empty IPC member attribute is not needed</value>
+  </data>
+  <data name="IPC201_Fix" xml:space="preserve">
+    <value>Remove the {0}</value>
+  </data>
+  <data name="IPC201_Message" xml:space="preserve">
+    <value>Empty {0} does nothing, so there is no need to add it.</value>
+  </data>
+  <data name="IPC202" xml:space="preserve">
+    <value>Mark the member as an IPC member</value>
+  </data>
+  <data name="IPC202_Message" xml:space="preserve">
+    <value>As an IPC shape, it is recommended to mark {0} as an IPC member.</value>
+  </data>
+  <data name="IPC240" xml:space="preserve">
+    <value>IPC property is not recommended</value>
+  </data>
+  <data name="IPC240_Message" xml:space="preserve">
+    <value>It's better to use an async method instead of a property as an IPC member to avoid potential UI frozen or deadlocks.</value>
+  </data>
+  <data name="IPC241" xml:space="preserve">
     <value>Set-only property is not supported</value>
   </data>
-  <data name="DIPC004_Message" xml:space="preserve">
+  <data name="IPC241_Message" xml:space="preserve">
     <value>Unknown IPC property {0}. Only get or get-set property is supported.</value>
+  </data>
+  <data name="IPC242" xml:space="preserve">
+    <value>The DefaultReturn is useless</value>
+  </data>
+  <data name="IPC242_Fix1" xml:space="preserve">
+    <value>Remove the DefaultReturn</value>
+  </data>
+  <data name="IPC242_Fix2" xml:space="preserve">
+    <value>Set IgnoresIpcException to true</value>
+  </data>
+  <data name="IPC242_Message" xml:space="preserve">
+    <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
+  </data>
+  <data name="IPC243" xml:space="preserve">
+    <value>IsReadonly is unnecessary</value>
+  </data>
+  <data name="IPC243_Message" xml:space="preserve">
+    <value>IsReadonly is set to false by default, so there is no need to assign it to false manully.</value>
+  </data>
+  <data name="IPC244" xml:space="preserve">
+    <value>The DefaultReturn type does not match the property type</value>
+  </data>
+  <data name="IPC244_Message" xml:space="preserve">
+    <value>The IPC DefaultReturn type {0} does not match the property type {1}.</value>
+  </data>
+  <data name="IPC245" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="IPC245_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @"""{0}""" instead.</value>
+  </data>
+  <data name="IPC246" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="IPC246_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to a {1} type.</value>
+  </data>
+  <data name="IPC247" xml:space="preserve">
+    <value>The string is treated as a code snippet but cannot be compiled</value>
+  </data>
+  <data name="IPC247_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
+  </data>
+  <data name="IPC248" xml:space="preserve">
+    <value>The property type is not supported</value>
+  </data>
+  <data name="IPC248_Message" xml:space="preserve">
+    <value>The type {1} of the property {0} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC property types.</value>
+  </data>
+  <data name="IPC260" xml:space="preserve">
+    <value>IPC sync method is not recommended</value>
+  </data>
+  <data name="IPC260_Message" xml:space="preserve">
+    <value>It's better to use an async method instead of a sync one as an IPC member to avoid potential UI frozen or deadlocks.</value>
+  </data>
+  <data name="IPC261" xml:space="preserve">
+    <value>The DefaultReturn is useless</value>
+  </data>
+  <data name="IPC261_Fix1" xml:space="preserve">
+    <value>Remove the DefaultReturn</value>
+  </data>
+  <data name="IPC261_Fix2" xml:space="preserve">
+    <value>Set IgnoresIpcException to true</value>
+  </data>
+  <data name="IPC261_Message" xml:space="preserve">
+    <value>The DefaultReturn only works with the situation in which IgnoresIpcException is set to true.</value>
+  </data>
+  <data name="IPC262" xml:space="preserve">
+    <value>WaitsVoid is recommended</value>
+  </data>
+  <data name="IPC262_Message" xml:space="preserve">
+    <value>Commonly, developers can hardly determin whether a waiting is happened during an IPC call if a method returns void. So it's recommended to assign WaitsVoid to the value you want instead of keeping it as false by default.</value>
+  </data>
+  <data name="IPC263" xml:space="preserve">
+    <value>The WaitsVoid is useless</value>
+  </data>
+  <data name="IPC263_Message" xml:space="preserve">
+    <value>This method has a return value so WaitsVoid does not work for it.</value>
+  </data>
+  <data name="IPC264" xml:space="preserve">
+    <value>The DefaultReturn type does not match the method return type</value>
+  </data>
+  <data name="IPC264_Message" xml:space="preserve">
+    <value>The IPC DefaultReturn type {0} does not match the method return type {1}.</value>
+  </data>
+  <data name="IPC265" xml:space="preserve">
+    <value>The DefaultReturn value for a void method is useless</value>
+  </data>
+  <data name="IPC265_Message" xml:space="preserve">
+    <value>The DefaultReturn value for a void method {0} is useless.</value>
+  </data>
+  <data name="IPC266" xml:space="preserve">
+    <value>The DefaultReturn value for an async Task method is useless</value>
+  </data>
+  <data name="IPC266_Message" xml:space="preserve">
+    <value>The DefaultReturn value for an async Task method {0} is useless.</value>
+  </data>
+  <data name="IPC267" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="IPC267_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @"""{0}""" instead.</value>
+  </data>
+  <data name="IPC268" xml:space="preserve">
+    <value>The string is treated as a code snippet</value>
+  </data>
+  <data name="IPC268_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet and will be set to a {1} type.</value>
+  </data>
+  <data name="IPC269" xml:space="preserve">
+    <value>The string is treated as a code snippet but cannot be compiled</value>
+  </data>
+  <data name="IPC269_Message" xml:space="preserve">
+    <value>The string {0} is treated as a code snippet but cannot be compiled.</value>
+  </data>
+  <data name="IPC270" xml:space="preserve">
+    <value>Generic methods are not supported</value>
+  </data>
+  <data name="IPC270_Message" xml:space="preserve">
+    <value>Generic methods are not supported, because we cannot determine a generic type at runtime which should have been determined at compile time.</value>
+  </data>
+  <data name="IPC271" xml:space="preserve">
+    <value>The method parameter type is not supported</value>
+  </data>
+  <data name="IPC271_Message" xml:space="preserve">
+    <value>The type {2} of the method {0} pamameter {1} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types.</value>
+  </data>
+  <data name="IPC272" xml:space="preserve">
+    <value>The method return type is not supported</value>
+  </data>
+  <data name="IPC272_Message" xml:space="preserve">
+    <value>The type {1} of the method {0} return is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types.</value>
+  </data>
+  <data name="IPC301" xml:space="preserve">
+    <value>Add IpcProxyConfigs</value>
+  </data>
+  <data name="IPC301_Message" xml:space="preserve">
+    <value>Configure the IPC behaviors by adding IpcProxyConfigs.</value>
+  </data>
+  <data name="IPC302" xml:space="preserve">
+    <value>Add an IpcShape</value>
+  </data>
+  <data name="IPC302_Fix1" xml:space="preserve">
+    <value>Generate an IpcShape for {0}</value>
+  </data>
+  <data name="IPC302_Fix2" xml:space="preserve">
+    <value>Generate an IpcShape for {0} in a new file</value>
+  </data>
+  <data name="IPC302_Message" xml:space="preserve">
+    <value>Configure the IPC behaviors by adding an IpcShape.</value>
+  </data>
+  <data name="IPC303" xml:space="preserve">
+    <value>Add IpcProxyConfigs</value>
+  </data>
+  <data name="IPC303_Message" xml:space="preserve">
+    <value>Configure the IPC behaviors by adding IpcProxyConfigs because no behaviors are specified on the IPC contract type.</value>
+  </data>
+  <data name="IPC304" xml:space="preserve">
+    <value>IpcProxyConfigs are not needed</value>
+  </data>
+  <data name="IPC304_Message" xml:space="preserve">
+    <value>All the behaviors are specified by the IPC contract type, so every value here does not work.</value>
+  </data>
+  <data name="IPC305" xml:space="preserve">
+    <value>Set IgnoresIpcException</value>
+  </data>
+  <data name="IPC305_Message" xml:space="preserve">
+    <value>For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here.</value>
+  </data>
+  <data name="IPC306" xml:space="preserve">
+    <value>IgnoresIpcException is not needed</value>
+  </data>
+  <data name="IPC306_Message" xml:space="preserve">
+    <value>IgnoresIpcException is not needed because it has been set on the IPC contract type.</value>
+  </data>
+  <data name="IPC307" xml:space="preserve">
+    <value>Set Timeout</value>
+  </data>
+  <data name="IPC307_Message" xml:space="preserve">
+    <value>Set timeout explicitly.</value>
+  </data>
+  <data name="IPC308" xml:space="preserve">
+    <value>Timeout is not needed</value>
+  </data>
+  <data name="IPC308_Message" xml:space="preserve">
+    <value>Timeout is not needed because it has been set on the IPC contract type.</value>
+  </data>
+  <data name="IPC309" xml:space="preserve">
+    <value>The type argument is not an IpcShape</value>
+  </data>
+  <data name="IPC309_Message" xml:space="preserve">
+    <value>The type argument {0} is not an IpcShape.</value>
+  </data>
+  <data name="IPC310" xml:space="preserve">
+    <value>The IPC proxy type does not match the IPC contract type</value>
+  </data>
+  <data name="IPC310_Message" xml:space="preserve">
+    <value>The IPC proxy type {0} does not match the IPC contract type {1}.</value>
   </data>
 </root>

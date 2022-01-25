@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.Exceptions
+﻿using System;
+
+namespace dotnetCampus.Ipc.Exceptions
 {
     /// <summary>
     /// 所有由本地问题导致的 IPC 异常。
@@ -25,7 +27,7 @@
         /// </summary>
         /// <param name="message">自定义消息。</param>
         /// <param name="innerException">内部异常。</param>
-        public IpcLocalException(string message, System.Exception innerException) : base(message, innerException)
+        public IpcLocalException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

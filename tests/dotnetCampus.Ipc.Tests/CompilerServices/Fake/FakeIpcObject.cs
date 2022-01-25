@@ -7,67 +7,149 @@ using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
-    [IpcPublic(typeof(IFakeIpcObject))]
     internal class FakeIpcObject : IFakeIpcObject
     {
-        private BindingFlags _bindingFlags = BindingFlags.Public;
+        private BindingFlags _enumProperty = BindingFlags.Public;
+        private bool _ipcReadonlyProperty = true;
 
 #nullable enable
-        public string? Title { get; set; } = "Title";
+        public string? NullableStringProperty { get; set; } = "Title";
 #nullable restore
 
 #nullable disable
-        public string? Description { get; set; } = "Description";
+        public string? NonNullableStringProperty { get; set; } = "Description";
 #nullable restore
 
-        public BindingFlags BindingFlags
+        public BindingFlags EnumProperty
         {
-            get => _bindingFlags;
-            set => _bindingFlags = value;
+            get => _enumProperty;
+            set => _enumProperty = value;
         }
 
-        [IpcProperty(IsReadonly = true)]
-        public bool IsFake { get; } = true;
+        public bool IpcReadonlyProperty => _ipcReadonlyProperty;
 
-        public IntPtr Handle { get; } = new IntPtr(1);
+        public void SetIpcReadonlyProperty(bool value)
+        {
+            _ipcReadonlyProperty = value;
+        }
 
-        [IpcMethod(WaitsVoid = true)]
-        public void Activate()
+        public IntPtr IntPtrProperty { get; } = new IntPtr(1);
+        public IntPtr? NullableIntPtrProperty { get; }
+
+        public void WaitsVoidMethod()
         {
             Thread.Sleep(100);
-            BindingFlags = BindingFlags.Public | BindingFlags.Instance;
+            EnumProperty = BindingFlags.Public | BindingFlags.Instance;
         }
 
-        [IpcMethod(WaitsVoid = false)]
-        public void Deactivate()
+        public void NonWaitsVoidMethod()
+        {
+            Thread.Sleep(100);
+            EnumProperty = BindingFlags.Public | BindingFlags.Instance;
+        }
+
+        public Task MethodThatIgnoresIpcException()
+        {
+            Thread.Sleep(100);
+            return Task.CompletedTask;
+        }
+
+        public Task MethodThatThrowsIpcException()
+        {
+            Thread.Sleep(100);
+            return Task.CompletedTask;
+        }
+
+        public Task MethodThatHasTimeout()
+        {
+            return Task.Delay(150);
+        }
+
+#nullable enable
+        public async Task<string?> MethodThatHasAsyncNullableReturn()
+        {
+            return null;
+        }
+#nullable restore
+
+#nullable enable
+        public async Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn()
+        {
+            return null;
+        }
+#nullable restore
+
+        public async Task<string> MethodThatHasDefaultReturn()
+        {
+            await Task.Delay(250);
+            return "xxx";
+        }
+
+        public async Task<object> MethodThatHasObjectWithObjectDefaultReturn()
+        {
+            await Task.Delay(250);
+            return "xxx";
+        }
+
+        public async Task<object> MethodThatHasObjectWithStringDefaultReturn()
+        {
+            await Task.Delay(250);
+            return "xxx";
+        }
+
+        // 请不要将这里的 String 改为 string，这是为了测试代码生成器能否处理类型而非关键字。
+        public async Task<String> MethodThatHasStringDefaultReturn()
+        {
+            await Task.Delay(250);
+            return "xxx";
+        }
+
+        public async Task<IntPtr> MethodThatHasCustomDefaultReturn()
+        {
+            await Task.Delay(150);
+            return IntPtr.Zero;
+        }
+
+        public async Task<string> MethodThatCannotBeCompiled_MustSetOtherAttributes()
+        {
+            await Task.Delay(150);
+            return "xxx";
+        }
+
+        public void MethodWithStructParameters(BindingFlags flags)
         {
         }
 
-        public void Call(BindingFlags flags)
+        public bool MethodWithStructReturn()
         {
+            return IpcReadonlyProperty;
         }
 
-        public bool CheckFake()
-        {
-            return IsFake;
-        }
-
-        public Task DoSomethingAsync()
+        public Task AsyncMethod()
         {
             return Task.CompletedTask;
         }
 
-        public Task<(double a, uint b, int c, byte d)> ConstructAsync(double a, uint b, int c, byte d)
+#nullable enable
+        public Task<(double a, uint b, int? c, byte d)> AsyncMethodWithStructParametersAndStructReturn(double a, uint b, int? c, byte d)
         {
             return Task.FromResult((a, b, c, d));
         }
+#nullable restore
 
-        public Task<FakeIpcObjectSubModelA> ConvertObjectAsync(FakeIpcObjectSubModelA model)
+#nullable enable
+        public Task<(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d)> AsyncMethodWithComplexValueTupleParametersAndComplexValueTupleReturn(FakeIpcObjectSubModelA a, FakeIpcObjectSubModelA? b, IntPtr c, IntPtr? d)
+        {
+            return Task.FromResult((new FakeIpcObjectSubModelA(), (FakeIpcObjectSubModelA?) null, IntPtr.Zero, (IntPtr?) null));
+        }
+#nullable restore
+
+        public Task<FakeIpcObjectSubModelA> AsyncMethodWithComplexParametersAndComplexReturn(FakeIpcObjectSubModelA model)
         {
             return Task.FromResult(new FakeIpcObjectSubModelA(model.A, model.B, model.C, model.D));
         }
 
-        public Task<string> ConvertStringAsync(string source)
+        public Task<string> AsyncMethodWithPrimaryParametersAndPrimaryReturn(string source)
         {
             return Task.FromResult(source);
         }
