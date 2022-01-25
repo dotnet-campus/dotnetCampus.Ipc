@@ -133,29 +133,31 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 编译期契约与傀儡类型到代理对接的转换。
         /// </summary>
-        /// <param name="contractType">契约类型。</param>
+        /// <param name="ipcType">标记了 <see cref="IpcPublicAttribute"/> 的契约类型或标记了 <see cref="IpcShapeAttribute"/> 的代理壳类型。</param>
         /// <returns>IPC 类型。</returns>
-        private static (Type? proxyType, Type? jointType) ConvertShapeTypeToProxyJointTypes(Type contractType)
+        private static (Type? proxyType, Type? jointType) ConvertShapeTypeToProxyJointTypes(Type ipcType)
         {
-            if (contractType?.IsDefined(typeof(IpcPublicAttribute)) is true)
+            if (ipcType?.IsDefined(typeof(IpcShapeAttribute)) is true)
             {
-                var attribute = contractType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>()
-                    .FirstOrDefault(x => x.IpcType == contractType);
+                // 因为 IpcShape 继承了 IpcPublic，所以需要首先检查代理壳，否则 IpcPublic 接口直接就通过了，产生错误。
+                var attribute = ipcType.Assembly.GetCustomAttributes<AssemblyIpcProxyAttribute>()
+                    .FirstOrDefault(x => x.IpcType == ipcType);
                 if (attribute is null)
                 {
-                    throw new NotSupportedException($"因为编译时没有生成“{contractType.Name}”接口的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
-                }
-                return (attribute.ProxyType, attribute.JointType);
-            }
-            else if (contractType?.IsDefined(typeof(IpcShapeAttribute)) is true)
-            {
-                var attribute = contractType.Assembly.GetCustomAttributes<AssemblyIpcProxyAttribute>()
-                    .FirstOrDefault(x => x.ContractType == contractType);
-                if (attribute is null)
-                {
-                    throw new NotSupportedException($"因为编译时没有生成“{contractType.Name}”接口的 IPC 代理类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”代理壳的 IPC 代理类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
                 }
                 return (attribute.ProxyType, null);
+            }
+            else if (ipcType?.IsDefined(typeof(IpcPublicAttribute)) is true)
+            {
+                // 随后再检查 IpcPublic。
+                var attribute = ipcType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>()
+                    .FirstOrDefault(x => x.IpcType == ipcType);
+                if (attribute is null)
+                {
+                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”接口的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                }
+                return (attribute.ProxyType, attribute.JointType);
             }
             return (null, null);
         }

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
@@ -17,6 +18,8 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         IntPtr IntPtrProperty { get; }
 
         IntPtr? NullableIntPtrProperty { get; }
+
+        INestedFakeIpcArgumentOrReturn NestedIpcProperty { get; set; }
 
         [IpcMethod(WaitsVoid = true)]
         void WaitsVoidMethod();
@@ -63,7 +66,13 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
 
         bool MethodWithStructReturn();
 
+        NestedEnum MethodWithNestedEnumReturn();
+
+        Task<IFakeIpcObject.NestedEnum> AsyncMethodWithNestedEnumReturn();
+
         Task AsyncMethod();
+
+        Task<INestedFakeIpcArgumentOrReturn> AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(INestedFakeIpcArgumentOrReturn nested, string changeValue);
 
 #nullable enable
         Task<(double a, uint b, int? c, byte d)> AsyncMethodWithStructParametersAndStructReturn(double a, uint b, int? c, byte d);
@@ -76,5 +85,11 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         Task<FakeIpcObjectSubModelA> AsyncMethodWithComplexParametersAndComplexReturn(FakeIpcObjectSubModelA model);
 
         Task<string> AsyncMethodWithPrimaryParametersAndPrimaryReturn(string source);
+
+        public enum NestedEnum
+        {
+            None,
+            Tested,
+        }
     }
 }

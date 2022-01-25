@@ -29,7 +29,7 @@ internal class IpcShapeCompilation : IpcPublicCompilation
     /// 查找 IPC 对象的所有成员。
     /// </summary>
     /// <returns>所有成员信息。</returns>
-    public IEnumerable<(INamedTypeSymbol contractType, INamedTypeSymbol shapeType, ISymbol member, ISymbol implementationMember)> EnumerateMembersByContractType()
+    public IEnumerable<(INamedTypeSymbol contractType, INamedTypeSymbol shapeType, ISymbol member, ISymbol shapeMember)> EnumerateMembersByContractType()
     {
         var members = ContractType.AllInterfaces.SelectMany(x => x.GetMembers())
             .Concat(ContractType.GetMembers());

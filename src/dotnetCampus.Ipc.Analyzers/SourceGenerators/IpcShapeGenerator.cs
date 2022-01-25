@@ -27,10 +27,8 @@ public class IpcShapeGenerator : ISourceGenerator
                 {
                     var ipcType = ipcObjectType.IpcType;
                     var proxySource = GenerateProxySource(ipcObjectType);
-                    var jointSource = GenerateJointSource(ipcObjectType);
                     var assemblySource = GenerateAssemblySource(ipcObjectType);
                     context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                    context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
                     context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
                 }
                 catch (DiagnosticException ex)
@@ -63,7 +61,7 @@ public class IpcShapeGenerator : ISourceGenerator
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {sc.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}, typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}), typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]";
         return sourceCode;
     }
 
