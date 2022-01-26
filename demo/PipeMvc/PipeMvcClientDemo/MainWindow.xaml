@@ -1,0 +1,25 @@
+﻿<Window x:Class="PipeMvcClientDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PipeMvcClientDemo"
+        mc:Ignorable="d"
+        Title="PipeMvcClientDemo" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Margin="10,10,10,10" Orientation="Horizontal">
+            <Button x:Name="GetFooButton" Margin="10,10,10,10" Click="GetFooButton_Click">Get</Button>
+            <Button x:Name="GetFooWithArgumentButton" Margin="10,10,10,10" Click="GetFooWithArgumentButton_Click">Get With Argument</Button>
+            <Button x:Name="PostFooButton" Margin="10,10,10,10" Click="PostFooButton_Click">Post</Button>
+            <Button x:Name="PostFooWithArgumentButton" Margin="10,10,10,10" Click="PostFooWithArgumentButton_Click">Post With Argument</Button>
+            <Button x:Name="MultiThreadButton" Margin="10,10,10,10" Click="MultiThreadButton_OnClick">多线程压测</Button>
+        </StackPanel>
+        <Grid Grid.Row="1" ClipToBounds="True">
+            <TextBlock x:Name="TraceTextBlock" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.PipeMvcServer.IpcFramework;
@@ -19,7 +18,7 @@ namespace dotnetCampus.Ipc.PipeMvcClient
         /// <param name="ipcPipeMvcServerName">对方 Ipc 服务名</param>
         /// <param name="clientIpcProvider">可选，用来进行 Ipc 连接的本地服务。如不传或是空，将创建新的 Ipc 连接服务</param>
         /// <returns></returns>
-        public static async Task<HttpClient> CreateIpcMvcClient(string ipcPipeMvcServerName, IpcProvider? clientIpcProvider = null)
+        public static async Task<HttpClient> CreateIpcMvcClientAsync(string ipcPipeMvcServerName, IpcProvider? clientIpcProvider = null)
         {
             if (clientIpcProvider == null)
             {
@@ -34,6 +33,5 @@ namespace dotnetCampus.Ipc.PipeMvcClient
                 BaseAddress = new Uri(IpcPipeMvcContext.BaseAddressUrl),
             };
         }
-
     }
 }

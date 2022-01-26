@@ -21,12 +21,15 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
                 RequestUri = RequestUri,
             };
 
-            var memoryStream = new MemoryStream(Convert.FromBase64String(ContentBase64));
-            //var text = Encoding.UTF8.GetString(memoryStream.ToArray());
-            var streamContent = new StreamContent(memoryStream);
-            result.Content = streamContent;
+            if(ContentBase64 is not null)
+            {
+                var memoryStream = new MemoryStream(Convert.FromBase64String(ContentBase64));
+                //var text = Encoding.UTF8.GetString(memoryStream.ToArray());
+                var streamContent = new StreamContent(memoryStream);
+                result.Content = streamContent;
+            }
 
-            var headerContentList = ContentHeaders.ToObject<List<HeaderContent>>();
+            var headerContentList = ContentHeaders?.ToObject<List<HeaderContent>>();
 
             if (headerContentList != null)
             {
@@ -51,6 +54,9 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
 
         public JContainer Headers { set; get; }
 
+        /// <summary>
+        /// 使用 <see cref="JContainer"/> 表示的 <see cref="ContentHeaders"/> 内容。特意命名和基类型相同，这样序列化时可以自动转换
+        /// </summary>
         public new JContainer ContentHeaders { set; get; }
     }
 }
