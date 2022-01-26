@@ -66,16 +66,16 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
 #nullable enable
-        public async Task<string?> MethodThatHasAsyncNullableReturn()
+        public Task<string?> MethodThatHasAsyncNullableReturn()
         {
-            return null;
+            return Task.FromResult(null);
         }
 #nullable restore
 
 #nullable enable
-        public async Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn()
+        public Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn()
         {
-            return null;
+            return Task.FromResult(null);
         }
 #nullable restore
 
