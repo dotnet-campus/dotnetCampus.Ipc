@@ -175,7 +175,7 @@
     <value>Let {0} implement {1}</value>
   </data>
   <data name="IPC161_Message" xml:space="preserve">
-    <value>{0} does not implement the contract type {1} that the IpcShape marked.</value>
+    <value>{0} does not fully implement the contract type {1} that the IpcShape marked.</value>
   </data>
   <data name="IPC162" xml:space="preserve">
     <value>Mark all members as IPC members</value>

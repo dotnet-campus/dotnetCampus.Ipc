@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices
 {
@@ -11,6 +12,18 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
     {
         private BindingFlags _enumProperty = BindingFlags.Public;
         private bool _ipcReadonlyProperty = true;
+#nullable enable
+        private INestedFakeIpcArgumentOrReturn? _nestedIpcObject;
+#nullable restore
+
+        public FakeIpcObject()
+        {
+        }
+
+        public FakeIpcObject(INestedFakeIpcArgumentOrReturn jointSideObject)
+        {
+            _nestedIpcObject = jointSideObject;
+        }
 
 #nullable enable
         public string? NullableStringProperty { get; set; } = "Title";
@@ -34,7 +47,14 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         }
 
         public IntPtr IntPtrProperty { get; } = new IntPtr(1);
+
         public IntPtr? NullableIntPtrProperty { get; }
+
+        public INestedFakeIpcArgumentOrReturn NestedIpcProperty
+        {
+            get => _nestedIpcObject;
+            set => _nestedIpcObject = value;
+        }
 
         public void WaitsVoidMethod()
         {
@@ -125,9 +145,31 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return IpcReadonlyProperty;
         }
 
+        public IFakeIpcObject.NestedEnum MethodWithNestedEnumReturn()
+        {
+            return IFakeIpcObject.NestedEnum.None;
+        }
+
+        public Task<IFakeIpcObject.NestedEnum> AsyncMethodWithNestedEnumReturn()
+        {
+            return Task.FromResult(IFakeIpcObject.NestedEnum.None);
+        }
+
         public Task AsyncMethod()
         {
             return Task.CompletedTask;
+        }
+
+        public async Task<INestedFakeIpcArgumentOrReturn> AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(INestedFakeIpcArgumentOrReturn nested, string changeValue)
+        {
+            // 修改来自参数所在进程的 IPC 对象的值。
+            await Task.Run(() =>
+            {
+                nested.Value = changeValue;
+            });
+
+            // 返回自己进程的值给对方进程。
+            return _nestedIpcObject;
         }
 
 #nullable enable

@@ -175,7 +175,7 @@
     <value>使 {0} 实现 {1} 接口</value>
   </data>
   <data name="IPC161_Message" xml:space="preserve">
-    <value>IpcShape 标记的契约类型是 {1}，但是 {0} 却并没有实现这个接口。</value>
+    <value>{0} 标记了 IPC 代理壳契约类型是 {1}，却并没有（完全）实现这个接口。</value>
   </data>
   <data name="IPC162" xml:space="preserve">
     <value>显式标记所有 IPC 成员</value>

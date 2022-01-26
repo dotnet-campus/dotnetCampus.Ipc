@@ -261,6 +261,34 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 // 植物。
                 Assert.AreEqual("Test", result);
             });
+
+            "IPC 代理生成：IPC 参数和异步 IPC 返回值".Test(async () =>
+            {
+                // 准备。
+                var proxySideObject = new FakeNestedIpcArgumentOrReturn("test on proxy side");
+                var jointSideObject = new FakeNestedIpcArgumentOrReturn("test on joint side");
+                var (aProvider, _, peer, proxy) = await CreateIpcPairWithProvidersAsync(nameof(FakeIpcObject.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn), new FakeIpcObject(jointSideObject));
+
+                // 安放。
+                var result = await proxy.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(proxySideObject, "change on joint side");
+
+                // 植物。
+                // 代理端对象的值被对接端修改。
+                Assert.AreEqual("change on joint side", proxySideObject.Value);
+                // 对接端的值保持原样。
+                Assert.AreEqual("test on joint side", jointSideObject.Value);
+                Assert.AreEqual("test on joint side", result.Value);
+
+                // 安放。
+                result.Value = "test changed from proxy side";
+
+                // 植物。
+                // 代理端对象的值保持原样。
+                Assert.AreEqual("change on joint side", proxySideObject.Value);
+                // 对接端的值被代理端修改。
+                Assert.AreEqual("test changed from proxy side", jointSideObject.Value);
+                Assert.AreEqual("test changed from proxy side", result.Value);
+            });
         }
 
         [ContractTestCase]
@@ -363,6 +391,22 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
             // 这里的延迟是为了暂时缓解死锁 bug @lindexi
             await Task.Delay(100);
             return (aPeer, bProxy);
+        }
+
+        private async Task<(IIpcProvider aProvider, IIpcProvider bProvider, IPeerProxy peer, IFakeIpcObject proxy)> CreateIpcPairWithProvidersAsync(string name, FakeIpcObject? instance = null)
+        {
+            var aName = $"IpcObjectTests.IpcTests.{name}.A";
+            var bName = $"IpcObjectTests.IpcTests.{name}.B";
+            var aProvider = new IpcProvider(aName);
+            var bProvider = new IpcProvider(bName);
+            aProvider.StartServer();
+            bProvider.StartServer();
+            var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(instance ?? new FakeIpcObject());
+            var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
+            var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer);
+            // 这里的延迟是为了暂时缓解死锁 bug @lindexi
+            await Task.Delay(100);
+            return (aProvider, bProvider, aPeer, bProxy);
         }
     }
 }

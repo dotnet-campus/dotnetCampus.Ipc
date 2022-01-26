@@ -13,7 +13,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// <item>对于 IPC 对接，只有返回值需要使用此模型，参数不需要。因为返回值可能是一个尚未对接的 IPC 对象。</item>
 /// </list>
 /// </summary>
-public readonly struct Garm<T>
+public readonly struct Garm<T> : IGarmObject
 {
     public Garm()
     {
@@ -21,13 +21,13 @@ public readonly struct Garm<T>
         IpcType = null;
     }
 
-    internal Garm(T? value)
+    public Garm(T? value)
     {
         Value = value;
         IpcType = null;
     }
 
-    internal Garm(T value, Type? ipcType)
+    public Garm(T? value, Type? ipcType)
     {
         Value = value;
         IpcType = ipcType;
@@ -46,12 +46,27 @@ public readonly struct Garm<T>
     public T Value { get; }
 #nullable restore
 
+    object? IGarmObject.Value => Value;
+
+    Type? IGarmObject.IpcType => IpcType;
+
     /// <summary>
     /// 将 IPC 代理的“非 IPC 类型”参数或 IPC 对接的“非 IPC 类型”返回值转换成“非 IPC 类型”的 GARM 模型。
     /// </summary>
     /// <param name="value">任意值。</param>
     public static implicit operator Garm<T>(T value)
     {
+        if (value is IGarmObject go)
+        {
+            return new Garm<T>((T?) go.Value, go.IpcType);
+        }
         return new Garm<T>(value);
     }
+}
+
+internal interface IGarmObject
+{
+    object? Value { get; }
+
+    Type? IpcType { get; }
 }

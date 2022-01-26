@@ -14,8 +14,9 @@ internal class IpcPublicMemberProxyJointGenerator
     /// <summary>
     /// 创建 IPC 对象的其中一个成员信息。
     /// </summary>
-    /// <param name="ipcType">IPC 类型（即标记了 <see cref="IpcPublicAttribute"/> 的接口类型）的语义符号。</param>
-    /// <param name="member">此成员的语义符号。</param>
+    /// <param name="ipcType">契约接口类型的语义符号。</param>
+    /// <param name="ipcType">IPC 类型（即标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型）的语义符号。（可能与 <paramref name="ipcType"/> 是相同类型。）</param>
+    /// <param name="member"><paramref name="ipcType"/> 中成员的语义符号。</param>
     public IpcPublicMemberProxyJointGenerator(INamedTypeSymbol ipcType, ISymbol member)
     {
         ipcType = ipcType ?? throw new ArgumentNullException(nameof(ipcType));
@@ -23,12 +24,37 @@ internal class IpcPublicMemberProxyJointGenerator
 
         _proxyMemberGenerator = member switch
         {
-            IMethodSymbol methodSymbol => new IpcPublicMethodInfo(ipcType, methodSymbol),
-            IPropertySymbol propertySymbol => new IpcPublicPropertyInfo(ipcType, propertySymbol),
+            IMethodSymbol methodSymbol => new IpcPublicMethodInfo(ipcType, ipcType, methodSymbol, methodSymbol),
+            IPropertySymbol propertySymbol => new IpcPublicPropertyInfo(ipcType, ipcType, propertySymbol, propertySymbol),
             _ => throw new DiagnosticException(
                 IPC200_IpcMembers_OnlyPropertiesMethodsAndEventsAreSupported,
                 member.Locations.FirstOrDefault(),
                 member.Name),
+        };
+        _shapeMemberGenerator = (IPublicIpcObjectShapeMemberGenerator) _proxyMemberGenerator;
+        _jointMatchGenerator = (IPublicIpcObjectJointMatchGenerator) _proxyMemberGenerator;
+    }
+
+    /// <summary>
+    /// 创建 IPC 对象的其中一个成员信息。
+    /// </summary>
+    /// <param name="contractType">契约接口类型的语义符号。</param>
+    /// <param name="ipcType">IPC 类型（即标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型）的语义符号。（可能与 <paramref name="contractType"/> 是相同类型。）</param>
+    /// <param name="contractMember">此成员原始定义（即在 <paramref name="contractType"/> 中所定义的方法）的语义符号。</param>
+    /// <param name="ipcMember">标记了 <see cref="IpcMemberAttribute"/> 的此成员实现的语义符号。（可能与 <paramref name="contractMember"/> 是相同实例。）</param>
+    public IpcPublicMemberProxyJointGenerator(INamedTypeSymbol contractType, INamedTypeSymbol ipcType, ISymbol contractMember, ISymbol ipcMember)
+    {
+        contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
+        contractMember = contractMember ?? throw new ArgumentNullException(nameof(contractMember));
+
+        _proxyMemberGenerator = contractMember switch
+        {
+            IMethodSymbol methodSymbol => new IpcPublicMethodInfo(contractType, ipcType, methodSymbol, (IMethodSymbol) ipcMember),
+            IPropertySymbol propertySymbol => new IpcPublicPropertyInfo(contractType, ipcType, propertySymbol, (IPropertySymbol) ipcMember),
+            _ => throw new DiagnosticException(
+                IPC200_IpcMembers_OnlyPropertiesMethodsAndEventsAreSupported,
+                contractMember.Locations.FirstOrDefault(),
+                contractMember.Name),
         };
         _shapeMemberGenerator = (IPublicIpcObjectShapeMemberGenerator) _proxyMemberGenerator;
         _jointMatchGenerator = (IPublicIpcObjectJointMatchGenerator) _proxyMemberGenerator;

@@ -38,6 +38,7 @@ internal class SourceTextBuilder
         if (originalName.StartsWith(@namespace, StringComparison.Ordinal))
         {
             // 常规类型，“命名空间.类名”型。
+            var recursiveTypeName = GetNestedTypeNameRecursively(typeSymbol);
             var nullablePostfix = typeSymbol.NullableAnnotation is NullableAnnotation.Annotated
                 ? "?"
                 : "";
@@ -45,7 +46,7 @@ internal class SourceTextBuilder
             if (typeSymbol is INamedTypeSymbol namedTypeSymbol
                 && namedTypeSymbol.TypeArguments.Length > 0)
             {
-                if (typeSymbol.Name == "Nullable"
+                if (namedTypeSymbol.Name == "Nullable"
                     && string.Equals(typeSymbol.ContainingNamespace.ToString(), "System", StringComparison.Ordinal))
                 {
                     // Nullable<T> 类型。
@@ -57,13 +58,13 @@ internal class SourceTextBuilder
                     var typeArgumentNames = string.Join(
                         ", ",
                         namedTypeSymbol.TypeArguments.Select(x => SimplifyNameByAddUsing(x)));
-                    return $"{typeSymbol.Name}<{typeArgumentNames}>{nullablePostfix}";
+                    return $"{recursiveTypeName}<{typeArgumentNames}>{nullablePostfix}";
                 }
             }
             else
             {
                 // T 类型。
-                return typeSymbol.Name + nullablePostfix;
+                return recursiveTypeName + nullablePostfix;
             }
         }
         else
@@ -84,6 +85,21 @@ internal class SourceTextBuilder
                 return originalName;
             }
         }
+    }
+
+    /// <summary>
+    /// 返回一个类型的嵌套内部类名称。
+    /// 无视特殊类型（如 Nullable、ValueTuple 等），因此请勿对特殊类型调用此方法。
+    /// </summary>
+    /// <param name="typeSymbol"></param>
+    /// <returns></returns>
+    private string GetNestedTypeNameRecursively(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol.ContainingType is { } containingType)
+        {
+            return $"{GetNestedTypeNameRecursively(containingType)}.{typeSymbol.Name}";
+        }
+        return typeSymbol.Name;
     }
 
     public SourceTextBuilder DeclareNamespace(string namespaceName)

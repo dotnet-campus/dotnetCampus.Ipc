@@ -232,7 +232,7 @@ namespace dotnetCampus.Ipc.Properties {
         }
         
         /// <summary>
-        ///   查找类似 {0} does not implement the contract type {1} that the IpcShape marked. 的本地化字符串。
+        ///   查找类似 {0} does not fully implement the contract type {1} that the IpcShape marked. 的本地化字符串。
         /// </summary>
         internal static string IPC161_Message {
             get {

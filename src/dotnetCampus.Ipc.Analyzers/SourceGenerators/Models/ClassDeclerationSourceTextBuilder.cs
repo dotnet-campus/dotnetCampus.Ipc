@@ -4,6 +4,7 @@ internal class ClassDeclarationSourceTextBuilder
 {
     private readonly SourceTextBuilder _root;
     private readonly string _typeName;
+    private readonly List<string> _attributeList = new();
     private readonly List<string> _baseTypeNames = new();
     private readonly List<MemberDeclarationSourceTextBuilder> _memberBuilders = new();
 
@@ -16,6 +17,17 @@ internal class ClassDeclarationSourceTextBuilder
         _root = root ?? throw new ArgumentNullException(nameof(root));
         _typeName = className;
         _baseTypeNames = baseTypeList.ToList();
+    }
+
+    internal ClassDeclarationSourceTextBuilder WithAttribute(string attribute)
+    {
+        if (string.IsNullOrWhiteSpace(attribute))
+        {
+            throw new ArgumentException($"“{nameof(attribute)}”不能为 null 或空白。", nameof(attribute));
+        }
+
+        _attributeList.Add(attribute);
+        return this;
     }
 
     internal ClassDeclarationSourceTextBuilder AddMemberDeclaration(Func<SourceTextBuilder, MemberDeclarationSourceTextBuilder> memberBuilder)
@@ -42,7 +54,7 @@ internal class ClassDeclarationSourceTextBuilder
 
     public override string ToString()
     {
-        return $@"
+        return $@"{string.Join(Environment.NewLine, _attributeList)}
 internal class {_typeName} {(_baseTypeNames.Count > 0 ? ":" : "")} {string.Join(", ", _baseTypeNames)}
 {{
     {string.Join(

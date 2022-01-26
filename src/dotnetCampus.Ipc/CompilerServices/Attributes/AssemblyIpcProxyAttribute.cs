@@ -3,7 +3,7 @@
 namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 
 /// <summary>
-/// 由编译器自动生成，将 IPC 类型与其自动生成的代理和对接类型关联起来。
+/// 由编译器自动生成，将 IPC 类型与其自动生成的代理类型关联起来（没有关联对接类型）。
 /// </summary>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
 #if !IPC_ANALYZER

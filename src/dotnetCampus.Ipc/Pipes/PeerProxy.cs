@@ -26,7 +26,7 @@ namespace dotnetCampus.Ipc.Pipes
 
             IpcContext = ipcContext;
 
-            IpcMessageRequestManager = new IpcMessageRequestManager();
+            IpcMessageRequestManager = new IpcMessageRequestManager(ipcContext);
             IpcMessageRequestManager.OnIpcClientRequestReceived += ResponseManager_OnIpcClientRequestReceived;
         }
 
