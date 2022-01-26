@@ -25,6 +25,17 @@ namespace dotnetCampus.Ipc.Pipes
     class IpcMessageRequestManager : IpcMessageManagerBase
     {
         /// <summary>
+        /// 创建请求管理
+        /// </summary>
+        /// <param name="ipcContext"></param>
+        public IpcMessageRequestManager(IpcContext ipcContext)
+        {
+            IpcContext = ipcContext;
+        }
+
+        internal IpcContext IpcContext { get; }
+
+        /// <summary>
         /// 等待响应的数量
         /// </summary>
         public int WaitingResponseCount
@@ -188,6 +199,7 @@ namespace dotnetCampus.Ipc.Pipes
                     }
                 }
 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (task == null)
                 {
                     return;
@@ -199,7 +211,16 @@ namespace dotnetCampus.Ipc.Pipes
                 try
                 {
                     var responseMessageByteList = binaryReader.ReadBytes(responseMessageLength);
-                    task.SetResult(new IpcMessageBody(responseMessageByteList));
+
+                    // 为什么需要放在线程池执行？原因是在使用 GetResponse 请求时，收到对方的请求，进入以下代码。此时的代码运行在 DispatchMessage 消息循环线程里面
+                    // 通过 CLR 的逻辑可以了解到，在调用 TaskCompletionSource 的 SetResult 方法
+                    // 将会让原本 await TaskCompletionSource.Task 的代码继续执行，在调用 SetResult 方法的线程上继续执行
+                    // 也就是 GetResponse 返回时的执行代码线程就是 DispatchMessage 消息循环线程
+                    // 但是 GetResponse 返回的代码执行是业务代码，如果在业务上锁住了，
+                    // 例如 https://github.com/dotnet-campus/dotnetCampus.Ipc/pull/67/commits/74f7a25446f2107f3556ac97659a89b37f82f885 的 "IPC 代理生成：IPC 参数和异步 IPC 返回值" 单元测试，在 GetResponse 之后进行异步转同步等待下一条消息
+                    // 此时消息循环线程进入等待，需要等待下一条消息才能继续。但是下一条消息需要等待消息循环线程收到下一条消息。于是相互等待
+                    // 让业务代码在消息循环线程上运行，是不符合框架设计的。因此让业务代码调度到线程池执行
+                    IpcContext.TaskPool.Run(() => task.SetResult(new IpcMessageBody(responseMessageByteList)));
                 }
                 finally
                 {
@@ -211,5 +232,10 @@ namespace dotnetCampus.Ipc.Pipes
         private object Locker => TaskList;
 
         private ulong CurrentMessageId { set; get; }
+
+        public override string ToString()
+        {
+            return $"[{nameof(IpcMessageRequestManager)}] PeerName={IpcContext.PipeName} CurrentMessageId={CurrentMessageId} WaitingResponseCount={WaitingResponseCount}";
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace dotnetCampus.Ipc.Tests
         {
             "发送消息之后，能等待收到对应的回复".Test(() =>
             {
-                var ipcMessageRequestManager = new IpcMessageRequestManager();
+                var ipcMessageRequestManager = new IpcMessageRequestManager(new IpcProvider().IpcContext);
                 var requestByteList = new byte[] { 0xFF, 0xFE };
                 var request = new IpcMessage("Tests", new IpcMessageBody(requestByteList));
                 var ipcClientRequestMessage = ipcMessageRequestManager.CreateRequestMessage(request);
@@ -104,7 +104,7 @@ namespace dotnetCampus.Ipc.Tests
                 // B: 发送回复消息
                 // A: 收到回复消息
                 // A: 完成请求
-                var aIpcMessageRequestManager = new IpcMessageRequestManager();
+                var aIpcMessageRequestManager = new IpcMessageRequestManager(new IpcProvider().IpcContext);
                 var requestByteList = new byte[] { 0xFF, 0xFE };
                 var request = new IpcMessage("Tests", new IpcMessageBody(requestByteList));
 
@@ -122,7 +122,7 @@ namespace dotnetCampus.Ipc.Tests
                 // 创建的请求消息还没发送出去，需要进行发送
                 // 发送的做法就是往 B 里面调用接收方法
                 // 在测试里面不引入 IPC 的发送逻辑，因此 A 的发送就是调用 B 的接收
-                var bIpcMessageRequestManager = new IpcMessageRequestManager();
+                var bIpcMessageRequestManager = new IpcMessageRequestManager(new IpcProvider().IpcContext);
                 var bIpcMessageResponseManager = new IpcMessageResponseManager();
 
                 // 接收 B 的消息，用的是事件
