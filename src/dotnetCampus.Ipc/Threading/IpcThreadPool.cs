@@ -188,7 +188,7 @@ namespace dotnetCampus.Ipc.Threading
         }
 
         /// <summary>
-        /// 等待一个制定的时间。但如果有任何一个线程空闲，则等待立即完成。
+        /// 等待一个指定的时间。但如果有任何一个线程空闲，则等待立即完成。
         /// </summary>
         /// <param name="delayTime"></param>
         /// <returns></returns>
