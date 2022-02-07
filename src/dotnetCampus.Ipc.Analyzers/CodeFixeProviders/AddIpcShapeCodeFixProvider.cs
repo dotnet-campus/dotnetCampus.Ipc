@@ -1,14 +1,11 @@
 ﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 using dotnetCampus.Ipc.Properties;
 using dotnetCampus.Ipc.SourceGenerators.Compiling;
-
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Text;
-
-using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-
 using static dotnetCampus.Ipc.SourceGenerators.Utils.GeneratorHelper;
+using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace dotnetCampus.Ipc.CodeFixeProviders;
 
@@ -67,7 +64,7 @@ public class AddIpcShapeCodeFixProvider : CodeFixProvider
         }
     }
 
-    private async Task<Solution> GenerateIpcShapeInNewFileAsync(Document document, IpcProxyInvokingInfo invokingInfo, SyntaxNode root, CancellationToken cancellationToken)
+    private Task<Solution> GenerateIpcShapeInNewFileAsync(Document document, IpcProxyInvokingInfo invokingInfo, SyntaxNode root, CancellationToken cancellationToken)
     {
         var newTypeName = GenerateClassNameByInterfaceName($"{invokingInfo.ContractType.Name}IpcShape");
 
@@ -102,11 +99,11 @@ public class AddIpcShapeCodeFixProvider : CodeFixProvider
                     newTypeName,
                     newDocumentRoot,
                     ImmutableArray.CreateRange(folders));
-                return newDocument.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot);
+                return Task.FromResult(newDocument.Project.Solution.WithDocumentSyntaxRoot(document.Id, newRoot));
             }
         }
 
-        return document.Project.Solution;
+        return Task.FromResult(document.Project.Solution);
     }
 
     private static string? GetNamespace(SyntaxNode root)
