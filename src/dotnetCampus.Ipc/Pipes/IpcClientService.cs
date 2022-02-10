@@ -112,7 +112,12 @@ namespace dotnetCampus.Ipc.Pipes
         private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
         {
             // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
-            await Task.Run(namedPipeClientStream.Connect);
+            await Task.Run(() => ConnectNamedPipe(namedPipeClientStream));
+        }
+
+        private void ConnectNamedPipe(NamedPipeClientStream namedPipeClientStream)
+        {
+            namedPipeClientStream.Connect();
         }
 
         private async Task RegisterToPeer()
