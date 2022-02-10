@@ -89,12 +89,7 @@ namespace dotnetCampus.Ipc.Pipes
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
-#if NETCOREAPP
-            await namedPipeClientStream.ConnectAsync();
-#else
-            // 在 NET45 没有 ConnectAsync 方法
-            await Task.Run(namedPipeClientStream.Connect);
-#endif
+            await ConnectNamedPipeAsync(namedPipeClientStream);
 
             if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
             {
@@ -106,6 +101,23 @@ namespace dotnetCampus.Ipc.Pipes
                 // 启动之后，向对方注册，此时对方是服务器
                 await RegisterToPeer();
             }
+        }
+
+        /// <summary>
+        /// 连接命名管道
+        /// </summary>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        /// 独立方法，方便 dnspy 调试
+        private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        {
+
+#if NETCOREAPP
+            await namedPipeClientStream.ConnectAsync();
+#else
+            // 在 NET45 没有 ConnectAsync 方法
+            await Task.Run(namedPipeClientStream.Connect);
+#endif
         }
 
         private async Task RegisterToPeer()
