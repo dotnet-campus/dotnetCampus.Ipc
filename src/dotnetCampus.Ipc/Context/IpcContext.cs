@@ -36,6 +36,8 @@ namespace dotnetCampus.Ipc.Context
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
             GeneratedProxyJointIpcContext = new GeneratedProxyJointIpcContext(this);
 
+            IpcClientPipeConnectConfiguration = IpcConfiguration.IpcClientPipeConnectConfiguration;
+
             TaskPool = IpcConfiguration.IpcTaskScheduling is IpcTaskScheduling.GlobalConcurrent
                 // 支持并发的 IPC 将共用同一个线程池。
                 ? DefaultIpcTask
@@ -56,6 +58,11 @@ namespace dotnetCampus.Ipc.Context
         }
 
         internal IpcConfiguration IpcConfiguration { get; }
+
+        /// <summary>
+        /// 配置客户端的管道连接
+        /// </summary>
+        public IpcClientPipeConnectConfiguration? IpcClientPipeConnectConfiguration { get; }
 
         internal IpcProvider IpcProvider { get; }
 
