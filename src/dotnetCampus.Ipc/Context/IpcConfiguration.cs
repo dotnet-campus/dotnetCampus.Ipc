@@ -65,6 +65,11 @@ namespace dotnetCampus.Ipc.Context
             {0x64, 0x6F, 0x74, 0x6E, 0x65, 0x74, 0x20, 0x63, 0x61, 0x6D, 0x70, 0x75, 0x73};
 
         /// <summary>
+        /// 配置客户端的管道连接
+        /// </summary>
+        public IpcClientPipeConnectConfiguration? IpcClientPipeConnectConfiguration { set; get; }
+
+        /// <summary>
         /// 提供给框架调用，用于注入框架特殊处理的请求处理器。
         /// </summary>
         /// <param name="handlers">框架特殊处理的请求处理器。</param>
@@ -88,5 +93,48 @@ namespace dotnetCampus.Ipc.Context
                 yield return @default;
             }
         }
+    }
+
+    /// <summary>
+    /// 配置客户端的管道连接
+    /// </summary>
+    public class IpcClientPipeConnectConfiguration
+    {
+        /// <summary>
+        /// 配置客户端的管道连接
+        /// </summary>
+        public IpcClientPipeConnectConfiguration(TimeSpan stepTimeout, GetStepSleepTimeDelegate getStepSleepTime, CanContinueDelegate canContinue)
+        {
+            StepTimeout = stepTimeout;
+            GetStepSleepTime = getStepSleepTime;
+            CanContinue = canContinue;
+        }
+
+        /// <summary>
+        /// 一次连接的超时时间
+        /// </summary>
+        public TimeSpan StepTimeout { get; }
+
+        /// <summary>
+        /// 获取连接的之间间隔时间
+        /// </summary>
+        public GetStepSleepTimeDelegate GetStepSleepTime { get; }
+
+        /// <summary>
+        /// 是否还能继续连接
+        /// </summary>
+        public CanContinueDelegate CanContinue { get; }
+
+        /// <summary>
+        /// 获取连接的之间间隔时间
+        /// </summary>
+        /// <param name="stepCount">第几次连接</param>
+        /// <returns></returns>
+        public delegate TimeSpan GetStepSleepTimeDelegate(int stepCount);
+
+        /// <summary>
+        /// 是否还能继续连接
+        /// </summary>
+        public delegate bool CanContinueDelegate();
     }
 }
