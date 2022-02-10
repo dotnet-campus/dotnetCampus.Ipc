@@ -123,6 +123,9 @@ namespace dotnetCampus.Ipc.Context
         /// <summary>
         /// 是否还能继续连接
         /// </summary>
+        /// <remarks>
+        /// 每次连接超时之后，将会调用此方法，判断是否可以继续下一次连接
+        /// </remarks>
         public CanContinueDelegate CanContinue { get; }
 
         /// <summary>
@@ -132,9 +135,7 @@ namespace dotnetCampus.Ipc.Context
         /// <returns></returns>
         public delegate TimeSpan GetStepSleepTimeDelegate(int stepCount);
 
-        /// <summary>
-        /// 是否还能继续连接
-        /// </summary>
+        /// <inheritdoc cref="CanContinue"/>
         public delegate bool CanContinueDelegate();
     }
 }
