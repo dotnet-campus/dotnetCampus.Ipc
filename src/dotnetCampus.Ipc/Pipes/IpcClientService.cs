@@ -111,13 +111,8 @@ namespace dotnetCampus.Ipc.Pipes
         /// 独立方法，方便 dnspy 调试
         private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
         {
-
-#if NETCOREAPP
-            await namedPipeClientStream.ConnectAsync();
-#else
-            // 在 NET45 没有 ConnectAsync 方法
+            // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
             await Task.Run(namedPipeClientStream.Connect);
-#endif
         }
 
         private async Task RegisterToPeer()
