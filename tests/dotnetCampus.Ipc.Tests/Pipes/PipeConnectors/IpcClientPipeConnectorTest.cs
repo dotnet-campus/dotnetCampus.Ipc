@@ -22,7 +22,7 @@ namespace dotnetCampus.Ipc.Tests.Pipes.PipeConnectors
                 int callCanContinueCount = 0;
                 var ipcConfiguration = new IpcConfiguration()
                 {
-                    IpcClientPipeConnectConfiguration = new IpcClientPipeConnector(c =>
+                    IpcClientPipeConnector = new IpcClientPipeConnector(c =>
                     {
                         callCanContinueCount++;
                         // 第一次返回可以继续连接，预期进来第二次
@@ -49,7 +49,7 @@ namespace dotnetCampus.Ipc.Tests.Pipes.PipeConnectors
                 int callCanContinueCount = 0;
                 var ipcConfiguration = new IpcConfiguration()
                 {
-                    IpcClientPipeConnectConfiguration = new IpcClientPipeConnector(c =>
+                    IpcClientPipeConnector = new IpcClientPipeConnector(c =>
                     {
                         callCanContinueCount++;
                         return true;

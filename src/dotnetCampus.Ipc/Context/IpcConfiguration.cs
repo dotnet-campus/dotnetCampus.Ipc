@@ -68,7 +68,7 @@ namespace dotnetCampus.Ipc.Context
         /// <summary>
         /// 设置或获取客户端的管道连接方法
         /// </summary>
-        public IIpcClientPipeConnector? IpcClientPipeConnectConfiguration { set; get; }
+        public IIpcClientPipeConnector? IpcClientPipeConnector { set; get; }
 
         /// <summary>
         /// 提供给框架调用，用于注入框架特殊处理的请求处理器。
