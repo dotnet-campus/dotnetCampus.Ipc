@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
@@ -21,7 +22,7 @@ namespace dotnetCampus.Ipc.Internals
             return ConnectedServerManagerList.TryAdd(peerProxy.PeerName, peerProxy);
         }
 
-        public bool TryGetValue(string key, out PeerProxy peer)
+        public bool TryGetValue(string key, [NotNullWhen(true)] out PeerProxy? peer)
         {
             return ConnectedServerManagerList.TryGetValue(key, out peer);
         }
@@ -98,12 +99,6 @@ namespace dotnetCampus.Ipc.Internals
             new ConcurrentDictionary<string, PeerProxy>();
         private readonly IpcProvider _ipcProvider;
 
-        /* 项目“dotnetCampus.Ipc.PipeCore (net45)”的未合并的更改
-        在此之前:
-                private void PeerProxy_PeerConnectionBroken(object? sender, dotnetCampus.Ipc.Abstractions.Context.IPeerConnectionBrokenArgs e)
-        在此之后:
-                private void PeerProxy_PeerConnectionBroken(object? sender, IPeerConnectionBrokenArgs e)
-        */
         private void PeerProxy_PeerConnectionBroken(object? sender, IPeerConnectionBrokenArgs e)
         {
             if (AutoReconnectPeers)
