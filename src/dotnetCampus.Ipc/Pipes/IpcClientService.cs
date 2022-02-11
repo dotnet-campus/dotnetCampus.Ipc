@@ -132,6 +132,7 @@ namespace dotnetCampus.Ipc.Pipes
         private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
             NamedPipeClientStream namedPipeClientStream)
         {
+            Logger.Trace($"Connect NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
             await ipcClientPipeConnector.ConnectNamedPipeAsync(namedPipeClientStream);
         }
 
@@ -142,6 +143,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         private async Task DefaultConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
         {
+            Logger.Trace($"Connect NamedPipe by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
             // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
             await Task.Run(namedPipeClientStream.Connect);
         }
