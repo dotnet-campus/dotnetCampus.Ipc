@@ -40,13 +40,16 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
             }
             catch (TimeoutException)
             {
-                // 连接超时了，判断能否继续
+                // 连接超时了，继续执行下面的逻辑
+                // 如果没有连接超时，连接成功了，那就会进入上面的 return 分支，方法结束
+                // 如果抛出其他异常了，那就不接住，继续向上抛出
             }
 
             if (CanContinue(ipcClientPipeConnectContext))
             {
                 var sleepTime = StepSleepTimeGetter(ipcClientPipeConnectContext, stepCount);
-                await Task.Delay(sleepTime);
+                await Task.Delay(sleepTime)
+                    .ConfigureAwait(false);
             }
             else
             {
