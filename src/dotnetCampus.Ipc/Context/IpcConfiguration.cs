@@ -65,7 +65,7 @@ namespace dotnetCampus.Ipc.Context
             {0x64, 0x6F, 0x74, 0x6E, 0x65, 0x74, 0x20, 0x63, 0x61, 0x6D, 0x70, 0x75, 0x73};
 
         /// <summary>
-        /// 配置客户端的管道连接
+        /// 设置或获取客户端的管道连接方法
         /// </summary>
         public IIpcClientPipeConnector? IpcClientPipeConnectConfiguration { set; get; }
 

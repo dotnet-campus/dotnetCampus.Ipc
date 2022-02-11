@@ -60,7 +60,7 @@ namespace dotnetCampus.Ipc.Context
         internal IpcConfiguration IpcConfiguration { get; }
 
         /// <summary>
-        /// 配置客户端的管道连接
+        /// 设置或获取客户端的管道连接方法
         /// </summary>
         internal IIpcClientPipeConnector? IpcClientPipeConnector { get; }
 
