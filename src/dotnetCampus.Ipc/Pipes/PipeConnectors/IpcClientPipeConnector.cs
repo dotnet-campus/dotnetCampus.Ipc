@@ -24,9 +24,9 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     }
 
     /// <inheritdoc />
-    public async Task ConnectNamedPipeAsync(IpcClientPipeConnectContext ipcClientPipeConnectContext)
+    public async Task ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext)
     {
-        var namedPipeClientStream = ipcClientPipeConnectContext.NamedPipeClientStream;
+        var namedPipeClientStream = ipcClientPipeConnectionContext.NamedPipeClientStream;
 
         int stepCount = 0;
         while (true)
@@ -45,15 +45,15 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
                 // 如果抛出其他异常了，那就不接住，继续向上抛出
             }
 
-            if (CanContinue(ipcClientPipeConnectContext))
+            if (CanContinue(ipcClientPipeConnectionContext))
             {
-                var sleepTime = StepSleepTimeGetter(ipcClientPipeConnectContext, stepCount);
+                var sleepTime = StepSleepTimeGetter(ipcClientPipeConnectionContext, stepCount);
                 await Task.Delay(sleepTime)
                     .ConfigureAwait(false);
             }
             else
             {
-                throw new IpcClientPipeConnectionException(ipcClientPipeConnectContext.PeerName);
+                throw new IpcClientPipeConnectionException(ipcClientPipeConnectionContext.PeerName);
             }
         }
     }
@@ -81,10 +81,10 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// <summary>
     /// 默认连接的之间间隔时间
     /// </summary>
-    /// <param name="ipcClientPipeConnectContext"></param>
+    /// <param name="ipcClientPipeConnectionContext"></param>
     /// <param name="stepCount"></param>
     /// <returns></returns>
-    public static TimeSpan DefaultGetStepSleepTime(IpcClientPipeConnectContext ipcClientPipeConnectContext,
+    public static TimeSpan DefaultGetStepSleepTime(IpcClientPipeConnectionContext ipcClientPipeConnectionContext,
         int stepCount)
     {
         return DefaultStepSleepTime;
@@ -101,12 +101,12 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// <summary>
     /// 获取连接的之间间隔时间
     /// </summary>
-    /// <param name="ipcClientPipeConnectContext"></param>
+    /// <param name="ipcClientPipeConnectionContext"></param>
     /// <param name="stepCount">第几次连接</param>
     /// <returns></returns>
-    public delegate TimeSpan GetStepSleepTimeDelegate(IpcClientPipeConnectContext ipcClientPipeConnectContext,
+    public delegate TimeSpan GetStepSleepTimeDelegate(IpcClientPipeConnectionContext ipcClientPipeConnectionContext,
         int stepCount);
 
     /// <inheritdoc cref="CanContinue"/>
-    public delegate bool CanContinueDelegate(IpcClientPipeConnectContext ipcClientPipeConnectContext);
+    public delegate bool CanContinueDelegate(IpcClientPipeConnectionContext ipcClientPipeConnectionContext);
 }

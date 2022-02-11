@@ -6,12 +6,12 @@ namespace dotnetCampus.Ipc.Pipes.PipeConnectors;
 /// <summary>
 /// 用于传递客户端的管道连接参数
 /// </summary>
-public readonly struct IpcClientPipeConnectContext
+public readonly struct IpcClientPipeConnectionContext
 {
     /// <summary>
     /// 用于传递客户端的管道连接参数
     /// </summary>
-    public IpcClientPipeConnectContext(string peerName, NamedPipeClientStream namedPipeClientStream,
+    public IpcClientPipeConnectionContext(string peerName, NamedPipeClientStream namedPipeClientStream,
         CancellationToken cancellationToken)
     {
         PeerName = peerName;

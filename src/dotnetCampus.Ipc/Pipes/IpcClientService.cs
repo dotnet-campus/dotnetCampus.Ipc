@@ -133,7 +133,7 @@ namespace dotnetCampus.Ipc.Pipes
             NamedPipeClientStream namedPipeClientStream)
         {
             Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
-            var ipcClientPipeConnectContext = new IpcClientPipeConnectContext(PeerName, namedPipeClientStream, CancellationToken.None);
+            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None);
             await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
         }
 
