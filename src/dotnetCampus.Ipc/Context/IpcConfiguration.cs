@@ -67,7 +67,7 @@ namespace dotnetCampus.Ipc.Context
         /// <summary>
         /// 配置客户端的管道连接
         /// </summary>
-        public IpcClientPipeConnectConfiguration? IpcClientPipeConnectConfiguration { set; get; }
+        public IIpcClientPipeConnector? IpcClientPipeConnectConfiguration { set; get; }
 
         /// <summary>
         /// 提供给框架调用，用于注入框架特殊处理的请求处理器。
@@ -95,21 +95,12 @@ namespace dotnetCampus.Ipc.Context
         }
     }
 
+
     /// <summary>
     /// 配置客户端的管道连接
     /// </summary>
-    public class IpcClientPipeConnectConfiguration
+    public interface IIpcClientPipeConnector
     {
-        /// <summary>
-        /// 配置客户端的管道连接
-        /// </summary>
-        public IpcClientPipeConnectConfiguration(TimeSpan stepTimeout, GetStepSleepTimeDelegate getStepSleepTime, CanContinueDelegate canContinue)
-        {
-            StepTimeout = stepTimeout;
-            GetStepSleepTime = getStepSleepTime;
-            CanContinue = canContinue;
-        }
-
         /// <summary>
         /// 一次连接的超时时间
         /// </summary>

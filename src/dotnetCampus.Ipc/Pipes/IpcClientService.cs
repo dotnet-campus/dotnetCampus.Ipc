@@ -111,13 +111,43 @@ namespace dotnetCampus.Ipc.Pipes
         /// 独立方法，方便 dnspy 调试
         private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
         {
+            var connector = IpcContext.IpcClientPipeConnector;
+
+            if (connector == null)
+            {
+                await DefaultConnectNamedPipeAsync(namedPipeClientStream);
+            }
+            else
+            {
+                await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
+            }
+        }
+
+        /// <summary>
+        /// 自定义的连接方式
+        /// </summary>
+        /// <param name="ipcClientPipeConnector"></param>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
+            NamedPipeClientStream namedPipeClientStream)
+        {
+        }
+
+        /// <summary>
+        /// 默认的连接方式
+        /// </summary>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        private async Task DefaultConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        {
             // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
-            await Task.Run(() => ConnectNamedPipeInner(namedPipeClientStream));
+            await Task.Run(namedPipeClientStream.Connect);
         }
 
         private async Task ConnectNamedPipeInner(NamedPipeClientStream namedPipeClientStream)
         {
-            var ipcClientPipeConnectConfiguration = IpcContext.IpcClientPipeConnectConfiguration;
+            var ipcClientPipeConnectConfiguration = IpcContext.IpcClientPipeConnector;
 
             if (ipcClientPipeConnectConfiguration == null)
             {
