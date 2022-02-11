@@ -33,7 +33,7 @@ namespace dotnetCampus.Ipc.Tests.Pipes.PipeConnectors
                 var ipcProviderA = new IpcProvider(Guid.NewGuid().ToString("N"), ipcConfiguration);
                 ipcProviderA.StartServer();
 
-                await Assert.ThrowsExceptionAsync<IpcClientPipeConnectFailException>(async () =>
+                await Assert.ThrowsExceptionAsync<IpcClientPipeConnectionException>(async () =>
                 {
                     // 连接一个不存在的服务
                     var peer = await ipcProviderA.GetAndConnectToPeerAsync("NotExists_" + Guid.NewGuid().ToString("N"));

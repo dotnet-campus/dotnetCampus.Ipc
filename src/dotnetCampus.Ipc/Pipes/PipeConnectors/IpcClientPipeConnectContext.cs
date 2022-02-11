@@ -30,7 +30,7 @@ public readonly struct IpcClientPipeConnectContext
     public NamedPipeClientStream NamedPipeClientStream { get; }
 
     /// <summary>
-    /// 凭据
+    /// 连接取消标记
     /// </summary>
     public CancellationToken CancellationToken { get; }
 }

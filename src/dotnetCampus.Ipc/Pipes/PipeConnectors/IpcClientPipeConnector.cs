@@ -50,7 +50,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
             }
             else
             {
-                throw new IpcClientPipeConnectFailException(ipcClientPipeConnectContext.PeerName);
+                throw new IpcClientPipeConnectionException(ipcClientPipeConnectContext.PeerName);
             }
         }
     }
