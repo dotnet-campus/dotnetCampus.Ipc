@@ -193,6 +193,35 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
         [ContractTestCase]
         public void IpcParametersAndReturnsTests()
         {
+            "IPC 代理生成：IPC 参数和异步 IPC 返回值".Test(async () =>
+            {
+                // 准备。
+                var proxySideObject = new FakeNestedIpcArgumentOrReturn("test on proxy side");
+                var jointSideObject = new FakeNestedIpcArgumentOrReturn("test on joint side");
+                var (aProvider, _, peer, proxy) = await CreateIpcPairWithProvidersAsync(nameof(FakeIpcObject.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn), new FakeIpcObject(jointSideObject));
+
+                // 安放。
+                var result = await proxy.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(proxySideObject, "change on joint side");
+
+                // 植物。
+                // 代理端对象的值被对接端修改。
+                Assert.AreEqual("change on joint side", proxySideObject.Value);
+                // 对接端的值保持原样。
+                Assert.AreEqual("test on joint side", jointSideObject.Value);
+                Assert.AreEqual("test on joint side", result.Value);
+
+                // 安放。
+                result.Value = "test changed from proxy side";
+
+                // 植物。
+                // 代理端对象的值保持原样。
+                Assert.AreEqual("change on joint side", proxySideObject.Value);
+                // 对接端的值被代理端修改。
+                Assert.AreEqual("test changed from proxy side", jointSideObject.Value);
+                Assert.AreEqual("test changed from proxy side", result.Value);
+            });
+
+
             "IPC 代理生成：枚举参数".Test(async () =>
             {
                 // 准备。
@@ -262,33 +291,6 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 Assert.AreEqual("Test", result);
             });
 
-            "IPC 代理生成：IPC 参数和异步 IPC 返回值".Test(async () =>
-            {
-                // 准备。
-                var proxySideObject = new FakeNestedIpcArgumentOrReturn("test on proxy side");
-                var jointSideObject = new FakeNestedIpcArgumentOrReturn("test on joint side");
-                var (aProvider, _, peer, proxy) = await CreateIpcPairWithProvidersAsync(nameof(FakeIpcObject.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn), new FakeIpcObject(jointSideObject));
-
-                // 安放。
-                var result = await proxy.AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(proxySideObject, "change on joint side");
-
-                // 植物。
-                // 代理端对象的值被对接端修改。
-                Assert.AreEqual("change on joint side", proxySideObject.Value);
-                // 对接端的值保持原样。
-                Assert.AreEqual("test on joint side", jointSideObject.Value);
-                Assert.AreEqual("test on joint side", result.Value);
-
-                // 安放。
-                result.Value = "test changed from proxy side";
-
-                // 植物。
-                // 代理端对象的值保持原样。
-                Assert.AreEqual("change on joint side", proxySideObject.Value);
-                // 对接端的值被代理端修改。
-                Assert.AreEqual("test changed from proxy side", jointSideObject.Value);
-                Assert.AreEqual("test changed from proxy side", result.Value);
-            });
         }
 
         [ContractTestCase]
