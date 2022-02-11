@@ -13,7 +13,7 @@ using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
-using dotnetCampus.Ipc.Utils;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 using dotnetCampus.Threading;
@@ -89,12 +89,7 @@ namespace dotnetCampus.Ipc.Pipes
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
-#if NETCOREAPP
-            await namedPipeClientStream.ConnectAsync();
-#else
-            // 在 NET45 没有 ConnectAsync 方法
-            await Task.Run(namedPipeClientStream.Connect);
-#endif
+            await ConnectNamedPipeAsync(namedPipeClientStream);
 
             if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
             {
@@ -105,6 +100,64 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 // 启动之后，向对方注册，此时对方是服务器
                 await RegisterToPeer();
+            }
+        }
+
+        /// <summary>
+        /// 连接命名管道
+        /// </summary>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        /// 独立方法，方便 dnspy 调试
+        private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        {
+            var connector = IpcContext.IpcClientPipeConnector;
+
+            if (connector == null)
+            {
+                await DefaultConnectNamedPipeAsync(namedPipeClientStream);
+            }
+            else
+            {
+                await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
+            }
+        }
+
+        /// <summary>
+        /// 自定义的连接方式
+        /// </summary>
+        /// <param name="ipcClientPipeConnector"></param>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
+            NamedPipeClientStream namedPipeClientStream)
+        {
+            Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
+            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None);
+            await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
+        }
+
+        /// <summary>
+        /// 默认的连接方式
+        /// </summary>
+        /// <param name="namedPipeClientStream"></param>
+        /// <returns></returns>
+        private async Task DefaultConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        {
+            var localClient = IpcContext.PipeName;
+            var remoteServer = PeerName;
+
+            Logger.Trace($"Connecting NamedPipe by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:'{localClient}';RemoteServer:'{remoteServer}'");
+            // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
+
+            await Task.Run(ConnectNamedPipe);
+
+            void ConnectNamedPipe()
+            {
+                namedPipeClientStream.Connect();
+
+                // 强行捕获变量，方便调试是在等待哪个连接
+                Logger.Trace($"Connected NamedPipe by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:'{localClient}';RemoteServer:'{remoteServer}'");
             }
         }
 

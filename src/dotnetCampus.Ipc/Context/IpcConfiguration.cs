@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Buffers;
 using dotnetCampus.Ipc.Utils.Logging;
@@ -63,6 +64,11 @@ namespace dotnetCampus.Ipc.Context
          */
         public byte[] MessageHeader { set; get; } =
             {0x64, 0x6F, 0x74, 0x6E, 0x65, 0x74, 0x20, 0x63, 0x61, 0x6D, 0x70, 0x75, 0x73};
+
+        /// <summary>
+        /// 设置或获取客户端的管道连接方法
+        /// </summary>
+        public IIpcClientPipeConnector? IpcClientPipeConnector { set; get; }
 
         /// <summary>
         /// 提供给框架调用，用于注入框架特殊处理的请求处理器。
