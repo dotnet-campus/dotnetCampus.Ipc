@@ -14,7 +14,6 @@ using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes.PipeConnectors;
-using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 using dotnetCampus.Threading;
@@ -134,7 +133,8 @@ namespace dotnetCampus.Ipc.Pipes
             NamedPipeClientStream namedPipeClientStream)
         {
             Logger.Trace($"Connect NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
-            await ipcClientPipeConnector.ConnectNamedPipeAsync(namedPipeClientStream);
+            var ipcClientPipeConnectContext = new IpcClientPipeConnectContext(PeerName, namedPipeClientStream, CancellationToken.None);
+            await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
         }
 
         /// <summary>
