@@ -13,6 +13,7 @@ using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;

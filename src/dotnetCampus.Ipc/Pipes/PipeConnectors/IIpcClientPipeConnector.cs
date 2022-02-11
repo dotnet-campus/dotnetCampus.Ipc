@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO.Pipes;
+﻿using System.IO.Pipes;
 using System.Threading.Tasks;
 
-namespace dotnetCampus.Ipc.Context;
+namespace dotnetCampus.Ipc.Pipes.PipeConnectors;
 
 /// <summary>
 /// 配置客户端的管道连接

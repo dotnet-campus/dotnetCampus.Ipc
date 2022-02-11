@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Buffers;
 using dotnetCampus.Ipc.Utils.Logging;

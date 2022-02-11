@@ -1,6 +1,7 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Threading.Tasks;
 using dotnetCampus.Ipc.Utils.Logging;
