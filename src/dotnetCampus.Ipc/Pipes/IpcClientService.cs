@@ -132,6 +132,7 @@ namespace dotnetCampus.Ipc.Pipes
         private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
             NamedPipeClientStream namedPipeClientStream)
         {
+            await ipcClientPipeConnector.ConnectNamedPipeAsync(namedPipeClientStream);
         }
 
         /// <summary>
@@ -143,44 +144,6 @@ namespace dotnetCampus.Ipc.Pipes
         {
             // 由于 dotnet 6 和以下版本的 ConnectAsync 的实现，只是通过 Task.Run 方法而已，因此统一采用相同的方法即可
             await Task.Run(namedPipeClientStream.Connect);
-        }
-
-        private async Task ConnectNamedPipeInner(NamedPipeClientStream namedPipeClientStream)
-        {
-            var ipcClientPipeConnectConfiguration = IpcContext.IpcClientPipeConnector;
-
-            if (ipcClientPipeConnectConfiguration == null)
-            {
-                // 没有特别配置，连接就好了
-                namedPipeClientStream.Connect();
-            }
-            else
-            {
-                int stepCount = 0;
-                while (true)
-                {
-                    try
-                    {
-                        stepCount++;
-                        namedPipeClientStream.Connect((int) ipcClientPipeConnectConfiguration.StepTimeout.TotalMilliseconds);
-                        return;
-                    }
-                    catch (TimeoutException)
-                    {
-                        // 连接超时了，判断能否继续
-                    }
-
-                    if (ipcClientPipeConnectConfiguration.CanContinue())
-                    {
-                        var sleepTime = ipcClientPipeConnectConfiguration.GetStepSleepTime(stepCount);
-                        await Task.Delay(sleepTime);
-                    }
-                    else
-                    {
-                        //
-                    }
-                }
-            }
         }
 
         private async Task RegisterToPeer()
