@@ -14,13 +14,13 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// </summary>
     /// <param name="canContinue"></param>
     /// <param name="stepTimeout"></param>
-    /// <param name="getStepSleepTime"></param>
+    /// <param name="stepSleepTimeGetter"></param>
     public IpcClientPipeConnector(CanContinueDelegate canContinue, TimeSpan? stepTimeout = null,
-        GetStepSleepTimeDelegate? getStepSleepTime = null)
+        GetStepSleepTimeDelegate? stepSleepTimeGetter = null)
     {
         CanContinue = canContinue;
         StepTimeout = stepTimeout ?? DefaultStepTimeout;
-        GetStepSleepTime = getStepSleepTime ?? DefaultGetStepSleepTime;
+        StepSleepTimeGetter = stepSleepTimeGetter ?? DefaultGetStepSleepTime;
     }
 
     /// <inheritdoc />
@@ -45,7 +45,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
 
             if (CanContinue(ipcClientPipeConnectContext))
             {
-                var sleepTime = GetStepSleepTime(ipcClientPipeConnectContext, stepCount);
+                var sleepTime = StepSleepTimeGetter(ipcClientPipeConnectContext, stepCount);
                 await Task.Delay(sleepTime);
             }
             else
@@ -73,7 +73,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// <summary>
     /// 获取连接的之间间隔时间
     /// </summary>
-    public GetStepSleepTimeDelegate GetStepSleepTime { get; }
+    public GetStepSleepTimeDelegate StepSleepTimeGetter { get; }
 
     /// <summary>
     /// 默认连接的之间间隔时间
