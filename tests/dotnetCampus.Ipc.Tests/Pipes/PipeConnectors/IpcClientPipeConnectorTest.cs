@@ -18,7 +18,7 @@ namespace dotnetCampus.Ipc.Tests.Pipes.PipeConnectors
         [ContractTestCase]
         public void ReConnectBreak()
         {
-            "重连接时，调用 CanContinue 方法返回不支持再次重新连接，".Test(async () =>
+            "重连接时，调用 CanContinue 方法返回不支持再次重新连接，则不再次重新连接".Test(async () =>
             {
                 int callCanContinueCount = 0;
                 var asyncAutoResetEvent = new AsyncAutoResetEvent(false);
