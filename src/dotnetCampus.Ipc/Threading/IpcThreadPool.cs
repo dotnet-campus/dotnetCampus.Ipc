@@ -198,7 +198,7 @@ namespace dotnetCampus.Ipc.Threading
             _delayStartWaitings.Enqueue(taskSource);
             try
             {
-                while (taskSource.IsCancellationRequested && delayTime > TimeSpan.Zero)
+                while (!taskSource.IsCancellationRequested && delayTime > TimeSpan.Zero)
                 {
                     await Task.Delay(15, taskSource.Token);
                     delayTime -= TimeSpan.FromMilliseconds(15);
