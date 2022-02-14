@@ -15,7 +15,7 @@ namespace dotnetCampus.Ipc.Context
     public class IpcConfiguration
     {
         /// <summary>
-        /// 自动重连 Peer 是否开启，如开启，在断开后将会自动尝试去重新连接。推荐设置为 true 时，同时设置 <see cref="IpcClientPipeConnector"/> 属性，以解决无限重试
+        /// 自动重连 Peer 是否开启，如开启，在断开后将会自动尝试去重新连接。设置为 true 时，推荐同时设置 <see cref="IpcClientPipeConnector"/> 属性，以防无限重试。
         /// </summary>
         public bool AutoReconnectPeers { get; set; } = false;
 
