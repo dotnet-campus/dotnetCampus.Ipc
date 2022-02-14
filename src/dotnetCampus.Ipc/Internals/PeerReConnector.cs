@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.Internals
 {
@@ -30,12 +33,26 @@ namespace dotnetCampus.Ipc.Internals
         private async void Reconnect()
         {
             var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
+            var success = await TryReconnectAsync(ipcClientService);
+
+            if (success)
+            {
+                _peerProxy.Reconnect(ipcClientService);
+            }
+            else
+            {
+                _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
+            }
+        }
+
+        private async Task<bool> TryReconnectAsync(IpcClientService ipcClientService)
+        {
             for (int i = 0; i < 16; i++)
             {
                 try
                 {
                     await ipcClientService.Start();
-                    break;
+                    return true;
                 }
                 // ## 此异常有两种
                 catch (FileNotFoundException)
@@ -47,6 +64,19 @@ namespace dotnetCampus.Ipc.Internals
                 {
                     // 2. 另一种来自 RegisterToPeer()，前面已经连上了，但试图发消息时便已断开。
                     await Task.Delay(16);
+                }
+                catch (IpcClientPipeConnectionException exception)
+                {
+                    // 业务层判断不能重新连接了，必定失败
+                    // 返回就可以了
+                    _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect][IpcClientPipeConnectionException] {exception}");
+                    return false;
+                }
+                catch (Exception exception)
+                {
+                    // 未知的异常，不再继续
+                    _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect]{exception}");
+                    return false;
                 }
                 // ## 然而，为什么一连上就断开了呢？
                 //
@@ -64,8 +94,8 @@ namespace dotnetCampus.Ipc.Internals
                 // 有可能本方法已全部完成之后才断开吗？不可能，因为 RegisterToPeer() 会发消息的，如果是对方进程退出等原因导致的断连，那么消息根本就无法发送。
                 // 因为本调用内会置一个 TaskCompleteSource，所以也会导致一起等待此任务的其他发送全部失败，而解决方法就是在其他发送处也重试。
             }
-            // 实在没办法连上，就抛异常吧。
-            _peerProxy.Reconnect(ipcClientService);
+
+            return false;
         }
     }
 }

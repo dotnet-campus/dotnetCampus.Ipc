@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Pipes.PipeConnectors;
-
+using dotnetCampus.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.Extensions.Contracts;
@@ -14,6 +15,44 @@ namespace dotnetCampus.Ipc.Tests.Pipes.PipeConnectors
     [TestClass]
     public class IpcClientPipeConnectorTest
     {
+        [ContractTestCase]
+        public void ReConnectBreak()
+        {
+            "重连接时，调用 CanContinue 方法返回不支持再次重新连接，则不再次重新连接".Test(async () =>
+            {
+                int callCanContinueCount = 0;
+                var asyncAutoResetEvent = new AsyncAutoResetEvent(false);
+                var ipcConfiguration = new IpcConfiguration()
+                {
+                    AutoReconnectPeers = true,
+                    IpcClientPipeConnector = new IpcClientPipeConnector(c =>
+                    {
+                        // 调用 CanContinue 方法返回不支持
+                        callCanContinueCount++;
+                        asyncAutoResetEvent.Set();
+                        return false;
+                    }, stepTimeout: TimeSpan.FromMilliseconds(100)),
+                };
+
+                var ipcProviderA = new IpcProvider(Guid.NewGuid().ToString("N"), ipcConfiguration);
+                var ipcProviderB = new IpcProvider();
+                ipcProviderA.StartServer();
+                ipcProviderB.StartServer();
+
+                var peer = await ipcProviderA.GetAndConnectToPeerAsync(ipcProviderB.IpcContext.PipeName);
+                Assert.AreEqual(0, callCanContinueCount);
+                Assert.IsNotNull(peer);
+
+                // 断开，预期此时将会重新连接
+                ipcProviderB.Dispose();
+
+                await asyncAutoResetEvent.WaitOneAsync();
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                Assert.AreEqual(true, peer.IsBroken);
+                Assert.AreEqual(1, callCanContinueCount);
+            });
+        }
+
         [ContractTestCase]
         public void ConnectNamedPipeAsync()
         {
