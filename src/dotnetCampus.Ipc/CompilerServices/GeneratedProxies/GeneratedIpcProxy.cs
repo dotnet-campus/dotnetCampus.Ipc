@@ -203,7 +203,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
             catch (AggregateException ex) when (ex.InnerExceptions.Count >= 1)
             {
-                var innerException = ex.InnerExceptions[0];
+                var innerException = ex.Flatten().InnerExceptions[0];
                 if (innerException is IpcRemoteException)
                 {
                     // 如果目标要求忽略异常，则返回指定值或默认值。
