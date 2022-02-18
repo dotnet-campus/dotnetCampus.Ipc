@@ -60,10 +60,10 @@ namespace dotnetCampus.Ipc.Pipes
             var requestTracker = new IpcMessageTracker<IpcMessageBody>(IpcContext.PipeName, PeerName, request.Body, request.Tag, IpcContext.Logger);
             requestTracker.CriticalStep("Send", null, request.Body);
 
+            await WaitConnectAsync(requestTracker).ConfigureAwait(false);
+
             try
             {
-                await WaitConnectAsync(requestTracker).ConfigureAwait(false);
-
                 // 发送带有追踪的请求。
                 await IpcClientService.WriteMessageAsync(requestTracker).ConfigureAwait(false);
             }
