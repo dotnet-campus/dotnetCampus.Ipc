@@ -62,7 +62,7 @@ namespace dotnetCampus.Ipc.Pipes
 
             try
             {
-                await WaitConnectAsync(requestTracker);
+                await WaitConnectAsync(requestTracker).ConfigureAwait(false);
 
                 // 发送带有追踪的请求。
                 await IpcClientService.WriteMessageAsync(requestTracker).ConfigureAwait(false);
