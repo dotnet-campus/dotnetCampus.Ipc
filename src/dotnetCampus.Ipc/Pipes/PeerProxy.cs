@@ -79,7 +79,7 @@ namespace dotnetCampus.Ipc.Pipes
             // 追踪业务消息。
             var requestTracker = new IpcMessageTracker<IpcMessage>(IpcContext.PipeName, PeerName, request, request.Tag, IpcContext.Logger);
             requestTracker.CriticalStep("Send", null, request.Body);
-            await WaitConnectAsync(requestTracker);
+            await WaitConnectAsync(requestTracker).ConfigureAwait(false);
 
             try
             {
