@@ -69,7 +69,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             catch (Exception e)
             {
-                throw new IpcRemoteException($"[NotifyAsync] Tag:{request.Tag};LocalPeer:{IpcContext.PipeName};RemotePeer:{PeerName};ExceptionMessage:{e.Message}", e);
+                throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:{request.Tag};LocalPeer:{IpcContext.PipeName};RemotePeer:{PeerName};ExceptionMessage:{e.Message}", e);
             }
         }
 
@@ -81,16 +81,23 @@ namespace dotnetCampus.Ipc.Pipes
             requestTracker.CriticalStep("Send", null, request.Body);
             await WaitConnectAsync(requestTracker);
 
-            // 将业务消息封装成请求消息，并追踪。
-            var ipcClientRequestMessage = IpcMessageRequestManager.CreateRequestMessage(request);
-            var ipcBufferMessageContextTracker = requestTracker.TrackNext(ipcClientRequestMessage.IpcBufferMessageContext);
+            try
+            {
+                // 将业务消息封装成请求消息，并追踪。
+                var ipcClientRequestMessage = IpcMessageRequestManager.CreateRequestMessage(request);
+                var ipcBufferMessageContextTracker = requestTracker.TrackNext(ipcClientRequestMessage.IpcBufferMessageContext);
 
-            // 发送带有追踪的请求。
-            await IpcClientService.WriteMessageAsync(ipcBufferMessageContextTracker).ConfigureAwait(false);
+                // 发送带有追踪的请求。
+                await IpcClientService.WriteMessageAsync(ipcBufferMessageContextTracker).ConfigureAwait(false);
 
-            // 等待响应，并追踪。
-            var messageBody = await ipcClientRequestMessage.Task.ConfigureAwait(false);
-            return new IpcMessage($"[{PeerName}]", messageBody);
+                // 等待响应，并追踪。
+                var messageBody = await ipcClientRequestMessage.Task.ConfigureAwait(false);
+                return new IpcMessage($"[{PeerName}]", messageBody);
+            }
+            catch (Exception e)
+            {
+                throw new IpcRemoteException($"[GetResponseAsync] Tag:{request.Tag};LocalPeer:{IpcContext.PipeName};RemotePeer:{PeerName};ExceptionMessage:{e.Message}", e);
+            }
         }
 
         /// <inheritdoc />
