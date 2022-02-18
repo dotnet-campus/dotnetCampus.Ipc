@@ -358,10 +358,19 @@ namespace dotnetCampus.Ipc.Tests
                 // 等待资源的释放
                 await Task.Delay(TimeSpan.FromSeconds(2));
 
-                await Assert.ThrowsExceptionAsync<ObjectDisposedException>(async () =>
+                try
                 {
                     await peer.NotifyAsync(new IpcMessage("A发送", aRequest));
-                });
+                }
+                catch (IpcRemoteException e)
+                {
+                    if (e.InnerException is ObjectDisposedException)
+                    {
+                        return;
+                    }
+                }
+
+                Assert.Fail($"预期能收到对象释放失败");
             });
 
             "设置为自动重连的服务，释放之后，不会有任何资源进入等待".Test(async () =>
