@@ -69,7 +69,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             catch (Exception e)
             {
-                throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:{request.Tag};LocalPeer:{IpcContext.PipeName};RemotePeer:{PeerName};ExceptionMessage:{e.Message}", e);
+                throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:'{request.Tag}'; LocalPeer:'{IpcContext.PipeName}'; RemotePeer:'{PeerName}'; ExceptionMessage:'{e.Message}'", e);
             }
         }
 
@@ -96,7 +96,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             catch (Exception e)
             {
-                throw new IpcRemoteException($"[GetResponseAsync] Tag:{request.Tag};LocalPeer:{IpcContext.PipeName};RemotePeer:{PeerName};ExceptionMessage:{e.Message}", e);
+                throw new IpcRemoteException($"[{nameof(GetResponseAsync)}] Tag:'{request.Tag}'; LocalPeer:'{IpcContext.PipeName}'; RemotePeer:'{PeerName}'; ExceptionMessage:'{e.Message}'", e);
             }
         }
 
