@@ -342,10 +342,22 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 });
 
                 // 植物。
-                await Assert.ThrowsExceptionAsync<IpcPeerConnectionBrokenException>(async () =>
+                try
                 {
                     await task;
-                });
+                }
+                catch (IpcRemoteException e)
+                {
+                    if (e.InnerException is IpcPeerConnectionBrokenException)
+                    {
+                        // 期望的异常是外层是 IpcRemoteException 异常
+                        // 里层是 IpcPeerConnectionBrokenException 异常
+                        // 外层的异常将包括发送的消息的调试使用的 Tag 信息
+                        return;
+                    }
+                }
+
+                Assert.Fail($"期望的异常没有被抛出");
             });
 
             "IPC 代理生成：成员上没有标记忽略异常，但是类型上标记了，也要忽略异常".Test(async () =>
