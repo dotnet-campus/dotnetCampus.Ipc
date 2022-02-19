@@ -257,8 +257,11 @@ namespace dotnetCampus.Ipc.Pipes
                     requestTracker.Debug("[Reconnect] Waiting FinishedTaskCompletion");
 #endif
 
-                    // 如果完全，且断开，且需要自动连接
-                    // 这…… 下面实现了简单的自旋，理论上是无伤的
+                    // 如果等待连接完成任务已经完成，且断开，且需要自动连接
+                    // 那么是不符合预期的。因为预期的是断开且需要自动连接时，应该有等待连接完成的任务正在执行
+                    // 但是由于有多线程访问，这就导致了会出现如上的条件满足
+                    // 只需要做很短的等待，即可进入符合预期的逻辑
+                    // 下面实现了简单的自旋，理论上是无伤的
                     while (WaitForFinishedTaskCompletionSource.Task.IsCompleted && IsBroken)
                     {
                         // 如果只执行到设置 IsBroken=true 还没有创建新 WaitForFinishedTaskCompletionSource 对象
