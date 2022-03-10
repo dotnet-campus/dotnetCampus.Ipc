@@ -21,7 +21,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
                 RequestUri = RequestUri,
             };
 
-            if(ContentBase64 is not null)
+            if (ContentBase64 is not null)
             {
                 var memoryStream = new MemoryStream(Convert.FromBase64String(ContentBase64));
                 //var text = Encoding.UTF8.GetString(memoryStream.ToArray());

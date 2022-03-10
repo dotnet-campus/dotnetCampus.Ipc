@@ -1,15 +1,14 @@
-﻿using dotnetCampus.Ipc.Tests.CompilerServices;
+﻿using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-
-using MSTest.Extensions.Contracts;
-using dotnetCampus.Ipc.Pipes;
-using dotnetCampus.Ipc.Messages;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dotnetCampus.Ipc.Context;
-using System.Threading;
 using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Tests.CompilerServices;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests.Threading;
 
