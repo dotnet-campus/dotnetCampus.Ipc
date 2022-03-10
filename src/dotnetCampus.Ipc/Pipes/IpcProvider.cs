@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -112,6 +113,58 @@ namespace dotnetCampus.Ipc.Pipes
 
         private async Task ConnectBackToPeer(IpcInternalPeerConnectedArgs e)
         {
+            try
+            {
+                await ConnectBackToPeerCore(e);
+            }
+            catch (ObjectDisposedException)
+            {
+                // 对方刚刚连接过来，然后对方立刻被释放
+                // 这是符合预期的，就不需要抛出异常了
+                IpcContext.Logger.Information("ConnectBackToPeer But Peer Disposed.");
+
+                /*
+                ExceptionName: System.ObjectDisposedException; 
+                ExceptionMessage: 无法访问已释放的对象。
+                对象名:“IpcClientService”。; 
+                ExceptionStackTrace:    在 dotnetCampus.Ipc.Pipes.IpcClientService.VerifyNotDisposed()
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<WriteMessageAsync>d__22.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<RegisterToPeer>d__20.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<Start>d__19.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcProvider.<ConnectBackToPeer>d__14.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcProvider.<NamedPipeServerStreamPoolPeerConnected>d__13.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.AsyncMethodBuilderCore.<>c.<ThrowAsync>b__6_1(Object state)
+                   在 System.Threading.QueueUserWorkItemCallback.WaitCallback_Context(Object state)
+                   在 System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+                   在 System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+                   在 System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem()
+                   在 System.Threading.ThreadPoolWorkQueue.Dispatch()
+                   在 System.Threading._ThreadPoolWaitCallback.PerformWaitCallback(); 
+                 */
+            }
+            catch (IOException)
+            {
+                // 对方刚刚连接过来
+                // 进行注册到对方时，写入到一半，对方挂掉了
+                // 这是符合预期的，就不需要抛出异常了
+                IpcContext.Logger.Information("ConnectBackToPeer But Peer IOException.");
+            }
+        }
+        private async Task ConnectBackToPeerCore(IpcInternalPeerConnectedArgs e)
+        {
             var peerName = e.PeerName;
             //var receivedAck = e.Ack;
 
@@ -167,7 +220,6 @@ namespace dotnetCampus.Ipc.Pipes
                     CreatePeerProxy(ipcClientService);
                 }
                 */
-
             }
 
             PeerProxy CreatePeerProxy(IpcClientService ipcClientService)
