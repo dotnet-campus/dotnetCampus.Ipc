@@ -69,7 +69,7 @@ namespace dotnetCampus.Ipc.Tests
                 var ipcConfiguration = new IpcConfiguration();
 
                 await IpcMessageConverter.WriteAsync(memoryStream, ipcConfiguration.MessageHeader, ack: 10,
-                    bufferMessageContext);
+                    bufferMessageContext, new SharedArrayPool());
 
                 memoryStream.Position = 0;
                 var (success, ipcMessageContext) = (await IpcMessageConverter.ReadAsync(memoryStream,

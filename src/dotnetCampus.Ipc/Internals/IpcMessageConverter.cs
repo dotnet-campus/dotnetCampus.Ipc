@@ -9,7 +9,6 @@ using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Utils.Buffers;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.IO;
-using dotnetCampus.Ipc.Utils.Logging;
 
 namespace dotnetCampus.Ipc.Internals
 {
@@ -19,17 +18,15 @@ namespace dotnetCampus.Ipc.Internals
     internal static class IpcMessageConverter
     {
         public static async Task WriteAsync(Stream stream, byte[] messageHeader, Ack ack,
-            IpcBufferMessageContext context)
+            IpcBufferMessageContext context, ISharedArrayPool pool)
         {
             // 准备变量。
             var commandType = context.IpcMessageCommandType;
             VerifyMessageLength(context.Length);
 
             // 发送消息头。
-            var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, commandType).ConfigureAwait(false);
-
-            // 发送消息长度。
-            await binaryWriter.WriteAsync(context.Length).ConfigureAwait(false);
+            await WriteHeaderAsync(stream, messageHeader, ack, commandType, (uint) context.Length, pool)
+                .ConfigureAwait(false);
 
             // 发送消息体。
             foreach (var ipcBufferMessage in context.IpcBufferMessageList)
@@ -39,13 +36,13 @@ namespace dotnetCampus.Ipc.Internals
         }
 
         public static async Task WriteAsync(Stream stream, byte[] messageHeader, Ack ack,
-            IpcMessageCommandType ipcMessageCommandType, byte[] buffer, int offset, int count, string? tag = null)
+            IpcMessageCommandType ipcMessageCommandType, byte[] buffer, int offset, int count, ISharedArrayPool pool, string? tag = null)
         {
             VerifyMessageLength(count, tag);
 
-            var binaryWriter = await WriteHeaderAsync(stream, messageHeader, ack, ipcMessageCommandType);
+            await WriteHeaderAsync(stream, messageHeader, ack, ipcMessageCommandType, (uint) count, pool)
+                .ConfigureAwait(false);
 
-            await binaryWriter.WriteAsync(count);
             await stream.WriteAsync(buffer, offset, count);
         }
 
@@ -64,40 +61,65 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        public static async Task<AsyncBinaryWriter> WriteHeaderAsync(Stream stream, byte[] messageHeader, Ack ack,
-            IpcMessageCommandType ipcMessageCommandType)
+        public static async Task WriteHeaderAsync(Stream stream, byte[] messageHeader, Ack ack,
+            IpcMessageCommandType ipcMessageCommandType, UInt32 contentLength, ISharedArrayPool pool)
         {
             /*
-             * UInt16 Message Header Length 消息头的长度
-             * byte[] Message Header        消息头的内容
-             * UInt32 Version        当前IPC服务的版本
-             * UInt64 Ack            用于给对方确认收到消息使用
-             * UInt32 Empty          给以后版本使用的值
-             * Int16 Command Type   命令类型，业务端的值将会是 0 而框架层采用其他值
-             * UInt32 Content Length 这条消息的内容长度
-             * byte[] Content        实际的内容
-             */
+            * UInt16 Message Header Length 消息头的长度
+            * byte[] Message Header        消息头的内容
+            * UInt32 Version        当前IPC服务的版本
+            * UInt64 Ack            用于给对方确认收到消息使用
+            * UInt32 Empty          给以后版本使用的值
+            * Int16 Command Type    命令类型，业务端的值将会是 0 而框架层采用其他值
+            * UInt32 Content Length 这条消息的内容长度
+            * byte[] Content        实际的内容
+            */
 
             // 当前版本默认是 1 版本，这个值用来后续如果有协议上的更改时，兼容旧版本使用
             // - 版本是 0 的版本，每条消息都有回复 ack 的值
             const uint version = 1;
 
-            var asyncBinaryWriter = new AsyncBinaryWriter(stream);
+            // 统计长度
             var messageHeaderLength = (ushort) messageHeader.Length;
-            await asyncBinaryWriter.WriteAsync(messageHeaderLength).ConfigureAwait(false);
 
-            await stream.WriteAsync(messageHeader).ConfigureAwait(false);
+            var totalByteCount =
+                // UInt16 Message Header Length 消息头的长度
+                sizeof(UInt16)
+                // byte[] Message Header        消息头的内容
+                + messageHeaderLength
+                // UInt32 Version        当前IPC服务的版本
+                + sizeof(UInt32)
+                // UInt64 Ack            用于给对方确认收到消息使用
+                + sizeof(UInt64)
+                // UInt32 Empty          给以后版本使用的值
+                + sizeof(UInt32)
+                // Int16 Command Type    命令类型，业务端的值将会是 0 而框架层采用其他值
+                + sizeof(Int16)
+                // UInt32 Content Length 这条消息的内容长度
+                + sizeof(UInt32);
+
+            var bytes = pool.Rent(totalByteCount);
+            using var memoryStream = new MemoryStream(bytes);
+            using var binaryWriter = new BinaryWriter(memoryStream);
+            // UInt16 Message Header Length 消息头的长度
+            binaryWriter.Write(messageHeaderLength);
+            // byte[] Message Header        消息头的内容
+            binaryWriter.Write(messageHeader);
             // UInt32 Version
-            await asyncBinaryWriter.WriteAsync(version).ConfigureAwait(false);
+            binaryWriter.Write(version);
             // UInt64 Ack
-            await asyncBinaryWriter.WriteAsync(ack.Value).ConfigureAwait(false);
+            binaryWriter.Write(ack.Value);
             // UInt32 Empty
-            await asyncBinaryWriter.WriteAsync(uint.MinValue).ConfigureAwait(false);
+            binaryWriter.Write(uint.MinValue);
             // Int16 Command Type   命令类型，业务端的值将会是 0 而框架层采用其他值
             var commandType = (ushort) ipcMessageCommandType;
-            await asyncBinaryWriter.WriteAsync(commandType).ConfigureAwait(false);
+            binaryWriter.Write(commandType);
+            // UInt32 Content Length 这条消息的内容长度
+            binaryWriter.Write(contentLength);
 
-            return asyncBinaryWriter;
+            await stream.WriteAsync(bytes, 0, totalByteCount).ConfigureAwait(false);
+
+            pool.Return(bytes);
         }
 
         public static async Task<StreamReadResult<IpcMessageResult>> ReadAsync(Stream stream,

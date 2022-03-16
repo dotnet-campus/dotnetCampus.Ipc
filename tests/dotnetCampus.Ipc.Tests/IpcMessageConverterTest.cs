@@ -28,7 +28,7 @@ namespace dotnetCampus.Ipc.Tests
 
                 var ipcBufferMessageContext = new IpcBufferMessageContext("test", IpcMessageCommandType.Unknown, new IpcMessageBody(buffer));
 
-                await IpcMessageConverter.WriteAsync(memoryStream, messageHeader, ack, ipcBufferMessageContext);
+                await IpcMessageConverter.WriteAsync(memoryStream, messageHeader, ack, ipcBufferMessageContext, new SharedArrayPool());
 
                 memoryStream.Position = 0;
                 var ipcMessageResult = (await IpcMessageConverter.ReadAsync(memoryStream,
@@ -51,7 +51,7 @@ namespace dotnetCampus.Ipc.Tests
 
                 var ipcBufferMessageContext = new IpcBufferMessageContext("test", IpcMessageCommandType.Unknown, new IpcMessageBody(buffer));
 
-                await IpcMessageConverter.WriteAsync(memoryStream, messageHeader, ack, ipcBufferMessageContext);
+                await IpcMessageConverter.WriteAsync(memoryStream, messageHeader, ack, ipcBufferMessageContext, new SharedArrayPool());
 
                 memoryStream.Position = 0;
                 var ipcMessageResult = (await IpcMessageConverter.ReadAsync(memoryStream,
@@ -72,7 +72,7 @@ namespace dotnetCampus.Ipc.Tests
                 ulong ack = 10;
                 var buffer = new byte[] { 0x12, 0x12, 0x00 };
                 var ipcBufferMessageContext = new IpcBufferMessageContext("test", IpcMessageCommandType.Unknown, new IpcMessageBody(buffer));
-                await IpcMessageConverter.WriteAsync(memoryStream, ipcConfiguration.MessageHeader, ack, ipcBufferMessageContext);
+                await IpcMessageConverter.WriteAsync(memoryStream, ipcConfiguration.MessageHeader, ack, ipcBufferMessageContext, new SharedArrayPool());
 
                 memoryStream.Position = 0;
                 var (success, ipcMessageContext) = (await IpcMessageConverter.ReadAsync(memoryStream,
