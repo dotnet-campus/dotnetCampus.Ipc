@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Utils.Extensions;
 
@@ -161,6 +162,18 @@ namespace dotnetCampus.Ipc.Pipes
                 // 进行注册到对方时，写入到一半，对方挂掉了
                 // 这是符合预期的，就不需要抛出异常了
                 IpcContext.Logger.Information("ConnectBackToPeer But Peer IOException.");
+            }
+            catch (IpcRemoteException ipcRemoteException)
+            {
+                if (ipcRemoteException.InnerException is InvalidOperationException)
+                {
+                    // 这是在 DoubleBufferTask 写入的锅，后续将会换掉
+                    // 符合预期，对方断开
+                    return;
+                }
+
+                // 其他逻辑的对方的锅，记录日志
+                IpcContext.Logger.Information($"ConnectBackToPeer IpcRemoteException {ipcRemoteException}");
             }
         }
         private async Task ConnectBackToPeerCore(IpcInternalPeerConnectedArgs e)
