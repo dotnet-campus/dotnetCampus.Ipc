@@ -1,10 +1,10 @@
-﻿using dotnetCampus.Ipc.CompilerServices.Attributes;
+﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Tests.CompilerServices;
 using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 {
