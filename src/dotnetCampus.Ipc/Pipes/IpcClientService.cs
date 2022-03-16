@@ -224,7 +224,8 @@ namespace dotnetCampus.Ipc.Pipes
                     stream,
                     IpcConfiguration.MessageHeader,
                     ack,
-                    tracker.Message
+                    tracker.Message,
+                    IpcConfiguration.SharedArrayPool
                 ).ConfigureAwait(false);
                 await stream.FlushAsync().ConfigureAwait(false);
 
@@ -271,8 +272,11 @@ namespace dotnetCampus.Ipc.Pipes
                     IpcMessageCommandType.Business,
                     tracker.Message.Buffer,
                     tracker.Message.Start,
-                    tracker.Message.Length
+                    tracker.Message.Length,
+                    IpcConfiguration.SharedArrayPool,
+                    tracker.Tag
                 );
+                
                 await stream.FlushAsync().ConfigureAwait(false);
 
                 // 追踪消息。
@@ -317,6 +321,7 @@ namespace dotnetCampus.Ipc.Pipes
                     buffer,
                     offset,
                     count,
+                    IpcConfiguration.SharedArrayPool,
                     currentTag
                 );
                 await stream.FlushAsync().ConfigureAwait(false);
