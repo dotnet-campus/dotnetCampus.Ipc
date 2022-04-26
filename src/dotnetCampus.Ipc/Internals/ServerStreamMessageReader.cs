@@ -64,18 +64,13 @@ namespace dotnetCampus.Ipc.Internals
         {
             try
             {
-                //await WaitForConnectionAsync().ConfigureAwait(false);
-
-                //Logger.Debug($"连接完成");
-
-                //await ReadMessageAsync().ConfigureAwait(false);
-
+                IpcContext.Logger.Debug($"[ServerStreamMessageReader][Run] Start Run. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
                 await RunAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 // 当前是后台线程了，不能接受任何的抛出
-                Logger.Error(e);
+                Logger.Error(e, $"[ServerStreamMessageReader][Run] Exception={e.Message}; LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
             }
         }
 
@@ -91,7 +86,7 @@ namespace dotnetCampus.Ipc.Internals
 
                     if (ipcMessageResult.IsEndOfStream)
                     {
-                        IpcContext.Logger.Error($"对方已关闭");
+                        IpcContext.Logger.Information($"[ServerStreamMessageReader][PeerConnectBroke] 对方已关闭 LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
 
                         OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                         return;
@@ -119,16 +114,29 @@ namespace dotnetCampus.Ipc.Internals
                 }
                 catch (Exception e)
                 {
-                    if (_isDisposed && e is ObjectDisposedException)
+                    if (e is ObjectDisposedException)
                     {
-                        // 符合预期
-                        // A 线程调用 Dispose 方法释放 Stream 属性
-                        // B 线程刚好正在读取内容
-                        // 此时将会在 IpcMessageConverter 收到 ObjectDisposedException 异常
+                        if (_isDisposed)
+                        {
+                            // 符合预期
+                            // A 线程调用 Dispose 方法释放 Stream 属性
+                            // B 线程刚好正在读取内容
+                            // 此时将会在 IpcMessageConverter 收到 ObjectDisposedException 异常
+                        }
+                        else
+                        {
+                            // 不符合预期，莫名被释放了
+#if DEBUG
+                            Debugger.Break();
+#endif
+                            IpcContext.Logger.Error(e, $"[ServerStreamMessageReader][Error] ObjectDisposedException without _isDisposed. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
+                        }
+
+                        OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                     }
                     else
                     {
-                        IpcContext.Logger.Error(e);
+                        IpcContext.Logger.Error(e, $"[ServerStreamMessageReader][Error] Exception={e.Message};LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
                     }
                 }
             }

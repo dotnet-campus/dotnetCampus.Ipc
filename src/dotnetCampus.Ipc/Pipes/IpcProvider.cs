@@ -201,7 +201,7 @@ namespace dotnetCampus.Ipc.Pipes
                 await task;
 
                 // 通知有其他客户端连接过来
-                _ = IpcContext.TaskPool.Run(() => PeerConnected?.Invoke(this, new PeerConnectedArgs(peer)), IpcContext.Logger);
+                NotifyPeerConnected(peer);
 
                 /*
                 SendAckAndRegisterToPeer();
@@ -251,6 +251,16 @@ namespace dotnetCampus.Ipc.Pipes
 
                 return peerProxy;
             }
+        }
+
+        /// <summary>
+        /// 通知有其他客户端连接过来
+        /// </summary>
+        /// <param name="peer"></param>
+        /// 拆分方法，优化调试
+        private void NotifyPeerConnected(PeerProxy peer)
+        {
+            _ = IpcContext.TaskPool.Run(() => PeerConnected?.Invoke(this, new PeerConnectedArgs(peer)), IpcContext.Logger);
         }
 
         /// <summary>

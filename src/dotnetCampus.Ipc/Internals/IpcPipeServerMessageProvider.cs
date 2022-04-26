@@ -87,6 +87,7 @@ namespace dotnetCampus.Ipc.Internals
             serverStreamMessageConverter.AckReceived += IpcContext.AckManager.OnAckReceived;
             serverStreamMessageConverter.PeerConnected += IpcServerService.OnPeerConnected;
             serverStreamMessageConverter.MessageReceived += IpcServerService.OnMessageReceived;
+            serverStreamMessageConverter.PeerConnectBroke += (sender, args) => PeerConnectBroke?.Invoke(sender, new IpcPipeServerMessageProviderPeerConnectionBrokenArgs(this, args));
 
             serverStreamMessageConverter.Run();
         }
@@ -99,6 +100,7 @@ namespace dotnetCampus.Ipc.Internals
         */
 
         private ServerStreamMessageReader? ServerStreamMessageReader { set; get; }
+        public event EventHandler<IpcPipeServerMessageProviderPeerConnectionBrokenArgs>? PeerConnectBroke;
 
         /*
         private async void SendAck(Ack receivedAck) => await SendAckAsync(receivedAck);
