@@ -130,8 +130,9 @@ namespace dotnetCampus.Ipc.Internals
                             Debugger.Break();
 #endif
                             IpcContext.Logger.Error(e, $"[ServerStreamMessageReader][Error] ObjectDisposedException without _isDisposed. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
-                            return;
                         }
+
+                        OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                     }
                     else
                     {
