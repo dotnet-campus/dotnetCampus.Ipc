@@ -276,7 +276,7 @@ namespace dotnetCampus.Ipc.Pipes
                     IpcConfiguration.SharedArrayPool,
                     tracker.Tag
                 );
-                
+
                 await stream.FlushAsync().ConfigureAwait(false);
 
                 // 追踪消息。
