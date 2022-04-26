@@ -202,7 +202,13 @@ namespace dotnetCampus.Ipc.Internals
 
             var messageBuffer = sharedArrayPool.Rent((int) messageLength);
             // byte[] Content        实际的内容
-            var readCount = await ReadBufferAsync(stream, messageBuffer, (int) messageLength);
+            var readCountResult = await ReadBufferAsync(stream, messageBuffer, (int) messageLength);
+            if (readCountResult.IsEndOfStream)
+            {
+                return StreamReadResult<IpcMessageResult>.EndOfStream;
+            }
+
+            var readCount = readCountResult.Result;
 
             Debug.Assert(readCount == messageLength);
 
@@ -210,17 +216,23 @@ namespace dotnetCampus.Ipc.Internals
             return new StreamReadResult<IpcMessageResult>(new IpcMessageResult(success: true, ipcMessageContext, commandType));
         }
 
-        private static async Task<int> ReadBufferAsync(Stream stream, byte[] messageBuffer, int messageLength)
+        private static async Task<StreamReadResult<int>> ReadBufferAsync(Stream stream, byte[] messageBuffer, int messageLength)
         {
             var readCount = 0;
 
             do
             {
                 var n = await stream.ReadAsync(messageBuffer, readCount, messageLength - readCount);
+
+                if (n == 0)
+                {
+                    return StreamReadResult<int>.EndOfStream;
+                }
+
                 readCount += n;
             } while (readCount < messageLength);
 
-            return readCount;
+            return new StreamReadResult<int>(readCount);
         }
 
         private static async Task<StreamReadResult<bool>> GetHeader(Stream stream, byte[] messageHeader, ISharedArrayPool sharedArrayPool)
@@ -245,7 +257,14 @@ namespace dotnetCampus.Ipc.Internals
 
             try
             {
-                var readCount = await ReadBufferAsync(stream, messageHeaderBuffer, messageHeader.Length);
+                var readCountResult = await ReadBufferAsync(stream, messageHeaderBuffer, messageHeader.Length);
+                if (readCountResult.IsEndOfStream)
+                {
+                    return StreamReadResult<bool>.EndOfStream;
+                }
+
+                var readCount = readCountResult.Result;
+
                 Debug.Assert(readCount == messageHeader.Length);
                 if (ByteListExtensions.Equals(messageHeaderBuffer, messageHeader, readCount))
                 {
