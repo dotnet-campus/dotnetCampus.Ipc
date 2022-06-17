@@ -6,4 +6,5 @@ namespace IpcRemotingObjectServerDemo; // Must the same namespace
 interface IFoo
 {
     int Add(int a, int b);
+    Task<string> AddAsync(string a, int b);
 }
