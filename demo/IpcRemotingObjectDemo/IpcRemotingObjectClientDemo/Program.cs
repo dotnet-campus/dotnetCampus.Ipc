@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Pipes;
 
 using IpcRemotingObjectServerDemo;
