@@ -221,17 +221,18 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string remotePeerName)
+        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string message)
         {
             var tracker = new IpcMessageTracker<IpcMessageContext>(
                 IpcContext.PipeName,
-                remotePeerName,
+                PeerName,
                 result.IpcMessageContext,
-                "DispatchMessage",
+                "DispatchMessage " + message,
                 IpcContext.Logger);
             tracker.CriticalStep("ReceiveCore",
                 result.IpcMessageContext.Ack,
-                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0, (int) result.IpcMessageContext.MessageLength));
+                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0,
+                    (int) result.IpcMessageContext.MessageLength));
             return tracker;
         }
 
