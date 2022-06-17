@@ -6,9 +6,7 @@
 |--|--|
 |![](https://github.com/dotnet-campus/dotnetCampus.Ipc/workflows/.NET%20Core/badge.svg)|[![](https://img.shields.io/nuget/v/dotnetCampus.Ipc.svg)](https://www.nuget.org/packages/dotnetCampus.Ipc)|
 
-项目可用状态
-
-打磨中
+项目级可用状态
 
 ## 特点
 
@@ -68,16 +66,6 @@
 
 进度：等待 API 设计中，也许会接入 [https://github.com/jacqueskang/IpcServiceFramework](https://github.com/jacqueskang/IpcServiceFramework) 的实现，或者模拟 WCF 或 Remoting 的实现 -->
 
-## API 特点
-
-### 设计特点
-
-底层每次调用需要传入 `string summary` 用于标识
-
-优势在于解决调试的时候，看到传送的二进制以及调用堆栈的时候，如何对应上具体的业务方的问题
-
-整个库编写过程中注意了给参数加上单位，不会存在基础类型的传入。例如给 ulong 的 Ack 特别定义了结构体等
-
 ## 进度
 
 - 基本完成 dotnetCampus.Ipc 的 API 定义和功能实现
@@ -88,8 +76,7 @@
 - 完成断线重连
 - 完成性能优化，包括内存优化
 - 完成 MVC 模式
-
-- [ ] 接入预编译提供上层的远程调用封装
+- 完成接入预编译提供上层的远程调用封装
 
 ## 感谢
 
