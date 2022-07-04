@@ -164,7 +164,8 @@ namespace dotnetCampus.Ipc.Internals
             if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.PeerRegister))
             {
                 var isPeerRegisterMessage = IpcContext.PeerRegisterProvider.TryParsePeerRegisterMessage(stream, out var peerName);
-                var tracker = CriticalTrackReceiveCore(ipcMessageResult, peerName);
+                // 下面这条消息是不需要发出的，这是调度开始的消息，很多都没准备完成。替换为使用 Logger 输出日志
+                //var tracker = CriticalTrackReceiveCore(ipcMessageResult, peerName);
 
                 if (IsConnected)
                 {
@@ -175,10 +176,12 @@ namespace dotnetCampus.Ipc.Internals
                     if (string.Equals(PeerName, peerName))
                     {
                         // 也许是对方发送两条注册消息过来
+                        Logger.Warning($"[DispatchMessage] PeerRegister message receive twice. 注册消息收到两次 PeerName={PeerName}");
                     }
                     else
                     {
-                        // 对方想改名而已
+                        // 对方想改名而已，然而这是不允许的
+                        Logger.Warning($"[DispatchMessage] PeerRegister message receive twice. 注册消息收到两次 OldPeerName={PeerName} ;NewPeerName={peerName}");
                     }
                 }
 
@@ -221,17 +224,18 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string remotePeerName)
+        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string message)
         {
             var tracker = new IpcMessageTracker<IpcMessageContext>(
                 IpcContext.PipeName,
-                remotePeerName,
+                PeerName,
                 result.IpcMessageContext,
-                "DispatchMessage",
+                "DispatchMessage " + message,
                 IpcContext.Logger);
             tracker.CriticalStep("ReceiveCore",
                 result.IpcMessageContext.Ack,
-                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0, (int) result.IpcMessageContext.MessageLength));
+                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0,
+                    (int) result.IpcMessageContext.MessageLength));
             return tracker;
         }
 

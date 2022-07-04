@@ -30,8 +30,6 @@ public class IpcThreadPoolTests : IIpcRequestHandler
             var bProvider = new IpcProvider(bName);
             aProvider.StartServer();
             bProvider.StartServer();
-            // 这里的延迟是为了暂时缓解死锁 bug @lindexi
-            await Task.Delay(100);
             var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
 
             // 占满线程池，以便有机会等待新任务调度。
