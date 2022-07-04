@@ -248,7 +248,7 @@ namespace dotnetCampus.Ipc.Pipes
                 if (IpcContext.IsDisposing || IpcContext.IsDisposed)
                 {
                     throw new ObjectDisposedException(nameof(PeerProxy),
-                        $"当前服务已被释放，服务名: LocalPeerName={IpcContext.PipeName}; MessageTag={requestTracker.Tag}");
+                        $"当前服务已被释放，服务名: LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName}; MessageTag={requestTracker.Tag}");
                 }
 
                 if (AutoReconnectPeers)
@@ -283,7 +283,7 @@ namespace dotnetCampus.Ipc.Pipes
                 }
                 else
                 {
-                    throw new IpcPeerConnectionBrokenException();
+                    throw new IpcPeerConnectionBrokenException($"PeerConnectionBroken. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};  MessageTag={requestTracker.Tag}");
                 }
             }
         }

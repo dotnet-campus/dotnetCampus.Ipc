@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
@@ -37,6 +38,14 @@ namespace dotnetCampus.Ipc.Pipes
         private List<IpcPipeServerMessageProvider> IpcPipeServerMessageProviderList { get; } =
             new List<IpcPipeServerMessageProvider>();
 
+#if DEBUG
+        /// <summary>
+        /// 只是调试使用的列表，仅仅用来调试
+        /// </summary>
+        private List<WeakReference<IpcPipeServerMessageProvider>> IpcPipeServerMessageProviderDebugList { get; } =
+            new List<WeakReference<IpcPipeServerMessageProvider>>();
+#endif
+
         /// <summary>
         /// 启动服务
         /// </summary>
@@ -46,9 +55,32 @@ namespace dotnetCampus.Ipc.Pipes
             while (!_isDisposed)
             {
                 var pipeServerMessage = new IpcPipeServerMessageProvider(IpcContext, this);
-                IpcPipeServerMessageProviderList.Add(pipeServerMessage);
-
+                lock (IpcPipeServerMessageProviderList)
+                {
+                    IpcPipeServerMessageProviderList.Add(pipeServerMessage);
+#if DEBUG
+                    IpcPipeServerMessageProviderDebugList.Add(new WeakReference<IpcPipeServerMessageProvider>(pipeServerMessage));
+#endif
+                }
+                pipeServerMessage.PeerConnectBroke += PipeServerMessage_PeerConnectBroke;
                 await pipeServerMessage.Start().ConfigureAwait(false);
+            }
+        }
+
+        private void PipeServerMessage_PeerConnectBroke(object? sender, IpcPipeServerMessageProviderPeerConnectionBrokenArgs e)
+        {
+            lock (IpcPipeServerMessageProviderList)
+            {
+                IpcPipeServerMessageProviderList.Remove(e.IpcPipeServerMessageProvider);
+            }
+
+            try
+            {
+                e.IpcPipeServerMessageProvider.Dispose();
+            }
+            catch (Exception)
+            {
+                // 释放过程挂了，忽略吧
             }
         }
 
@@ -87,7 +119,14 @@ namespace dotnetCampus.Ipc.Pipes
 
             _isDisposed = true;
 
-            foreach (var ipcPipeServerMessageProvider in IpcPipeServerMessageProviderList)
+            List<IpcPipeServerMessageProvider> ipcPipeServerMessageProviderList;
+
+            lock (IpcPipeServerMessageProviderList)
+            {
+                ipcPipeServerMessageProviderList = IpcPipeServerMessageProviderList.ToList();
+            }
+
+            foreach (var ipcPipeServerMessageProvider in ipcPipeServerMessageProviderList)
             {
                 ipcPipeServerMessageProvider.Dispose();
             }

@@ -64,18 +64,13 @@ namespace dotnetCampus.Ipc.Internals
         {
             try
             {
-                //await WaitForConnectionAsync().ConfigureAwait(false);
-
-                //Logger.Debug($"连接完成");
-
-                //await ReadMessageAsync().ConfigureAwait(false);
-
+                IpcContext.Logger.Debug($"[ServerStreamMessageReader][Run] Start Run. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
                 await RunAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 // 当前是后台线程了，不能接受任何的抛出
-                Logger.Error(e);
+                Logger.Error(e, $"[ServerStreamMessageReader][Run] Exception={e.Message}; LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
             }
         }
 
@@ -91,7 +86,7 @@ namespace dotnetCampus.Ipc.Internals
 
                     if (ipcMessageResult.IsEndOfStream)
                     {
-                        IpcContext.Logger.Error($"对方已关闭");
+                        IpcContext.Logger.Information($"[ServerStreamMessageReader][PeerConnectBroke] 对方已关闭 LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
 
                         OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                         return;
@@ -119,16 +114,29 @@ namespace dotnetCampus.Ipc.Internals
                 }
                 catch (Exception e)
                 {
-                    if (_isDisposed && e is ObjectDisposedException)
+                    if (e is ObjectDisposedException)
                     {
-                        // 符合预期
-                        // A 线程调用 Dispose 方法释放 Stream 属性
-                        // B 线程刚好正在读取内容
-                        // 此时将会在 IpcMessageConverter 收到 ObjectDisposedException 异常
+                        if (_isDisposed)
+                        {
+                            // 符合预期
+                            // A 线程调用 Dispose 方法释放 Stream 属性
+                            // B 线程刚好正在读取内容
+                            // 此时将会在 IpcMessageConverter 收到 ObjectDisposedException 异常
+                        }
+                        else
+                        {
+                            // 不符合预期，莫名被释放了
+#if DEBUG
+                            Debugger.Break();
+#endif
+                            IpcContext.Logger.Error(e, $"[ServerStreamMessageReader][Error] ObjectDisposedException without _isDisposed. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
+                        }
+
+                        OnPeerConnectBroke(new PeerConnectionBrokenArgs());
                     }
                     else
                     {
-                        IpcContext.Logger.Error(e);
+                        IpcContext.Logger.Error(e, $"[ServerStreamMessageReader][Error] Exception={e.Message};LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
                     }
                 }
             }
@@ -156,7 +164,8 @@ namespace dotnetCampus.Ipc.Internals
             if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.PeerRegister))
             {
                 var isPeerRegisterMessage = IpcContext.PeerRegisterProvider.TryParsePeerRegisterMessage(stream, out var peerName);
-                var tracker = CriticalTrackReceiveCore(ipcMessageResult, peerName);
+                // 下面这条消息是不需要发出的，这是调度开始的消息，很多都没准备完成。替换为使用 Logger 输出日志
+                //var tracker = CriticalTrackReceiveCore(ipcMessageResult, peerName);
 
                 if (IsConnected)
                 {
@@ -167,10 +176,12 @@ namespace dotnetCampus.Ipc.Internals
                     if (string.Equals(PeerName, peerName))
                     {
                         // 也许是对方发送两条注册消息过来
+                        Logger.Warning($"[DispatchMessage] PeerRegister message receive twice. 注册消息收到两次 PeerName={PeerName}");
                     }
                     else
                     {
-                        // 对方想改名而已
+                        // 对方想改名而已，然而这是不允许的
+                        Logger.Warning($"[DispatchMessage] PeerRegister message receive twice. 注册消息收到两次 OldPeerName={PeerName} ;NewPeerName={peerName}");
                     }
                 }
 
@@ -213,17 +224,18 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string remotePeerName)
+        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string message)
         {
             var tracker = new IpcMessageTracker<IpcMessageContext>(
                 IpcContext.PipeName,
-                remotePeerName,
+                PeerName,
                 result.IpcMessageContext,
-                "DispatchMessage",
+                "DispatchMessage " + message,
                 IpcContext.Logger);
             tracker.CriticalStep("ReceiveCore",
                 result.IpcMessageContext.Ack,
-                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0, (int) result.IpcMessageContext.MessageLength));
+                new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0,
+                    (int) result.IpcMessageContext.MessageLength));
             return tracker;
         }
 

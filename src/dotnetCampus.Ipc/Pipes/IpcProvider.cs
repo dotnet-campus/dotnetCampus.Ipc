@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Utils.Extensions;
 
@@ -112,6 +114,70 @@ namespace dotnetCampus.Ipc.Pipes
 
         private async Task ConnectBackToPeer(IpcInternalPeerConnectedArgs e)
         {
+            try
+            {
+                await ConnectBackToPeerCore(e);
+            }
+            catch (ObjectDisposedException)
+            {
+                // 对方刚刚连接过来，然后对方立刻被释放
+                // 这是符合预期的，就不需要抛出异常了
+                IpcContext.Logger.Information("ConnectBackToPeer But Peer Disposed.");
+
+                /*
+                ExceptionName: System.ObjectDisposedException; 
+                ExceptionMessage: 无法访问已释放的对象。
+                对象名:“IpcClientService”。; 
+                ExceptionStackTrace:    在 dotnetCampus.Ipc.Pipes.IpcClientService.VerifyNotDisposed()
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<WriteMessageAsync>d__22.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<RegisterToPeer>d__20.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcClientService.<Start>d__19.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcProvider.<ConnectBackToPeer>d__14.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                   在 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                   在 dotnetCampus.Ipc.Pipes.IpcProvider.<NamedPipeServerStreamPoolPeerConnected>d__13.MoveNext()
+                --- 引发异常的上一位置中堆栈跟踪的末尾 ---
+                   在 System.Runtime.CompilerServices.AsyncMethodBuilderCore.<>c.<ThrowAsync>b__6_1(Object state)
+                   在 System.Threading.QueueUserWorkItemCallback.WaitCallback_Context(Object state)
+                   在 System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+                   在 System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+                   在 System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem()
+                   在 System.Threading.ThreadPoolWorkQueue.Dispatch()
+                   在 System.Threading._ThreadPoolWaitCallback.PerformWaitCallback(); 
+                 */
+            }
+            catch (IOException)
+            {
+                // 对方刚刚连接过来
+                // 进行注册到对方时，写入到一半，对方挂掉了
+                // 这是符合预期的，就不需要抛出异常了
+                IpcContext.Logger.Information("ConnectBackToPeer But Peer IOException.");
+            }
+            catch (IpcRemoteException ipcRemoteException)
+            {
+                if (ipcRemoteException.InnerException is InvalidOperationException)
+                {
+                    // 这是在 DoubleBufferTask 写入的锅，后续将会换掉
+                    // 符合预期，对方断开
+                    return;
+                }
+
+                // 其他逻辑的对方的锅，记录日志
+                IpcContext.Logger.Information($"ConnectBackToPeer IpcRemoteException {ipcRemoteException}");
+            }
+        }
+        private async Task ConnectBackToPeerCore(IpcInternalPeerConnectedArgs e)
+        {
             var peerName = e.PeerName;
             //var receivedAck = e.Ack;
 
@@ -135,7 +201,7 @@ namespace dotnetCampus.Ipc.Pipes
                 await task;
 
                 // 通知有其他客户端连接过来
-                _ = IpcContext.TaskPool.Run(() => PeerConnected?.Invoke(this, new PeerConnectedArgs(peer)), IpcContext.Logger);
+                NotifyPeerConnected(peer);
 
                 /*
                 SendAckAndRegisterToPeer();
@@ -167,7 +233,6 @@ namespace dotnetCampus.Ipc.Pipes
                     CreatePeerProxy(ipcClientService);
                 }
                 */
-
             }
 
             PeerProxy CreatePeerProxy(IpcClientService ipcClientService)
@@ -189,6 +254,16 @@ namespace dotnetCampus.Ipc.Pipes
         }
 
         /// <summary>
+        /// 通知有其他客户端连接过来
+        /// </summary>
+        /// <param name="peer"></param>
+        /// 拆分方法，优化调试
+        private void NotifyPeerConnected(PeerProxy peer)
+        {
+            _ = IpcContext.TaskPool.Run(() => PeerConnected?.Invoke(this, new PeerConnectedArgs(peer)), IpcContext.Logger);
+        }
+
+        /// <summary>
         /// 本机作为服务端，有对方连接过来时触发
         /// </summary>
         public event EventHandler<PeerConnectedArgs>? PeerConnected;
@@ -196,6 +271,18 @@ namespace dotnetCampus.Ipc.Pipes
         /// <summary>
         /// 获取一个连接到指定 <paramref name="peerName"/> 的客户端。如没有连接过，则需要等待连接。如已建立连接则不需要重新建立连接
         /// </summary>
+        /// <remarks>
+        /// 禁止在此方法返回之后所在的线程执行将等待 IPC 响应的逻辑的异步做同步等待，否则 IPC 将会停止。例如以下代码是禁止使用的是
+        /// <para/>
+        /// <code>
+        /// var peer = await ipcProvider.GetAndConnectToPeerAsync("xxx");
+        /// var result = peer.GetResponseAsync(xxx).Result; // 这是被禁止的，禁止将等待 IPC 响应的逻辑的异步做同步等待
+        /// </code>
+        /// <para/>
+        /// 此方法的返回之后，如无线程同步上下文，将调度到 IPC 的接收消息端所在线程进行执行。也就是说在此方法返回值之后的逻辑，可以卡住接收消息端，以此解决获取到 Peer 之后，对 Peer 加等事件之前，就接收了 Peer 的消息，从而在事件加等之前由于消息已被处理而漏掉消息。由于接收消息端所在线程需要等待此方法返回之后的同步逻辑执行完成，才能继续接收消息，从而解决了对 Peer 加等事件比消息处理慢的问题
+        /// <para/>
+        /// 但与此也引入另外的问题，那就是如果在此方法调用后的同步逻辑里面，编写了等待此 IPC 的响应的逻辑的异步做同步等待方法，将会导致 IPC 停止工作。其原因是 IPC 的响应需要由接收消息端接收到对方的响应才能完成，然而接收消息端所在线程在等待同步锁，此同步锁的释放需要等待 IPC 的响应完成
+        /// </remarks>
         /// <param name="peerName">对方</param>
         /// <returns></returns>
         public async Task<PeerProxy> GetAndConnectToPeerAsync(string peerName)
