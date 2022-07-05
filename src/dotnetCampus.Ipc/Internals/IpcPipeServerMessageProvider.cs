@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
@@ -39,18 +41,8 @@ namespace dotnetCampus.Ipc.Internals
 
         public async Task Start()
         {
-            var namedPipeServerStream = new NamedPipeServerStream
-            (
-                PipeName,
-                // 本框架使用两个半工做双向通讯，因此这里只是接收，不做发送
-                PipeDirection.In,
-                // 旧框架采用默认为 260 个实例链接，这里减少 10 个，没有具体的理由，待测试
-                250,
-                // 默认都采用 byte 方式
-                PipeTransmissionMode.Byte,
-                // 采用异步的方式。如果没有设置，默认是同步方式，即使有 Async 的方法，底层也是走同步
-                PipeOptions.Asynchronous
-            );
+            var namedPipeServerStream = CreateNamedPipeServerStream();
+
             NamedPipeServerStream = namedPipeServerStream;
 
             try
@@ -58,7 +50,7 @@ namespace dotnetCampus.Ipc.Internals
 #if NETCOREAPP
                 await namedPipeServerStream.WaitForConnectionAsync().ConfigureAwait(false);
 #else
-            await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
+                await Task.Factory.FromAsync(namedPipeServerStream.BeginWaitForConnection,
                 namedPipeServerStream.EndWaitForConnection, null).ConfigureAwait(false);
 #endif
             }
@@ -92,13 +84,71 @@ namespace dotnetCampus.Ipc.Internals
             serverStreamMessageConverter.Run();
         }
 
+        /// <summary>
+        /// 创建 NamedPipeServerStream 对象
+        /// </summary>
+        /// <returns></returns>
+        /// 在 Windows 下，支持管理员权限和非管理员权限的进程相互通讯
+        private NamedPipeServerStream CreateNamedPipeServerStream()
+        {
+            NamedPipeServerStream namedPipeServerStream;
+
+#if NET6_0_OR_GREATER
+            if (System.OperatingSystem.IsWindows())
+            {
+                // 用来在 Windows 下，混用管理员权限和非管理员权限的管道
+                SecurityIdentifier securityIdentifier = new SecurityIdentifier(
+                    WellKnownSidType.AuthenticatedUserSid, null);
+
+                PipeSecurity pipeSecurity = new PipeSecurity();
+                pipeSecurity.AddAccessRule(new PipeAccessRule(securityIdentifier,
+                    PipeAccessRights.ReadWrite | PipeAccessRights.CreateNewInstance,
+                    AccessControlType.Allow));
+
+                // 这个 NamedPipeServerStreamAcl 是在 .NET 5 引入的
+                namedPipeServerStream = NamedPipeServerStreamAcl.Create
+                (
+                    PipeName,
+                    // 本框架使用两个半工做双向通讯，因此这里只是接收，不做发送
+                    PipeDirection.In,
+                    // 旧框架采用默认为 260 个实例链接，这里减少 10 个，没有具体的理由，待测试
+                    250,
+                    // 默认都采用 byte 方式
+                    PipeTransmissionMode.Byte,
+                    // 采用异步的方式。如果没有设置，默认是同步方式，即使有 Async 的方法，底层也是走同步
+                    PipeOptions.Asynchronous,
+                    inBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
+                    outBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
+                    pipeSecurity
+                    //, HandleInheritability.None 默认值
+                    //, PipeAccessRights.ReadWrite 默认值
+                );
+                return namedPipeServerStream;
+            }
+            // 如果非 Windows 平台，或者非 .NET 6 应用，那就不加上权限
+#endif
+            namedPipeServerStream = new NamedPipeServerStream
+            (
+                PipeName,
+                // 本框架使用两个半工做双向通讯，因此这里只是接收，不做发送
+                PipeDirection.In,
+                // 旧框架采用默认为 260 个实例链接，这里减少 10 个，没有具体的理由，待测试
+                250,
+                // 默认都采用 byte 方式
+                PipeTransmissionMode.Byte,
+                // 采用异步的方式。如果没有设置，默认是同步方式，即使有 Async 的方法，底层也是走同步
+                PipeOptions.Asynchronous
+            );
+
+            return namedPipeServerStream;
+        }
+
         /*
         private void ServerStreamMessageConverter_AckRequested(object? sender, Ack e)
         {
             SendAck(e);
         }
         */
-
         private ServerStreamMessageReader? ServerStreamMessageReader { set; get; }
         public event EventHandler<IpcPipeServerMessageProviderPeerConnectionBrokenArgs>? PeerConnectBroke;
 
