@@ -167,25 +167,16 @@ namespace dotnetCampus.Ipc.Internals
 
         public void Dispose()
         {
-            try
+            if (ServerStreamMessageReader is null)
             {
-                if (ServerStreamMessageReader is null)
-                {
-                    // 证明此时还没完全连接
-                    NamedPipeServerStream.Dispose();
-                }
-                else
-                {
-                    // 证明已连接完成，此时不需要释放 NamedPipeServerStream 类
-                    // 不在这一层释放 NamedPipeServerStream 类
-                    ServerStreamMessageReader.Dispose();
-                }
+                // 证明此时还没完全连接
+                NamedPipeServerStream.Dispose();
             }
-            finally
+            else
             {
-                // 通过查看 Dispose 的堆栈来检查出异常时到底是谁在 Dispose。
-                IpcContext.Logger.Warning(@$"IpcPipeServerMessageProvider.Dispose
-{new StackTrace()}");
+                // 证明已连接完成，此时不需要释放 NamedPipeServerStream 类
+                // 不在这一层释放 NamedPipeServerStream 类
+                ServerStreamMessageReader.Dispose();
             }
         }
     }
