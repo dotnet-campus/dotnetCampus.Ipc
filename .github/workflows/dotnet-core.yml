@@ -16,10 +16,14 @@ jobs:
         dotnet-version: |
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
 
-    - name: Build with dotnet
+    - name: Build
       run: dotnet build --configuration Release
 
     - name: Test
       run: dotnet test --configuration Release
+
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build
+       
