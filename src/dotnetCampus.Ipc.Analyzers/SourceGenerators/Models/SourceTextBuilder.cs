@@ -34,7 +34,11 @@ internal class SourceTextBuilder
     public string SimplifyNameByAddUsing(ITypeSymbol typeSymbol)
     {
         var originalName = typeSymbol.ToString();
-        var @namespace = typeSymbol.ContainingNamespace.ToString();
+        var @namespace = typeSymbol.ContainingNamespace?.ToString();
+        if (@namespace == null)
+        {
+            return originalName;
+        }
         if (originalName.StartsWith(@namespace, StringComparison.Ordinal))
         {
             // 常规类型，“命名空间.类名”型。
