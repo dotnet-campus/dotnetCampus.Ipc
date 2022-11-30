@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DefineConstants>$(DefineConstants)TRACE;PublicAsInternal</DefineConstants>
   </PropertyGroup>
 
   <!-- 在 GitHub 的 Action 构建会添加 GITHUB_ACTIONS 变量 -->
@@ -27,6 +28,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="..\..\tests\dotnetCampus.Ipc.Tests\Attributes.cs" Link="Properties\Attributes.cs" />
   </ItemGroup>
@@ -38,10 +40,7 @@
 
   <ItemGroup>
     <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.1.0" PrivateAssets="all" />
-    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.6.5" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
