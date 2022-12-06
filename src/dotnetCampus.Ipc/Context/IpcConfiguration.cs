@@ -40,6 +40,11 @@ namespace dotnetCampus.Ipc.Context
         public IpcTaskScheduling IpcTaskScheduling { get; set; }
 
         /// <summary>
+        /// xxx
+        /// </summary>
+        public CustomIpcThreadPoolBase? CustomIpcThreadPool { set; get; }
+
+        /// <summary>
         /// 为 IPC 记录日志。
         /// </summary>
         public Func<string, IpcLogger>? IpcLoggerProvider { get; set; }

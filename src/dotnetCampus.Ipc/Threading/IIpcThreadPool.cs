@@ -24,4 +24,14 @@ namespace dotnetCampus.Ipc.Threading
         /// </remarks>
         Task<Task> Run(Action action, ILogger? logger);
     }
+
+    public abstract class CustomIpcThreadPoolBase : IIpcThreadPool
+    {
+        Task<Task> IIpcThreadPool.Run(Action action, ILogger? logger)
+        {
+            return Run(action);
+        }
+
+        protected abstract Task<Task> Run(Action action);
+    }
 }

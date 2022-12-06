@@ -39,11 +39,18 @@ namespace dotnetCampus.Ipc.Context
 
             IpcClientPipeConnector = IpcConfiguration.IpcClientPipeConnector;
 
-            TaskPool = IpcConfiguration.IpcTaskScheduling is IpcTaskScheduling.GlobalConcurrent
-                // 支持并发的 IPC 将共用同一个线程池。
-                ? DefaultIpcTask
-                // 要求在同一线程调度的 IPC 将近似独享一个“线程”。
-                : new IpcTask(new IpcSingleThreadPool());
+            if (IpcConfiguration.CustomIpcThreadPool is {} customIpcThreadPool)
+            {
+                TaskPool = new IpcTask(customIpcThreadPool);
+            }
+            else
+            {
+                TaskPool = IpcConfiguration.IpcTaskScheduling is IpcTaskScheduling.GlobalConcurrent
+                    // 支持并发的 IPC 将共用同一个线程池。
+                    ? DefaultIpcTask
+                    // 要求在同一线程调度的 IPC 将近似独享一个“线程”。
+                    : new IpcTask(new IpcSingleThreadPool());
+            }
 
             Logger = IpcConfiguration.IpcLoggerProvider?.Invoke(pipeName) ?? new IpcLogger(pipeName);
         }
