@@ -82,44 +82,75 @@ namespace dotnetCampus.Ipc.Pipes
         /// 启动客户端，启动的时候将会去主动连接服务端，然后向服务端注册自身
         /// </summary>
         /// <param name="shouldRegisterToPeer">是否需要向对方注册</param>
+        /// <exception cref="IpcClientPipeConnectionException">连接失败时抛出</exception>
         /// <returns></returns>
         public async Task Start(bool shouldRegisterToPeer = true)
+        {
+            var result = await StartInternalAsync(isReConnect: false, shouldRegisterToPeer);
+
+            if (!result)
+            {
+                throw new IpcClientPipeConnectionException(PeerName);
+            }
+        }
+
+        /// <inheritdoc cref="Start"/>
+        /// <param name="isReConnect">是否属于重新连接</param>
+        /// <returns>True:启动成功</returns>
+        internal async Task<bool> StartInternalAsync(bool isReConnect, bool shouldRegisterToPeer)
         {
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
-            await ConnectNamedPipeAsync(namedPipeClientStream);
-
-            if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
+            try
             {
-                _namedPipeClientStreamTaskCompletionSource.SetResult(namedPipeClientStream);
+                var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
+                if (!result)
+                {
+                    _namedPipeClientStreamTaskCompletionSource.TrySetException(new IpcClientPipeConnectionException(PeerName));
+                    return false;
+                }
             }
+            catch (Exception e)
+            {
+                // 理论上不应该存在任何异常的才对，但是由于开放给上层业务端定制。如果存在任何业务端的异常，那就应该设置给 _namedPipeClientStreamTaskCompletionSource 里。否则有一些逻辑将会进入等待，如 Write 系列，等待的 _namedPipeClientStreamTaskCompletionSource 的 Task 将永远不会被释放
+                // 包装到 IpcClientPipeConnectionException 里面，方便其他逻辑捕获异常。毕竟要是上层业务端定制的逻辑抛出奇怪类型的异常，那调用 Write 系列的就不好捕获
+                _namedPipeClientStreamTaskCompletionSource.TrySetException(
+                    new IpcClientPipeConnectionException(PeerName, e));
+                throw;
+            }
+
+            _namedPipeClientStreamTaskCompletionSource.TrySetResult(namedPipeClientStream);
 
             if (shouldRegisterToPeer)
             {
                 // 启动之后，向对方注册，此时对方是服务器
                 await RegisterToPeer();
             }
+
+            return true;
         }
 
         /// <summary>
         /// 连接命名管道
         /// </summary>
+        /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="namedPipeClientStream"></param>
-        /// <returns></returns>
+        /// <returns>True 连接成功</returns>
         /// 独立方法，方便 dnspy 调试
-        private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        private async Task<bool> ConnectNamedPipeAsync(bool isReConnect, NamedPipeClientStream namedPipeClientStream)
         {
             var connector = IpcContext.IpcClientPipeConnector;
 
             if (connector == null)
             {
                 await DefaultConnectNamedPipeAsync(namedPipeClientStream);
+                return true;
             }
             else
             {
-                await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
+               return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream);
             }
         }
 
@@ -128,13 +159,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="ipcClientPipeConnector"></param>
         /// <param name="namedPipeClientStream"></param>
+        /// <param name="isReConnect">是否属于重新连接</param>
         /// <returns></returns>
-        private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
+        private async Task<bool> CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector, bool isReConnect,
             NamedPipeClientStream namedPipeClientStream)
         {
             Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
-            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None);
-            await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
+            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None, isReConnect);
+            var result = await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
+            Logger.Trace($"Connected NamedPipe by {nameof(CustomConnectNamedPipeAsync)} Success={result.Success} {result.Reason}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
+
+            return result.Success;
         }
 
         /// <summary>

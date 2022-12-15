@@ -30,6 +30,8 @@ namespace dotnetCampus.Ipc.Internals
         private readonly PeerProxy _peerProxy;
         private readonly IpcProvider _ipcProvider;
 
+        public event EventHandler<ReconnectFailEventArgs>? ReconnectFail;
+
         private async void Reconnect()
         {
             var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
@@ -42,6 +44,8 @@ namespace dotnetCampus.Ipc.Internals
             else
             {
                 _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
+
+                ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider));
             }
         }
 
@@ -51,8 +55,7 @@ namespace dotnetCampus.Ipc.Internals
             {
                 try
                 {
-                    await ipcClientService.Start();
-                    return true;
+                    return await ipcClientService.StartInternalAsync(isReConnect: true, shouldRegisterToPeer: true);
                 }
                 // ## 此异常有两种
                 catch (FileNotFoundException)
@@ -65,13 +68,14 @@ namespace dotnetCampus.Ipc.Internals
                     // 2. 另一种来自 RegisterToPeer()，前面已经连上了，但试图发消息时便已断开。
                     await Task.Delay(16);
                 }
-                catch (IpcClientPipeConnectionException exception)
-                {
-                    // 业务层判断不能重新连接了，必定失败
-                    // 返回就可以了
-                    _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect][IpcClientPipeConnectionException] {exception}");
-                    return false;
-                }
+                // 不会出现此异常。原本是通过异常控制是否成功，才需要判断
+                //catch (IpcClientPipeConnectionException exception)
+                //{
+                //    // 业务层判断不能重新连接了，必定失败
+                //    // 返回就可以了
+                //    _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect][IpcClientPipeConnectionException] {exception}");
+                //    return false;
+                //}
                 catch (Exception exception)
                 {
                     // 未知的异常，不再继续
@@ -97,5 +101,17 @@ namespace dotnetCampus.Ipc.Internals
 
             return false;
         }
+    }
+
+    class ReconnectFailEventArgs : EventArgs
+    {
+        public ReconnectFailEventArgs(PeerProxy peerProxy, IpcProvider ipcProvider)
+        {
+            PeerProxy = peerProxy;
+            IpcProvider = ipcProvider;
+        }
+
+        public PeerProxy PeerProxy { get; }
+        public IpcProvider IpcProvider { get; }
     }
 }

@@ -39,13 +39,13 @@ namespace dotnetCampus.Ipc.Exceptions
         /// </summary>
         /// <param name="message">自定义消息。</param>
         /// <param name="innerException">内部异常。</param>
-        public IpcRemoteException(string message, Exception innerException) : base(message, innerException)
+        public IpcRemoteException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
 
         /// <summary>
         /// 远端出现异常时的调用堆栈。
         /// </summary>
-        public override string StackTrace => _remoteStackTrace ?? base.StackTrace;
+        public override string? StackTrace => _remoteStackTrace ?? base.StackTrace;
     }
 }

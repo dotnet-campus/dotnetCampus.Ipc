@@ -12,11 +12,12 @@ public readonly struct IpcClientPipeConnectionContext
     /// 用于传递客户端的管道连接参数
     /// </summary>
     public IpcClientPipeConnectionContext(string peerName, NamedPipeClientStream namedPipeClientStream,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, bool isReConnect)
     {
         PeerName = peerName;
         NamedPipeClientStream = namedPipeClientStream;
         CancellationToken = cancellationToken;
+        IsReConnect = isReConnect;
     }
 
     /// <summary>
@@ -33,4 +34,9 @@ public readonly struct IpcClientPipeConnectionContext
     /// 连接取消标记
     /// </summary>
     public CancellationToken CancellationToken { get; }
+
+    /// <summary>
+    /// 是否属于重新连接。如 Peer 断开之后的重新连接
+    /// </summary>
+    public bool IsReConnect { get; }
 }

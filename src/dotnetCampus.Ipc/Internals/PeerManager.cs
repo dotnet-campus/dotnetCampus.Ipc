@@ -78,7 +78,17 @@ namespace dotnetCampus.Ipc.Internals
             if (AutoReconnectPeers)
             {
                 peerProxy.PeerReConnector ??= new PeerReConnector(peerProxy, _ipcProvider);
+
+                peerProxy.PeerReConnector.ReconnectFail -= PeerReConnector_ReconnectFail;
+                peerProxy.PeerReConnector.ReconnectFail += PeerReConnector_ReconnectFail;
             }
+        }
+
+        private void PeerReConnector_ReconnectFail(object? sender, ReconnectFailEventArgs e)
+        {
+            // 重新连接失败，此时需要清理
+            // 如果不清理，将会导致过了一会，有新的连接进来，使用和上次需要重连相同的 PeerName 的不会再次触发事件
+            RemovePeerProxy(e.PeerProxy);
         }
 
         private bool AutoReconnectPeers => _ipcProvider.IpcServerService.IpcContext.IpcConfiguration.AutoReconnectPeers;
@@ -93,7 +103,6 @@ namespace dotnetCampus.Ipc.Internals
                 peer.DisposePeer();
             }
         }
-
 
         private ConcurrentDictionary<string, PeerProxy> ConnectedServerManagerList { get; } =
             new ConcurrentDictionary<string, PeerProxy>();

@@ -12,5 +12,31 @@ public interface IIpcClientPipeConnector
     /// </summary>
     /// <param name="ipcClientPipeConnectionContext"></param>
     /// <returns></returns>
-    Task ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext);
+    Task<IpcClientNamedPipeConnectResult> ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext);
+}
+
+/// <summary>
+/// 客户端的管道连接结果
+/// </summary>
+public readonly struct IpcClientNamedPipeConnectResult
+{
+    /// <summary>
+    /// 创建客户端的管道连接结果
+    /// </summary>
+    /// <param name="success"></param>
+    public IpcClientNamedPipeConnectResult(bool success, string? reason = null)
+    {
+        Success = success;
+        Reason = reason;
+    }
+
+    /// <summary>
+    /// 连接是否成功
+    /// </summary>
+    public bool Success { get; }
+
+    /// <summary>
+    /// 连接成功或失败的原因
+    /// </summary>
+    public string? Reason { get; }
 }

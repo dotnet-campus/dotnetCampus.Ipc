@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.Exceptions;
+﻿using System;
+
+namespace dotnetCampus.Ipc.Exceptions;
 
 /// <summary>
 /// IPC的客户端连接失败异常
@@ -10,12 +12,16 @@ public class IpcClientPipeConnectionException : IpcRemoteException
     /// </summary>
     /// <param name="peerName">连接的服务名</param>
     /// <param name="message"></param>
-    public IpcClientPipeConnectionException(string peerName, string? message = null)
+    public IpcClientPipeConnectionException(string peerName, string? message = null) : this(peerName, null, message)
     {
-        PeerName = peerName;
-        _message = message;
     }
 
+    public IpcClientPipeConnectionException(string peerName, Exception? innerException, string? message = null) : base(message, innerException)
+    {
+        PeerName = peerName;
+        _message = message ?? innerException?.Message;
+    }
+    
     /// <inheritdoc />
     public override string Message => _message ?? $"连接管道服务失败。服务管道名:{PeerName}";
 

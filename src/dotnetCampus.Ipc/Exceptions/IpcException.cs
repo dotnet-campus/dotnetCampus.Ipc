@@ -27,7 +27,7 @@ namespace dotnetCampus.Ipc.Exceptions
         /// </summary>
         /// <param name="message">自定义消息。</param>
         /// <param name="innerException">内部异常。</param>
-        public IpcException(string message, Exception innerException) : base(message, innerException)
+        public IpcException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
     }
