@@ -25,6 +25,16 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// <inheritdoc />
     public async Task<IpcClientNamedPipeConnectResult> ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext)
     {
+        if (ipcClientPipeConnectionContext.IsReConnect)
+        {
+            // 如果是重新连接的，先获取上层业务端，询问是否可以继续连接
+            if (CanContinue(ipcClientPipeConnectionContext) is false)
+            {
+                // 如果上层业务端返回说不能继续连接了，那就不继续了
+                return new IpcClientNamedPipeConnectResult(false, "CanContinue return false. IsReConnect=true");
+            }
+        }
+
         var namedPipeClientStream = ipcClientPipeConnectionContext.NamedPipeClientStream;
 
         int stepCount = 0;
@@ -32,7 +42,6 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
         {
             try
             {
-                stepCount++;
                 // 由于 namedPipeClientStream.ConnectAsync 底层也是使用 Task.Run 执行 Connect 的逻辑
                 // 且 ConnectAsync 在 .NET Framework 4.5 不存在
                 // 因此这里就使用 Task.Run 执行
@@ -46,6 +55,8 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
                 // 如果没有连接超时，连接成功了，那就会进入上面的 return 分支，方法结束
                 // 如果抛出其他异常了，那就不接住，继续向上抛出
             }
+
+            stepCount++;
 
             if (CanContinue(ipcClientPipeConnectionContext))
             {

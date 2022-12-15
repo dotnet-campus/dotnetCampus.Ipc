@@ -144,7 +144,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             else
             {
-               return await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
+               return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream);
             }
         }
 
@@ -153,12 +153,13 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="ipcClientPipeConnector"></param>
         /// <param name="namedPipeClientStream"></param>
+        /// <param name="isReConnect">是否属于重新连接</param>
         /// <returns></returns>
-        private async Task<bool> CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
+        private async Task<bool> CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector, bool isReConnect,
             NamedPipeClientStream namedPipeClientStream)
         {
             Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
-            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None);
+            var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None, isReConnect);
             var result = await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
             Logger.Trace($"Connected NamedPipe by {nameof(CustomConnectNamedPipeAsync)} Success={result.Success} {result.Reason}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
 
