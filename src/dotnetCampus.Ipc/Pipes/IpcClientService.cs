@@ -85,7 +85,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         public Task Start(bool shouldRegisterToPeer = true)
         {
-            return StartInternalAsync(isReConnect:false,shouldRegisterToPeer);
+            return StartInternalAsync(isReConnect: false, shouldRegisterToPeer);
         }
 
         /// <inheritdoc cref="Start"/>
@@ -111,7 +111,8 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 // 理论上不应该存在任何异常的才对，但是由于开放给上层业务端定制。如果存在任何业务端的异常，那就应该设置给 _namedPipeClientStreamTaskCompletionSource 里。否则有一些逻辑将会进入等待，如 Write 系列，等待的 _namedPipeClientStreamTaskCompletionSource 的 Task 将永远不会被释放
                 // 包装到 IpcClientPipeConnectionException 里面，方便其他逻辑捕获异常。毕竟要是上层业务端定制的逻辑抛出奇怪类型的异常，那调用 Write 系列的就不好捕获
-                _namedPipeClientStreamTaskCompletionSource.TrySetException(new IpcClientPipeConnectionException(PeerName, e));
+                _namedPipeClientStreamTaskCompletionSource.TrySetException(
+                    new IpcClientPipeConnectionException(PeerName, e));
                 throw;
             }
 
