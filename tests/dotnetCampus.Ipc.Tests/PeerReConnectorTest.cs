@@ -27,8 +27,8 @@ namespace dotnetCampus.Ipc.Tests
                 // 让 c 主动连接 a 然后聊聊天
                 // 预期可以让 a 获取到 c 的连接事件
 
-                var aName = "A_PeerConnectorTest_01";
-                var bName = "B_PeerConnectorTest_01";
+                var aName = "A_PeerConnectorTest_02";
+                var bName = "B_PeerConnectorTest_02";
                 var aResponse = new byte[] { 0xF1, 0xF3 };
                 var bRequest = new byte[] { 0xF1, 0xF2, 0xF3 };
                 var cRequest = new byte[] { 0x01, 0x05, 0xF3 };
