@@ -79,47 +79,73 @@ namespace dotnetCampus.Ipc.Pipes
         private ILogger Logger => IpcContext.Logger;
 
         /// <summary>
+        /// 是否连接失败 <para/>
+        /// - null : 还没连接
+        /// - true : 连接失败，再也没有 <see cref="NamedPipeClientStreamTask"/> 返回
+        /// - false : 连接成功
+        /// </summary>
+        private bool? IsConnectFail { set; get; }
+
+        /// <summary>
         /// 启动客户端，启动的时候将会去主动连接服务端，然后向服务端注册自身
         /// </summary>
         /// <param name="shouldRegisterToPeer">是否需要向对方注册</param>
         /// <returns></returns>
-        public async Task Start(bool shouldRegisterToPeer = true)
+        public Task Start(bool shouldRegisterToPeer = true)
+        {
+            return StartInternalAsync(isReConnect:false,shouldRegisterToPeer);
+        }
+
+        /// <inheritdoc cref="Start"/>
+        /// <param name="isReConnect">是否属于重新连接</param>
+        /// <returns>True:启动成功</returns>
+        internal async Task<bool> StartInternalAsync(bool isReConnect, bool shouldRegisterToPeer)
         {
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
-            await ConnectNamedPipeAsync(namedPipeClientStream);
-
-            if (!_namedPipeClientStreamTaskCompletionSource.Task.IsCompleted)
+            var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
+            if (!result)
             {
-                _namedPipeClientStreamTaskCompletionSource.SetResult(namedPipeClientStream);
+                IsConnectFail = true;
+                return false;
             }
+            else
+            {
+                IsConnectFail = false;
+            }
+
+            _namedPipeClientStreamTaskCompletionSource.TrySetResult(namedPipeClientStream);
 
             if (shouldRegisterToPeer)
             {
                 // 启动之后，向对方注册，此时对方是服务器
                 await RegisterToPeer();
             }
+
+            return true;
         }
 
         /// <summary>
         /// 连接命名管道
         /// </summary>
+        /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="namedPipeClientStream"></param>
         /// <returns></returns>
         /// 独立方法，方便 dnspy 调试
-        private async Task ConnectNamedPipeAsync(NamedPipeClientStream namedPipeClientStream)
+        private async Task<bool> ConnectNamedPipeAsync(bool isReConnect, NamedPipeClientStream namedPipeClientStream)
         {
             var connector = IpcContext.IpcClientPipeConnector;
 
             if (connector == null)
             {
                 await DefaultConnectNamedPipeAsync(namedPipeClientStream);
+                return true;
             }
             else
             {
-                await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
+               return await CustomConnectNamedPipeAsync(connector, namedPipeClientStream);
             }
         }
 
@@ -129,12 +155,14 @@ namespace dotnetCampus.Ipc.Pipes
         /// <param name="ipcClientPipeConnector"></param>
         /// <param name="namedPipeClientStream"></param>
         /// <returns></returns>
-        private async Task CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
+        private async Task<bool> CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
             NamedPipeClientStream namedPipeClientStream)
         {
             Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
             var ipcClientPipeConnectContext = new IpcClientPipeConnectionContext(PeerName, namedPipeClientStream, CancellationToken.None);
             await ipcClientPipeConnector.ConnectNamedPipeAsync(ipcClientPipeConnectContext);
+
+            return true;
         }
 
         /// <summary>
