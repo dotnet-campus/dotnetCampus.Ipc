@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using dotnetCampus.Ipc.Exceptions;
 
 namespace dotnetCampus.Ipc.Pipes.PipeConnectors;
 
@@ -24,7 +23,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     }
 
     /// <inheritdoc />
-    public async Task ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext)
+    public async Task<IpcClientNamedPipeConnectResult> ConnectNamedPipeAsync(IpcClientPipeConnectionContext ipcClientPipeConnectionContext)
     {
         var namedPipeClientStream = ipcClientPipeConnectionContext.NamedPipeClientStream;
 
@@ -39,7 +38,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
                 // 因此这里就使用 Task.Run 执行
                 await Task.Run(() => namedPipeClientStream.Connect((int) StepTimeout.TotalMilliseconds))
                     .ConfigureAwait(false);
-                return;
+                return new IpcClientNamedPipeConnectResult(true);
             }
             catch (TimeoutException)
             {
@@ -56,7 +55,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
             }
             else
             {
-                throw new IpcClientPipeConnectionException(ipcClientPipeConnectionContext.PeerName);
+                return new IpcClientNamedPipeConnectResult(false, "CanContinue return false");
             }
         }
     }
