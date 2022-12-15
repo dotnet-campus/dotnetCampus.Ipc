@@ -45,7 +45,7 @@ namespace dotnetCampus.Ipc.Internals
             {
                 _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
 
-                ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider);
+                ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider));
             }
         }
 
