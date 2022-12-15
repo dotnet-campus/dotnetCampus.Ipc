@@ -12,9 +12,9 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// <summary>
     /// 创建默认的配置客户端连接方法
     /// </summary>
-    /// <param name="canContinue"></param>
-    /// <param name="stepTimeout"></param>
-    /// <param name="stepSleepTimeGetter"></param>
+    /// <param name="canContinue">是否能继续连接的判断委托</param>
+    /// <param name="stepTimeout">每一次连接的等待超时时间</param>
+    /// <param name="stepSleepTimeGetter">等待超时之后，下一次连接的延迟时间。连接的之间间隔时间</param>
     public IpcClientPipeConnector(CanContinueDelegate canContinue, TimeSpan? stepTimeout = null,
         GetStepSleepTimeDelegate? stepSleepTimeGetter = null)
     {

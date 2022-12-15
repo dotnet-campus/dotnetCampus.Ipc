@@ -25,6 +25,9 @@ namespace dotnetCampus.Ipc.Threading
         Task<Task> Run(Action action, ILogger? logger);
     }
 
+    /// <summary>
+    /// 自定义的 IPC 所采用的线程池
+    /// </summary>
     public abstract class CustomIpcThreadPoolBase : IIpcThreadPool
     {
         Task<Task> IIpcThreadPool.Run(Action action, ILogger? logger)
@@ -32,6 +35,7 @@ namespace dotnetCampus.Ipc.Threading
             return Run(action);
         }
 
+        /// <inheritdoc cref="IIpcThreadPool.Run"/>
         protected abstract Task<Task> Run(Action action);
     }
 }

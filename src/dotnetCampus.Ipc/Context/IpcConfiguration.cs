@@ -40,7 +40,7 @@ namespace dotnetCampus.Ipc.Context
         public IpcTaskScheduling IpcTaskScheduling { get; set; }
 
         /// <summary>
-        /// xxx
+        /// 添加自定义的 IPC 线程池。此属性一旦设置，将会让 <see cref="IpcTaskScheduling"/> 被无效掉
         /// </summary>
         public CustomIpcThreadPoolBase? CustomIpcThreadPool { set; get; }
 
