@@ -278,7 +278,7 @@ namespace dotnetCampus.Ipc.Pipes
 
                     if (result.Exception is not null)
                     {
-                        ExceptionDispatchInfo.Throw(result.Exception);
+                        ExceptionDispatchInfo.Capture(result.Exception).Throw();
                     }
                     
                     return;
@@ -333,7 +333,7 @@ namespace dotnetCampus.Ipc.Pipes
                 {
                     if (result.Exception is not null)
                     {
-                        ExceptionDispatchInfo.Throw(result.Exception);
+                        ExceptionDispatchInfo.Capture(result.Exception).Throw();
                     }
 
                     return;
@@ -399,7 +399,7 @@ namespace dotnetCampus.Ipc.Pipes
                 {
                     if (result.Exception is not null)
                     {
-                        ExceptionDispatchInfo.Throw(result.Exception);
+                        ExceptionDispatchInfo.Capture(result.Exception).Throw();
                     }
 
                     return;
@@ -484,7 +484,7 @@ namespace dotnetCampus.Ipc.Pipes
 
             IsDisposed = true;
 
-            if (NamedPipeClientStreamTask.IsCompletedSuccessfully)
+            if (NamedPipeClientStreamTask.IsCompleted)
             {
                 var result = NamedPipeClientStreamTask.Result;
                 if (result.Success)
