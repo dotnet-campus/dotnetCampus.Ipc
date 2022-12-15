@@ -79,14 +79,6 @@ namespace dotnetCampus.Ipc.Pipes
         private ILogger Logger => IpcContext.Logger;
 
         /// <summary>
-        /// 是否连接失败 <para/>
-        /// - null : 还没连接
-        /// - true : 连接失败，再也没有 <see cref="NamedPipeClientStreamTask"/> 返回
-        /// - false : 连接成功
-        /// </summary>
-        private bool? IsConnectFail { set; get; }
-
-        /// <summary>
         /// 启动客户端，启动的时候将会去主动连接服务端，然后向服务端注册自身
         /// </summary>
         /// <param name="shouldRegisterToPeer">是否需要向对方注册</param>
@@ -105,15 +97,22 @@ namespace dotnetCampus.Ipc.Pipes
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
             _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
-            var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
-            if (!result)
+            try
             {
-                IsConnectFail = true;
-                return false;
+                var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
+                if (!result)
+                {
+                    _namedPipeClientStreamTaskCompletionSource.TrySetException(
+                        new IpcClientPipeConnectionException(PeerName));
+                    return false;
+                }
             }
-            else
+            catch (Exception e)
             {
-                IsConnectFail = false;
+                // 理论上不应该存在任何异常的才对，但是由于开放给上层业务端定制。如果存在任何业务端的异常，那就应该设置给 _namedPipeClientStreamTaskCompletionSource 里。否则有一些逻辑将会进入等待，如 Write 系列，等待的 _namedPipeClientStreamTaskCompletionSource 的 Task 将永远不会被释放
+                // 包装到 IpcClientPipeConnectionException 里面，方便其他逻辑捕获异常。毕竟要是上层业务端定制的逻辑抛出奇怪类型的异常，那调用 Write 系列的就不好捕获
+                _namedPipeClientStreamTaskCompletionSource.TrySetException(new IpcClientPipeConnectionException(PeerName, e));
+                throw;
             }
 
             _namedPipeClientStreamTaskCompletionSource.TrySetResult(namedPipeClientStream);
