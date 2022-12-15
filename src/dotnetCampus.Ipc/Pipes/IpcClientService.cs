@@ -102,8 +102,7 @@ namespace dotnetCampus.Ipc.Pipes
                 var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
                 if (!result)
                 {
-                    _namedPipeClientStreamTaskCompletionSource.TrySetException(
-                        new IpcClientPipeConnectionException(PeerName));
+                    _namedPipeClientStreamTaskCompletionSource.TrySetException(new IpcClientPipeConnectionException(PeerName));
                     return false;
                 }
             }
@@ -132,7 +131,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="namedPipeClientStream"></param>
-        /// <returns></returns>
+        /// <returns>True 连接成功</returns>
         /// 独立方法，方便 dnspy 调试
         private async Task<bool> ConnectNamedPipeAsync(bool isReConnect, NamedPipeClientStream namedPipeClientStream)
         {
