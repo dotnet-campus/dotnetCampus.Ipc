@@ -16,6 +16,9 @@ public class IpcClientPipeConnectionException : IpcRemoteException
     {
     }
 
+    /// <summary>
+    /// IPC的客户端连接失败异常
+    /// </summary>
     public IpcClientPipeConnectionException(string peerName, Exception? innerException, string? message = null) : base(message, innerException)
     {
         PeerName = peerName;

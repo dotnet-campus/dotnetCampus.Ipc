@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,11 +54,28 @@ namespace dotnetCampus.Ipc.Pipes
             }
         }
 
-        private TaskCompletionSource<NamedPipeClientStream>? _namedPipeClientStreamTaskCompletionSource;
+        private readonly TaskCompletionSource<NamedPipeClientStreamResult> _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStreamResult>();
 
-        private Task<NamedPipeClientStream> NamedPipeClientStreamTask => _namedPipeClientStreamTaskCompletionSource is null
-            ? Task.FromResult<NamedPipeClientStream>(null!)
-            : _namedPipeClientStreamTaskCompletionSource.Task;
+        private Task<NamedPipeClientStreamResult> NamedPipeClientStreamTask => _namedPipeClientStreamTaskCompletionSource.Task;
+
+        readonly struct NamedPipeClientStreamResult
+        {
+            public NamedPipeClientStreamResult(NamedPipeClientStream? namedPipeClientStream)
+            {
+                NamedPipeClientStream = namedPipeClientStream!;
+                Exception = null;
+            }
+
+            public NamedPipeClientStreamResult(Exception exception)
+            {
+                Exception = exception;
+                NamedPipeClientStream = null!;
+            }
+
+            public bool Success => NamedPipeClientStream is not null;
+            public NamedPipeClientStream NamedPipeClientStream { get; }
+            public Exception? Exception { get; }
+        }
 
         internal AckManager AckManager => IpcContext.AckManager;
 
@@ -96,19 +113,20 @@ namespace dotnetCampus.Ipc.Pipes
 
         /// <inheritdoc cref="Start"/>
         /// <param name="isReConnect">是否属于重新连接</param>
+        /// <param name="shouldRegisterToPeer">是否需要向对方注册</param>
         /// <returns>True:启动成功</returns>
         internal async Task<bool> StartInternalAsync(bool isReConnect, bool shouldRegisterToPeer)
         {
             var namedPipeClientStream = new NamedPipeClientStream(".", PeerName, PipeDirection.Out,
                 PipeOptions.None, TokenImpersonationLevel.Impersonation);
-            _namedPipeClientStreamTaskCompletionSource = new TaskCompletionSource<NamedPipeClientStream>();
 
             try
             {
                 var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream);
                 if (!result)
                 {
-                    _namedPipeClientStreamTaskCompletionSource.TrySetException(new IpcClientPipeConnectionException(PeerName));
+                    _namedPipeClientStreamTaskCompletionSource.TrySetResult(new NamedPipeClientStreamResult(namedPipeClientStream: null));
+
                     return false;
                 }
             }
@@ -116,12 +134,14 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 // 理论上不应该存在任何异常的才对，但是由于开放给上层业务端定制。如果存在任何业务端的异常，那就应该设置给 _namedPipeClientStreamTaskCompletionSource 里。否则有一些逻辑将会进入等待，如 Write 系列，等待的 _namedPipeClientStreamTaskCompletionSource 的 Task 将永远不会被释放
                 // 包装到 IpcClientPipeConnectionException 里面，方便其他逻辑捕获异常。毕竟要是上层业务端定制的逻辑抛出奇怪类型的异常，那调用 Write 系列的就不好捕获
-                _namedPipeClientStreamTaskCompletionSource.TrySetException(
-                    new IpcClientPipeConnectionException(PeerName, e));
+                _namedPipeClientStreamTaskCompletionSource.TrySetResult(new NamedPipeClientStreamResult(new IpcClientPipeConnectionException(PeerName, e)));
+
+                // 为什么不能调用 SetException 方法？因为以下被注释的代码如果被调用，如果没有任何逻辑等待 _namedPipeClientStreamTaskCompletionSource 的 Task 将会抛出到 TaskScheduler.UnobservedTaskException 里。虽然没有什么事情发生，但是对于某些客户端来说，会让一些伙伴以为存在大坑
+                //_namedPipeClientStreamTaskCompletionSource.TrySetException
                 throw;
             }
 
-            _namedPipeClientStreamTaskCompletionSource.TrySetResult(namedPipeClientStream);
+            _namedPipeClientStreamTaskCompletionSource.TrySetResult(new NamedPipeClientStreamResult(namedPipeClientStream));
 
             if (shouldRegisterToPeer)
             {
@@ -246,7 +266,25 @@ namespace dotnetCampus.Ipc.Pipes
                     return;
                 }
 
-                var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                var result = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                if (result.Success is false)
+                {
+                    // 理论上框架内不会进入此分支
+                    if (Debugger.IsAttached)
+                    {
+                        // 框架内不应该进入此分支
+                        Debugger.Break();
+                    }
+
+                    if (result.Exception is not null)
+                    {
+                        ExceptionDispatchInfo.Throw(result.Exception);
+                    }
+                    
+                    return;
+                }
+
+                var stream = result.NamedPipeClientStream;
 
                 // 追踪、校验消息。
                 var ack = AckManager.GetAck();
@@ -290,7 +328,18 @@ namespace dotnetCampus.Ipc.Pipes
                     return;
                 }
 
-                var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                var result = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                if (result.Success is false)
+                {
+                    if (result.Exception is not null)
+                    {
+                        ExceptionDispatchInfo.Throw(result.Exception);
+                    }
+
+                    return;
+                }
+
+                var stream = result.NamedPipeClientStream;
 
                 // 追踪、校验消息。
                 var ack = AckManager.GetAck();
@@ -345,7 +394,18 @@ namespace dotnetCampus.Ipc.Pipes
                 }
 
                 var currentTag = tag;
-                var stream = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                var result = await NamedPipeClientStreamTask.ConfigureAwait(false);
+                if (result.Success is false)
+                {
+                    if (result.Exception is not null)
+                    {
+                        ExceptionDispatchInfo.Throw(result.Exception);
+                    }
+
+                    return;
+                }
+
+                var stream = result.NamedPipeClientStream;
                 await IpcMessageConverter.WriteAsync
                 (
                     stream,
@@ -424,9 +484,13 @@ namespace dotnetCampus.Ipc.Pipes
 
             IsDisposed = true;
 
-            if (NamedPipeClientStreamTask.IsCompleted)
+            if (NamedPipeClientStreamTask.IsCompletedSuccessfully)
             {
-                NamedPipeClientStreamTask.Result.Dispose();
+                var result = NamedPipeClientStreamTask.Result;
+                if (result.Success)
+                {
+                    result.NamedPipeClientStream.Dispose();
+                }
             }
 
             DoubleBufferTask.Finish();
