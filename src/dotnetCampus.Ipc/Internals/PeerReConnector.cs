@@ -30,6 +30,8 @@ namespace dotnetCampus.Ipc.Internals
         private readonly PeerProxy _peerProxy;
         private readonly IpcProvider _ipcProvider;
 
+        public event EventHandler<ReconnectFailEventArgs>? ReconnectFail;
+
         private async void Reconnect()
         {
             var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
@@ -42,6 +44,8 @@ namespace dotnetCampus.Ipc.Internals
             else
             {
                 _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
+
+                ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider);
             }
         }
 
@@ -97,5 +101,17 @@ namespace dotnetCampus.Ipc.Internals
 
             return false;
         }
+    }
+
+    class ReconnectFailEventArgs : EventArgs
+    {
+        public ReconnectFailEventArgs(PeerProxy peerProxy, IpcProvider ipcProvider)
+        {
+            PeerProxy = peerProxy;
+            IpcProvider = ipcProvider;
+        }
+
+        public PeerProxy PeerProxy { get; }
+        public IpcProvider IpcProvider { get; }
     }
 }

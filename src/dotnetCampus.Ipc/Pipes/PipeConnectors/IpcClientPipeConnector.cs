@@ -14,7 +14,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
     /// </summary>
     /// <param name="canContinue">是否能继续连接的判断委托</param>
     /// <param name="stepTimeout">每一次连接的等待超时时间</param>
-    /// <param name="stepSleepTimeGetter">等待超时之后，下一次连接的延迟时间。连接的之间间隔时间</param>
+    /// <param name="stepSleepTimeGetter">等待超时之后，下一次连接的延迟时间。连接的之间间隔时间。可以根据连接次数，不断延长延迟时间</param>
     public IpcClientPipeConnector(CanContinueDelegate canContinue, TimeSpan? stepTimeout = null,
         GetStepSleepTimeDelegate? stepSleepTimeGetter = null)
     {
@@ -34,6 +34,9 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
             try
             {
                 stepCount++;
+                // 由于 namedPipeClientStream.ConnectAsync 底层也是使用 Task.Run 执行 Connect 的逻辑
+                // 且 ConnectAsync 在 .NET Framework 4.5 不存在
+                // 因此这里就使用 Task.Run 执行
                 await Task.Run(() => namedPipeClientStream.Connect((int) StepTimeout.TotalMilliseconds))
                     .ConfigureAwait(false);
                 return;
