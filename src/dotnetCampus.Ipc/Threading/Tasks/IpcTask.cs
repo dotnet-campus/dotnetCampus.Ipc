@@ -34,7 +34,6 @@ namespace dotnetCampus.Ipc.Threading.Tasks
         /// 支持并发进入的 IPC 任务。
         /// 被此 <see cref="IpcTask"/> 管理的异步任务将按调用此方法的顺序依次开始执行，至于开始后多少个任务可以同时运行或者执行多长时间后算超时而执行下一个取决于此 <see cref="IpcTask"/> 的配置。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
