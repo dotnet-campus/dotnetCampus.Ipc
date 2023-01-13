@@ -72,15 +72,26 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         public async void StartServer()
         {
-            if (IsStarted) return;
+            try
+            {
+                if (IsStarted) return;
 
-            var ipcServerService = new IpcServerService(IpcContext);
-            _ipcServerService = ipcServerService;
+                var ipcServerService = new IpcServerService(IpcContext);
+                _ipcServerService = ipcServerService;
 
-            ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
+                ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
 
-            // 以下的 Start 是一个循环，不会返回的
-            await ipcServerService.Start().ConfigureAwait(false);
+                // 以下的 Start 是一个循环，不会返回的
+                await ipcServerService.Start().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // 当前是后台线程了，不能接受任何的抛出
+#if DEBUG
+                // 理论上框架层不会在这里抛出任何异常
+                Debugger.Break();
+#endif
+            }
         }
 
         /// <summary>
@@ -90,25 +101,33 @@ namespace dotnetCampus.Ipc.Pipes
         /// <param name="e"></param>
         private async void NamedPipeServerStreamPoolPeerConnected(object? sender, IpcInternalPeerConnectedArgs e)
         {
-            // 也许是对方反过来连接
-            if (PeerManager.TryGetValue(e.PeerName, out var peerProxy))
+            try
             {
-                // 如果当前的 Peer 已断开且不需要重新连接，那么重新创建 Peer 反过来连接对方的服务器端
-                if (peerProxy.IsBroken && !IpcContext.IpcConfiguration.AutoReconnectPeers)
+                // 也许是对方反过来连接
+                if (PeerManager.TryGetValue(e.PeerName, out var peerProxy))
                 {
-                    // 理论上不会进入这个分支，因为如果 IsBroken 将会自动去清理，除非刚好一个断开，然后立刻连接
-                    PeerManager.RemovePeerProxy(peerProxy);
-                    await ConnectBackToPeer(e);
+                    // 如果当前的 Peer 已断开且不需要重新连接，那么重新创建 Peer 反过来连接对方的服务器端
+                    if (peerProxy.IsBroken && !IpcContext.IpcConfiguration.AutoReconnectPeers)
+                    {
+                        // 理论上不会进入这个分支，因为如果 IsBroken 将会自动去清理，除非刚好一个断开，然后立刻连接
+                        PeerManager.RemovePeerProxy(peerProxy);
+                        await ConnectBackToPeer(e);
+                    }
+                    else
+                    {
+                        peerProxy.Update(e);
+                    }
                 }
                 else
                 {
-                    peerProxy.Update(e);
+                    // 其他客户端连接，需要反过来连接对方的服务器端
+                    await ConnectBackToPeer(e);
                 }
             }
-            else
+            catch (Exception exception)
             {
-                // 其他客户端连接，需要反过来连接对方的服务器端
-                await ConnectBackToPeer(e);
+                // 当前是后台线程了，不能接受任何的抛出
+                IpcContext.Logger.Error(exception);
             }
         }
 

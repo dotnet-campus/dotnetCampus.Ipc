@@ -37,35 +37,53 @@ namespace dotnetCampus.Ipc.Pipes
         /// 3. 将 <see cref="IIpcRequestHandler"/> 的返回值发送给到客户端
         public async void HandleRequest(PeerProxy sender, IpcClientRequestArgs args)
         {
-            var requestMessage = args.IpcMessageBody;
-            var peerProxy = sender;
+            try
+            {
+                var requestMessage = args.IpcMessageBody;
+                var peerProxy = sender;
 
-            IpcMessage ipcMessage = new IpcMessage($"[{peerProxy.PeerName}][{args.MessageId}]", requestMessage);
-            var ipcRequestContext = new IpcRequestMessageContext(ipcMessage, peerProxy, args.MessageCommandType.ToCoreMessageType());
+                IpcMessage ipcMessage = new IpcMessage($"[{peerProxy.PeerName}][{args.MessageId}]", requestMessage);
+                var ipcRequestContext = new IpcRequestMessageContext(ipcMessage, peerProxy, args.MessageCommandType.ToCoreMessageType());
 
-            // 处理消息
-            // 优先从 Peer 里面找处理的方法，这样上层可以对某个特定的 Peer 做不同的处理
-            // Todo 需要设计这部分 API 现在因为没有 API 的设计，先全部走 DefaultIpcRequestHandler 的逻辑
-            var receiveRequestTracker = new IpcMessageTracker<IpcRequestMessageContext>(
-                peerProxy.IpcContext.PipeName,
-                peerProxy.PeerName,
-                ipcRequestContext,
-                "HandleRequest",
-                IpcContext.Logger);
-            var result = await HandleRequestAsync(receiveRequestTracker, peerProxy.PeerName).ConfigureAwait(false);
+                // 处理消息
+                // 优先从 Peer 里面找处理的方法，这样上层可以对某个特定的 Peer 做不同的处理
+                // Todo 需要设计这部分 API 现在因为没有 API 的设计，先全部走 DefaultIpcRequestHandler 的逻辑
+                var receiveRequestTracker = new IpcMessageTracker<IpcRequestMessageContext>(
+                    peerProxy.IpcContext.PipeName,
+                    peerProxy.PeerName,
+                    ipcRequestContext,
+                    "HandleRequest",
+                    IpcContext.Logger);
+                IIpcResponseMessage result;
 
-            // 构建信息回复，发送回客户端。
-            // 由于这里是通用的回复逻辑，所以只对需要回复的业务进行回复（不需要回复的业务就直接忽略）。
-            var responseManager = IpcContext.IpcMessageResponseManager;
-            var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ResponseMessage);
-            var sendResponseTracker = new IpcMessageTracker<IpcBufferMessageContext>(
-                peerProxy.IpcContext.PipeName,
-                peerProxy.PeerName,
-                responseMessage,
-                "HandleRequest",
-                IpcContext.Logger);
-            sendResponseTracker.CriticalStep("Send", null, requestMessage);
-            await WriteResponseMessageAsync(peerProxy, sendResponseTracker).ConfigureAwait(false);
+                try
+                {
+                    result = await HandleRequestAsync(receiveRequestTracker, peerProxy.PeerName).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    IpcContext.Logger.Error(e, "业务端 HandleRequestAsync 抛出异常");
+                    result = new IpcHandleRequestMessageResult(new IpcMessage("Error", new byte[0]));
+                }
+
+                // 构建信息回复，发送回客户端。
+                // 由于这里是通用的回复逻辑，所以只对需要回复的业务进行回复（不需要回复的业务就直接忽略）。
+                var responseManager = IpcContext.IpcMessageResponseManager;
+                var responseMessage = responseManager.CreateResponseMessage(args.MessageId, result.ResponseMessage);
+                var sendResponseTracker = new IpcMessageTracker<IpcBufferMessageContext>(
+                    peerProxy.IpcContext.PipeName,
+                    peerProxy.PeerName,
+                    responseMessage,
+                    "HandleRequest",
+                    IpcContext.Logger);
+                sendResponseTracker.CriticalStep("Send", null, requestMessage);
+                await WriteResponseMessageAsync(peerProxy, sendResponseTracker).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                // 当前是后台线程了，不能接受任何的抛出
+                IpcContext.Logger.Error(e);
+            }
         }
 
         private async Task<IIpcResponseMessage> HandleRequestAsync(IpcMessageTracker<IpcRequestMessageContext> context, string remotePeerName)
