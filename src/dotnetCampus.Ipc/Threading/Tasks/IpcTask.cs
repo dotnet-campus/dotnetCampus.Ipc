@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,37 +62,48 @@ namespace dotnetCampus.Ipc.Threading.Tasks
 
         private async void ResumeRunning()
         {
-            var isRunning = Interlocked.CompareExchange(ref _isRunning, 1, 0);
-            if (isRunning is 1)
+            try
             {
-                lock (_locker)
+                var isRunning = Interlocked.CompareExchange(ref _isRunning, 1, 0);
+                if (isRunning is 1)
                 {
-                    if (_isRunning is 1)
+                    lock (_locker)
                     {
-                        // 当前已经在执行队列，因此无需继续执行。
-                        return;
+                        if (_isRunning is 1)
+                        {
+                            // 当前已经在执行队列，因此无需继续执行。
+                            return;
+                        }
+                    }
+                }
+
+                var hasTask = true;
+                while (hasTask)
+                {
+                    // 当前还没有任何队列开始执行，因此需要开始执行队列。
+                    while (_queue.TryDequeue(out var taskItem))
+                    {
+                        // 内部已包含异常处理，因此外面可以无需捕获或者清理。
+                        await ConsumeTaskItemAsync(taskItem).ConfigureAwait(false);
+                    }
+
+                    lock (_locker)
+                    {
+                        hasTask = _queue.TryPeek(out _);
+                        if (!hasTask)
+                        {
+                            _isRunning = 0;
+                        }
                     }
                 }
             }
-
-            var hasTask = true;
-            while (hasTask)
+            catch (Exception)
             {
-                // 当前还没有任何队列开始执行，因此需要开始执行队列。
-                while (_queue.TryDequeue(out var taskItem))
-                {
-                    // 内部已包含异常处理，因此外面可以无需捕获或者清理。
-                    await ConsumeTaskItemAsync(taskItem).ConfigureAwait(false);
-                }
-
-                lock (_locker)
-                {
-                    hasTask = _queue.TryPeek(out _);
-                    if (!hasTask)
-                    {
-                        _isRunning = 0;
-                    }
-                }
+                // 当前是后台线程了，不能接受任何的抛出
+                // 理论上这里框架层是不会抛出任何异常的
+#if DEBUG
+                Debugger.Break();
+#endif
             }
         }
 
