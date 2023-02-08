@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -203,6 +204,42 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(string methodName, Action<T1, T2, T3, T4, T5, T6, T7> methodInvoker)
+        {
+            _methods.Add((methodName, 7), args =>
+            {
+                methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!);
+                return default;
+            });
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, Task> methodInvoker)
+        {
+            _asyncMethods.Add((methodName, 7), async args =>
+            {
+                await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!).ConfigureAwait(false);
+                return default;
+            });
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(string methodName, Action<T1, T2, T3, T4, T5, T6, T7, T8> methodInvoker)
+        {
+            _methods.Add((methodName, 8), args =>
+            {
+                methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!);
+                return default;
+            });
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> methodInvoker)
+        {
+            _asyncMethods.Add((methodName, 8), async args =>
+            {
+                await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!).ConfigureAwait(false);
+                return default;
+            });
+        }
+
         protected void MatchMethod<TReturn>(string methodName, Func<Garm<TReturn>> methodInvoker)
         {
             _methods.Add((methodName, 0), _ => CastReturn(methodInvoker()));
@@ -271,6 +308,26 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add((methodName, 6), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!).ConfigureAwait(false)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, Garm<TReturn>> methodInvoker)
+        {
+            _methods.Add((methodName, 7), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, Task<Garm<TReturn>>> methodInvoker)
+        {
+            _asyncMethods.Add((methodName, 7), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!).ConfigureAwait(false)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, T8, Garm<TReturn>> methodInvoker)
+        {
+            _methods.Add((methodName, 8), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<Garm<TReturn>>> methodInvoker)
+        {
+            _asyncMethods.Add((methodName, 8), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!).ConfigureAwait(false)));
         }
 
         protected void MatchProperty<T>(string propertyName, Func<Garm<T>> getter)
