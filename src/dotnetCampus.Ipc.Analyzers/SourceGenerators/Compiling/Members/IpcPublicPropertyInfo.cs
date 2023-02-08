@@ -60,6 +60,8 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     {
         var propertyTypeName = builder.SimplifyNameByAddUsing(_contractProperty.Type);
         var containingTypeName = builder.SimplifyNameByAddUsing(_contractProperty.ContainingType);
+        var getMemberId = MemberIdGenerator.GeneratePropertyId("get", _ipcProperty.Name);
+        var setMemberId = MemberIdGenerator.GeneratePropertyId("set", _ipcProperty.Name);
         var valueArgumentName = GenerateGarmArgument(builder, _contractProperty.Type, "value");
         var namedValues = _ipcProperty.GetIpcNamedValues(_ipcType);
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
@@ -72,15 +74,15 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
 
 {propertyTypeName} {containingTypeName}.{_contractProperty.Name}
 {{
-    get => GetValueAsync<{propertyTypeName}>({namedValues}).Result;
-    set => SetValueAsync<{propertyTypeName}>({valueArgumentName}, {namedValues}).Wait();
+    get => GetValueAsync<{propertyTypeName}>(""{getMemberId}"", {namedValues}).Result;
+    set => SetValueAsync<{propertyTypeName}>(""{setMemberId}"", {valueArgumentName}, {namedValues}).Wait();
 }}
 
                 ",
                 // get 属性。
                 (true, false) => $@"
 
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({namedValues}).Result;
+{propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>(""{getMemberId}"", {namedValues}).Result;
 
                 ",
                 // 不支持 set 属性。
@@ -133,17 +135,19 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     {
         var containingTypeName = builder.SimplifyNameByAddUsing(_contractProperty.ContainingType);
         var propertyTypeName = builder.SimplifyNameByAddUsing(_contractProperty.Type);
+        var getMemberId = MemberIdGenerator.GeneratePropertyId("get", _ipcProperty.Name);
+        var setMemberId = MemberIdGenerator.GeneratePropertyId("set", _ipcProperty.Name);
         var garmPropertyTypeName = $"Garm<{propertyTypeName}>";
         var garmPropertyArgumentName = GenerateGarmArgument(builder, _contractProperty.Type, $"{real}.{_contractProperty.Name}");
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
         if (hasGet && hasSet)
         {
-            var sourceCode = $"MatchProperty(nameof({containingTypeName}.{_contractProperty.Name}), new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
+            var sourceCode = $"MatchProperty(\"{getMemberId}\", \"{setMemberId}\", new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
             return sourceCode;
         }
         else if (hasGet)
         {
-            var sourceCode = $"MatchProperty(nameof({containingTypeName}.{_contractProperty.Name}), new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}));";
+            var sourceCode = $"MatchProperty(\"{getMemberId}\", new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}));";
             return sourceCode;
         }
         else

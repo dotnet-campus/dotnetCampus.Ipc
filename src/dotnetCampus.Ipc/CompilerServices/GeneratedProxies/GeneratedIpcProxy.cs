@@ -86,7 +86,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性的值。</returns>
-        protected async Task<T?> GetValueAsync<T>(IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
+        protected async Task<T?> GetValueAsync<T>(string memberId, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
         {
             if (namedValues.IsReadonly ?? false)
             {
@@ -98,13 +98,13 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     return (T?) cachedValue;
                 }
                 // 否则，通过 IPC 访问获取此属性的值后设入缓存。（这里可能存在并发情况，会导致浪费的 IPC 访问，但能确保数据一致性）。
-                var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, namedValues).ConfigureAwait(false);
+                var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, memberId, propertyName, null, namedValues).ConfigureAwait(false);
                 _readonlyPropertyValues.TryAdd(propertyName, value);
                 return value;
             }
             else
             {
-                return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, propertyName, null, namedValues).ConfigureAwait(false);
+                return await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, memberId, propertyName, null, namedValues).ConfigureAwait(false);
             }
         }
 
@@ -116,9 +116,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性设置。</returns>
-        protected Task SetValueAsync<T>(Garm<T> value, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
+        protected Task SetValueAsync<T>(string memberId, Garm<T> value, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, propertyName, new Garm<object?>[] { CastArg(value) }, namedValues);
+            return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, memberId, propertyName, new Garm<object?>[] { CastArg(value) }, namedValues);
         }
 
         /// <summary>
@@ -128,9 +128,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task CallMethod(Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
+        protected Task CallMethod(string memberId, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.Method, methodName, args, namedValues);
+            return IpcInvokeAsync<object>(MemberInvokingType.Method, memberId, methodName, args, namedValues);
         }
 
         /// <summary>
@@ -140,9 +140,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task<T?> CallMethod<T>(Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
+        protected Task<T?> CallMethod<T>(string memberId, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<T>(MemberInvokingType.Method, methodName, args, namedValues);
+            return IpcInvokeAsync<T>(MemberInvokingType.Method, memberId, methodName, args, namedValues);
         }
 
         /// <summary>
@@ -152,9 +152,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task CallMethodAsync(Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
+        protected Task CallMethodAsync(string memberId, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, methodName, args, namedValues);
+            return IpcInvokeAsync<object>(MemberInvokingType.AsyncMethod, memberId, methodName, args, namedValues);
         }
 
         /// <summary>
@@ -164,9 +164,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        protected Task<T?> CallMethodAsync<T>(Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
+        protected Task<T?> CallMethodAsync<T>(string memberId, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string methodName = "")
         {
-            return IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, methodName, args, namedValues);
+            return IpcInvokeAsync<T>(MemberInvokingType.AsyncMethod, memberId, methodName, args, namedValues);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="args">调用参数。</param>
         /// <param name="namedValues">包含属性上标记的调用此 IPC 成员的个性化方式。</param>
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
-        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues)
+        private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberId, string memberName, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues)
         {
             var ignoresIpcException = namedValues.IgnoresIpcException ?? RuntimeConfigs?.IgnoresIpcException ?? false;
             try
@@ -186,6 +186,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 return (namedValues.Timeout ?? RuntimeConfigs?.Timeout) is int timeout && timeout > 0
                     ? await InvokeWithTimeoutAsync<T>(
                         callType,
+                        memberId,
                         memberName,
                         args,
                         timeout,
@@ -193,6 +194,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                         namedValues.DefaultReturn).ConfigureAwait(false)
                     : await Invoker.IpcInvokeAsync<T>(
                         callType,
+                        memberId,
                         memberName,
                         args).ConfigureAwait(false);
             }
@@ -222,10 +224,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private async Task<T?> InvokeWithTimeoutAsync<T>(MemberInvokingType callType, string memberName, Garm<object?>[]? args,
+        private async Task<T?> InvokeWithTimeoutAsync<T>(MemberInvokingType callType, string memberId, string memberName, Garm<object?>[]? args,
             int millisecondsTimeout, bool ignoreException, object? defaultReturn)
         {
-            var ipcTask = Invoker.IpcInvokeAsync<T>(callType, memberName, args);
+            var ipcTask = Invoker.IpcInvokeAsync<T>(callType, memberId, memberName, args);
             var timeoutTask = Task.Delay(millisecondsTimeout);
             var task = await Task.WhenAny(ipcTask, timeoutTask).ConfigureAwait(false);
             if (task == ipcTask)

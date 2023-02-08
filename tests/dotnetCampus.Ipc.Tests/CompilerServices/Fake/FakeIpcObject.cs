@@ -178,7 +178,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
 
         public long MethodWithSameParameterCountOverloading(long a, long b)
         {
-            return a + b;
+            return a * b;
         }
 
         public IFakeIpcObject.NestedEnum MethodWithNestedEnumReturn()

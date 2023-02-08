@@ -134,7 +134,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             try
             {
                 var args = ExtractArgsFromArgsModel(requestModel.Args, peer);
-                var returnValue = await InvokeMember(joint, requestModel.CallType, requestModel.MemberName!, args).ConfigureAwait(false);
+                var returnValue = await InvokeMember(joint, requestModel.CallType, requestModel.MemberId!, requestModel.MemberName!, args).ConfigureAwait(false);
                 @return = CreateReturnModelFromReturnObject(returnValue);
 #if DEBUG
                 @return.Invoking = requestModel;
@@ -207,14 +207,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, string memberName, object?[]? args)
+        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, string memberId, string memberName, object?[]? args)
         {
             return callType switch
             {
-                MemberInvokingType.GetProperty => joint.GetProperty(memberName),
-                MemberInvokingType.SetProperty => joint.SetProperty(memberName, args?.FirstOrDefault()),
-                MemberInvokingType.Method => joint.CallMethod(memberName, args),
-                MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberName, args).ConfigureAwait(false),
+                MemberInvokingType.GetProperty => joint.GetProperty(memberId, memberName),
+                MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args?.FirstOrDefault()),
+                MemberInvokingType.Method => joint.CallMethod(memberId, memberName, args),
+                MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberId, memberName, args).ConfigureAwait(false),
                 _ => new Garm<object?>(null),
             };
         }
