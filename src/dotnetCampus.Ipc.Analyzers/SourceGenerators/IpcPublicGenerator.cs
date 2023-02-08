@@ -9,39 +9,38 @@ namespace dotnetCampus.Ipc;
 /// <summary>
 /// 为 IPC 接口生成对应的代理（Proxy）和对接（Joint）。
 /// </summary>
-[Generator]
-public class IpcPublicGenerator : ISourceGenerator
+[Generator(LanguageNames.CSharp)]
+public class IpcPublicGenerator : IIncrementalGenerator
 {
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        //System.Diagnostics.Debugger.Launch();
+        var compilations = context.SyntaxProvider.CreateSyntaxProvider(
+            // 基本过滤：有特性的接口。
+            (syntaxNode, ct) => syntaxNode is InterfaceDeclarationSyntax ids && ids.AttributeLists.Count > 0,
+            // 语义解析：确定是否真的是感兴趣的 IPC 接口。
+            (generatorSyntaxContext, ct) => IpcPublicCompilation.TryCreateIpcPublicCompilation(
+                (InterfaceDeclarationSyntax) generatorSyntaxContext.Node,
+                generatorSyntaxContext.SemanticModel,
+                out var ipcPublicCompilation)
+                    ? ipcPublicCompilation
+                    : null)
+            .Where(x => x is not null)
+            .Select((x, ct) => x!);
+
+        context.RegisterSourceOutput(compilations, Execute);
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    private void Execute(SourceProductionContext context, IpcPublicCompilation ipcPublicCompilation)
     {
         try
         {
-            foreach (var ipcPublicCompilation in FindIpcPublicInterfaces(context.Compilation))
-            {
-                try
-                {
-                    var ipcType = ipcPublicCompilation.IpcType;
-                    var proxySource = GenerateProxySource(ipcPublicCompilation);
-                    var jointSource = GenerateJointSource(ipcPublicCompilation);
-                    var assemblySource = GenerateAssemblySource(ipcPublicCompilation);
-                    context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                    context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
-                    context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
-                }
-                catch (DiagnosticException ex)
-                {
-                    ReportDiagnosticsThatHaveNotBeenReported(context, ex);
-                }
-                catch (Exception ex)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
-                }
-            }
+            var ipcType = ipcPublicCompilation.IpcType;
+            var proxySource = GenerateProxySource(ipcPublicCompilation);
+            var jointSource = GenerateJointSource(ipcPublicCompilation);
+            var assemblySource = GenerateAssemblySource(ipcPublicCompilation);
+            context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+            context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
+            context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
         }
         catch (DiagnosticException ex)
         {
@@ -65,24 +64,5 @@ using {pc.GetNamespace()};
 
 [assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({pc.IpcType}), typeof(__{pc.IpcType.Name}IpcProxy), typeof(__{pc.IpcType.Name}IpcJoint))]";
         return sourceCode;
-    }
-
-    /// <summary>
-    /// 在整个项目的编译信息中寻找 IPC 真实对象的编译信息。
-    /// </summary>
-    /// <param name="compilation">整个项目的编译信息。</param>
-    /// <returns>所有 IPC 真实对象的编译信息</returns>
-    private IEnumerable<IpcPublicCompilation> FindIpcPublicInterfaces(Compilation compilation)
-    {
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            if (IpcPublicCompilation.TryFindIpcPublicCompilations(compilation, syntaxTree, out var ipcPublicCompilations))
-            {
-                foreach (var ipcPublicCompilation in ipcPublicCompilations)
-                {
-                    yield return ipcPublicCompilation;
-                }
-            }
-        }
     }
 }

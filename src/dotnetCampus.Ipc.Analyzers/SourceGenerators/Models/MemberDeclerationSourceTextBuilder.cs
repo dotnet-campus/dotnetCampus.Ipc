@@ -32,7 +32,7 @@ internal class MemberDeclarationSourceTextBuilder
         {
             return $@"{_sourceCode}
 {{
-    {string.Join(Environment.NewLine, _expressions)}
+    {string.Join("\r\n", _expressions)}
 }}";
         }
     }

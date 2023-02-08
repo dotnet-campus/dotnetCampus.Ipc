@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>dotnetCampus.Ipc</RootNamespace>
     <DefineConstants>$(DefineConstants);IPC_ANALYZER</DefineConstants>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <ItemGroup>
