@@ -238,6 +238,18 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 Assert.AreEqual(new ValueTuple<double, uint, int, byte>(1, 2, 3, 4), result);
             });
 
+            "IPC 代理生成：同数量的参数。".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.AsyncMethodWithStructParametersAndStructReturn));
+
+                // 安放。
+                var result = await proxy.AsyncMethodWithStructParametersAndStructReturn(1, 2, 3, 4);
+
+                // 植物。
+                Assert.AreEqual(new ValueTuple<double, uint, int, byte>(1, 2, 3, 4), result);
+            });
+
             "IPC 代理生成：复杂参数和异步复杂返回值".Test(async () =>
             {
                 // 准备。

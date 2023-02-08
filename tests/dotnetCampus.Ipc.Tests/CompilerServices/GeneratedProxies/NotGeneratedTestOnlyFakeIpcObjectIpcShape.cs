@@ -148,6 +148,16 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
             throw null;
         }
 
+        public int MethodWithSameParameterCountOverloading(int a, int b)
+        {
+            throw null;
+        }
+
+        public long MethodWithSameParameterCountOverloading(long a, long b)
+        {
+            throw null;
+        }
+
         [IpcMethod]
         IFakeIpcObject.NestedEnum IFakeIpcObject.MethodWithNestedEnumReturn()
         {

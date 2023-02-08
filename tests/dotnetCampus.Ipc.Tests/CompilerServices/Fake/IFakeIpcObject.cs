@@ -79,6 +79,10 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
 
         bool MethodWithStructReturn();
 
+        int MethodWithSameParameterCountOverloading(int a, int b);
+
+        long MethodWithSameParameterCountOverloading(long a, long b);
+
         NestedEnum MethodWithNestedEnumReturn();
 
         Task<IFakeIpcObject.NestedEnum> AsyncMethodWithNestedEnumReturn();
