@@ -144,7 +144,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     .FirstOrDefault(x => x.IpcType == ipcType);
                 if (attribute is null)
                 {
-                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”代理壳的 IPC 代理类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”代理壳的 IPC 代理类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
                 }
                 return (attribute.ProxyType, null);
             }
@@ -155,7 +155,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     .FirstOrDefault(x => x.IpcType == ipcType);
                 if (attribute is null)
                 {
-                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”接口的 IPC 代理与对接类，所以运行时无法创建他们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                    throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”接口的 IPC 代理与对接类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
                 }
                 return (attribute.ProxyType, attribute.JointType);
             }
