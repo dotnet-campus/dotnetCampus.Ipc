@@ -36,6 +36,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
                 null => default!,
                 JValue jValue => jValue.ToObject<T>(),
                 JObject jObject => jObject.ToObject<T>(),
+                JArray jArray => jArray.ToObject<T>(),
                 _ => throw new NotSupportedException("不支持将其他 JToken 类型转换成 IPC 业务类型。")
             };
     }
