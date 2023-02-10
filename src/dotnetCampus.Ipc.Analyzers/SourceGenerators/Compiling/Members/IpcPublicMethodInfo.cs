@@ -247,9 +247,9 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     {
         return string.Join(
             ", ",
-            parameters.Select(x => x.Type.TypeKind == TypeKind.Interface
+            parameters.Select(x => x.Type.GetIsIpcType()
                 ? $"new Garm<{builder.SimplifyNameByAddUsing(x.Type)}>({x.Name}, typeof({x.Type.Name}))"
-                : $"{x.Name}"));
+                : $"new Garm<{builder.SimplifyNameByAddUsing(x.Type)}>({x.Name})"));
     }
 
     /// <summary>
@@ -296,7 +296,7 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     /// <returns>方法实参列表字符串。</returns>
     private string GenerateGarmReturn(SourceTextBuilder builder, ITypeSymbol @return, string value)
     {
-        return @return.TypeKind == TypeKind.Interface
+        return @return.GetIsIpcType()
                 ? $"new Garm<{builder.SimplifyNameByAddUsing(@return)}>({value}, typeof({@return.Name}))"
                 : $"new Garm<{builder.SimplifyNameByAddUsing(@return)}>({value})";
     }

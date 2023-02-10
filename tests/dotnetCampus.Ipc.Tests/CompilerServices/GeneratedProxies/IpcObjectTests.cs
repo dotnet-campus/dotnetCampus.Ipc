@@ -1,5 +1,7 @@
 ﻿#nullable enable
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -13,6 +15,7 @@ using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using MSTest.Extensions.AssertExtensions;
 using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
@@ -288,6 +291,88 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 // 对接端的值被代理端修改。
                 Assert.AreEqual("test changed from proxy side", jointSideObject.Value);
                 Assert.AreEqual("test changed from proxy side", result.Value);
+            });
+        }
+
+        [ContractTestCase]
+        public void IpcCollectionTests()
+        {
+            "IPC 代理生成：集合（列表）属性".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.ListProperty));
+
+                // 安放。
+                var result = proxy.ListProperty;
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "List1", "List2" }, result);
+            });
+
+            "IPC 代理生成：集合（接口）属性".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.CollectionProperty));
+
+                // 安放。
+                var result = proxy.CollectionProperty;
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "Collection1", "Collection2" }, (ICollection?) result);
+            });
+
+            "IPC 代理生成：集合（数组）属性".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.ArrayProperty));
+
+                // 安放。
+                var result = proxy.ArrayProperty;
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "Array1", "Array2" }, result);
+            });
+
+            "IPC 代理生成：集合（列表）异步方法".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.MethodWithListParametersAndListReturn));
+
+                // 安放。
+                var result = await proxy.MethodWithListParametersAndListReturn(
+                    new List<string> { "a", "b" },
+                    new List<string> { "c", "d" });
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "a", "b", "c", "d" }, result);
+            });
+
+            "IPC 代理生成：集合（接口）异步方法".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.MethodWithCollectionParametersAndCollectionReturn));
+
+                // 安放。
+                var result = await proxy.MethodWithCollectionParametersAndCollectionReturn(
+                    new List<string> { "a", "b" },
+                    new List<string> { "c", "d" });
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "a", "b", "c", "d" }, (ICollection) result);
+            });
+
+            "IPC 代理生成：集合（数组）异步方法".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.MethodWithArrayParametersAndArrayReturn));
+
+                // 安放。
+                var result = await proxy.MethodWithArrayParametersAndArrayReturn(
+                    new string[] { "a", "b" },
+                    new string[] { "c", "d" });
+
+                // 植物。
+                CollectionAssert.AreEqual(new string[] { "a", "b", "c", "d" }, result);
             });
         }
 

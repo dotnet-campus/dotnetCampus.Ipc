@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,6 +57,12 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             get => _nestedIpcObject;
             set => _nestedIpcObject = value;
         }
+
+        public List<string>? ListProperty { get; set; } = new List<string>() { "List1", "List2" };
+
+        public IList<string>? CollectionProperty { get; set; } = new List<string>() { "Collection1", "Collection2" };
+
+        public string[]? ArrayProperty { get; set; } = new string[] { "Array1", "Array2" };
 
         public void WaitsVoidMethod()
         {
@@ -134,6 +142,24 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         {
             await Task.Delay(150);
             return "xxx";
+        }
+
+        public async Task<List<string>> MethodWithListParametersAndListReturn(List<string> a, List<string> b)
+        {
+            await Task.Delay(1);
+            return a.Concat(b).ToList();
+        }
+
+        public async Task<IList<string>> MethodWithCollectionParametersAndCollectionReturn(IList<string> a, IList<string> b)
+        {
+            await Task.Delay(1);
+            return a.Concat(b).ToList();
+        }
+
+        public async Task<string[]> MethodWithArrayParametersAndArrayReturn(string[] a, string[] b)
+        {
+            await Task.Delay(1);
+            return a.Concat(b).ToArray();
         }
 
         public void MethodWithStructParameters(BindingFlags flags)

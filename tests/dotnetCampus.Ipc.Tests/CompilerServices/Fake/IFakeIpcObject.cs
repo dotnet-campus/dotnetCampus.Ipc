@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -18,6 +19,12 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         IntPtr IntPtrProperty { get; }
 
         IntPtr? NullableIntPtrProperty { get; }
+
+        List<string>? ListProperty { get; set; }
+
+        IList<string>? CollectionProperty { get; set; }
+
+        string[]? ArrayProperty { get; set; }
 
         INestedFakeIpcArgumentOrReturn NestedIpcProperty { get; set; }
 
@@ -61,6 +68,12 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
 
         [IpcMethod(DefaultReturn = "default1")]
         Task<string> MethodThatCannotBeCompiled_MustSetOtherAttributes();
+
+        Task<List<string>> MethodWithListParametersAndListReturn(List<string> a, List<string> b);
+
+        Task<IList<string>> MethodWithCollectionParametersAndCollectionReturn(IList<string> a, IList<string> b);
+
+        Task<string[]> MethodWithArrayParametersAndArrayReturn(string[] a, string[] b);
 
         void MethodWithStructParameters(BindingFlags flags);
 

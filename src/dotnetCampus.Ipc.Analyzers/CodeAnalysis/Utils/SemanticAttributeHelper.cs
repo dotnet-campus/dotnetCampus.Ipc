@@ -54,6 +54,20 @@ internal static class SemanticAttributeHelper
     }
 
     /// <summary>
+    /// 检查此成员是否已定义了 <typeparamref name="TAttribute"/> 类型的特性。
+    /// </summary>
+    /// <typeparam name="TAttribute">要检查的类型。</typeparam>
+    /// <param name="symbol">要查找特性的语义符号。</param>
+    /// <returns>如果定义了 <typeparamref name="TAttribute"/>，则返回 true；否则返回 false。</returns>
+    internal static bool GetIsDefined<TAttribute>(this ISymbol symbol)
+    {
+        return symbol.GetAttributes().FirstOrDefault(x => string.Equals(
+            x.AttributeClass?.ToString(),
+            typeof(TAttribute).FullName,
+            StringComparison.Ordinal)) is { } ipcMethodAttribute;
+    }
+
+    /// <summary>
     /// 检查此成员的 <paramref name="attributeTypeName"/> 类型特性的 <paramref name="namedArgumentName"/> 名字的参数的值。
     /// </summary>
     /// <param name="symbol">要查找特性的语义符号。</param>
