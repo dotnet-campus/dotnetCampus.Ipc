@@ -74,15 +74,15 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
 
 {propertyTypeName} {containingTypeName}.{_contractProperty.Name}
 {{
-    get => GetValueAsync<{propertyTypeName}>(""{getMemberId}"", {namedValues}).Result;
-    set => SetValueAsync<{propertyTypeName}>(""{setMemberId}"", {valueArgumentName}, {namedValues}).Wait();
+    get => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result;
+    set => SetValueAsync<{propertyTypeName}>({setMemberId}, {valueArgumentName}, {namedValues}).Wait();
 }}
 
                 ",
                 // get 属性。
                 (true, false) => $@"
 
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>(""{getMemberId}"", {namedValues}).Result;
+{propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result;
 
                 ",
                 // 不支持 set 属性。
@@ -142,12 +142,12 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
         if (hasGet && hasSet)
         {
-            var sourceCode = $"MatchProperty(\"{getMemberId}\", \"{setMemberId}\", new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
+            var sourceCode = $"MatchProperty({getMemberId}, {setMemberId}, new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
             return sourceCode;
         }
         else if (hasGet)
         {
-            var sourceCode = $"MatchProperty(\"{getMemberId}\", new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}));";
+            var sourceCode = $"MatchProperty({getMemberId}, new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}));";
             return sourceCode;
         }
         else

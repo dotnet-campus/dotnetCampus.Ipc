@@ -19,9 +19,6 @@ public static class MemberIdGenerator
         var inputBytes = Encoding.UTF8.GetBytes(text);
         var hashBytes = sha256.ComputeHash(inputBytes);
 
-        return BitConverter.ToString(hashBytes)
-            .Replace("-", "")
-            .Substring(0, 16)
-            .ToLower(CultureInfo.InvariantCulture);
+        return $"0x{BitConverter.ToInt64(hashBytes, 0).ToString("X")}";
     }
 }

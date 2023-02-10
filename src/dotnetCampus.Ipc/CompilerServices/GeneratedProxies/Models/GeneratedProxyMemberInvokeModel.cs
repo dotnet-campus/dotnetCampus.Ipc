@@ -42,7 +42,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 调用的成员 Id（由源代码生成器自动生成，唯一表示一个属性或方法）。
         /// </summary>
         [DataMember(Name = "d")]
-        public string? MemberId { get; internal set; }
+        public ulong MemberId { get; internal set; }
 
         /// <summary>
         /// 调用的成员名称（属性名、方法名）。

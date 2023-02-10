@@ -207,7 +207,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, string memberId, string memberName, object?[]? args)
+        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, object?[]? args)
         {
             return callType switch
             {
