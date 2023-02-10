@@ -8,6 +8,17 @@ namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 internal static class IpcSemanticAttributeHelper
 {
     /// <summary>
+    /// 如果类型是 IPC 类型，则返回 true；否则返回 false。
+    /// <para>IPC 类型为标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型。</para>
+    /// </summary>
+    /// <param name="type">要检查的类型。</param>
+    /// <returns></returns>
+    internal static bool GetIsIpcType(this ITypeSymbol type)
+    {
+        return type.GetIsDefined<IpcPublicAttribute>() || type.GetIsDefined<IpcShapeAttribute>();
+    }
+
+    /// <summary>
     /// 检查此类型上标记的 <see cref="IpcPublicAttribute"/> 并将其转换为传入 IPC 代理的类型。
     /// </summary>
     /// <param name="type"></param>

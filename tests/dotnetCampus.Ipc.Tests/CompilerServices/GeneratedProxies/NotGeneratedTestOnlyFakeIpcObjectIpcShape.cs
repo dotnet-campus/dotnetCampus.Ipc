@@ -3,6 +3,8 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Tests.CompilerServices;
 using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -31,6 +33,15 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 
         [IpcProperty]
         INestedFakeIpcArgumentOrReturn IFakeIpcObject.NestedIpcProperty { get; set; }
+
+        [IpcProperty]
+        public List<string> ListProperty { get; set; }
+
+        [IpcProperty]
+        public IList<string> CollectionProperty { get; set; }
+
+        [IpcProperty]
+        public string[] ArrayProperty { get; set; }
 
         [IpcMethod]
         void IFakeIpcObject.WaitsVoidMethod()
@@ -106,6 +117,21 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 
         [IpcMethod]
         Task<string> IFakeIpcObject.MethodThatCannotBeCompiled_MustSetOtherAttributes()
+        {
+            throw null;
+        }
+
+        public Task<List<string>> MethodWithListParametersAndListReturn(List<string> a, List<string> b)
+        {
+            throw null;
+        }
+
+        public Task<IList<string>> MethodWithCollectionParametersAndCollectionReturn(IList<string> a, IList<string> b)
+        {
+            throw null;
+        }
+
+        public Task<string[]> MethodWithArrayParametersAndArrayReturn(string[] a, string[] b)
         {
             throw null;
         }
