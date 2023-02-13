@@ -171,6 +171,16 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return IpcReadonlyProperty;
         }
 
+        public int MethodWithSameParameterCountOverloading(int a, int b)
+        {
+            return a + b;
+        }
+
+        public long MethodWithSameParameterCountOverloading(long a, long b)
+        {
+            return a * b;
+        }
+
         public IFakeIpcObject.NestedEnum MethodWithNestedEnumReturn()
         {
             return IFakeIpcObject.NestedEnum.None;
@@ -181,9 +191,9 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
             return Task.FromResult(IFakeIpcObject.NestedEnum.None);
         }
 
-        public Task AsyncMethod()
+        public async Task AsyncMethod()
         {
-            return Task.CompletedTask;
+            await Task.Delay(2000);
         }
 
         public async Task<INestedFakeIpcArgumentOrReturn> AsyncMethodWithIpcPublicObjectParametersAndIpcPublicObjectReturn(INestedFakeIpcArgumentOrReturn nested, string changeValue)

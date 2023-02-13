@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -19,10 +20,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <param name="realInstance">真实实例。</param>
         internal abstract void SetInstance(object realInstance);
-        internal abstract Garm<object?> GetProperty(string propertyName);
-        internal abstract Garm<object?> SetProperty(string propertyName, object? value);
-        internal abstract Garm<object?> CallMethod(string methodName, object?[]? args);
-        internal abstract Task<Garm<object?>> CallMethodAsync(string methodName, object?[]? args);
+        internal abstract Garm<object?> GetProperty(ulong memberId, string propertyName);
+        internal abstract Garm<object?> SetProperty(ulong memberId, string propertyName, object? value);
+        internal abstract Garm<object?> CallMethod(ulong memberId, string methodName, object?[]? args);
+        internal abstract Task<Garm<object?>> CallMethodAsync(ulong memberId, string methodName, object?[]? args);
     }
 
     /// <summary>
@@ -34,22 +35,22 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 获取属性值的方法集合。
         /// </summary>
-        private readonly Dictionary<string, Func<Garm<object?>>> _propertyGetters = new();
+        private readonly Dictionary<ulong, Func<Garm<object?>>> _propertyGetters = new();
 
         /// <summary>
-        /// 设置属性值的方法集合。
+        /// 设置属性值的方法集合（Key 为 MemberId，用于标识一个接口内的唯一一个成员，其中属性的 get 和 set 分别是两个不同的成员）。
         /// </summary>
-        private readonly Dictionary<string, Action<object?>> _propertySetters = new();
+        private readonly Dictionary<ulong, Action<object?>> _propertySetters = new();
 
         /// <summary>
-        /// 调用方法的方法集合。
+        /// 调用方法的方法集合（Key 为 MemberId，用于标识一个接口内的唯一一个成员，其中属性的 get 和 set 分别是两个不同的成员）。
         /// </summary>
-        private readonly Dictionary<(string methodName, int parameterCount), Func<object?[]?, Garm<object?>>> _methods = new();
+        private readonly Dictionary<ulong, Func<object?[]?, Garm<object?>>> _methods = new();
 
         /// <summary>
         /// 调用异步方法的方法集合。
         /// </summary>
-        private readonly Dictionary<(string methodName, int parameterCount), Func<object?[]?, Task<Garm<object?>>>> _asyncMethods = new();
+        private readonly Dictionary<ulong, Func<object?[]?, Task<Garm<object?>>>> _asyncMethods = new();
 
         /// <summary>
         /// 设置此对接对象的真实实例。
@@ -77,225 +78,281 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="realInstance">当对接时，可使用此参数来访问真实对象。</param>
         protected abstract void MatchMembers(TContract realInstance);
 
-        protected void MatchMethod(string methodName, Action methodInvoker)
+        protected void MatchMethod(ulong memberId, Action methodInvoker)
         {
-            _methods.Add((methodName, 0), _ =>
+            _methods.Add(memberId, _ =>
             {
                 methodInvoker();
                 return default;
             });
         }
 
-        protected void MatchMethod(string methodName, Func<Task> methodInvoker)
+        protected void MatchMethod(ulong memberId, Func<Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 0), async _ =>
+            _asyncMethods.Add(memberId, async _ =>
             {
                 await methodInvoker().ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T>(string methodName, Action<T> methodInvoker)
+        protected void MatchMethod<T>(ulong memberId, Action<T> methodInvoker)
         {
-            _methods.Add((methodName, 1), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T>(args![0])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T>(string methodName, Func<T, Task> methodInvoker)
+        protected void MatchMethod<T>(ulong memberId, Func<T, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 1), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T>(args![0])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2>(string methodName, Action<T1, T2> methodInvoker)
+        protected void MatchMethod<T1, T2>(ulong memberId, Action<T1, T2> methodInvoker)
         {
-            _methods.Add((methodName, 2), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2>(string methodName, Func<T1, T2, Task> methodInvoker)
+        protected void MatchMethod<T1, T2>(ulong memberId, Func<T1, T2, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 2), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3>(string methodName, Action<T1, T2, T3> methodInvoker)
+        protected void MatchMethod<T1, T2, T3>(ulong memberId, Action<T1, T2, T3> methodInvoker)
         {
-            _methods.Add((methodName, 3), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3>(string methodName, Func<T1, T2, T3, Task> methodInvoker)
+        protected void MatchMethod<T1, T2, T3>(ulong memberId, Func<T1, T2, T3, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 3), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4>(string methodName, Action<T1, T2, T3, T4> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4>(ulong memberId, Action<T1, T2, T3, T4> methodInvoker)
         {
-            _methods.Add((methodName, 4), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4>(string methodName, Func<T1, T2, T3, T4, Task> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4>(ulong memberId, Func<T1, T2, T3, T4, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 4), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5>(string methodName, Action<T1, T2, T3, T4, T5> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5>(ulong memberId, Action<T1, T2, T3, T4, T5> methodInvoker)
         {
-            _methods.Add((methodName, 5), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5>(string methodName, Func<T1, T2, T3, T4, T5, Task> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5>(ulong memberId, Func<T1, T2, T3, T4, T5, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 5), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, T6>(string methodName, Action<T1, T2, T3, T4, T5, T6> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6>(ulong memberId, Action<T1, T2, T3, T4, T5, T6> methodInvoker)
         {
-            _methods.Add((methodName, 6), args =>
+            _methods.Add(memberId, args =>
             {
                 methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!);
                 return default;
             });
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, T6>(string methodName, Func<T1, T2, T3, T4, T5, T6, Task> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 6), async args =>
+            _asyncMethods.Add(memberId, async args =>
             {
                 await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!).ConfigureAwait(false);
                 return default;
             });
         }
 
-        protected void MatchMethod<TReturn>(string methodName, Func<Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(ulong memberId, Action<T1, T2, T3, T4, T5, T6, T7> methodInvoker)
         {
-            _methods.Add((methodName, 0), _ => CastReturn(methodInvoker()));
+            _methods.Add(memberId, args =>
+            {
+                methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!);
+                return default;
+            });
         }
 
-        protected void MatchMethod<TReturn>(string methodName, Func<Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 0), async _ => CastReturn(await methodInvoker().ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args =>
+            {
+                await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!).ConfigureAwait(false);
+                return default;
+            });
         }
 
-        protected void MatchMethod<T, TReturn>(string methodName, Func<T, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(ulong memberId, Action<T1, T2, T3, T4, T5, T6, T7, T8> methodInvoker)
         {
-            _methods.Add((methodName, 1), args => CastReturn(methodInvoker(CastArg<T>(args![0])!)));
+            _methods.Add(memberId, args =>
+            {
+                methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!);
+                return default;
+            });
         }
 
-        protected void MatchMethod<T, TReturn>(string methodName, Func<T, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 1), async args => CastReturn(await methodInvoker(CastArg<T>(args![0])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args =>
+            {
+                await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!).ConfigureAwait(false);
+                return default;
+            });
         }
 
-        protected void MatchMethod<T1, T2, TReturn>(string methodName, Func<T1, T2, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<TReturn>(ulong memberId, Func<Garm<TReturn>> methodInvoker)
         {
-            _methods.Add((methodName, 2), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!)));
+            _methods.Add(memberId, _ => CastReturn(methodInvoker()));
         }
 
-        protected void MatchMethod<T1, T2, TReturn>(string methodName, Func<T1, T2, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<TReturn>(ulong memberId, Func<Task<Garm<TReturn>>> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 2), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async _ => CastReturn(await methodInvoker().ConfigureAwait(false)));
         }
 
-        protected void MatchMethod<T1, T2, T3, TReturn>(string methodName, Func<T1, T2, T3, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T, TReturn>(ulong memberId, Func<T, Garm<TReturn>> methodInvoker)
         {
-            _methods.Add((methodName, 3), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!)));
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T>(args![0])!)));
         }
 
-        protected void MatchMethod<T1, T2, T3, TReturn>(string methodName, Func<T1, T2, T3, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T, TReturn>(ulong memberId, Func<T, Task<Garm<TReturn>>> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 3), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T>(args![0])!).ConfigureAwait(false)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, TReturn>(string methodName, Func<T1, T2, T3, T4, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T1, T2, TReturn>(ulong memberId, Func<T1, T2, Garm<TReturn>> methodInvoker)
         {
-            _methods.Add((methodName, 4), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!)));
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, TReturn>(string methodName, Func<T1, T2, T3, T4, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T1, T2, TReturn>(ulong memberId, Func<T1, T2, Task<Garm<TReturn>>> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 4), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!).ConfigureAwait(false)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, TReturn>(ulong memberId, Func<T1, T2, T3, Garm<TReturn>> methodInvoker)
         {
-            _methods.Add((methodName, 5), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!)));
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, TReturn>(ulong memberId, Func<T1, T2, T3, Task<Garm<TReturn>>> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 5), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!).ConfigureAwait(false)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, Garm<TReturn>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, TReturn>(ulong memberId, Func<T1, T2, T3, T4, Garm<TReturn>> methodInvoker)
         {
-            _methods.Add((methodName, 6), args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!)));
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!)));
         }
 
-        protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(string methodName, Func<T1, T2, T3, T4, T5, T6, Task<Garm<TReturn>>> methodInvoker)
+        protected void MatchMethod<T1, T2, T3, T4, TReturn>(ulong memberId, Func<T1, T2, T3, T4, Task<Garm<TReturn>>> methodInvoker)
         {
-            _asyncMethods.Add((methodName, 6), async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!).ConfigureAwait(false)));
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!).ConfigureAwait(false)));
         }
 
-        protected void MatchProperty<T>(string propertyName, Func<Garm<T>> getter)
+        protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, Garm<TReturn>> methodInvoker)
         {
-            _propertyGetters.Add(propertyName, () => CastReturn(getter()));
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!)));
         }
 
-        protected void MatchProperty<T>(string propertyName, Func<Garm<T>> getter, Action<T> setter)
+        protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, Task<Garm<TReturn>>> methodInvoker)
         {
-            _propertyGetters.Add(propertyName, () => CastReturn(getter()));
-            _propertySetters.Add(propertyName, value => setter(CastArg<T>(value)!));
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!).ConfigureAwait(false)));
         }
 
-        internal sealed override Garm<object?> GetProperty(string propertyName)
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Garm<TReturn>> methodInvoker)
         {
-            if (_propertyGetters.TryGetValue(propertyName, out var getter))
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Task<Garm<TReturn>>> methodInvoker)
+        {
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!).ConfigureAwait(false)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Garm<TReturn>> methodInvoker)
+        {
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Task<Garm<TReturn>>> methodInvoker)
+        {
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!).ConfigureAwait(false)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Garm<TReturn>> methodInvoker)
+        {
+            _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!)));
+        }
+
+        protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<Garm<TReturn>>> methodInvoker)
+        {
+            _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!).ConfigureAwait(false)));
+        }
+
+        protected void MatchProperty<T>(ulong getPropertyId, Func<Garm<T>> getter)
+        {
+            _propertyGetters.Add(getPropertyId, () => CastReturn(getter()));
+        }
+
+        protected void MatchProperty<T>(ulong getPropertyId, ulong setPropertyId, Func<Garm<T>> getter, Action<T> setter)
+        {
+            _propertyGetters.Add(getPropertyId, () => CastReturn(getter()));
+            _propertySetters.Add(setPropertyId, value => setter(CastArg<T>(value)!));
+        }
+
+        internal sealed override Garm<object?> GetProperty(ulong memberId, string propertyName)
+        {
+            if (_propertyGetters.TryGetValue(memberId, out var getter))
             {
                 return getter();
             }
             throw new NotImplementedException($"无法对接 {typeof(TContract).FullName}.{propertyName} 属性，因为没有在 {GetType().FullName} 的 IPC 对接类中进行匹配。");
         }
 
-        internal sealed override Garm<object?> SetProperty(string propertyName, object? value)
+        internal sealed override Garm<object?> SetProperty(ulong memberId, string propertyName, object? value)
         {
-            if (_propertySetters.TryGetValue(propertyName, out var setter))
+            if (_propertySetters.TryGetValue(memberId, out var setter))
             {
                 setter(value);
                 return default;
@@ -303,24 +360,24 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             throw new NotImplementedException($"无法对接 {typeof(TContract).FullName}.{propertyName} 属性，因为没有在 {GetType().FullName} 的 IPC 对接类中进行匹配。");
         }
 
-        internal sealed override Garm<object?> CallMethod(string methodName, object?[]? args)
+        internal sealed override Garm<object?> CallMethod(ulong memberId, string methodName, object?[]? args)
         {
             var count = args is null ? 0 : args.Length;
-            if (_methods.TryGetValue((methodName, count), out var method))
+            if (_methods.TryGetValue(memberId, out var method))
             {
                 return method(args);
             }
-            throw CreateMethodNotMatchException(methodName, count);
+            throw CreateMethodNotMatchException(memberId, methodName);
         }
 
-        internal sealed override async Task<Garm<object?>> CallMethodAsync(string methodName, object?[]? args)
+        internal sealed override async Task<Garm<object?>> CallMethodAsync(ulong memberId, string methodName, object?[]? args)
         {
             var count = args is null ? 0 : args.Length;
-            if (_asyncMethods.TryGetValue((methodName, count), out var asyncMethod))
+            if (_asyncMethods.TryGetValue(memberId, out var asyncMethod))
             {
                 return await asyncMethod(args).ConfigureAwait(false);
             }
-            throw CreateMethodNotMatchException(methodName, count);
+            throw CreateMethodNotMatchException(memberId, methodName);
         }
 
         private T? CastArg<T>(object? argModel)
@@ -337,22 +394,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             return new Garm<object?>(argModel.Value, argModel.IpcType);
         }
 
-        private Exception CreateMethodNotMatchException(string methodName, int count)
+        private Exception CreateMethodNotMatchException(ulong memberId, string methodName)
         {
-            var methodPair = _methods.FirstOrDefault(pair => pair.Key.methodName == methodName);
-            var asyncMethodPair = _asyncMethods.FirstOrDefault(pair => pair.Key.methodName == methodName);
-            if (methodPair.Key.parameterCount != count)
-            {
-                return new NotImplementedException($"无法对接 {typeof(TContract).FullName}.{methodName}({count} 个参数) 方法，在 {GetType().FullName} 中能找到的 IPC 对接类中最接近的是 {methodPair.Key.parameterCount} 个参数的重载。");
-            }
-            else if (asyncMethodPair.Key.parameterCount != count)
-            {
-                return new NotImplementedException($"无法对接 {typeof(TContract).FullName}.{methodName}({count} 个参数) 方法，在 {GetType().FullName} 中能找到的 IPC 对接类中最接近的是 {asyncMethodPair.Key.parameterCount} 个参数的异步重载。");
-            }
-            else
-            {
-                return new NotImplementedException($"无法对接 {typeof(TContract).FullName}.{methodName} 方法，因为没有在 {GetType().FullName} 的 IPC 对接类中进行匹配。");
-            }
+            return new NotImplementedException($"无法对接 Id 为 {memberId} 的 {typeof(TContract).FullName}.{methodName} 方法，因为没有在 {GetType().FullName} 的 IPC 对接类中进行匹配。");
         }
     }
 }

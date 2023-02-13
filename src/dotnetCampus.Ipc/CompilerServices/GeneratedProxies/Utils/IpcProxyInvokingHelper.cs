@@ -44,7 +44,7 @@ internal class IpcProxyInvokingHelper
     /// </summary>
     internal string? ObjectId { get; set; }
 
-    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, string memberName, Garm<object?>[]? args)
+    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, Garm<object?>[]? args)
     {
         if (PeerProxy is null)
         {
@@ -56,6 +56,7 @@ internal class IpcProxyInvokingHelper
             Id = ObjectId,
             ContractFullTypeName = TypeName,
             CallType = callType,
+            MemberId = memberId,
             MemberName = memberName,
             Args = args?.Select(SerializeArg).ToArray(),
         }).ConfigureAwait(false);

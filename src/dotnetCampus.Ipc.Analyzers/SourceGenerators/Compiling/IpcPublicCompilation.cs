@@ -1,10 +1,9 @@
 ﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
-
 /// <summary>
 /// 提供 IPC 对象（契约接口）的语法和语义分析。
 /// </summary>
 [DebuggerDisplay("IpcPublic : {IpcType.Name,nq}")]
-internal class IpcPublicCompilation
+internal class IpcPublicCompilation : IEquatable<IpcPublicCompilation?>
 {
     /// <summary>
     /// IPC 对象文件的编译信息。
@@ -42,7 +41,7 @@ internal class IpcPublicCompilation
     public string GetUsing()
     {
         var usingsSyntax = _compilationUnitSyntax.Usings;
-        var usings = string.Join(Environment.NewLine, usingsSyntax.Select(x => x.ToString()));
+        var usings = string.Join("\r\n", usingsSyntax.Select(x => x.ToString()));
         return usings;
     }
 
@@ -92,6 +91,31 @@ internal class IpcPublicCompilation
     }
 
     /// <summary>
+    /// 试图解析一个接口定义语法节点并创建 IPC 对象（契约接口）。
+    /// </summary>
+    /// <param name="syntaxNode">接口定义语法节点。</param>
+    /// <param name="semanticModel">此接口定义语法节点的语义模型。</param>
+    /// <param name="ipcPublicCompilation">如果找到了 IPC 对象，则此参数为此语法树中的所有 IPC 对象；如果没有找到，则为空集合。</param>
+    /// <returns>如果找到了 IPC 类型，则返回 true；如果没有找到，则返回 false。</returns>
+    public static bool TryCreateIpcPublicCompilation(InterfaceDeclarationSyntax syntaxNode, SemanticModel semanticModel,
+        [NotNullWhen(true)] out IpcPublicCompilation? ipcPublicCompilation)
+    {
+        var syntaxTree = syntaxNode.SyntaxTree;
+        if (semanticModel.GetDeclaredSymbol(syntaxNode) is { } typeSymbol
+            && typeSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
+                x.AttributeClass?.ToString(),
+                typeof(IpcPublicAttribute).FullName,
+                StringComparison.Ordinal)) is { } ipcPublicAttribute)
+        {
+            ipcPublicCompilation = new IpcPublicCompilation(syntaxTree, semanticModel, typeSymbol);
+            return true;
+        }
+
+        ipcPublicCompilation = null;
+        return false;
+    }
+
+    /// <summary>
     /// 在一个语法树（单个文件）中查找所有的 IPC 对象（契约接口）。
     /// </summary>
     /// <param name="compilation">整个项目的编译信息。</param>
@@ -109,17 +133,29 @@ internal class IpcPublicCompilation
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         foreach (var typeDeclarationSyntax in typeDeclarationSyntaxes)
         {
-            if (semanticModel.GetDeclaredSymbol(typeDeclarationSyntax) is { } typeSymbol
-                && typeSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
-                     x.AttributeClass?.ToString(),
-                     typeof(IpcPublicAttribute).FullName,
-                     StringComparison.Ordinal)) is { } ipcPublicAttribute)
+            if (TryCreateIpcPublicCompilation(typeDeclarationSyntax, semanticModel, out var publicIpcObjectCompilation))
             {
-                result.Add(new IpcPublicCompilation(syntaxTree, semanticModel, typeSymbol));
+                result.Add(publicIpcObjectCompilation);
             }
         }
 
         publicIpcObjectCompilations = result;
         return publicIpcObjectCompilations.Count > 0;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as IpcPublicCompilation);
+    }
+
+    public bool Equals(IpcPublicCompilation? other)
+    {
+        return other is not null &&
+               SymbolEqualityComparer.Default.Equals(IpcType, other.IpcType); ;
+    }
+
+    public override int GetHashCode()
+    {
+        return 1998130605 + EqualityComparer<INamedTypeSymbol>.Default.GetHashCode(IpcType);
     }
 }

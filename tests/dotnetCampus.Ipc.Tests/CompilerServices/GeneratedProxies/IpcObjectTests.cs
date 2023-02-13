@@ -217,6 +217,20 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 Assert.AreEqual(true, result);
             });
 
+            "IPC 代理生成：同数量的参数组成的重载方法组。".Test(async () =>
+            {
+                // 准备。
+                var (peer, proxy) = await CreateIpcPairAsync(nameof(FakeIpcObject.MethodWithSameParameterCountOverloading));
+
+                // 安放。
+                var int32Result = proxy.MethodWithSameParameterCountOverloading(1, 2);
+                var int64Result = proxy.MethodWithSameParameterCountOverloading(1l, 2l);
+
+                // 植物。
+                Assert.AreEqual(3, int32Result);
+                Assert.AreEqual(2l, int64Result);
+            });
+
             "IPC 代理生成：异步返回值".Test(async () =>
             {
                 // 准备。

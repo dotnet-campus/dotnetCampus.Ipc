@@ -10,36 +10,35 @@ namespace dotnetCampus.Ipc;
 /// 为 IPC 代理壳生成对应的代理（Proxy）。
 /// </summary>
 [Generator]
-public class IpcShapeGenerator : ISourceGenerator
+public class IpcShapeGenerator : IIncrementalGenerator
 {
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        //System.Diagnostics.Debugger.Launch();
+        var compilations = context.SyntaxProvider.CreateSyntaxProvider(
+            // 基本过滤：有特性的接口。
+            (syntaxNode, ct) => syntaxNode is ClassDeclarationSyntax ids && ids.AttributeLists.Count > 0,
+            // 语义解析：确定是否真的是感兴趣的 IPC 接口。
+            (generatorSyntaxContext, ct) => IpcShapeCompilation.TryCreateIpcShapeCompilation(
+                (ClassDeclarationSyntax) generatorSyntaxContext.Node,
+                generatorSyntaxContext.SemanticModel,
+                out var ipcPublicCompilation)
+                    ? ipcPublicCompilation
+                    : null)
+            .Where(x => x is not null)
+            .Select((x, ct) => x!);
+
+        context.RegisterSourceOutput(compilations, Execute);
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    private void Execute(SourceProductionContext context, IpcShapeCompilation ipcShapeCompilation)
     {
         try
         {
-            foreach (var ipcObjectType in FindIpcShapeClasses(context.Compilation))
-            {
-                try
-                {
-                    var ipcType = ipcObjectType.IpcType;
-                    var proxySource = GenerateProxySource(ipcObjectType);
-                    var assemblySource = GenerateAssemblySource(ipcObjectType);
-                    context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-                    context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
-                }
-                catch (DiagnosticException ex)
-                {
-                    ReportDiagnosticsThatHaveNotBeenReported(context, ex);
-                }
-                catch (Exception ex)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
-                }
-            }
+            var ipcType = ipcShapeCompilation.IpcType;
+            var proxySource = GenerateProxySource(ipcShapeCompilation);
+            var assemblySource = GenerateAssemblySource(ipcShapeCompilation);
+            context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
+            context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
         }
         catch (DiagnosticException ex)
         {
@@ -63,24 +62,5 @@ using {sc.GetNamespace()};
 
 [assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}), typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]";
         return sourceCode;
-    }
-
-    /// <summary>
-    /// 在整个项目的编译信息中寻找 IPC 真实对象的编译信息。
-    /// </summary>
-    /// <param name="compilation">整个项目的编译信息。</param>
-    /// <returns>所有 IPC 真实对象的编译信息</returns>
-    private IEnumerable<IpcShapeCompilation> FindIpcShapeClasses(Compilation compilation)
-    {
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            if (IpcShapeCompilation.TryFindIpcShapeCpmpilations(compilation, syntaxTree, out var ipcShapeCompilations))
-            {
-                foreach (var ipcShapeCompilation in ipcShapeCompilations)
-                {
-                    yield return ipcShapeCompilation;
-                }
-            }
-        }
     }
 }

@@ -65,6 +65,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     /// <returns>方法源代码。</returns>
     public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder)
     {
+        var methodId = MemberIdGenerator.GenerateMethodId(_contractMethod);
         var parameters = GenerateMethodParameters(builder, _contractMethod.Parameters);
         var arguments = GenerateGarmArguments(builder, _contractMethod.Parameters);
         var asyncReturnType = GetAsyncReturnType(_contractMethod.ReturnType);
@@ -83,7 +84,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
 
 Task {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethodAsync(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    return CallMethodAsync({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
 }}
 
                 ",
@@ -92,7 +93,7 @@ Task {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 
 Task<{returnTypeName}> {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethodAsync<{returnTypeName}>(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    return CallMethodAsync<{returnTypeName}>({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
 }}
 
                 ",
@@ -101,19 +102,19 @@ Task<{returnTypeName}> {methodContainingTypeName}.{_contractMethod.Name}({parame
                     ? @$"
 void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Wait();
+    CallMethod({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues}).Wait();
 }}"
                     : @$"
 void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    _ = CallMethod(new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    _ = CallMethod({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
 }}",
 
                 // 同步 T 方法。
                 (false, _) => $@"
 {returnTypeName} {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethod<{returnTypeName}>(new Garm<object?>[] {{ {arguments} }}, {namedValues}).Result;
+    return CallMethod<{returnTypeName}>({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues}).Result;
 }}
                 ",
             }
@@ -149,6 +150,7 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     /// <returns>方法源代码。</returns>
     public string GenerateJointMatch(SourceTextBuilder builder, string real)
     {
+        var methodId = MemberIdGenerator.GenerateMethodId(_contractMethod);
         var containingTypeName = builder.SimplifyNameByAddUsing(_contractMethod.ContainingType);
         var parameterTypes = GenerateMethodParameterTypes(builder, _contractMethod.Parameters);
         var arguments = GenerateMethodArguments(_contractMethod.Parameters);
@@ -162,8 +164,8 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
             // 异步 Task 方法。
             var call = $"{real}.{_contractMethod.Name}({arguments})";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<Task>(() => {call}));"
-                : $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<{parameterTypes}, Task>(({arguments}) => {call}));";
+                ? $"MatchMethod({methodId}, new Func<Task>(() => {call}));"
+                : $"MatchMethod({methodId}, new Func<{parameterTypes}, Task>(({arguments}) => {call}));";
             return sourceCode;
         }
         else if (isAsync && !returnsVoid)
@@ -172,8 +174,8 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
             var @return = $"Task<Garm<{returnTypeName}>>";
             var call = GenerateGarmReturn(builder, asyncReturnType!, $"await {real}.{_contractMethod.Name}({arguments}).ConfigureAwait(false)");
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<{@return}>(async () => {call}));"
-                : $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<{parameterTypes}, {@return}>(async ({arguments}) => {call}));";
+                ? $"MatchMethod({methodId}, new Func<{@return}>(async () => {call}));"
+                : $"MatchMethod({methodId}, new Func<{parameterTypes}, {@return}>(async ({arguments}) => {call}));";
             return sourceCode;
         }
         else if (!isAsync && returnsVoid)
@@ -181,8 +183,8 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
             // 同步 void 方法。
             var call = $"{real}.{_contractMethod.Name}({arguments})";
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Action(() => {call}));"
-                : $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Action<{parameterTypes}>(({arguments}) => {call}));";
+                ? $"MatchMethod({methodId}, new Action(() => {call}));"
+                : $"MatchMethod({methodId}, new Action<{parameterTypes}>(({arguments}) => {call}));";
             return sourceCode;
         }
         else
@@ -191,8 +193,8 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
             var @return = $"Garm<{returnTypeName}>";
             var call = GenerateGarmReturn(builder, _contractMethod.ReturnType, $"{real}.{_contractMethod.Name}({arguments})");
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
-                ? $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<{@return}>(() => {call}));"
-                : $"MatchMethod(nameof({containingTypeName}.{_contractMethod.Name}), new Func<{parameterTypes}, {@return}>(({arguments}) => {call}));";
+                ? $"MatchMethod({methodId}, new Func<{@return}>(() => {call}));"
+                : $"MatchMethod({methodId}, new Func<{parameterTypes}, {@return}>(({arguments}) => {call}));";
             return sourceCode;
         }
     }

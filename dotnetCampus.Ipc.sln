@@ -26,12 +26,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetCampus.Ipc.PipeMvcCli
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "dotnetCampus.Ipc.PipeMvcShare", "src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.shproj", "{05ACE3BB-61E5-4592-AC73-747850DB1081}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11767A0B-CBFB-4323-BCEE-DE1CDD6C4B4B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{11767A0B-CBFB-4323-BCEE-DE1CDD6C4B4B}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
-		.github\workflows\dotnet-format.yml = .github\workflows\dotnet-format.yml
-		.github\workflows\nuget-tag-publish.yml = .github\workflows\nuget-tag-publish.yml
 		build\Version.props = build\Version.props
 	EndProjectSection
 EndProject
@@ -49,16 +46,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipeMvcServerDemo", "demo\P
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IpcRemotingObjectDemo", "IpcRemotingObjectDemo", "{927CE552-9207-47AD-9595-650C5A0624A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpcRemotingObjectServerDemo", "demo\IpcRemotingObjectDemo\IpcRemotingObjectServerDemo\IpcRemotingObjectServerDemo.csproj", "{CB343EAE-9DA2-49F3-B39B-E9CDDCEB2292}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpcRemotingObjectServerDemo", "demo\IpcRemotingObjectDemo\IpcRemotingObjectServerDemo\IpcRemotingObjectServerDemo.csproj", "{CB343EAE-9DA2-49F3-B39B-E9CDDCEB2292}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpcRemotingObjectClientDemo", "demo\IpcRemotingObjectDemo\IpcRemotingObjectClientDemo\IpcRemotingObjectClientDemo.csproj", "{6639929E-3AC1-47D9-BE74-97FDF3C29B6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpcRemotingObjectClientDemo", "demo\IpcRemotingObjectDemo\IpcRemotingObjectClientDemo\IpcRemotingObjectClientDemo.csproj", "{6639929E-3AC1-47D9-BE74-97FDF3C29B6B}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{05ace3bb-61e5-4592-ac73-747850db1081}*SharedItemsImports = 13
-		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{0f6b9c0c-7a64-4b21-bc28-e52565245a1a}*SharedItemsImports = 5
-		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{1ace3261-cc3d-4442-8c83-516721b3da46}*SharedItemsImports = 5
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -233,5 +225,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8828641-2F8C-4B6A-BF1D-F8F3C8C8454D}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{05ace3bb-61e5-4592-ac73-747850db1081}*SharedItemsImports = 13
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{0f6b9c0c-7a64-4b21-bc28-e52565245a1a}*SharedItemsImports = 5
+		src\PipeMvc\dotnetCampus.Ipc.PipeMvcShare\dotnetCampus.Ipc.PipeMvcShare.projitems*{1ace3261-cc3d-4442-8c83-516721b3da46}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

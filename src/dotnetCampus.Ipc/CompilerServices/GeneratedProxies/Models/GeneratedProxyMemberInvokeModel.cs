@@ -39,6 +39,12 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         public string? ContractFullTypeName { get; set; }
 
         /// <summary>
+        /// 调用的成员 Id（由源代码生成器自动生成，唯一表示一个属性或方法）。
+        /// </summary>
+        [DataMember(Name = "d")]
+        public ulong MemberId { get; internal set; }
+
+        /// <summary>
         /// 调用的成员名称（属性名、方法名）。
         /// </summary>
         [DataMember(Name = "m")]

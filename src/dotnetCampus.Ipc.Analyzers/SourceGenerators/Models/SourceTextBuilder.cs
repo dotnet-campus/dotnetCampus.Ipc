@@ -143,7 +143,7 @@ internal class SourceTextBuilder
             builder.Append($"using {usingNamespace.Value};");
         }
         var classes = string.Join(
-            Environment.NewLine,
+            "\r\n",
             _typeDeclarationBuilders.Select(x => x.ToString()));
         if (useFileScopedNamespace)
         {

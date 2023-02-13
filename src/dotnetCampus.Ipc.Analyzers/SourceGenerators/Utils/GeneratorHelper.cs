@@ -113,7 +113,7 @@ internal static class GeneratorHelper
     /// </summary>
     /// <param name="context"></param>
     /// <param name="ex"></param>
-    internal static void ReportDiagnosticsThatHaveNotBeenReported(GeneratorExecutionContext context, DiagnosticException ex)
+    internal static void ReportDiagnosticsThatHaveNotBeenReported(SourceProductionContext context, DiagnosticException ex)
     {
         var diagnosticsThatWillBeReported = new List<DiagnosticDescriptor>
         {

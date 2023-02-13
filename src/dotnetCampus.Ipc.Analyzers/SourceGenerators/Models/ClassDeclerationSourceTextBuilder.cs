@@ -54,11 +54,11 @@ internal class ClassDeclarationSourceTextBuilder
 
     public override string ToString()
     {
-        return $@"{string.Join(Environment.NewLine, _attributeList)}
+        return $@"{string.Join("\r\n", _attributeList)}
 internal class {_typeName} {(_baseTypeNames.Count > 0 ? ":" : "")} {string.Join(", ", _baseTypeNames)}
 {{
     {string.Join(
-        Environment.NewLine,
+        "\r\n",
         _memberBuilders.Select(x => x.ToString()))}
 }}
         ";

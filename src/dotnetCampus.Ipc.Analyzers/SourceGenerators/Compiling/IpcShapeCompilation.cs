@@ -1,10 +1,9 @@
 ﻿namespace dotnetCampus.Ipc.SourceGenerators.Compiling;
-
 /// <summary>
 /// 提供 IPC 对象（代理壳类）的语法和语义分析。
 /// </summary>
 [DebuggerDisplay("{ShapeType} : {ContractType.Name,nq}")]
-internal class IpcShapeCompilation : IpcPublicCompilation
+internal class IpcShapeCompilation : IpcPublicCompilation, IEquatable<IpcShapeCompilation?>
 {
     /// <summary>
     /// 创建 IPC 对象的语法和语义分析。
@@ -75,13 +74,60 @@ internal class IpcShapeCompilation : IpcPublicCompilation
     }
 
     /// <summary>
+    /// 试图解析一个类型定义语法节点并创建 IPC 对象（契约接口）。
+    /// </summary>
+    /// <param name="syntaxNode">类型定义语法节点。</param>
+    /// <param name="semanticModel">此类型定义语法节点的语义模型。</param>
+    /// <param name="ipcShapeCompilation">如果找到了 IPC 对象，则此参数为此语法树中的所有 IPC 对象；如果没有找到，则为空集合。</param>
+    /// <returns>如果找到了 IPC 类型，则返回 true；如果没有找到，则返回 false。</returns>
+    public static bool TryCreateIpcShapeCompilation(ClassDeclarationSyntax syntaxNode, SemanticModel semanticModel,
+        [NotNullWhen(true)] out IpcShapeCompilation? ipcShapeCompilation)
+    {
+        var syntaxTree = syntaxNode.SyntaxTree;
+        if (semanticModel.GetDeclaredSymbol(syntaxNode) is { } typeSymbol
+            && typeSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
+                 x.AttributeClass?.ToString(),
+                 typeof(IpcShapeAttribute).FullName,
+                 StringComparison.Ordinal)) is { } ipcPublicAttribute)
+        {
+            if (ipcPublicAttribute.ConstructorArguments.Length == 1)
+            {
+                if (ipcPublicAttribute.ConstructorArguments[0] is TypedConstant typedConstant
+                    && typedConstant.Value is INamedTypeSymbol contractType)
+                {
+                    if (contractType.TypeKind == TypeKind.Interface)
+                    {
+                        ipcShapeCompilation = new IpcShapeCompilation(syntaxTree, semanticModel, typeSymbol, contractType);
+                        return true;
+                    }
+                    else
+                    {
+                        throw new DiagnosticException(IPC002_KnownDiagnosticError);
+                    }
+                }
+                else
+                {
+                    throw new DiagnosticException(IPC001_KnownCompilerError);
+                }
+            }
+            else
+            {
+                throw new DiagnosticException(IPC001_KnownCompilerError);
+            }
+        }
+
+        ipcShapeCompilation = null;
+        return false;
+    }
+
+    /// <summary>
     /// 在一个语法树（单个文件）中查找所有的 IPC 对象（契约接口）。
     /// </summary>
     /// <param name="compilation">整个项目的编译信息。</param>
     /// <param name="syntaxTree">单个文件的语法树。</param>
     /// <param name="publicIpcObjectCompilations">如果找到了 IPC 对象，则此参数为此语法树中的所有 IPC 对象；如果没有找到，则为空集合。</param>
     /// <returns>如果找到了 IPC 类型，则返回 true；如果没有找到，则返回 false。</returns>
-    public static bool TryFindIpcShapeCpmpilations(Compilation compilation, SyntaxTree syntaxTree,
+    public static bool TryFindIpcShapeCompilations(Compilation compilation, SyntaxTree syntaxTree,
         out IReadOnlyList<IpcShapeCompilation> publicIpcObjectCompilations)
     {
         var result = new List<IpcShapeCompilation>();
@@ -92,39 +138,34 @@ internal class IpcShapeCompilation : IpcPublicCompilation
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         foreach (var typeDeclarationSyntax in typeDeclarationSyntaxes)
         {
-            if (semanticModel.GetDeclaredSymbol(typeDeclarationSyntax) is { } typeSymbol
-                && typeSymbol.GetAttributes().FirstOrDefault(x => string.Equals(
-                     x.AttributeClass?.ToString(),
-                     typeof(IpcShapeAttribute).FullName,
-                     StringComparison.Ordinal)) is { } ipcPublicAttribute)
+            if (TryCreateIpcShapeCompilation(typeDeclarationSyntax, semanticModel, out var publicIpcObjectCompilation))
             {
-                if (ipcPublicAttribute.ConstructorArguments.Length == 1)
-                {
-                    if (ipcPublicAttribute.ConstructorArguments[0] is TypedConstant typedConstant
-                        && typedConstant.Value is INamedTypeSymbol contractType)
-                    {
-                        if (contractType.TypeKind == TypeKind.Interface)
-                        {
-                            result.Add(new IpcShapeCompilation(syntaxTree, semanticModel, typeSymbol, contractType));
-                        }
-                        else
-                        {
-                            throw new DiagnosticException(IPC002_KnownDiagnosticError);
-                        }
-                    }
-                    else
-                    {
-                        throw new DiagnosticException(IPC001_KnownCompilerError);
-                    }
-                }
-                else
-                {
-                    throw new DiagnosticException(IPC001_KnownCompilerError);
-                }
+                result.Add(publicIpcObjectCompilation);
             }
         }
 
         publicIpcObjectCompilations = result;
         return publicIpcObjectCompilations.Count > 0;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as IpcShapeCompilation);
+    }
+
+    public bool Equals(IpcShapeCompilation? other)
+    {
+        return other is not null &&
+               SymbolEqualityComparer.Default.Equals(IpcType, other.IpcType) &&
+               SymbolEqualityComparer.Default.Equals(ContractType, other.ContractType);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = -1723556882;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<INamedTypeSymbol>.Default.GetHashCode(IpcType);
+        hashCode = hashCode * -1521134295 + EqualityComparer<INamedTypeSymbol>.Default.GetHashCode(ContractType);
+        return hashCode;
     }
 }
