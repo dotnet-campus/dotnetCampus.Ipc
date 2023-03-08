@@ -56,20 +56,43 @@ namespace dotnetCampus.Ipc.Pipes
         /// <inheritdoc />
         public async Task NotifyAsync(IpcMessage request)
         {
-            // 追踪业务消息。
-            var requestTracker = new IpcMessageTracker<IpcMessageBody>(IpcContext.PipeName, PeerName, request.Body, request.Tag, IpcContext.Logger);
-            requestTracker.CriticalStep("Send", null, request.Body);
-
-            await WaitConnectAsync(requestTracker).ConfigureAwait(false);
-
-            try
+            if (request.IpcMessageHeader != 0)
             {
-                // 发送带有追踪的请求。
-                await IpcClientService.WriteMessageAsync(requestTracker).ConfigureAwait(false);
+                // 追踪业务消息。
+                var requestTracker = new IpcMessageTracker<IpcMessage>(IpcContext.PipeName, PeerName, request, request.Tag, IpcContext.Logger);
+                requestTracker.CriticalStep("Send", null, request.Body);
+
+                await WaitConnectAsync(requestTracker).ConfigureAwait(false);
+
+                try
+                {
+                    // 发送带有追踪的请求。
+                    await IpcClientService.WriteMessageAsync(requestTracker).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:'{request.Tag}'; LocalPeer:'{IpcContext.PipeName}'; RemotePeer:'{PeerName}'; ExceptionMessage:'{e.Message}'", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:'{request.Tag}'; LocalPeer:'{IpcContext.PipeName}'; RemotePeer:'{PeerName}'; ExceptionMessage:'{e.Message}'", e);
+                var ipcBufferMessageContext = request.ToIpcBufferMessageContextWithMessageHeader(IpcMessageCommandType.Business);
+
+                var requestTracker = new IpcMessageTracker<IpcBufferMessageContext>(IpcContext.PipeName, PeerName, ipcBufferMessageContext, ipcBufferMessageContext.Tag, IpcContext.Logger);
+
+                requestTracker.CriticalStep("Send", null, request.Body);
+
+                await WaitConnectAsync(requestTracker).ConfigureAwait(false);
+
+                try
+                {
+                    // 发送带有追踪的请求。
+                    await IpcClientService.WriteMessageAsync(requestTracker).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    throw new IpcRemoteException($"[{nameof(NotifyAsync)}] Tag:'{request.Tag}'; LocalPeer:'{IpcContext.PipeName}'; RemotePeer:'{PeerName}'; ExceptionMessage:'{e.Message}'", e);
+                }
             }
         }
 

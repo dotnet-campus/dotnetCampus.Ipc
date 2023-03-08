@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Serialization;
 
@@ -56,12 +57,28 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
         public static IpcMessage Serialize(GeneratedProxyMemberReturnModel model)
         {
-            return JsonIpcMessageSerializer.Serialize("Return", model);
+            var serializeMessage = JsonIpcMessageSerializer.Serialize("Return", model);
+
+            return new IpcMessage(serializeMessage.Tag, serializeMessage.Body,
+                (ulong) KnownMessageHeaders.RemoteObjectMessageHeader);
         }
 
         public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberReturnModel? model)
         {
-            return JsonIpcMessageSerializer.TryDeserialize(message, out model);
+            var header = BitConverter.ToUInt64(message.Body.Buffer, message.Body.Start);
+            if (header != (ulong) KnownMessageHeaders.RemoteObjectMessageHeader)
+            {
+                // 如果业务头不对，那就不需要解析了
+                model = null;
+                return false;
+            }
+
+            // 跳过业务头的消息内容
+            var deserializeMessage = new IpcMessage(message.Tag,
+                new IpcMessageBody(message.Body.Buffer, message.Body.Start + sizeof(long),
+                    message.Body.Length - sizeof(long)));
+
+            return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
         }
     }
 }

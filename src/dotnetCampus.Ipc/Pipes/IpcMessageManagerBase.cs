@@ -21,15 +21,39 @@ namespace dotnetCampus.Ipc.Pipes
            */
             var currentMessageIdByteList = BitConverter.GetBytes(messageId.MessageIdValue);
 
-            var responseMessageLengthByteList = BitConverter.GetBytes(response.Body.Length);
+            var messageLength = response.Body.Length;
+            IpcMessageBody[] ipcBufferMessageList;
+            if (response.IpcMessageHeader == 0)
+            {
+                var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
+                ipcBufferMessageList = new[]
+                {
+                    new IpcMessageBody(ResponseMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(responseMessageLengthByteList),
+                    response.Body
+                };
+            }
+            else
+            {
+                messageLength += sizeof(ulong);
+                var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
+                ipcBufferMessageList = new[]
+                {
+                    new IpcMessageBody(ResponseMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(responseMessageLengthByteList),
+                    // 有业务头，加上业务头
+                    new IpcMessageBody(BitConverter.GetBytes(response.IpcMessageHeader)),
+                    response.Body
+                };
+            }
+
             return new IpcBufferMessageContext
             (
                 response.Tag,
-                IpcMessageCommandType.ResponseMessage | response.CoreMessageType.AsMessageCommandTypeFlags(),
-                new IpcMessageBody(ResponseMessageHeader),
-                new IpcMessageBody(currentMessageIdByteList),
-                new IpcMessageBody(responseMessageLengthByteList),
-                response.Body
+                IpcMessageCommandType.ResponseMessage,
+                ipcBufferMessageList
             );
         }
 
@@ -43,16 +67,44 @@ namespace dotnetCampus.Ipc.Pipes
             */
             var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);
 
-            var requestMessageLengthByteList = BitConverter.GetBytes(request.Body.Length);
+            var messageLength = request.Body.Length;
+
+            IpcMessageBody[] ipcBufferMessageList;
+            if (request.IpcMessageHeader == 0)
+            {
+                var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
+
+                ipcBufferMessageList = new[]
+                {
+                    new IpcMessageBody(RequestMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(requestMessageLengthByteList),
+                    request.Body
+                };
+            }
+            else
+            {
+                // 需要带上头的消息
+                messageLength += sizeof(ulong);
+
+                var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
+
+                ipcBufferMessageList = new[]
+                {
+                    new IpcMessageBody(RequestMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(requestMessageLengthByteList),
+                    // 有业务头，加上业务头
+                    new IpcMessageBody(BitConverter.GetBytes(request.IpcMessageHeader)),
+                    request.Body
+                };
+            }
 
             return new IpcBufferMessageContext
             (
                 request.Tag,
-                IpcMessageCommandType.RequestMessage | request.CoreMessageType.AsMessageCommandTypeFlags(),
-                new IpcMessageBody(RequestMessageHeader),
-                new IpcMessageBody(currentMessageIdByteList),
-                new IpcMessageBody(requestMessageLengthByteList),
-                request.Body
+                IpcMessageCommandType.RequestMessage,
+                ipcBufferMessageList
             );
         }
 
