@@ -14,97 +14,85 @@ namespace dotnetCampus.Ipc.Pipes
         protected static IpcBufferMessageContext CreateResponseMessageInner(IpcClientRequestMessageId messageId, in IpcMessage response)
         {
             /*
-           * MessageHeader
-           * MessageId
-            * Response Message Length
-           * Response Message
-           */
+             * MessageHeader
+             * MessageId
+             * Response Message Length
+             * Response Message
+             */
+            var messageLength = response.Body.Length;
             var currentMessageIdByteList = BitConverter.GetBytes(messageId.MessageIdValue);
 
-            var messageLength = response.Body.Length;
-            IpcMessageBody[] ipcBufferMessageList;
+            IpcMessageBody businessHeader;
             if (response.IpcMessageHeader == 0)
             {
-                var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
-                ipcBufferMessageList = new[]
-                {
-                    new IpcMessageBody(ResponseMessageHeader),
-                    new IpcMessageBody(currentMessageIdByteList),
-                    new IpcMessageBody(responseMessageLengthByteList),
-                    response.Body
-                };
-            }
-            else
-            {
-                messageLength += sizeof(ulong);
-                var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
-                ipcBufferMessageList = new[]
-                {
-                    new IpcMessageBody(ResponseMessageHeader),
-                    new IpcMessageBody(currentMessageIdByteList),
-                    new IpcMessageBody(responseMessageLengthByteList),
-                    // 有业务头，加上业务头
-                    new IpcMessageBody(BitConverter.GetBytes(response.IpcMessageHeader)),
-                    response.Body
-                };
-            }
-
-            return new IpcBufferMessageContext
-            (
-                response.Tag,
-                IpcMessageCommandType.ResponseMessage,
-                ipcBufferMessageList
-            );
-        }
-
-        protected static IpcBufferMessageContext CreateRequestMessageInner(in IpcMessage request, ulong currentMessageId)
-        {
-            /*
-            * MessageHeader
-            * MessageId
-            * Request Message Length
-            * Request Message
-            */
-            var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);
-
-            var messageLength = request.Body.Length;
-
-            IpcMessageBody[] ipcBufferMessageList;
-            if (request.IpcMessageHeader == 0)
-            {
-                var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
-
-                ipcBufferMessageList = new[]
-                {
-                    new IpcMessageBody(RequestMessageHeader),
-                    new IpcMessageBody(currentMessageIdByteList),
-                    new IpcMessageBody(requestMessageLengthByteList),
-                    request.Body
-                };
+                businessHeader = IpcMessageBody.EmptyIpcMessageBody;
             }
             else
             {
                 // 需要带上头的消息
                 messageLength += sizeof(ulong);
 
-                var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
-
-                ipcBufferMessageList = new[]
-                {
-                    new IpcMessageBody(RequestMessageHeader),
-                    new IpcMessageBody(currentMessageIdByteList),
-                    new IpcMessageBody(requestMessageLengthByteList),
-                    // 有业务头，加上业务头
-                    new IpcMessageBody(BitConverter.GetBytes(request.IpcMessageHeader)),
-                    request.Body
-                };
+                // 有业务头，加上业务头
+                businessHeader = new IpcMessageBody(BitConverter.GetBytes(response.IpcMessageHeader));
             }
+
+            var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
+
+            return new IpcBufferMessageContext
+            (
+                response.Tag,
+                IpcMessageCommandType.ResponseMessage,
+                new[]
+                {
+                    new IpcMessageBody(ResponseMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(responseMessageLengthByteList),
+                    businessHeader,
+                    response.Body
+                }
+            );
+        }
+
+        protected static IpcBufferMessageContext CreateRequestMessageInner(in IpcMessage request, ulong currentMessageId)
+        {
+            /*
+             * MessageHeader
+             * MessageId
+             * Request Message Length
+             * Request Message
+             */
+            var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);
+
+            var messageLength = request.Body.Length;
+
+            IpcMessageBody businessHeader;
+            if (request.IpcMessageHeader == 0)
+            {
+                businessHeader = IpcMessageBody.EmptyIpcMessageBody;
+            }
+            else
+            {
+                // 需要带上头的消息
+                messageLength += sizeof(ulong);
+
+                // 有业务头，加上业务头
+                businessHeader = new IpcMessageBody(BitConverter.GetBytes(request.IpcMessageHeader));
+            }
+
+            var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
 
             return new IpcBufferMessageContext
             (
                 request.Tag,
                 IpcMessageCommandType.RequestMessage,
-                ipcBufferMessageList
+                new[]
+                {
+                    new IpcMessageBody(RequestMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(requestMessageLengthByteList),
+                    businessHeader,
+                    request.Body
+                }
             );
         }
 
