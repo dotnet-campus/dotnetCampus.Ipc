@@ -8,6 +8,7 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Serialization;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 {
@@ -86,20 +87,19 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns></returns>
         public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberInvokeModel? model)
         {
-            var header = BitConverter.ToUInt64(message.Body.Buffer, message.Body.Start);
-            if (header != (ulong) KnownMessageHeaders.RemoteObjectMessageHeader)
+            if (message.TryReadBusinessHeader(out var header) && header == (ulong) KnownMessageHeaders.RemoteObjectMessageHeader)
+            {
+                // 跳过业务头的消息内容
+                var deserializeMessage = message.Skip(sizeof(ulong));
+
+                return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
+            }
+            else
             {
                 // 如果业务头不对，那就不需要解析了
                 model = null;
                 return false;
             }
-
-            // 跳过业务头的消息内容
-            var deserializeMessage = new IpcMessage(message.Tag,
-                new IpcMessageBody(message.Body.Buffer, message.Body.Start + sizeof(long),
-                    message.Body.Length - sizeof(long)));
-
-            return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
         }
 
         /// <summary>
