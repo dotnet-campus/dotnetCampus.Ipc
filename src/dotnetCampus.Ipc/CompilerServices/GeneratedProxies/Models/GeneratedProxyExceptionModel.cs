@@ -65,10 +65,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         {
             { typeof(ArgumentException).FullName!, (m, e) => new ArgumentException(m) },
             { typeof(ArgumentNullException).FullName!, (m, e) => new ArgumentNullException(e, m) },
+            { typeof(BadImageFormatException).FullName!, (m, e) => new BadImageFormatException(m) },
             { typeof(InvalidCastException).FullName!, (m, e) => new InvalidCastException(m) },
+            { typeof(InvalidOperationException).FullName!, (m, e) => new InvalidOperationException(m) },
             { typeof(NotImplementedException).FullName!, (m, e) => new NotImplementedException(m) },
             { typeof(NullReferenceException).FullName!, (m, e) => new NullReferenceException(m) },
-            { typeof(BadImageFormatException).FullName!, (m, e) => new BadImageFormatException(m) },
         };
     }
 }
