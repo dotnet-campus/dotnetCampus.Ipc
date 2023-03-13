@@ -38,7 +38,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             {
                 var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
                 proxy.Context = GetContext(ipcProvider);
+                proxy.PeerName = peer.PeerName;
                 proxy.PeerProxy = peer;
+                proxy.InnerIpcProvider = ipcProvider;
                 proxy.ObjectId = ipcObjectId;
                 return (TContract) (object) proxy;
             }
@@ -57,7 +59,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="ipcProxyConfigs">指定创建的 IPC 代理在进行 IPC 通信时应使用的相关配置。</param>
         /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
         /// <returns>契约类型。</returns>
-        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, IpcProxyConfigs ipcProxyConfigs, string? ipcObjectId = null)
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, IpcProxyConfigs ipcProxyConfigs = null, string? ipcObjectId = null)
             where TContract : class
         {
             if (IpcTypeToProxyJointCache[typeof(TContract)].proxyType is { } proxyType)
@@ -65,8 +67,51 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
                 proxy.Context = GetContext(ipcProvider);
                 proxy.PeerProxy = peer;
+                proxy.PeerName = peer.PeerName;
+                proxy.InnerIpcProvider = ipcProvider;
                 proxy.ObjectId = ipcObjectId;
                 proxy.RuntimeConfigs = ipcProxyConfigs;
+                return (TContract) (object) proxy;
+            }
+            else
+            {
+                throw new ArgumentException($"接口 {typeof(TContract).Name} 上没有找到 {typeof(IpcPublicAttribute).Name} 特性，因此不知道如何创建 {typeof(TContract).Name} 的 IPC 代理。", nameof(TContract));
+            }
+        }
+
+        /// <summary>
+        /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
+        /// </summary>
+        /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
+        /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
+        /// <param name="peerName">IPC 远端的名称。</param>
+        /// <param name="ipcProxyConfigs">指定创建的 IPC 代理在进行 IPC 通信时应使用的相关配置。</param>
+        /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
+        /// <returns>契约类型。</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, string peerName, IpcProxyConfigs? ipcProxyConfigs, string? ipcObjectId = null)
+            where TContract : class
+        {
+            if (IpcTypeToProxyJointCache[typeof(TContract)].proxyType is { } proxyType)
+            {
+                var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
+                proxy.Context = GetContext(ipcProvider);
+                proxy.InnerIpcProvider = ipcProvider;
+                proxy.ObjectId = ipcObjectId;
+                proxy.PeerName = peerName;
+
+                if (ipcProxyConfigs != null)
+                {
+                    proxy.RuntimeConfigs = ipcProxyConfigs;
+                }
+
+                if (ipcProvider is dotnetCampus.Ipc.Pipes.IpcProvider provider)
+                {
+                    if (provider.PeerManager.TryGetValue(peerName, out var peerProxy))
+                    {
+                        proxy.PeerProxy = peerProxy;
+                    }
+                }
                 return (TContract) (object) proxy;
             }
             else
@@ -92,7 +137,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 var proxy = (GeneratedIpcProxy<TContract>) Activator.CreateInstance(proxyType)!;
                 proxy.Context = GetContext(ipcProvider);
                 proxy.PeerProxy = peer;
+                proxy.PeerName = peer.PeerName;
                 proxy.ObjectId = ipcObjectId;
+                proxy.InnerIpcProvider = ipcProvider;
                 return (TContract) (object) proxy;
             }
             else
