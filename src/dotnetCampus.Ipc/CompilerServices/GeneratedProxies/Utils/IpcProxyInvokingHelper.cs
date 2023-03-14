@@ -93,7 +93,7 @@ internal class IpcProxyInvokingHelper
         }
 
         var requestMessage = GeneratedProxyMemberInvokeModel.Serialize(model);
-        requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
+        //requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
         var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
         if (GeneratedProxyMemberReturnModel.TryDeserialize(responseMessage, out var returnModel))
         {

@@ -315,7 +315,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <remarks>
         /// 业务层使用的
         /// </remarks>
-        internal async Task WriteMessageAsync(IpcMessageTracker<IpcMessageBody> tracker)
+        internal async Task WriteMessageAsync(IpcMessageTracker<IpcMessage> tracker)
         {
             VerifyNotDisposed();
 
@@ -341,10 +341,12 @@ namespace dotnetCampus.Ipc.Pipes
 
                 var stream = result.NamedPipeClientStream;
 
+                var ipcMessageBody = tracker.Message.Body;
+
                 // 追踪、校验消息。
                 var ack = AckManager.GetAck();
                 tracker.Debug("IPC start writing...");
-                tracker.CriticalStep("SendCore", ack, tracker.Message);
+                tracker.CriticalStep("SendCore", ack, ipcMessageBody);
 
                 // 发送消息。
                 await IpcMessageConverter.WriteAsync
@@ -354,9 +356,9 @@ namespace dotnetCampus.Ipc.Pipes
                     AckManager.GetAck(),
                     // 表示这是业务层的消息
                     IpcMessageCommandType.Business,
-                    tracker.Message.Buffer,
-                    tracker.Message.Start,
-                    tracker.Message.Length,
+                    ipcMessageBody.Buffer,
+                    ipcMessageBody.Start,
+                    ipcMessageBody.Length,
                     IpcConfiguration.SharedArrayPool,
                     tracker.Tag
                 );

@@ -59,6 +59,13 @@ namespace dotnetCampus.Ipc.Messages
         /// 数据长度
         /// </summary>
         public int Length { get; }
+
+        internal static IpcMessageBody EmptyIpcMessageBody =>
+#if NET45
+            new IpcMessageBody(new byte[0]);
+#else
+            new IpcMessageBody(Array.Empty<byte>());
+#endif
     }
 
     /// <summary>

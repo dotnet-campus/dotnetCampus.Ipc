@@ -1,11 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 using System.Text;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Serialization;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 {
@@ -69,7 +72,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns></returns>
         public static IpcMessage Serialize(GeneratedProxyMemberInvokeModel model)
         {
-            return JsonIpcMessageSerializer.Serialize(model.ToString(), model);
+            // 加上头信息
+            var serializeMessage = JsonIpcMessageSerializer.Serialize(model.ToString(), model);
+
+            return new IpcMessage(serializeMessage.Tag, serializeMessage.Body,
+                (ulong) KnownMessageHeaders.RemoteObjectMessageHeader);
         }
 
         /// <summary>
@@ -80,7 +87,19 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns></returns>
         public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberInvokeModel? model)
         {
-            return JsonIpcMessageSerializer.TryDeserialize(message, out model);
+            if (message.TryReadBusinessHeader(out var header) && header == (ulong) KnownMessageHeaders.RemoteObjectMessageHeader)
+            {
+                // 跳过业务头的消息内容
+                var deserializeMessage = message.Skip(sizeof(ulong));
+
+                return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
+            }
+            else
+            {
+                // 如果业务头不对，那就不需要解析了
+                model = null;
+                return false;
+            }
         }
 
         /// <summary>

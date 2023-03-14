@@ -41,35 +41,35 @@ namespace dotnetCampus.Ipc
         /// </summary>
         ResponseMessage = (1 << 2) | Business,
 
-        /// <summary>
-        /// 请求的细分类型，IPC 框架无法识别和处理此消息体。
-        /// </summary>
-        RawRequestMessage = (1 << 3) | RequestMessage,
+        ///// <summary>
+        ///// 请求的细分类型，IPC 框架无法识别和处理此消息体。
+        ///// </summary>
+        //RawRequestMessage = (1 << 3) | RequestMessage,
 
-        /// <summary>
-        /// 响应的细分类型，IPC 框架无法识别和处理此消息体。
-        /// </summary>
-        RawResponseMessage = (1 << 3) | ResponseMessage,
+        ///// <summary>
+        ///// 响应的细分类型，IPC 框架无法识别和处理此消息体。
+        ///// </summary>
+        //RawResponseMessage = (1 << 3) | ResponseMessage,
 
-        /// <summary>
-        /// 请求的细分类型，IPC 框架知道此消息体是可被处理的字符串。
-        /// </summary>
-        StringRequestMessage = (1 << 4) | RequestMessage,
+        ///// <summary>
+        ///// 请求的细分类型，IPC 框架知道此消息体是可被处理的字符串。
+        ///// </summary>
+        //StringRequestMessage = (1 << 4) | RequestMessage,
 
-        /// <summary>
-        /// 响应的细分类型，IPC 框架知道此消息体是可被处理的字符串。
-        /// </summary>
-        StringResponseMessage = (1 << 4) | ResponseMessage,
+        ///// <summary>
+        ///// 响应的细分类型，IPC 框架知道此消息体是可被处理的字符串。
+        ///// </summary>
+        //StringResponseMessage = (1 << 4) | ResponseMessage,
 
-        /// <summary>
-        /// 请求的细分类型，IPC 框架知道此消息体是可被处理的 .NET 对象。
-        /// </summary>
-        ObjectRequestMessage = (1 << 5) | RequestMessage,
+        ///// <summary>
+        ///// 请求的细分类型，IPC 框架知道此消息体是可被处理的 .NET 对象。
+        ///// </summary>
+        //ObjectRequestMessage = (1 << 5) | RequestMessage,
 
-        /// <summary>
-        /// 响应的细分类型，IPC 框架知道此消息体是可被处理的 .NET 对象。
-        /// </summary>
-        ObjectResponseMessage = (1 << 5) | ResponseMessage,
+        ///// <summary>
+        ///// 响应的细分类型，IPC 框架知道此消息体是可被处理的 .NET 对象。
+        ///// </summary>
+        //ObjectResponseMessage = (1 << 5) | ResponseMessage,
 
         /// <summary>
         /// 其他消息。

@@ -14,45 +14,85 @@ namespace dotnetCampus.Ipc.Pipes
         protected static IpcBufferMessageContext CreateResponseMessageInner(IpcClientRequestMessageId messageId, in IpcMessage response)
         {
             /*
-           * MessageHeader
-           * MessageId
-            * Response Message Length
-           * Response Message
-           */
+             * MessageHeader
+             * MessageId
+             * Response Message Length
+             * Response Message
+             */
+            var messageLength = response.Body.Length;
             var currentMessageIdByteList = BitConverter.GetBytes(messageId.MessageIdValue);
 
-            var responseMessageLengthByteList = BitConverter.GetBytes(response.Body.Length);
+            IpcMessageBody businessHeader;
+            if (response.IpcMessageHeader == 0)
+            {
+                businessHeader = IpcMessageBody.EmptyIpcMessageBody;
+            }
+            else
+            {
+                // 需要带上头的消息
+                messageLength += sizeof(ulong);
+
+                // 有业务头，加上业务头
+                businessHeader = new IpcMessageBody(BitConverter.GetBytes(response.IpcMessageHeader));
+            }
+
+            var responseMessageLengthByteList = BitConverter.GetBytes(messageLength);
+
             return new IpcBufferMessageContext
             (
                 response.Tag,
-                IpcMessageCommandType.ResponseMessage | response.CoreMessageType.AsMessageCommandTypeFlags(),
-                new IpcMessageBody(ResponseMessageHeader),
-                new IpcMessageBody(currentMessageIdByteList),
-                new IpcMessageBody(responseMessageLengthByteList),
-                response.Body
+                IpcMessageCommandType.ResponseMessage,
+                new[]
+                {
+                    new IpcMessageBody(ResponseMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(responseMessageLengthByteList),
+                    businessHeader,
+                    response.Body
+                }
             );
         }
 
         protected static IpcBufferMessageContext CreateRequestMessageInner(in IpcMessage request, ulong currentMessageId)
         {
             /*
-            * MessageHeader
-            * MessageId
-            * Request Message Length
-            * Request Message
-            */
+             * MessageHeader
+             * MessageId
+             * Request Message Length
+             * Request Message
+             */
             var currentMessageIdByteList = BitConverter.GetBytes(currentMessageId);
 
-            var requestMessageLengthByteList = BitConverter.GetBytes(request.Body.Length);
+            var messageLength = request.Body.Length;
+
+            IpcMessageBody businessHeader;
+            if (request.IpcMessageHeader == 0)
+            {
+                businessHeader = IpcMessageBody.EmptyIpcMessageBody;
+            }
+            else
+            {
+                // 需要带上头的消息
+                messageLength += sizeof(ulong);
+
+                // 有业务头，加上业务头
+                businessHeader = new IpcMessageBody(BitConverter.GetBytes(request.IpcMessageHeader));
+            }
+
+            var requestMessageLengthByteList = BitConverter.GetBytes(messageLength);
 
             return new IpcBufferMessageContext
             (
                 request.Tag,
-                IpcMessageCommandType.RequestMessage | request.CoreMessageType.AsMessageCommandTypeFlags(),
-                new IpcMessageBody(RequestMessageHeader),
-                new IpcMessageBody(currentMessageIdByteList),
-                new IpcMessageBody(requestMessageLengthByteList),
-                request.Body
+                IpcMessageCommandType.RequestMessage,
+                new[]
+                {
+                    new IpcMessageBody(RequestMessageHeader),
+                    new IpcMessageBody(currentMessageIdByteList),
+                    new IpcMessageBody(requestMessageLengthByteList),
+                    businessHeader,
+                    request.Body
+                }
             );
         }
 
