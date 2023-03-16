@@ -7,7 +7,7 @@ var ipcProvider = new IpcProvider("IpcRemotingObjectClientDemo");
 
 ipcProvider.StartServer();
 
-var foo = ipcProvider.CreateIpcProxy<IFoo>("IpcRemotingObjectServerDemo", null, null);
+var foo = ipcProvider.CreateIpcProxyByPeerName<IFoo>("IpcRemotingObjectServerDemo", new IpcProxyConfigs());
 
 var peer = await ipcProvider.GetAndConnectToPeerAsync("IpcRemotingObjectServerDemo");
 

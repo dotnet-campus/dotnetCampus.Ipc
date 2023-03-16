@@ -59,7 +59,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="ipcProxyConfigs">指定创建的 IPC 代理在进行 IPC 通信时应使用的相关配置。</param>
         /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
         /// <returns>契约类型。</returns>
-        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, IpcProxyConfigs ipcProxyConfigs = null, string? ipcObjectId = null)
+        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, IPeerProxy peer, IpcProxyConfigs ipcProxyConfigs, string? ipcObjectId = null)
             where TContract : class
         {
             if (IpcTypeToProxyJointCache[typeof(TContract)].proxyType is { } proxyType)
@@ -89,7 +89,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
         /// <returns>契约类型。</returns>
         /// <exception cref="ArgumentException"></exception>
-        public static TContract CreateIpcProxy<TContract>(this IIpcProvider ipcProvider, string peerName, IpcProxyConfigs? ipcProxyConfigs, string? ipcObjectId = null)
+        public static TContract CreateIpcProxyByPeerName<TContract>(this IIpcProvider ipcProvider, string peerName, IpcProxyConfigs? ipcProxyConfigs, string? ipcObjectId = null)
             where TContract : class
         {
             if (IpcTypeToProxyJointCache[typeof(TContract)].proxyType is { } proxyType)
