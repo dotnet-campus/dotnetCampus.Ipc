@@ -56,7 +56,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <inheritdoc />
         public async Task NotifyAsync(IpcMessage request)
         {
-            if (request.IpcMessageHeader != 0)
+            if (request.IpcMessageHeader == 0)
             {
                 // 追踪业务消息。
                 var requestTracker = new IpcMessageTracker<IpcMessage>(IpcContext.PipeName, PeerName, request, request.Tag, IpcContext.Logger);

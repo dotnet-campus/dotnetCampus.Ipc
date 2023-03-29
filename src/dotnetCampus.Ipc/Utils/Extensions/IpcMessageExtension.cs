@@ -11,19 +11,4 @@ static class IpcMessageExtension
             ipcMessage.Body.Start + length,
             ipcMessage.Body.Length - length));
     }
-
-    public static bool TryReadBusinessHeader(this in IpcMessage ipcMessage, out ulong header)
-    {
-        var length = sizeof(ulong);
-        if (ipcMessage.Body.Length < length)
-        {
-            header = 0;
-            return false;
-        }
-        else
-        {
-            header = BitConverter.ToUInt64(ipcMessage.Body.Buffer, ipcMessage.Body.Start);
-            return true;
-        }
-    }
 }
