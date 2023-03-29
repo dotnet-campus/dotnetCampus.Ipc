@@ -66,11 +66,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
         public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberReturnModel? model)
         {
-            if (message.TryReadBusinessHeader(out var header) && header == (ulong) KnownMessageHeaders.RemoteObjectMessageHeader)
+            const ulong header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
+            if (message.TryGetPayload(header, out var deserializeMessage))
             {
-                // 跳过业务头的消息内容
-                var deserializeMessage = message.Skip(sizeof(ulong));
-
                 return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
             }
             else

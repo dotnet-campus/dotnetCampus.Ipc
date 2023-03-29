@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.Context
 {
@@ -41,6 +42,9 @@ namespace dotnetCampus.Ipc.Context
         /// 对方的名字，此名字是对方的服务器名字，可以用来连接
         /// </summary>
         public string PeerName { get; }
+
+        public bool TryGetPayload(byte[] requiredHeader, out IpcMessage subMessage) =>
+            PeerMessageArgsExtension.TryGetPayload(this, requiredHeader, out subMessage);
 
         internal IpcMessageCommandType MessageCommandType { get; }
 
