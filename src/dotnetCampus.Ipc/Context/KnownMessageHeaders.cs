@@ -20,4 +20,11 @@ public enum KnownMessageHeaders : ulong
     RemoteObjectMessageHeader
         // 消息头是 R(e)m(ote)O(b)j(ect) 的 RmOj 几个字符组成的 long 头
         = 0x526D4F6A,
+
+    /// <summary>
+    /// 发送的是 Json 的直接路由消息
+    /// </summary>
+    JsonIpcDirectRoutedMessageHeader
+        // JsonDrRt
+        = 0x745272446E6F734A,
 }
