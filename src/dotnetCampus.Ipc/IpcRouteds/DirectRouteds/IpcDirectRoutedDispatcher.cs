@@ -28,12 +28,15 @@ static class IpcDirectRoutedMessageCreator
     //}
 }
 
-class JsonIpcDirectRoutedClientProxy
+
+
+public class JsonIpcDirectRoutedClientProxy
 {
     public JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
     {
         _peerProxy = peerProxy;
     }
+
     private readonly IPeerProxy _peerProxy;
     private JsonSerializer? _jsonSerializer;
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
