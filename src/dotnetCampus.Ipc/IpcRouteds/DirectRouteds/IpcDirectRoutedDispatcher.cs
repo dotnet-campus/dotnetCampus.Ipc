@@ -30,27 +30,34 @@ static class IpcDirectRoutedMessageCreator
 
 class JsonIpcDirectRoutedClientProxy
 {
-    public static Task NotifyAsync<T>(IPeerProxy peerProxy, string routedPath, T obj) where T : class
+    public JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
+    {
+        _peerProxy = peerProxy;
+    }
+    private readonly IPeerProxy _peerProxy;
+    private JsonSerializer? _jsonSerializer;
+    private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
+
+    public Task NotifyAsync<T>(string routedPath, T obj) where T : class
     {
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
-        return peerProxy.NotifyAsync(ipcMessage);
+        return _peerProxy.NotifyAsync(ipcMessage);
     }
 
-    public static async Task<TResponse?> GetResponseAsync<TResponse>(IPeerProxy peerProxy, string routedPath, object obj) where TResponse : class
+    public async Task<TResponse?> GetResponseAsync<TResponse>(string routedPath, object obj) where TResponse : class
     {
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
-        var responseMessage = await peerProxy.GetResponseAsync(ipcMessage);
-        var jsonSerializer = JsonSerializer.CreateDefault();
+        var responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
+
         using var memoryStream = new MemoryStream(responseMessage.Body.Buffer, responseMessage.Body.Start, responseMessage.Body.Length, writable: false);
         using StreamReader reader = new StreamReader(memoryStream, leaveOpen: true);
         JsonReader jsonReader = new JsonTextReader(reader);
-        return jsonSerializer.Deserialize<TResponse>(jsonReader);
+        return JsonSerializer.Deserialize<TResponse>(jsonReader);
     }
 
-    private static IpcMessage BuildMessage(string routedPath, object obj)
+    private IpcMessage BuildMessage(string routedPath, object obj)
     {
         using var memoryStream = new MemoryStream();
-        var jsonSerializer = JsonSerializer.CreateDefault();
         using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
         {
             IpcDirectRoutedMessageCreator.WriteHeader(binaryWriter, (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader, routedPath);
@@ -58,7 +65,7 @@ class JsonIpcDirectRoutedClientProxy
 
         using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
         {
-            jsonSerializer.Serialize(textWriter, obj);
+            JsonSerializer.Serialize(textWriter, obj);
         }
 
         var buffer = memoryStream.GetBuffer();
