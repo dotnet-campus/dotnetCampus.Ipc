@@ -19,11 +19,47 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 static class IpcDirectRoutedMessageCreator
 {
-    public static void WriteHeader(BinaryWriter writer, ulong businessMessageHeader, string routedPath)
+    public static async void WriteHeader(BinaryWriter writer, ulong businessMessageHeader, string routedPath)
     {
         writer.Write(businessMessageHeader);
         writer.Write(routedPath);
+
+        // 创建：
+        // 用法1：
+        var provider = new JsonIpcDirectRoutedProvider("CurrentPeerName xxx", (IpcConfiguration?) null);
+        // 用法2：传入现有的 IpcProvider 类型，可以共用，也可以做更高级的定制
+        var ipcProvider = new IpcProvider();
+        var provider2 = new JsonIpcDirectRoutedProvider(ipcProvider);
+
+        // 使用：
+        // 服务端：
+        // 添加通知处理：
+        provider.AddNotifyHandler("Foo1", (Foo foo) =>
+        {
+            // 处理通知
+        });
+        // 添加请求处理：
+        provider.AddRequestHandler("Foo2", (Foo foo) =>
+        {
+            return "123";
+        });
+
+        // 客户端：
+        // 获取对某个服务的连接客户端：
+        var jsonIpcDirectRoutedClientProxy = await provider.GetAndConnectClientAsync("服务名");
+        // 发送通知：
+        await jsonIpcDirectRoutedClientProxy.NotifyAsync("Foo1", new Foo());
+        // 发送请求：
+        await jsonIpcDirectRoutedClientProxy.GetResponseAsync<string>("Foo2", new Foo());
+
+        // 启动服务
+        provider.StartServer();
     }
+}
+
+class Foo
+{
+
 }
 
 public class JsonIpcDirectRoutedProvider
