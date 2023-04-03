@@ -19,19 +19,11 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 static class IpcDirectRoutedMessageCreator
 {
-    //public int GetHeaderByteCount(string routedPath)
-    //{
-    //}
-
     public static void WriteHeader(BinaryWriter writer, ulong businessMessageHeader, string routedPath)
     {
         writer.Write(businessMessageHeader);
         writer.Write(routedPath);
     }
-
-    //public IpcMessage CreateNotifyMessage()
-    //{
-    //}
 }
 
 public class JsonIpcDirectRoutedProvider
