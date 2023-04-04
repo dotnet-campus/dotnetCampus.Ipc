@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
-static class IpcDirectRoutedMessageCreator
+static class IpcDirectRoutedMessageWriter
 {
     public static void WriteHeader(BinaryWriter writer, ulong businessMessageHeader, string routedPath)
     {
@@ -25,6 +25,8 @@ static class IpcDirectRoutedMessageCreator
         writer.Write(routedPath);
     }
 }
+
+public record JsonIpcDirectRoutedContext(string PeerName);
 
 public class JsonIpcDirectRoutedProvider
 {
@@ -42,10 +44,13 @@ public class JsonIpcDirectRoutedProvider
 
     public void StartServer()
     {
-        IpcProvider.StartServer();
-        IpcProvider.IpcServerService.MessageReceived += IpcServerService_MessageReceived;
+        // 处理请求消息
         var requestHandler = new RequestHandler(this);
         IpcProvider.IpcContext.IpcConfiguration.AddFrameworkRequestHandlers(requestHandler);
+
+        IpcProvider.StartServer();
+        // 处理 Notify 消息
+        IpcProvider.IpcServerService.MessageReceived += IpcServerService_MessageReceived;
     }
 
     /// <summary>
@@ -63,13 +68,18 @@ public class JsonIpcDirectRoutedProvider
 
     public void AddNotifyHandler<T>(string routedPath, Func<T, Task> handler)
     {
+        AddNotifyHandler<T>(routedPath, (args, _) => handler(args));
+    }
+
+    public void AddNotifyHandler<T>(string routedPath, Func<T, JsonIpcDirectRoutedContext, Task> handler)
+    {
         // ReSharper disable once AsyncVoidLambda
         // ReSharper disable once ConvertToLocalFunction
-        Action<T> notifyHandler = async (argument) =>
+        Action<T, JsonIpcDirectRoutedContext> notifyHandler = async (argument, context) =>
         {
             try
             {
-                await handler(argument);
+                await handler(argument, context);
             }
             catch (Exception e)
             {
@@ -82,6 +92,11 @@ public class JsonIpcDirectRoutedProvider
 
     public void AddNotifyHandler<T>(string routedPath, Action<T> handler)
     {
+        AddNotifyHandler<T>(routedPath, (args, _) => handler(args));
+    }
+
+    public void AddNotifyHandler<T>(string routedPath, Action<T, JsonIpcDirectRoutedContext> handler)
+    {
         ThrowIfStarted();
 
         if (!HandleNotifyDictionary.TryAdd(routedPath, NotifyHandler))
@@ -89,14 +104,14 @@ public class JsonIpcDirectRoutedProvider
             throw new InvalidOperationException($"重复添加对 {routedPath} 的处理");
         }
 
-        void NotifyHandler(MemoryStream stream)
+        void NotifyHandler(MemoryStream stream, JsonIpcDirectRoutedContext context)
         {
             var argument = ToObject<T>(stream);
-            handler(argument!);
+            handler(argument!, context);
         }
     }
 
-    private delegate void HandleNotify(MemoryStream stream);
+    private delegate void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context);
 
     private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, HandleNotify>();
 
@@ -113,7 +128,8 @@ public class JsonIpcDirectRoutedProvider
             // 接下来进行调度
             if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
             {
-                handleNotify(stream);
+                var context = new JsonIpcDirectRoutedContext(e.PeerName);
+                handleNotify(stream, context);
             }
             else
             {
@@ -130,7 +146,7 @@ public class JsonIpcDirectRoutedProvider
 
     public void AddRequestHandler<TRequest, TResponse>(string routedPath, Func<TRequest, TResponse> handler)
     {
-        AddRequestHandler<TRequest, TResponse>(routedPath, request =>
+        AddRequestHandler<TRequest, TResponse>(routedPath, (request, _) =>
         {
             var response = handler(request);
             return Task.FromResult(response);
@@ -138,6 +154,12 @@ public class JsonIpcDirectRoutedProvider
     }
 
     public void AddRequestHandler<TRequest, TResponse>(string routedPath, Func<TRequest, Task<TResponse>> handler)
+    {
+        AddRequestHandler<TRequest, TResponse>(routedPath, (request, _) => handler(request));
+    }
+
+    public void AddRequestHandler<TRequest, TResponse>(string routedPath,
+        Func<TRequest, JsonIpcDirectRoutedContext, Task<TResponse>> handler)
     {
         ThrowIfStarted();
         HandleRequest handleRequest = HandleRequest;
@@ -147,10 +169,10 @@ public class JsonIpcDirectRoutedProvider
             throw new InvalidOperationException($"重复添加对 {routedPath} 的处理");
         }
 
-        async ValueTask<IpcMessage> HandleRequest(MemoryStream stream)
+        async ValueTask<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context)
         {
             var argument = ToObject<TRequest>(stream);
-            var response = await handler(argument!);
+            var response = await handler(argument!, context);
             var responseMemoryStream = new MemoryStream();
             using (TextWriter textWriter = new StreamWriter(responseMemoryStream, Encoding.UTF8, leaveOpen: true))
             {
@@ -163,7 +185,7 @@ public class JsonIpcDirectRoutedProvider
         }
     }
 
-    private delegate ValueTask<IpcMessage> HandleRequest(MemoryStream stream);
+    private delegate ValueTask<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context);
 
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
@@ -184,7 +206,8 @@ public class JsonIpcDirectRoutedProvider
                 {
                     if (JsonIpcDirectRoutedProvider.HandleRequestDictionary.TryGetValue(routedPath, out var handler))
                     {
-                        var ipcMessage = await handler(stream);
+                        var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
+                        var ipcMessage = await handler(stream, context);
 
                         IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
                         return response;
@@ -271,7 +294,7 @@ public class JsonIpcDirectRoutedClientProxy
         using var memoryStream = new MemoryStream();
         using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
         {
-            IpcDirectRoutedMessageCreator.WriteHeader(binaryWriter, (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader, routedPath);
+            IpcDirectRoutedMessageWriter.WriteHeader(binaryWriter, (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader, routedPath);
         }
 
         using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
