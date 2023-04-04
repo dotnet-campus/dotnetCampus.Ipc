@@ -17,8 +17,16 @@ using Newtonsoft.Json;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
+/// <summary>
+/// 提供 Json 直接路由的 IPC 通讯
+/// </summary>
 public class JsonIpcDirectRoutedProvider
 {
+    /// <summary>
+    /// 创建 Json 直接路由的 IPC 通讯
+    /// </summary>
+    /// <param name="pipeName"></param>
+    /// <param name="ipcConfiguration"></param>
     public JsonIpcDirectRoutedProvider(string? pipeName = null, IpcConfiguration? ipcConfiguration = null)
     {
         pipeName ??= $"JsonIpcDirectRouted_{Guid.NewGuid():N}";
@@ -26,11 +34,18 @@ public class JsonIpcDirectRoutedProvider
         IpcProvider = ipcProvider;
     }
 
+    /// <summary>
+    /// 创建 Json 直接路由的 IPC 通讯
+    /// </summary>
+    /// <param name="ipcProvider"></param>
     public JsonIpcDirectRoutedProvider(IpcProvider ipcProvider)
     {
         IpcProvider = ipcProvider;
     }
 
+    /// <summary>
+    /// 启动服务。启动服务之后将不能再添加通知处理和请求处理
+    /// </summary>
     public void StartServer()
     {
         // 处理请求消息
@@ -122,7 +137,8 @@ public class JsonIpcDirectRoutedProvider
             }
             else
             {
-                IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddNotifyHandler)} 添加处理");
+                // 考虑可能有多个实例，每个实例处理不同的业务情况
+                //IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddNotifyHandler)} 添加处理");
             }
 
             e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
@@ -203,7 +219,8 @@ public class JsonIpcDirectRoutedProvider
                     }
                     else
                     {
-                        JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
+                        // 考虑可能有多个实例，每个实例处理不同的业务情况
+                        //JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
                         return KnownIpcResponseMessages.CannotHandle;
                     }
                 };
