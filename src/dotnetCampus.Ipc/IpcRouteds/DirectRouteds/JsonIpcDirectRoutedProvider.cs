@@ -58,7 +58,7 @@ public class JsonIpcDirectRoutedProvider
     }
 
     /// <summary>
-    /// 获取对 <see cref="serverPeerName"/> 请求的客户端
+    /// 获取对 <paramref name="serverPeerName"/> 请求的客户端
     /// </summary>
     /// <param name="serverPeerName"></param>
     /// <returns></returns>
@@ -70,11 +70,23 @@ public class JsonIpcDirectRoutedProvider
 
     #region Notify
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddNotifyHandler<T>(string routedPath, Func<T, Task> handler)
     {
         AddNotifyHandler<T>(routedPath, (args, _) => handler(args));
     }
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddNotifyHandler<T>(string routedPath, Func<T, JsonIpcDirectRoutedContext, Task> handler)
     {
         // ReSharper disable once AsyncVoidLambda
@@ -94,11 +106,24 @@ public class JsonIpcDirectRoutedProvider
         AddNotifyHandler(routedPath, notifyHandler);
     }
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddNotifyHandler<T>(string routedPath, Action<T> handler)
     {
         AddNotifyHandler<T>(routedPath, (args, _) => handler(args));
     }
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void AddNotifyHandler<T>(string routedPath, Action<T, JsonIpcDirectRoutedContext> handler)
     {
         ThrowIfStarted();
@@ -149,6 +174,13 @@ public class JsonIpcDirectRoutedProvider
 
     #region Request Response
 
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddRequestHandler<TRequest, TResponse>(string routedPath, Func<TRequest, TResponse> handler)
     {
         AddRequestHandler<TRequest, TResponse>(routedPath, (request, _) =>
@@ -158,11 +190,26 @@ public class JsonIpcDirectRoutedProvider
         });
     }
 
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddRequestHandler<TRequest, TResponse>(string routedPath, Func<TRequest, Task<TResponse>> handler)
     {
         AddRequestHandler<TRequest, TResponse>(routedPath, (request, _) => handler(request));
     }
 
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void AddRequestHandler<TRequest, TResponse>(string routedPath,
         Func<TRequest, JsonIpcDirectRoutedContext, Task<TResponse>> handler)
     {
