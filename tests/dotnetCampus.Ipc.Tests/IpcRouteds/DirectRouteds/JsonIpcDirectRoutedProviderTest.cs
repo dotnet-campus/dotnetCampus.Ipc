@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -266,7 +267,7 @@ public class JsonIpcDirectRoutedProviderTest
 
             serverProvider1.AddNotifyHandler("Foo1", (FakeArgument arg) =>
             {
-                enterCount++;
+                Interlocked.Increment(ref enterCount);
                 Assert.AreEqual(argument.Name, arg.Name);
                 Assert.AreEqual(argument.Count, arg.Count);
 
@@ -281,7 +282,7 @@ public class JsonIpcDirectRoutedProviderTest
 
             serverProvider2.AddNotifyHandler("Foo2", (FakeArgument arg) =>
             {
-                enterCount++;
+                Interlocked.Increment(ref enterCount);
                 Assert.AreEqual(argument.Name, arg.Name);
                 Assert.AreEqual(argument.Count, arg.Count);
 
