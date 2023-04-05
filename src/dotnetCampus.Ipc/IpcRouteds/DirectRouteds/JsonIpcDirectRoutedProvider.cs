@@ -12,6 +12,7 @@ using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Utils.Extensions;
+using dotnetCampus.Ipc.Utils.Logging;
 
 using Newtonsoft.Json;
 
@@ -48,6 +49,12 @@ public class JsonIpcDirectRoutedProvider
     /// </summary>
     public void StartServer()
     {
+        if (IpcProvider.IsStarted)
+        {
+            // 如果在当前框架启动之前，已经启动了 IPC 服务，那就记录一条调试信息
+            Logger.Debug($"[{nameof(JsonIpcDirectRoutedProvider)}][StartServer] 在 JsonIpcDirectRouted 框架启动服务之前，传入的 {nameof(IpcProvider)} 已经启动。可能启动的 {nameof(IpcProvider)} 已在接收消息，接收掉的消息将不会被 JsonIpcDirectRouted 框架处理。可能丢失消息");
+        }
+
         // 处理请求消息
         var requestHandler = new RequestHandler(this);
         IpcProvider.IpcContext.IpcConfiguration.AddFrameworkRequestHandlers(requestHandler);
@@ -55,6 +62,8 @@ public class JsonIpcDirectRoutedProvider
         IpcProvider.StartServer();
         // 处理 Notify 消息
         IpcProvider.IpcServerService.MessageReceived += IpcServerService_MessageReceived;
+
+        _isStarted = true;
     }
 
     /// <summary>
@@ -101,7 +110,7 @@ public class JsonIpcDirectRoutedProvider
             catch (Exception e)
             {
                 // 后台顶层，抛出就没了哦
-                IpcProvider.IpcContext.Logger.Warning($"Handle {routedPath} with exception. {e}");
+                Logger.Warning($"Handle {routedPath} with exception. {e}");
             }
         };
         AddNotifyHandler(routedPath, notifyHandler);
@@ -172,7 +181,7 @@ public class JsonIpcDirectRoutedProvider
                 catch (Exception exception)
                 {
                     // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
-                    IpcProvider.IpcContext.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
+                    Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
                 }
             }
             else
@@ -304,7 +313,7 @@ public class JsonIpcDirectRoutedProvider
                         catch (Exception exception)
                         {
                             // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
-                            JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
+                            JsonIpcDirectRoutedProvider.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
                         }
                     }
                     else
@@ -340,10 +349,12 @@ public class JsonIpcDirectRoutedProvider
     private IpcProvider IpcProvider { get; }
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
+    private bool _isStarted;
+    private ILogger Logger => IpcProvider.IpcContext.Logger;
 
     private void ThrowIfStarted()
     {
-        if (IpcProvider.IsStarted)
+        if (_isStarted)
         {
             throw new InvalidOperationException($"禁止在启动之后再次添加处理");
         }
