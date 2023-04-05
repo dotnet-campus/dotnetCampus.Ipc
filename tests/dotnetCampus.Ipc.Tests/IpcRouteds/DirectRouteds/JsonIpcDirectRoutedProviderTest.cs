@@ -66,55 +66,6 @@ public class JsonIpcDirectRoutedProviderTest
     [ContractTestCase]
     public void TestRequest()
     {
-        "允许创建多个服务端实例共用相同的 IpcProvider 对象，但是如果多个服务端对相同的路由进行处理，只有先添加的才能收到消息".Test(async () =>
-        {
-            // 初始化服务端
-            var serverName = "JsonIpcDirectRoutedProviderTest_Notify_3";
-            // 这样的创建方式也是对 IPC 连接最高定制的方式
-            IpcProvider ipcProvider = new(serverName);
-            var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
-            var argument = new FakeArgument("TestName", 1);
-            int enterCount = 0;
-            const string routedPath = "Foo1";
-            var responseText = Guid.NewGuid().ToString();
-            TaskCompletionSource taskCompletionSource = new();
-
-            serverProvider1.AddRequestHandler(routedPath, (FakeArgument arg) =>
-            {
-                enterCount++;
-                return new FakeResult(responseText);
-            });
-
-            // 再次开启一个服务，共用相同的 IpcProvider 对象
-            var serverProvider2 = new JsonIpcDirectRoutedProvider(ipcProvider);
-
-            serverProvider2.AddRequestHandler(routedPath, (FakeArgument arg) =>
-            {
-                // 第二个服务收不到消息
-                Assert.Fail();
-
-                return new FakeResult(responseText);
-            });
-
-            // 多服务使用相同的 IpcProvider 对象存在一个问题，那就是如果是原先 IpcProvider 就启动过的，那这里添加处理一定会抛出异常
-            // 意味着需要所有的 JsonIpcDirectRoutedProvider 都创建和添加处理，才能一起调用 StartServer 开始
-            serverProvider1.StartServer();
-            serverProvider2.StartServer();
-
-            // 创建客户端
-            // 允许无参数，如果只是做客户端使用的话
-            JsonIpcDirectRoutedProvider clientProvider = new();
-            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
-
-            var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
-
-            // 可以获取到响应内容
-            Assert.AreEqual(responseText, result.Name);
-
-            // 要求只进入一次
-            Assert.AreEqual(1, enterCount);
-        });
-
         "客户端请求服务端，可以在服务端收到客户端请求的内容".Test(async () =>
         {
             // 初始化服务端
@@ -196,6 +147,55 @@ public class JsonIpcDirectRoutedProviderTest
             var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
             var result = await clientProxy.GetResponseAsync<FakeResult>("Foo2", argument);
+
+            // 可以获取到响应内容
+            Assert.AreEqual(responseText, result.Name);
+
+            // 要求只进入一次
+            Assert.AreEqual(1, enterCount);
+        });
+
+        "允许创建多个服务端实例共用相同的 IpcProvider 对象，但是如果多个服务端对相同的路由进行处理，只有先添加的才能收到消息".Test(async () =>
+        {
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_Request_3";
+            // 这样的创建方式也是对 IPC 连接最高定制的方式
+            IpcProvider ipcProvider = new(serverName);
+            var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
+            var argument = new FakeArgument("TestName", 1);
+            int enterCount = 0;
+            const string routedPath = "Foo1";
+            var responseText = Guid.NewGuid().ToString();
+            TaskCompletionSource taskCompletionSource = new();
+
+            serverProvider1.AddRequestHandler(routedPath, (FakeArgument arg) =>
+            {
+                enterCount++;
+                return new FakeResult(responseText);
+            });
+
+            // 再次开启一个服务，共用相同的 IpcProvider 对象
+            var serverProvider2 = new JsonIpcDirectRoutedProvider(ipcProvider);
+
+            serverProvider2.AddRequestHandler(routedPath, (FakeArgument arg) =>
+            {
+                // 第二个服务收不到消息
+                Assert.Fail();
+
+                return new FakeResult(responseText);
+            });
+
+            // 多服务使用相同的 IpcProvider 对象存在一个问题，那就是如果是原先 IpcProvider 就启动过的，那这里添加处理一定会抛出异常
+            // 意味着需要所有的 JsonIpcDirectRoutedProvider 都创建和添加处理，才能一起调用 StartServer 开始
+            serverProvider1.StartServer();
+            serverProvider2.StartServer();
+
+            // 创建客户端
+            // 允许无参数，如果只是做客户端使用的话
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+
+            var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
 
             // 可以获取到响应内容
             Assert.AreEqual(responseText, result.Name);
