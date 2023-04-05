@@ -161,11 +161,19 @@ public class JsonIpcDirectRoutedProvider
                 var context = new JsonIpcDirectRoutedContext(e.PeerName);
                 e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
 
-                // 不等了，也没啥业务
-                _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                try
                 {
-                    handleNotify(stream, context);
-                });
+                    // 不等了，也没啥业务
+                    _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                    {
+                        handleNotify(stream, context);
+                    });
+                }
+                catch (Exception exception)
+                {
+                    // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
+                    IpcProvider.IpcContext.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
+                }
             }
             else
             {
@@ -282,13 +290,22 @@ public class JsonIpcDirectRoutedProvider
                     {
                         var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
                         var taskPool = JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.TaskPool;
-                        var ipcMessage = await taskPool.Run(async () =>
-                        {
-                            return await handler(stream, context);
-                        });
 
-                        IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
-                        return response;
+                        try
+                        {
+                            var ipcMessage = await taskPool.Run(async () =>
+                            {
+                                return await handler(stream, context);
+                            });
+
+                            IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
+                            return response;
+                        }
+                        catch (Exception exception)
+                        {
+                            // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
+                            JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
+                        }
                     }
                     else
                     {
