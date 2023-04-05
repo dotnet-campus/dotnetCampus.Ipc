@@ -159,8 +159,13 @@ public class JsonIpcDirectRoutedProvider
             if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
             {
                 var context = new JsonIpcDirectRoutedContext(e.PeerName);
-                handleNotify(stream, context);
                 e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
+
+                // 不等了，也没啥业务
+                _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                {
+                    handleNotify(stream, context);
+                });
             }
             else
             {
@@ -276,7 +281,11 @@ public class JsonIpcDirectRoutedProvider
                     if (JsonIpcDirectRoutedProvider.HandleRequestDictionary.TryGetValue(routedPath, out var handler))
                     {
                         var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
-                        var ipcMessage = await handler(stream, context);
+                        var taskPool = JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.TaskPool;
+                        var ipcMessage = await taskPool.Run(async () =>
+                        {
+                            return await handler(stream, context);
+                        });
 
                         IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
                         return response;
