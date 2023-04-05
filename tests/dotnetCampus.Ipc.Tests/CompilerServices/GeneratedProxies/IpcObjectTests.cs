@@ -500,6 +500,14 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
             var aPeer = await bProvider.GetAndConnectToPeerAsync(aName);
             var bProxy = bProvider.CreateIpcProxy<IFakeIpcObject>(aPeer);
             // 这里的延迟是为了暂时缓解死锁 bug @lindexi
+            // 这个问题其实是因为 IpcObject 这一套可能存在异步转同步等待的问题
+            // 问题原因如下：
+            // 从 GetAndConnectToPeerAsync 返回的时，是消息接受端 DispatchMessage 所在线程调用过来的
+            // 如果此线程卡住了，那就意味着不再能够接收到消息
+            // 那为什么存在锁的问题？因为如果在接下来一句话是走 IpcObject 框架获取远程对象的属性值类似的代码
+            // 将会在获取属性时，进入异步转同步等待，需要等待到什么时候才会继续执行？需要等待消息接受端 DispatchMessage 接收到远程对象返回的消息
+            // 然而消息接受端 DispatchMessage 所在线程已经进入异步转同步等待，导致无法接收到消息，进而导致 DispatchMessage 所在线程无法释放
+            // 那为什么设计上要让 GetAndConnectToPeerAsync 返回的线程是消息接受端 DispatchMessage 所在线程？原因是在主动发起对 Peer 连接时，也许需要进行一些事件加等处理等，如果在另一个线程，那可能出现在获取到 Peer 的同时也接收到 Peer 发送过来的消息。这会存在由于事件加等处理在另一个线程，没有及时执行，导致丢失消息
             await Task.Delay(100);
             return (aPeer, bProxy);
         }

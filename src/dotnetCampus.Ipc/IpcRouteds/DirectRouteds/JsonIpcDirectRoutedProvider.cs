@@ -62,6 +62,7 @@ public class JsonIpcDirectRoutedProvider
     /// </summary>
     /// <param name="serverPeerName"></param>
     /// <returns></returns>
+    /// todo 命名： 这里是叫 XxClientProxy 好，还是 XxServerProxy 好？
     public async Task<JsonIpcDirectRoutedClientProxy> GetAndConnectClientAsync(string serverPeerName)
     {
         var peer = await IpcProvider.GetAndConnectToPeerAsync(serverPeerName);
@@ -159,14 +160,13 @@ public class JsonIpcDirectRoutedProvider
             {
                 var context = new JsonIpcDirectRoutedContext(e.PeerName);
                 handleNotify(stream, context);
+                e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
             }
             else
             {
                 // 考虑可能有多个实例，每个实例处理不同的业务情况
                 //IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddNotifyHandler)} 添加处理");
             }
-
-            e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
         }
     }
 
@@ -200,6 +200,23 @@ public class JsonIpcDirectRoutedProvider
     public void AddRequestHandler<TRequest, TResponse>(string routedPath, Func<TRequest, Task<TResponse>> handler)
     {
         AddRequestHandler<TRequest, TResponse>(routedPath, (request, _) => handler(request));
+    }
+
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler<TRequest, TResponse>(string routedPath,
+        Func<TRequest, JsonIpcDirectRoutedContext, TResponse> handler)
+    {
+        AddRequestHandler<TRequest, TResponse>(routedPath, (request, context) =>
+        {
+            var result = handler(request, context);
+            return Task.FromResult(result);
+        });
     }
 
     /// <summary>
