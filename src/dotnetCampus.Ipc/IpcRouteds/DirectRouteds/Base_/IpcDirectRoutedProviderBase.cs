@@ -127,13 +127,21 @@ public abstract class IpcDirectRoutedProviderBase
 
     private bool TryHandleMessage(in IpcMessage ipcMessage, [NotNullWhen(true)] out MemoryStream? stream, [NotNullWhen(true)] out string? routedPath)
     {
-        if (ipcMessage.TryGetPayload(BusinessHeader, out var message))
+        try
         {
-            stream = new(message.Body.Buffer, message.Body.Start, message.Body.Length);
-            using BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
-            routedPath = binaryReader.ReadString();
-            return true;
+            if (ipcMessage.TryGetPayload(BusinessHeader, out var message))
+            {
+                stream = new(message.Body.Buffer, message.Body.Start, message.Body.Length);
+                using BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+                routedPath = binaryReader.ReadString();
+                return true;
+            }
         }
+        catch (Exception e)
+        {
+            Logger.Error(e, $"HandleMessage");
+        }
+
         stream = default;
         routedPath = default;
         return false;
