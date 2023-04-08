@@ -63,6 +63,7 @@ public static class PeerMessageArgsExtension
     /// <summary>
     /// 尝试根据 <paramref name="requiredHeader"/> 获取有效负载内容。如果当前的 <see cref="ipcMessage"/> 不包含 <paramref name="requiredHeader"/> 头信息，将返回 false 值。如包含，则将 <see cref="ipcMessage"/> 去掉 <paramref name="requiredHeader"/> 长度之后作为 <paramref name="subMessage"/> 返回，同时返回 true 值
     /// </summary>
+    /// <param name="ipcMessage"></param>
     /// <param name="requiredHeader"></param>
     /// <param name="subMessage"></param>
     /// <returns></returns>
