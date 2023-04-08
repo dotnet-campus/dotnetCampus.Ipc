@@ -112,12 +112,12 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     {
         ThrowIfStarted();
 
-        if (!HandleNotifyDictionary.TryAdd(routedPath, NotifyHandler))
+        if (!HandleNotifyDictionary.TryAdd(routedPath, HandleNotify))
         {
             throw new InvalidOperationException($"重复添加对 {routedPath} 的处理");
         }
 
-        void NotifyHandler(MemoryStream stream, JsonIpcDirectRoutedContext context)
+        void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
         {
             var argument = ToObject<T>(stream);
             handler(argument!, context);
