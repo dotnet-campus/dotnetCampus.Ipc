@@ -13,7 +13,8 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 {
-    public RawByteIpcDirectRoutedProvider(string? pipeName = null, IpcConfiguration? ipcConfiguration = null) : base(pipeName, ipcConfiguration)
+    public RawByteIpcDirectRoutedProvider(string? pipeName = null, IpcConfiguration? ipcConfiguration = null) : base(
+        pipeName, ipcConfiguration)
     {
     }
 
@@ -23,6 +24,51 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.RawByteIpcDirectRoutedMessageHeader;
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddNotifyHandler(string routedPath, Func<IpcMessageBody, Task> handler) =>
+        AddNotifyHandler(routedPath, (data, _) => handler(data));
+
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddNotifyHandler(string routedPath, Func<IpcMessageBody, JsonIpcDirectRoutedContext, Task> handler)
+    {
+        AddNotifyHandler(routedPath, HandlerNotify);
+
+        async void HandlerNotify(IpcMessageBody data, JsonIpcDirectRoutedContext context)
+        {
+            try
+            {
+                await handler(data, context);
+            }
+            catch (Exception e)
+            {
+                // 线程顶层，不能再抛出异常
+                Logger.Warning($"Handle {routedPath} with exception. {e}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddNotifyHandler(string routedPath, Action<IpcMessageBody> handler) =>
+        AddNotifyHandler(routedPath, (data, _) => handler(data));
+
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void AddNotifyHandler(string routedPath, Action<IpcMessageBody, JsonIpcDirectRoutedContext> handler)
     {
         ThrowIfStarted();
@@ -38,7 +84,8 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
     }
 
-    private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, HandleNotify>();
+    private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } =
+        new ConcurrentDictionary<string, HandleNotify>();
 
     private delegate void HandleNotify(IpcMessageBody data, JsonIpcDirectRoutedContext context);
 
@@ -64,7 +111,8 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             catch (Exception exception)
             {
                 // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
-                Logger.Error(exception, $"[{nameof(RawByteIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
+                Logger.Error(exception,
+                    $"[{nameof(RawByteIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
             }
         }
         else
@@ -73,6 +121,37 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
     }
 
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler(string routedPath,
+        Func<IpcMessageBody, IpcMessage> handler)
+        => AddRequestHandler(routedPath, (data, _) => handler(data));
+
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler(string routedPath,
+        Func<IpcMessageBody, JsonIpcDirectRoutedContext, IpcMessage> handler)
+        => AddRequestHandler(routedPath, (data, context) => Task.FromResult(handler(data, context)));
+
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler(string routedPath, Func<IpcMessageBody, Task<IpcMessage>> handler)
+        => AddRequestHandler(routedPath, (data, _) => handler(data));
+
+    /// <summary>
+    /// 添加请求的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
     public void AddRequestHandler(string routedPath,
         Func<IpcMessageBody, JsonIpcDirectRoutedContext, Task<IpcMessage>> handler)
     {
@@ -94,7 +173,8 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
-    protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext)
+    protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message,
+        IIpcRequestContext requestContext)
     {
         var routedPath = message.RoutedPath;
 
@@ -118,7 +198,8 @@ public class RawByteIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             catch (Exception exception)
             {
                 // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
-                Logger.Error(exception, $"[{nameof(RawByteIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
+                Logger.Error(exception,
+                    $"[{nameof(RawByteIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
                 // 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
                 return KnownIpcResponseMessages.CannotHandle;
             }
