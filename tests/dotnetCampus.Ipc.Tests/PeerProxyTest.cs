@@ -383,7 +383,7 @@ namespace dotnetCampus.Ipc.Tests
                 a.Dispose();
 
                 // 等待资源的释放
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.WhenAny(peer.WaitForFinishedTaskCompletionSource.Task, Task.Delay(TimeSpan.FromSeconds(10)));
 
                 Assert.AreEqual(true, peer.IsBroken);
                 Assert.AreEqual(true, peer.WaitForFinishedTaskCompletionSource.Task.IsCompleted);
