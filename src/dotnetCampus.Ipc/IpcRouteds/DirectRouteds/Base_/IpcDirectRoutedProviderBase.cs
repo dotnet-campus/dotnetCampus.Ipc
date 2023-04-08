@@ -28,7 +28,7 @@ public abstract class IpcDirectRoutedProviderBase
     }
 
     public IpcProvider IpcProvider { get; }
-    private ILogger Logger => IpcProvider.IpcContext.Logger;
+    private protected ILogger Logger => IpcProvider.IpcContext.Logger;
     private bool _isStarted;
 
     /// <summary>
@@ -141,7 +141,16 @@ public abstract class IpcDirectRoutedProviderBase
     }
 
     protected readonly record struct IpcDirectRoutedMessage(string RoutedPath, MemoryStream Stream,
-        IpcMessage PayloadIpcMessage);
+        IpcMessage PayloadIpcMessage)
+    {
+        public IpcMessageBody GetData()
+        {
+            var position = (int) Stream.Position;
+            var payload = PayloadIpcMessage.Body;
+            var data = new IpcMessageBody(payload.Buffer, payload.Start + position, payload.Length - position);
+            return data;
+        }
+    }
 }
 
 #endif
