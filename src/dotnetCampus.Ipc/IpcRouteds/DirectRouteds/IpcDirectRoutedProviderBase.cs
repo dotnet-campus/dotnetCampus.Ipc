@@ -1,10 +1,10 @@
-﻿using System;
+﻿#if NET6_0_OR_GREATER
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-#if NET6_0_OR_GREATER
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
@@ -61,12 +61,6 @@ public abstract class IpcDirectRoutedProviderBase
         }
     }
 
-    //public virtual async Task<RawByteIpcDirectRoutedClientProxy> GetAndConnectClientAsync(string serverPeerName)
-    //{
-    //    var peer = await IpcProvider.GetAndConnectToPeerAsync(serverPeerName);
-    //    return new RawByteIpcDirectRoutedClientProxy(peer);
-    //}
-
     protected abstract ulong BusinessHeader { get; }
 
     private void IpcServerService_MessageReceived(object? sender, PeerMessageArgs e)
@@ -77,11 +71,16 @@ public abstract class IpcDirectRoutedProviderBase
         }
 
         // 这里是全部的消息都会进入的，但是这里通过判断业务头，只处理感兴趣的
-        if (TryHandleMessage(e.Message, out var stream, out var routedPath))
+        if (TryHandleMessage(e.Message, out MemoryStream? stream, out var routedPath))
         {
+            // 这是一个 MemoryStream 释放或不释放都没啥差别
+            //using (stream) ;
             try
             {
-                HandleNotify(routedPath, stream, e);
+                using (stream)
+                {
+                    OnHandleNotify(routedPath, stream, e);
+                }
             }
             catch (Exception exception)
             {
@@ -91,7 +90,7 @@ public abstract class IpcDirectRoutedProviderBase
         }
     }
 
-    protected abstract void HandleNotify(string routedPath, MemoryStream stream, PeerMessageArgs e);
+    protected abstract void OnHandleNotify(string routedPath, MemoryStream stream, PeerMessageArgs e);
 
     class RequestHandler : IIpcRequestHandler
     {
@@ -109,7 +108,10 @@ public abstract class IpcDirectRoutedProviderBase
             {
                 try
                 {
-                    return IpcDirectRoutedProviderBase.HandleRequestAsync(routedPath, stream);
+                    using (stream)
+                    {
+                        return IpcDirectRoutedProviderBase.OnHandleRequestAsync(routedPath, stream, requestContext);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -121,7 +123,7 @@ public abstract class IpcDirectRoutedProviderBase
         }
     }
 
-    protected abstract Task<IIpcResponseMessage> HandleRequestAsync(string routedPath, MemoryStream stream);
+    protected abstract Task<IIpcResponseMessage> OnHandleRequestAsync(string routedPath, MemoryStream stream, IIpcRequestContext requestContext);
 
     private bool TryHandleMessage(in IpcMessage ipcMessage, [NotNullWhen(true)] out MemoryStream? stream, [NotNullWhen(true)] out string? routedPath)
     {

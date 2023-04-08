@@ -21,49 +21,23 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 /// <summary>
 /// 提供 Json 直接路由的 IPC 通讯
 /// </summary>
-public class JsonIpcDirectRoutedProvider
+public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 {
     /// <summary>
     /// 创建 Json 直接路由的 IPC 通讯
     /// </summary>
     /// <param name="pipeName"></param>
     /// <param name="ipcConfiguration"></param>
-    public JsonIpcDirectRoutedProvider(string? pipeName = null, IpcConfiguration? ipcConfiguration = null)
+    public JsonIpcDirectRoutedProvider(string? pipeName = null, IpcConfiguration? ipcConfiguration = null) : base(pipeName, ipcConfiguration)
     {
-        pipeName ??= $"JsonIpcDirectRouted_{Guid.NewGuid():N}";
-        var ipcProvider = new IpcProvider(pipeName, ipcConfiguration);
-        IpcProvider = ipcProvider;
     }
 
     /// <summary>
     /// 创建 Json 直接路由的 IPC 通讯
     /// </summary>
     /// <param name="ipcProvider"></param>
-    public JsonIpcDirectRoutedProvider(IpcProvider ipcProvider)
+    public JsonIpcDirectRoutedProvider(IpcProvider ipcProvider) : base(ipcProvider)
     {
-        IpcProvider = ipcProvider;
-    }
-
-    /// <summary>
-    /// 启动服务。启动服务之后将不能再添加通知处理和请求处理
-    /// </summary>
-    public void StartServer()
-    {
-        if (IpcProvider.IsStarted)
-        {
-            // 如果在当前框架启动之前，已经启动了 IPC 服务，那就记录一条调试信息
-            Logger.Debug($"[{nameof(JsonIpcDirectRoutedProvider)}][StartServer] 在 JsonIpcDirectRouted 框架启动服务之前，传入的 {nameof(IpcProvider)} 已经启动。可能启动的 {nameof(IpcProvider)} 已在接收消息，接收掉的消息将不会被 JsonIpcDirectRouted 框架处理。可能丢失消息");
-        }
-
-        // 处理请求消息
-        var requestHandler = new RequestHandler(this);
-        IpcProvider.IpcContext.IpcConfiguration.AddFrameworkRequestHandlers(requestHandler);
-
-        IpcProvider.StartServer();
-        // 处理 Notify 消息
-        IpcProvider.IpcServerService.MessageReceived += IpcServerService_MessageReceived;
-
-        _isStarted = true;
     }
 
     /// <summary>
@@ -154,41 +128,34 @@ public class JsonIpcDirectRoutedProvider
 
     private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, HandleNotify>();
 
-    private void IpcServerService_MessageReceived(object? sender, PeerMessageArgs e)
+    protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
+
+    protected override void OnHandleNotify(string routedPath, MemoryStream stream, PeerMessageArgs e)
     {
-        if (e.Handle)
+        // 接下来进行调度
+        if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
         {
-            return;
+            var context = new JsonIpcDirectRoutedContext(e.PeerName);
+            e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
+
+            try
+            {
+                // 不等了，也没啥业务
+                _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                {
+                    handleNotify(stream, context);
+                });
+            }
+            catch (Exception exception)
+            {
+                // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
+                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
+            }
         }
-
-        // 这里是全部的消息都会进入的，但是这里通过判断业务头，只处理 Json 的
-        if (TryHandleMessage(e.Message, out var stream, out var routedPath))
+        else
         {
-            // 接下来进行调度
-            if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
-            {
-                var context = new JsonIpcDirectRoutedContext(e.PeerName);
-                e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
-
-                try
-                {
-                    // 不等了，也没啥业务
-                    _ = IpcProvider.IpcContext.TaskPool.Run(() =>
-                    {
-                        handleNotify(stream, context);
-                    });
-                }
-                catch (Exception exception)
-                {
-                    // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
-                    Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
-                }
-            }
-            else
-            {
-                // 考虑可能有多个实例，每个实例处理不同的业务情况
-                //IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddNotifyHandler)} 添加处理");
-            }
+            // 考虑可能有多个实例，每个实例处理不同的业务情况
+            //IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddNotifyHandler)} 添加处理");
         }
     }
 
@@ -281,84 +248,44 @@ public class JsonIpcDirectRoutedProvider
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
-    class RequestHandler : IIpcRequestHandler
+    protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(string routedPath, MemoryStream stream, IIpcRequestContext requestContext)
     {
-        public RequestHandler(JsonIpcDirectRoutedProvider jsonIpcDirectRoutedProvider)
+        if (HandleRequestDictionary.TryGetValue(routedPath, out var handler))
         {
-            JsonIpcDirectRoutedProvider = jsonIpcDirectRoutedProvider;
-        }
-        private JsonIpcDirectRoutedProvider JsonIpcDirectRoutedProvider { get; }
+            var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
+            var taskPool = IpcProvider.IpcContext.TaskPool;
 
-        async Task<IIpcResponseMessage> IIpcRequestHandler.HandleRequest(IIpcRequestContext requestContext)
-        {
-            if (JsonIpcDirectRoutedProvider.TryHandleMessage(requestContext.IpcBufferMessage, out var stream, out var routedPath))
+            try
             {
-                using (stream)
+                var ipcMessage = await taskPool.Run(async () =>
                 {
-                    if (JsonIpcDirectRoutedProvider.HandleRequestDictionary.TryGetValue(routedPath, out var handler))
-                    {
-                        var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
-                        var taskPool = JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.TaskPool;
+                    return await handler(stream, context);
+                });
 
-                        try
-                        {
-                            var ipcMessage = await taskPool.Run(async () =>
-                            {
-                                return await handler(stream, context);
-                            });
-
-                            IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
-                            return response;
-                        }
-                        catch (Exception exception)
-                        {
-                            // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
-                            JsonIpcDirectRoutedProvider.Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
-                        }
-                    }
-                    else
-                    {
-                        // 考虑可能有多个实例，每个实例处理不同的业务情况
-                        //JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
-                        return KnownIpcResponseMessages.CannotHandle;
-                    }
-                };
+                IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
+                return response;
             }
-
+            catch (Exception exception)
+            {
+                // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
+                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
+                // 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
+                return KnownIpcResponseMessages.CannotHandle;
+            }
+        }
+        else
+        {
+            // 考虑可能有多个实例，每个实例处理不同的业务情况
+            //JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
             return KnownIpcResponseMessages.CannotHandle;
         }
     }
 
     #endregion
 
-    private static bool TryHandleMessage(in IpcMessage ipcMessage, [NotNullWhen(true)] out MemoryStream? stream, [NotNullWhen(true)] out string? routedPath)
-    {
-        const ulong header = (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
-        if (ipcMessage.TryGetPayload(header, out var message))
-        {
-            stream = new(message.Body.Buffer, message.Body.Start, message.Body.Length);
-            using BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
-            routedPath = binaryReader.ReadString();
-            return true;
-        }
-        stream = default;
-        routedPath = default;
-        return false;
-    }
-
-    private IpcProvider IpcProvider { get; }
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
-    private bool _isStarted;
     private ILogger Logger => IpcProvider.IpcContext.Logger;
-
-    private void ThrowIfStarted()
-    {
-        if (_isStarted)
-        {
-            throw new InvalidOperationException($"禁止在启动之后再次添加处理");
-        }
-    }
 
     private T? ToObject<T>(MemoryStream stream)
     {
