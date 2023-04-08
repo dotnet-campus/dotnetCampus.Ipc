@@ -27,4 +27,11 @@ public enum KnownMessageHeaders : ulong
     JsonIpcDirectRoutedMessageHeader
         // JsonDrRt
         = 0x745272446E6F734A,
+
+    /// <summary>
+    /// 发送的是裸 byte 的直接路由消息
+    /// </summary>
+    RawByteIpcDirectRoutedMessageHeader
+        // RwBtDrRt
+        = 0x7452724474427752,
 }
