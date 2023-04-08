@@ -130,9 +130,10 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
 
-    protected override void OnHandleNotify(string routedPath, MemoryStream stream, PeerMessageArgs e)
+    protected override void OnHandleNotify(IpcDirectRoutedMessage message, PeerMessageArgs e)
     {
         // 接下来进行调度
+        var (routedPath, stream, _) = message;
         if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
         {
             var context = new JsonIpcDirectRoutedContext(e.PeerName);
@@ -248,8 +249,10 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
-    protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(string routedPath, MemoryStream stream, IIpcRequestContext requestContext)
+    protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext)
     {
+        var (routedPath, stream, _) = message;
+
         if (HandleRequestDictionary.TryGetValue(routedPath, out var handler))
         {
             var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);

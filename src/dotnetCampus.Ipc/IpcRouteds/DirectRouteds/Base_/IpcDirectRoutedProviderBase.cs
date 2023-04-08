@@ -71,16 +71,13 @@ public abstract class IpcDirectRoutedProviderBase
         }
 
         // 这里是全部的消息都会进入的，但是这里通过判断业务头，只处理感兴趣的
-        if (TryHandleMessage(e.Message, out MemoryStream? stream, out var routedPath))
+        if (TryHandleMessage(e.Message, out var message))
         {
             // 这是一个 MemoryStream 释放或不释放都没啥差别
             //using (stream) ;
             try
             {
-                using (stream)
-                {
-                    OnHandleNotify(routedPath, stream, e);
-                }
+                OnHandleNotify(message.Value, e);
             }
             catch (Exception exception)
             {
@@ -90,7 +87,7 @@ public abstract class IpcDirectRoutedProviderBase
         }
     }
 
-    protected abstract void OnHandleNotify(string routedPath, MemoryStream stream, PeerMessageArgs e);
+    protected abstract void OnHandleNotify(IpcDirectRoutedMessage message, PeerMessageArgs e);
 
     class RequestHandler : IIpcRequestHandler
     {
@@ -103,15 +100,11 @@ public abstract class IpcDirectRoutedProviderBase
 
         public Task<IIpcResponseMessage> HandleRequest(IIpcRequestContext requestContext)
         {
-            if (IpcDirectRoutedProviderBase.TryHandleMessage(requestContext.IpcBufferMessage, out var stream,
-                    out var routedPath))
+            if (IpcDirectRoutedProviderBase.TryHandleMessage(requestContext.IpcBufferMessage, out var message))
             {
                 try
                 {
-                    using (stream)
-                    {
-                        return IpcDirectRoutedProviderBase.OnHandleRequestAsync(routedPath, stream, requestContext);
-                    }
+                    return IpcDirectRoutedProviderBase.OnHandleRequestAsync(message.Value, requestContext);
                 }
                 catch (Exception e)
                 {
@@ -123,17 +116,18 @@ public abstract class IpcDirectRoutedProviderBase
         }
     }
 
-    protected abstract Task<IIpcResponseMessage> OnHandleRequestAsync(string routedPath, MemoryStream stream, IIpcRequestContext requestContext);
+    protected abstract Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext);
 
-    private bool TryHandleMessage(in IpcMessage ipcMessage, [NotNullWhen(true)] out MemoryStream? stream, [NotNullWhen(true)] out string? routedPath)
+    private bool TryHandleMessage(in IpcMessage ipcMessage, [NotNullWhen(true)] out IpcDirectRoutedMessage? ipcDirectRoutedMessage)
     {
         try
         {
             if (ipcMessage.TryGetPayload(BusinessHeader, out var message))
             {
-                stream = new(message.Body.Buffer, message.Body.Start, message.Body.Length);
+                var stream = new MemoryStream(message.Body.Buffer, message.Body.Start, message.Body.Length, writable: true, publiclyVisible: true);
                 using BinaryReader binaryReader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
-                routedPath = binaryReader.ReadString();
+                var routedPath = binaryReader.ReadString();
+                ipcDirectRoutedMessage = new IpcDirectRoutedMessage(routedPath, stream, message);
                 return true;
             }
         }
@@ -142,9 +136,12 @@ public abstract class IpcDirectRoutedProviderBase
             Logger.Error(e, $"HandleMessage");
         }
 
-        stream = default;
-        routedPath = default;
+        ipcDirectRoutedMessage = default;
         return false;
     }
+
+    protected readonly record struct IpcDirectRoutedMessage(string RoutedPath, MemoryStream Stream,
+        IpcMessage PayloadIpcMessage);
 }
+
 #endif
