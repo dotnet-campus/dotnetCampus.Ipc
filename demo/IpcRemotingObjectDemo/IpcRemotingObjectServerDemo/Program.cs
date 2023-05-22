@@ -12,3 +12,4 @@ ipcProvider.PeerConnected += (sender, connectedArgs) =>
 ipcProvider.StartServer();
 
 Console.Read();
+

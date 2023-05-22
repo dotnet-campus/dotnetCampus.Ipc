@@ -62,6 +62,17 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 除了编译时确定的 IPC 代理访问配置之外，还可以额外指定一个运行时的配置。优先级最低，在编译时配置没有设的时候使用。
         /// </summary>
         internal IpcProxyConfigs? RuntimeConfigs { get; set; }
+
+
+        /// <summary>
+        /// 远端名称
+        /// </summary>
+        internal string PeerName { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal IIpcProvider InnerIpcProvider { get; set; }
     }
 
     /// <summary>
@@ -77,6 +88,22 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         protected GeneratedIpcProxy()
         {
             TypeName = typeof(TContract).FullName!;
+        }
+
+
+        private void ChackPeerProxy()
+        {
+            if (PeerProxy is null)
+            {
+                if (InnerIpcProvider is dotnetCampus.Ipc.Pipes.IpcProvider provider)
+                {
+                    if (provider.PeerManager.TryGetValue(PeerName, out var peerProxy))
+                    {
+                        PeerProxy = peerProxy;
+                    }
+                }
+            }
+
         }
 
         /// <summary>
@@ -180,6 +207,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns>可异步等待方法返回值的可等待对象。</returns>
         private async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, Garm<object?>[]? args, IpcProxyMemberNamedValues namedValues)
         {
+            ChackPeerProxy();
             var ignoresIpcException = namedValues.IgnoresIpcException ?? RuntimeConfigs?.IgnoresIpcException ?? false;
             try
             {

@@ -43,7 +43,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <inheritdoc />
         public IpcContext IpcContext { get; }
 
-        private PeerManager PeerManager { get; }
+        internal PeerManager PeerManager { get; }
 
         /// <summary>
         /// 是否启动了
