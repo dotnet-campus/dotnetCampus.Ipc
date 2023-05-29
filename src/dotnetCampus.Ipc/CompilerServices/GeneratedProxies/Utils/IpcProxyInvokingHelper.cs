@@ -121,13 +121,13 @@ internal class IpcProxyInvokingHelper
             return null;
         }
 
-        if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var assemblyQualifiedName))
+        if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var ipcTypeFullName))
         {
             // 如果此参数是一个 IPC 对象。
             return new GeneratedProxyObjectModel
             {
                 Id = objectId,
-                IpcTypeFullName = assemblyQualifiedName,
+                IpcTypeFullName = ipcTypeFullName,
             };
         }
         else
