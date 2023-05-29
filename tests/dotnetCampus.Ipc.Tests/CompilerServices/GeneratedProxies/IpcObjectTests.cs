@@ -4,14 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Exceptions;
+using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Tests.CompilerServices.Fake;
+using dotnetCampus.Ipc.Tests.CompilerServices.FakeRemote;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -305,6 +309,74 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
                 // 对接端的值被代理端修改。
                 Assert.AreEqual("test changed from proxy side", jointSideObject.Value);
                 Assert.AreEqual("test changed from proxy side", result.Value);
+            });
+        }
+
+        [ContractTestCase]
+        public void DifferentAssembliesIpcParametersAndReturnsTests()
+        {
+            "IPC 代理生成：不同程序集中的同名 IPC 参数和异步 IPC 返回值".Test(async () =>
+            {
+                // 准备。
+                var remoteExecutablePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "..", "..", "..", "..",
+                    @"dotnetCampus.Ipc.FakeTests\bin",
+                    Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyConfigurationAttribute>()!.Configuration,
+                    "net6.0",
+                    "dotnetCampus.Ipc.FakeTests.dll");
+
+                if (!File.Exists(remoteExecutablePath))
+                {
+                    throw new FileNotFoundException($"在执行真正跨进程 IPC 通信时，目标程序集未找到，请确认代码中编写的路径是否已更新到最新路径。路径为：{remoteExecutablePath}");
+                }
+
+                var process = Process.Start(new ProcessStartInfo("dotnet")
+                {
+                    UseShellExecute = true,
+                    ArgumentList =
+                    {
+                        remoteExecutablePath,
+                    },
+                })!;
+                try
+                {
+                    var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject";
+                    var ipcProvider = new IpcProvider(ipcPeerName + ".Local");
+                    ipcProvider.StartServer();
+                    var ipcPeer = await ipcProvider.GetAndConnectToPeerAsync(ipcPeerName);
+                    var remoteObject = ipcProvider.CreateIpcProxy<IRemoteFakeIpcObject>(ipcPeer);
+                    var ipcArgument = new RemoteIpcArgument("argument");
+
+                    // 安放。
+                    var ipcReturn = await remoteObject.MethodWithIpcParameterAsync(ipcArgument, "changed ipc argument");
+
+                    try
+                    {
+                        // 植物。
+                        // 本地值被远端修改。
+                        Assert.AreEqual("changed ipc argument", ipcArgument.Value);
+                        // 远端的值保持默认。
+                        Assert.AreEqual("private", ipcReturn.Value);
+                    }
+                    finally
+                    {
+                        // 清理。
+                        await remoteObject.ShutdownAsync();
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        // 清理。
+                        process.Kill();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
             });
         }
 
