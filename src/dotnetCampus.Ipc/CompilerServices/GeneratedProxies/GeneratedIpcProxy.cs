@@ -83,6 +83,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 通过 IPC 访问目标对象上某属性的值。
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
         /// <returns>可异步等待的属性的值。</returns>
@@ -112,6 +113,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 通过 IPC 设置目标对象上某属性的值。
         /// </summary>
         /// <typeparam name="T">属性类型。</typeparam>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="value">要设置的属性的值。</param>
         /// <param name="namedValues">包含属性上标记的调用此 IPC 属性的个性化方式。</param>
         /// <param name="propertyName">属性名称。</param>
@@ -124,6 +126,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个方法。
         /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="args">方法参数列表。</param>
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
@@ -136,6 +139,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个方法。
         /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="args">方法参数列表。</param>
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
@@ -148,6 +152,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个异步方法。
         /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="args">方法参数列表。</param>
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
@@ -160,6 +165,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 通过 IPC 调用目标对象上的某个异步方法。
         /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="args">方法参数列表。</param>
         /// <param name="namedValues">包含方法上标记的调用此 IPC 方法的个性化方式。</param>
         /// <param name="methodName">方法名。</param>
@@ -174,6 +180,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="callType">调用类型（属性还是方法）。</param>
+        /// <param name="memberId">方法签名的 Id。</param>
         /// <param name="memberName">成员名。</param>
         /// <param name="args">调用参数。</param>
         /// <param name="namedValues">包含属性上标记的调用此 IPC 成员的个性化方式。</param>

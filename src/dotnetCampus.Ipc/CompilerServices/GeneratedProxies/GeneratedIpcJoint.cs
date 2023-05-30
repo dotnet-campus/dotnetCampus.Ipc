@@ -78,6 +78,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="realInstance">当对接时，可使用此参数来访问真实对象。</param>
         protected abstract void MatchMembers(TContract realInstance);
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod(ulong memberId, Action methodInvoker)
         {
             _methods.Add(memberId, _ =>
@@ -87,6 +92,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod(ulong memberId, Func<Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async _ =>
@@ -96,6 +106,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T>(ulong memberId, Action<T> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -105,6 +120,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T>(ulong memberId, Func<T, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -114,6 +134,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2>(ulong memberId, Action<T1, T2> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -123,6 +148,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2>(ulong memberId, Func<T1, T2, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -132,6 +162,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3>(ulong memberId, Action<T1, T2, T3> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -141,6 +176,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3>(ulong memberId, Func<T1, T2, T3, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -150,6 +190,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4>(ulong memberId, Action<T1, T2, T3, T4> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -159,6 +204,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4>(ulong memberId, Func<T1, T2, T3, T4, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -168,6 +218,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5>(ulong memberId, Action<T1, T2, T3, T4, T5> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -177,6 +232,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5>(ulong memberId, Func<T1, T2, T3, T4, T5, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -186,6 +246,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6>(ulong memberId, Action<T1, T2, T3, T4, T5, T6> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -195,6 +260,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -204,6 +274,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(ulong memberId, Action<T1, T2, T3, T4, T5, T6, T7> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -213,6 +288,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -222,6 +302,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(ulong memberId, Action<T1, T2, T3, T4, T5, T6, T7, T8> methodInvoker)
         {
             _methods.Add(memberId, args =>
@@ -231,6 +316,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args =>
@@ -240,101 +330,203 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             });
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<TReturn>(ulong memberId, Func<Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, _ => CastReturn(methodInvoker()));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<TReturn>(ulong memberId, Func<Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async _ => CastReturn(await methodInvoker().ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T, TReturn>(ulong memberId, Func<T, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T>(args![0])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T, TReturn>(ulong memberId, Func<T, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T>(args![0])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, TReturn>(ulong memberId, Func<T1, T2, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, TReturn>(ulong memberId, Func<T1, T2, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, TReturn>(ulong memberId, Func<T1, T2, T3, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, TReturn>(ulong memberId, Func<T1, T2, T3, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, TReturn>(ulong memberId, Func<T1, T2, T3, T4, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, TReturn>(ulong memberId, Func<T1, T2, T3, T4, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Garm<TReturn>> methodInvoker)
         {
             _methods.Add(memberId, args => CastReturn(methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="memberId">方法签名的 Id。</param>
+        /// <param name="methodInvoker">对接实现。</param>
         protected void MatchMethod<T1, T2, T3, T4, T5, T6, T7, T8, TReturn>(ulong memberId, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<Garm<TReturn>>> methodInvoker)
         {
             _asyncMethods.Add(memberId, async args => CastReturn(await methodInvoker(CastArg<T1>(args![0])!, CastArg<T2>(args![1])!, CastArg<T3>(args![2])!, CastArg<T4>(args![3])!, CastArg<T5>(args![4])!, CastArg<T6>(args![5])!, CastArg<T7>(args![6])!, CastArg<T8>(args![7])!).ConfigureAwait(false)));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个属性，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="getter"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="getPropertyId">属性 get 的签名的 Id。</param>
+        /// <param name="getter">get 的对接实现。</param>
         protected void MatchProperty<T>(ulong getPropertyId, Func<Garm<T>> getter)
         {
             _propertyGetters.Add(getPropertyId, () => CastReturn(getter()));
         }
 
+        /// <summary>
+        /// 匹配一个 IPC 目标对象上的某个属性，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="getter"/> 所指向的具体实现。
+        /// </summary>
+        /// <param name="getPropertyId">属性 get 的签名的 Id。</param>
+        /// <param name="setPropertyId">属性 set 的签名的 Id。</param>
+        /// <param name="getter">get 的对接实现。</param>
+        /// <param name="setter">set 的对接实现。</param>
         protected void MatchProperty<T>(ulong getPropertyId, ulong setPropertyId, Func<Garm<T>> getter, Action<T> setter)
         {
             _propertyGetters.Add(getPropertyId, () => CastReturn(getter()));
