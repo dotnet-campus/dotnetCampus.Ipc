@@ -244,7 +244,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
 
     private T? CastArg<T>(IGarmObject argModel)
     {
-        if(argModel is Garm go)
+        if (argModel is Garm go)
         {
             argModel = go.ToGeneric<T>();
         }

@@ -93,7 +93,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberInvokeModel? model)
         {
             const ulong header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
-            if (message.TryGetPayload(header,out var deserializeMessage))
+            if (message.TryGetPayload(header, out var deserializeMessage))
             {
                 return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
             }

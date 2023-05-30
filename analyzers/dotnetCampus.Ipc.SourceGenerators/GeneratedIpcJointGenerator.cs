@@ -69,7 +69,7 @@ public class GeneratedIpcJointGenerator : IIncrementalGenerator
         {
             _methods.Add(memberId, (new[] { {{GenerateTs(genericCount, "typeof(T)")}} }, args =>
             {
-                methodInvoker({{GenerateTs(genericCount, i => $"CastArg<T>(args![{i-1}])!")}});
+                methodInvoker({{GenerateTs(genericCount, i => $"CastArg<T>(args![{i - 1}])!")}});
                 return DefaultGarm;
             }
             ));

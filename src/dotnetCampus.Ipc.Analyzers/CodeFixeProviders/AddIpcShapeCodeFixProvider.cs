@@ -1,14 +1,11 @@
 ﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
 using dotnetCampus.Ipc.Properties;
 using dotnetCampus.Ipc.SourceGenerators.Compiling;
-
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Text;
-
-using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-
 using static dotnetCampus.Ipc.SourceGenerators.Utils.GeneratorHelper;
+using SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace dotnetCampus.Ipc.CodeFixeProviders;
 

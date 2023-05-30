@@ -170,7 +170,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             else
             {
-               return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream);
+                return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream);
             }
         }
 
@@ -280,7 +280,7 @@ namespace dotnetCampus.Ipc.Pipes
                     {
                         ExceptionDispatchInfo.Capture(result.Exception).Throw();
                     }
-                    
+
                     return;
                 }
 
@@ -362,7 +362,7 @@ namespace dotnetCampus.Ipc.Pipes
                     IpcConfiguration.SharedArrayPool,
                     tracker.Tag
                 );
-                
+
                 await stream.FlushAsync().ConfigureAwait(false);
 
                 // 追踪消息。

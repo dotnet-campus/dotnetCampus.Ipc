@@ -75,7 +75,7 @@ internal class IpcProxyInvokingHelper
             var ipcType = string.IsNullOrWhiteSpace(model.IpcTypeFullName)
                 ? null
                 : typeof(T);
-            if(ipcType is not null
+            if (ipcType is not null
                 && Context.TryCreateProxyFromSerializationInfo(PeerProxy,
                     ipcType, model.Id, out var proxyInstance))
             {
