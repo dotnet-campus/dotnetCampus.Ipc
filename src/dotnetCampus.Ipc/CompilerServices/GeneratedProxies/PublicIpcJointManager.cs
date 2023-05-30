@@ -133,7 +133,8 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             GeneratedProxyMemberReturnModel? @return;
             try
             {
-                var args = ExtractArgsFromArgsModel(requestModel.Args, peer);
+                var parameterTypes = joint.GetParameterTypes(requestModel.CallType, requestModel.MemberId);
+                var args = ExtractArgsFromArgsModel(parameterTypes, requestModel.Args, peer);
                 var returnValue = await InvokeMember(joint, requestModel.CallType, requestModel.MemberId!, requestModel.MemberName!, args).ConfigureAwait(false);
                 @return = CreateReturnModelFromReturnObject(returnValue);
 #if DEBUG
@@ -150,11 +151,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <summary>
         /// 预处理一组需要进行 IPC 代理访问的参数。
         /// </summary>
+        /// <param name="parameterTypes">参数类型列表。</param>
         /// <param name="argModels">参数模型列表。</param>
         /// <param name="peer">如果某个参数的模型表示需要通过代理访问一个 IPC 远端对象，则会用到这个远端。</param>
         /// <returns>参数实例列表。</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private object?[]? ExtractArgsFromArgsModel(GeneratedProxyObjectModel?[]? argModels, IPeerProxy peer)
+        private IGarmObject[]? ExtractArgsFromArgsModel(
+            Type[] parameterTypes,
+            GeneratedProxyObjectModel?[]? argModels,
+            IPeerProxy peer)
         {
             if (argModels is null)
             {
@@ -163,20 +167,36 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
             if (argModels.Length is 0)
             {
-                return new object?[0];
+#if NETCOREAPP3_0_OR_GREATER
+                return Array.Empty<IGarmObject>();
+#else
+                return new IGarmObject[0];
+#endif
             }
 
-            var args = new object?[argModels.Length];
+            var args = new IGarmObject[argModels.Length];
             for (var i = 0; i < args.Length; i++)
             {
+                var parameterType = parameterTypes[i];
                 var argModel = argModels[i];
-                if (argModel is not null && _context.TryCreateProxyFromSerializationInfo(peer, argModel.IpcTypeFullName, argModel.Id, out var proxy))
+                if (argModel is null)
                 {
-                    args[i] = proxy;
+                    // 如果参数模型为 null，那么就是一个 null 参数。
+                    args[i] = new Garm(null, parameterType);
                 }
                 else
                 {
-                    args[i] = argModel?.Value;
+                    var ipcType = parameterType;
+                    if (_context.TryCreateProxyFromSerializationInfo(peer, ipcType, argModel.Id, out var proxy))
+                    {
+                        // 如果参数模型表示需要通过代理访问一个 IPC 远端对象，则创建一个代理对象。
+                        args[i] = new Garm(proxy, ipcType);
+                    }
+                    else
+                    {
+                        // 如果参数模型表示是一个普通的值，则直接使用这个值。
+                        args[i] = new Garm(argModel?.Value, parameterType);
+                    }
                 }
             }
             return args;
@@ -188,7 +208,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <param name="returnModel">真实的返回值或返回实例。</param>
         /// <returns>可被序列化进行 IPC 传输的返回值模型。</returns>
-        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(Garm<object?> returnModel)
+        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(IGarmObject returnModel)
         {
             if (_context.TryCreateSerializationInfoFromIpcRealInstance(returnModel, out var objectId, out var ipcTypeFullName))
             {
@@ -207,15 +227,15 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, object?[]? args)
+        private static async Task<IGarmObject> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, IGarmObject[]? args)
         {
             return callType switch
             {
                 MemberInvokingType.GetProperty => joint.GetProperty(memberId, memberName),
-                MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args?.FirstOrDefault()),
+                MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args?.FirstOrDefault() ?? GarmObjectExtensions.Default),
                 MemberInvokingType.Method => joint.CallMethod(memberId, memberName, args),
                 MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberId, memberName, args).ConfigureAwait(false),
-                _ => new Garm<object?>(null),
+                _ => GarmObjectExtensions.Default,
             };
         }
     }

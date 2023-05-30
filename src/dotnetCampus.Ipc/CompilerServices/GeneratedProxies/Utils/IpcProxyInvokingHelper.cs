@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Exceptions;
-using dotnetCampus.Ipc.Messages;
-
-using Newtonsoft.Json.Linq;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
 
@@ -44,7 +41,7 @@ internal class IpcProxyInvokingHelper
     /// </summary>
     internal string? ObjectId { get; set; }
 
-    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, Garm<object?>[]? args)
+    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, IGarmObject[]? args)
     {
         if (PeerProxy is null)
         {
@@ -73,12 +70,18 @@ internal class IpcProxyInvokingHelper
             exceptionModel.Throw();
         }
 
-        if (returnModel.Return is { } model
-            && Context.TryCreateProxyFromSerializationInfo(PeerProxy,
-                model.IpcTypeFullName, model.Id, out var proxyInstance))
+        if (returnModel.Return is { } model)
         {
-            // 如果远端返回 IPC 公开的对象，则本地获取此对象的代理并返回。
-            return (T?) proxyInstance;
+            var ipcType = string.IsNullOrWhiteSpace(model.IpcTypeFullName)
+                ? null
+                : typeof(T);
+            if(ipcType is not null
+                && Context.TryCreateProxyFromSerializationInfo(PeerProxy,
+                    ipcType, model.Id, out var proxyInstance))
+            {
+                // 如果远端返回 IPC 公开的对象，则本地获取此对象的代理并返回。
+                return (T?) proxyInstance;
+            }
         }
 
         // 其他情况直接使用反序列化的值返回。
@@ -107,27 +110,23 @@ internal class IpcProxyInvokingHelper
 
     private T? Cast<T>(object? arg)
     {
-        if (arg is JToken jToken)
-        {
-            return KnownTypeConverter.ConvertBack<T>(jToken);
-        }
-        return (T?) arg;
+        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(arg);
     }
 
-    private GeneratedProxyObjectModel? SerializeArg(Garm<object?> argModel)
+    private GeneratedProxyObjectModel? SerializeArg(IGarmObject argModel)
     {
         if (PeerProxy is null)
         {
             return null;
         }
 
-        if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var assemblyQualifiedName))
+        if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var ipcTypeFullName))
         {
             // 如果此参数是一个 IPC 对象。
             return new GeneratedProxyObjectModel
             {
                 Id = objectId,
-                IpcTypeFullName = assemblyQualifiedName,
+                IpcTypeFullName = ipcTypeFullName,
             };
         }
         else

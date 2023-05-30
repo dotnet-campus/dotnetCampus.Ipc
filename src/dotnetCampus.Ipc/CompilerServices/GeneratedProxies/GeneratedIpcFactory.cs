@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
@@ -18,6 +19,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
     /// </summary>
     public static class GeneratedIpcFactory
     {
+        /// <summary>
+        /// 编译期 IPC 类型的程序集到此程序集中的所有编译期 IPC 类型的缓存。
+        /// </summary>
+        private static readonly ConcurrentDictionary<Assembly, AssemblyIpcProxyJointAttribute[]> AssemblyIpcAttributesCache = new();
+
         /// <summary>
         /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口或标记了 <see cref="IpcShapeAttribute"/> 的代理壳类型）到代理对接类型的缓存。
         /// </summary>
@@ -137,11 +143,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns>IPC 类型。</returns>
         private static (Type? proxyType, Type? jointType) ConvertShapeTypeToProxyJointTypes(Type ipcType)
         {
+            var attributes = AssemblyIpcAttributesCache.GetOrAdd(
+                ipcType.Assembly,
+                _ => ipcType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>().ToArray());
+
             if (ipcType?.IsDefined(typeof(IpcShapeAttribute)) is true)
             {
                 // 因为 IpcShape 继承了 IpcPublic，所以需要首先检查代理壳，否则 IpcPublic 接口直接就通过了，产生错误。
-                var attribute = ipcType.Assembly.GetCustomAttributes<AssemblyIpcProxyAttribute>()
-                    .FirstOrDefault(x => x.IpcType == ipcType);
+                var attribute = attributes.FirstOrDefault(x => x.IpcType == ipcType);
                 if (attribute is null)
                 {
                     throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”代理壳的 IPC 代理类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
@@ -151,8 +160,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             else if (ipcType?.IsDefined(typeof(IpcPublicAttribute)) is true)
             {
                 // 随后再检查 IpcPublic。
-                var attribute = ipcType.Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>()
-                    .FirstOrDefault(x => x.IpcType == ipcType);
+                var attribute = attributes.FirstOrDefault(x => x.IpcType == ipcType);
                 if (attribute is null)
                 {
                     throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”接口的 IPC 代理与对接类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");

@@ -84,7 +84,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
 
 Task {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethodAsync({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    return CallMethodAsync({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
 }}
 
                 ",
@@ -93,7 +93,7 @@ Task {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 
 Task<{returnTypeName}> {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethodAsync<{returnTypeName}>({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    return CallMethodAsync<{returnTypeName}>({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
 }}
 
                 ",
@@ -102,19 +102,19 @@ Task<{returnTypeName}> {methodContainingTypeName}.{_contractMethod.Name}({parame
                     ? @$"
 void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    CallMethod({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues}).Wait();
+    CallMethod({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues}).Wait();
 }}"
                     : @$"
 void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    _ = CallMethod({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues});
+    _ = CallMethod({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
 }}",
 
                 // 同步 T 方法。
                 (false, _) => $@"
 {returnTypeName} {methodContainingTypeName}.{_contractMethod.Name}({parameters})
 {{
-    return CallMethod<{returnTypeName}>({methodId}, new Garm<object?>[] {{ {arguments} }}, {namedValues}).Result;
+    return CallMethod<{returnTypeName}>({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues}).Result;
 }}
                 ",
             }
