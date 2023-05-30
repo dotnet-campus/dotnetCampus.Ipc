@@ -30,11 +30,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         internal static CachePool<Type, (Type? proxyType, Type? jointType)> IpcTypeToProxyJointCache { get; } = new(ConvertShapeTypeToProxyJointTypes, true);
 
         /// <summary>
-        /// 编译期 IPC 类型的完整名称到 IPC 类型的缓存。
-        /// </summary>
-        internal static CachePool<string, Type?> IpcTypeFullNameToIpcTypeCache { get; } = new(ConvertIpcTypeFullNameToProxyJointTypes, true);
-
-        /// <summary>
         /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
         /// </summary>
         /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
@@ -140,16 +135,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
         private static GeneratedProxyJointIpcContext GetContext(IIpcProvider ipcProvider)
             => ipcProvider.IpcContext.GeneratedProxyJointIpcContext;
-
-        private static AssemblyIpcProxyJointAttribute[] ConvertAssemblyToIpcAttributes(Assembly assembly)
-        {
-            return assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>().ToArray();
-        }
-
-        private static Type? ConvertIpcTypeFullNameToProxyJointTypes(string ipcTypeFullName) => AssemblyIpcAttributesCache
-            .SelectMany(x => x.Value)
-            .Select(x => x.IpcType)
-            .FirstOrDefault(x => x.FullName == ipcTypeFullName);
 
         /// <summary>
         /// 编译期契约与傀儡类型到代理对接的转换。
