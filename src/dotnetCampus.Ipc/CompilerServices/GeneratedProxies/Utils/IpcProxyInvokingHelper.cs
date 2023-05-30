@@ -44,7 +44,7 @@ internal class IpcProxyInvokingHelper
     /// </summary>
     internal string? ObjectId { get; set; }
 
-    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, Garm<object?>[]? args)
+    internal async Task<T?> IpcInvokeAsync<T>(MemberInvokingType callType, ulong memberId, string memberName, IGarmObject[]? args)
     {
         if (PeerProxy is null)
         {
@@ -114,7 +114,7 @@ internal class IpcProxyInvokingHelper
         return (T?) arg;
     }
 
-    private GeneratedProxyObjectModel? SerializeArg(Garm<object?> argModel)
+    private GeneratedProxyObjectModel? SerializeArg(IGarmObject argModel)
     {
         if (PeerProxy is null)
         {

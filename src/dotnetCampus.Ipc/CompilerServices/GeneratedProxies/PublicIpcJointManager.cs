@@ -188,7 +188,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </summary>
         /// <param name="returnModel">真实的返回值或返回实例。</param>
         /// <returns>可被序列化进行 IPC 传输的返回值模型。</returns>
-        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(Garm<object?> returnModel)
+        private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(IGarmObject returnModel)
         {
             if (_context.TryCreateSerializationInfoFromIpcRealInstance(returnModel, out var objectId, out var ipcTypeFullName))
             {
@@ -207,7 +207,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private static async Task<Garm<object?>> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, object?[]? args)
+        private static async Task<IGarmObject> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, object?[]? args)
         {
             return callType switch
             {
@@ -215,7 +215,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args?.FirstOrDefault()),
                 MemberInvokingType.Method => joint.CallMethod(memberId, memberName, args),
                 MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberId, memberName, args).ConfigureAwait(false),
-                _ => new Garm<object?>(null),
+#if NET6_0_OR_GREATER
+                _ => IGarmObject.Default,
+#else
+                _ => GarmObjectExtensions.Default,
+#endif
             };
         }
     }

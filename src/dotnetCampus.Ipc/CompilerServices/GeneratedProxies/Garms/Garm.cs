@@ -59,6 +59,8 @@ public readonly struct Garm<T> : IGarmObject
 
     object? IGarmObject.Value => Value;
 
+    Type IGarmObject.ValueType => typeof(T);
+
     Type? IGarmObject.IpcType => IpcType;
 
     /// <summary>
