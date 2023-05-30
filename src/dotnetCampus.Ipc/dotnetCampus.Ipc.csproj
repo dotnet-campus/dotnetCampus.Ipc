@@ -28,7 +28,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\..\tests\dotnetCampus.Ipc.Tests\Attributes.cs" Link="Properties\Attributes.cs" />
   </ItemGroup>
@@ -44,6 +44,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\analyzers\dotnetCampus.Ipc.SourceGenerators\dotnetCampus.Ipc.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <!-- 生成 NuGet 包。 -->

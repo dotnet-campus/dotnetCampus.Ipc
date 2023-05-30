@@ -30,16 +30,15 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
         /// </summary>
         /// <param name="context">基于 .NET 类型进行 IPC 传输的上下文信息。</param>
         /// <param name="peerProxy">IPC 对方端。</param>
-        /// <param name="ipcTypeFullName">标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型的名称。</param>
+        /// <param name="ipcType">标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型。</param>
         /// <param name="objectId">如果可能有同一个契约类型的多个对象，则在此传入此对象的 IPC 访问 Id。</param>
         /// <param name="proxyReturnOrJointArg">如果经判断是一个 IPC 公开的对象，则可以从此参数中获取到这个对象的本地代理。</param>
         /// <returns>如果这是一个 IPC 公开的对象，则返回 true，如果只是一个普通对象，则返回 false。</returns>
         public static bool TryCreateProxyFromSerializationInfo(this GeneratedProxyJointIpcContext context,
-            IPeerProxy peerProxy, string? ipcTypeFullName, string? objectId,
+            IPeerProxy peerProxy, Type? ipcType, string? objectId,
             out object? proxyReturnOrJointArg)
         {
-            if (ipcTypeFullName is not null
-                && IpcTypeFullNameToIpcTypeCache[ipcTypeFullName] is { } ipcType
+            if (ipcType is not null
                 && IpcTypeToProxyJointCache[ipcType].proxyType is { } proxyType)
             {
                 var proxyInstance = ProxyCache[(proxyType, objectId, peerProxy.PeerName)];

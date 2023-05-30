@@ -6,13 +6,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// </summary>
 public interface IGarmObject
 {
-#if NET6_0_OR_GREATER
-    /// <summary>
-    /// <see cref="IGarmObject"/> 的默认值，等效于可空类型的 null。
-    /// </summary>
-    internal static Garm<object?> Default { get; } = new Garm<object?>();
-#endif
-
     /// <summary>
     /// 获取 <see cref="Garm{T}"/> 的值。
     /// </summary>
@@ -29,9 +22,7 @@ public interface IGarmObject
     Type? IpcType { get; }
 }
 
-#if !NET6_0_OR_GREATER
 internal static class GarmObjectExtensions
 {
     internal static IGarmObject Default { get; } = new Garm<object?>();
 }
-#endif

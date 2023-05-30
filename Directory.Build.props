@@ -12,6 +12,8 @@
 
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright © 2020-2023 dotnet campus, All Rights Reserved.</Copyright>
+
+    <NoWarn>$(NoWarn);NU1803</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

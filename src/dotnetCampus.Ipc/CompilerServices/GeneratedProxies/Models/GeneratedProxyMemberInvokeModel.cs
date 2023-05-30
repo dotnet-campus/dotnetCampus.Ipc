@@ -21,6 +21,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
     {
         [ContractPublicPropertyName(nameof(Id))]
         private string? _id;
+        private string? _contractFullTypeName;
 
         /// <summary>
         /// 远端对象 Id。
@@ -39,7 +40,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 远端对象的契约类型名称（含命名空间，不含 Token）。
         /// </summary>
         [DataMember(Name = "t")]
-        public string? ContractFullTypeName { get; set; }
+        public string ContractFullTypeName
+        {
+            get => _contractFullTypeName ?? throw new InvalidOperationException("在获取 ContractFullTypeName 之前，必须先对其反序列化。");
+            set => _contractFullTypeName = value;
+        }
 
         /// <summary>
         /// 调用的成员 Id（由源代码生成器自动生成，唯一表示一个属性或方法）。
