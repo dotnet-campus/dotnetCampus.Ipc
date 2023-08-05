@@ -120,8 +120,8 @@ namespace dotnetCampus.Ipc.Internals
                     inBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
                     outBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
                     pipeSecurity
-                    //, HandleInheritability.None 默认值
-                    //, PipeAccessRights.ReadWrite 默认值
+                //, HandleInheritability.None 默认值
+                //, PipeAccessRights.ReadWrite 默认值
                 );
                 return namedPipeServerStream;
             }

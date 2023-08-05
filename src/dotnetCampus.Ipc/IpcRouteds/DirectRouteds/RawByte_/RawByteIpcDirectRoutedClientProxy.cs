@@ -10,7 +10,7 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 /// <summary>
 /// 传输裸的 byte 数据的直接路由的 IPC 通讯客户端
 /// </summary>
-public class RawByteIpcDirectRoutedClientProxy: IpcDirectRoutedClientProxyBase
+public class RawByteIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 {
     public RawByteIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
     {

@@ -39,7 +39,7 @@ namespace dotnetCampus.Ipc.Context
 
             IpcClientPipeConnector = IpcConfiguration.IpcClientPipeConnector;
 
-            if (IpcConfiguration.CustomIpcThreadPool is {} customIpcThreadPool)
+            if (IpcConfiguration.CustomIpcThreadPool is { } customIpcThreadPool)
             {
                 TaskPool = new IpcTask(customIpcThreadPool);
             }

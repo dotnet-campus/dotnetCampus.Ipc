@@ -24,7 +24,7 @@ public class IpcClientPipeConnectionException : IpcRemoteException
         PeerName = peerName;
         _message = message ?? innerException?.Message;
     }
-    
+
     /// <inheritdoc />
     public override string Message => _message ?? $"连接管道服务失败。服务管道名:{PeerName}";
 
