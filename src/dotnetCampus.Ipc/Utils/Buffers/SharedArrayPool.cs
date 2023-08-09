@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace dotnetCampus.Ipc.Utils.Buffers
 {
@@ -45,11 +46,11 @@ namespace dotnetCampus.Ipc.Utils.Buffers
         /// <inheritdoc />
         public byte[] Rent(int minLength)
         {
-            var cacheByteList = _cacheByteList.Value;
+            var cacheByteList = _cacheByteList;
 
             if (cacheByteList != null && cacheByteList.Length >= minLength)
             {
-                _cacheByteList.Value = null;
+                _cacheByteList = null;
                 return cacheByteList;
             }
 
@@ -59,14 +60,15 @@ namespace dotnetCampus.Ipc.Utils.Buffers
         /// <inheritdoc />
         public void Return(byte[] array)
         {
-            var cacheByteList = _cacheByteList.Value;
+            var cacheByteList = _cacheByteList;
             if (cacheByteList == null || cacheByteList.Length < array.Length)
             {
-                _cacheByteList.Value = cacheByteList;
+                _cacheByteList = cacheByteList;
             }
         }
 
-        private readonly ThreadLocal<byte[]?> _cacheByteList = new ThreadLocal<byte[]?>();
+        [ThreadStatic]
+        private static byte[]? _cacheByteList;
     }
 #endif
 }
