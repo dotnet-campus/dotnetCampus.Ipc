@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -140,9 +139,16 @@ public abstract class IpcDirectRoutedProviderBase
         return false;
     }
 
-    protected readonly record struct IpcDirectRoutedMessage(string RoutedPath, MemoryStream Stream,
-        IpcMessage PayloadIpcMessage)
+    protected readonly struct IpcDirectRoutedMessage
     {
+        public IpcDirectRoutedMessage(string routedPath, MemoryStream stream,
+            IpcMessage payloadIpcMessage)
+        {
+            this.RoutedPath = routedPath;
+            this.Stream = stream;
+            this.PayloadIpcMessage = payloadIpcMessage;
+        }
+
         public IpcMessageBody GetData()
         {
             var position = (int) Stream.Position;
@@ -150,7 +156,10 @@ public abstract class IpcDirectRoutedProviderBase
             var data = new IpcMessageBody(payload.Buffer, payload.Start + position, payload.Length - position);
             return data;
         }
+
+        public string RoutedPath { get; }
+        public MemoryStream Stream { get; }
+        public IpcMessage PayloadIpcMessage { get; }
     }
 }
 
-#endif

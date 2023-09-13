@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using dotnetCampus.Ipc.Messages;
 
@@ -23,4 +22,3 @@ public abstract class IpcDirectRoutedClientProxyBase
         return new IpcMessage(tag, new IpcMessageBody(buffer, start: 0, length));
     }
 }
-#endif
