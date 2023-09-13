@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,7 +32,16 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         var responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
 
         using var memoryStream = new MemoryStream(responseMessage.Body.Buffer, responseMessage.Body.Start, responseMessage.Body.Length, writable: false);
-        using StreamReader reader = new StreamReader(memoryStream, leaveOpen: true);
+        using StreamReader reader = new StreamReader
+        (
+            memoryStream,
+#if !NETCOREAPP
+            Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: false,
+            bufferSize: 2048,
+#endif
+            leaveOpen: true
+        );
         JsonReader jsonReader = new JsonTextReader(reader);
         return JsonSerializer.Deserialize<TResponse>(jsonReader);
     }
@@ -43,7 +51,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = new MemoryStream();
         WriteHeader(memoryStream, routedPath);
 
-        using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
+        using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true, bufferSize: 2048))
         {
             JsonSerializer.Serialize(textWriter, obj);
         }
@@ -53,4 +61,3 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
 }
-#endif

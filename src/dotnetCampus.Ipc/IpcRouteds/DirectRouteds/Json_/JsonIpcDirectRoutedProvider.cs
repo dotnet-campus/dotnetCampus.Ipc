@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +14,10 @@ using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 
 using Newtonsoft.Json;
+
+#if !NETCOREAPP
+using ValueTask = System.Threading.Tasks.Task;
+#endif
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
@@ -133,7 +136,8 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     protected override void OnHandleNotify(IpcDirectRoutedMessage message, PeerMessageArgs e)
     {
         // 接下来进行调度
-        var (routedPath, stream, _) = message;
+        var routedPath = message.RoutedPath;
+        var stream = message.Stream;
         if (HandleNotifyDictionary.TryGetValue(routedPath, out var handleNotify))
         {
             var context = new JsonIpcDirectRoutedContext(e.PeerName);
@@ -228,12 +232,26 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             throw new InvalidOperationException($"重复添加对 {routedPath} 的处理");
         }
 
+#if NETCOREAPP
         async ValueTask<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context)
+#else
+        async Task<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context)
+#endif
         {
             var argument = ToObject<TRequest>(stream);
             var response = await handler(argument!, context);
             var responseMemoryStream = new MemoryStream();
-            using (TextWriter textWriter = new StreamWriter(responseMemoryStream, Encoding.UTF8, leaveOpen: true))
+            using
+            (
+                TextWriter textWriter = new StreamWriter
+                (
+                    responseMemoryStream, Encoding.UTF8
+#if !NETCOREAPP
+                    , bufferSize: 2048
+#endif
+                    , leaveOpen: true
+                )
+            )
             {
                 JsonSerializer.Serialize(textWriter, response);
             }
@@ -244,14 +262,19 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
     }
 
+#if NETCOREAPP
     private delegate ValueTask<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context);
+#else
+    private delegate Task<IpcMessage> HandleRequest(MemoryStream stream, JsonIpcDirectRoutedContext context);
+#endif
 
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
     protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext)
     {
-        var (routedPath, stream, _) = message;
+        var routedPath = message.RoutedPath;
+        var stream = message.Stream;
 
         if (HandleRequestDictionary.TryGetValue(routedPath, out var handler))
         {
@@ -284,7 +307,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
     }
 
-    #endregion
+#endregion
 
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
@@ -292,10 +315,18 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     private T? ToObject<T>(MemoryStream stream)
     {
-        using StreamReader reader = new StreamReader(stream, leaveOpen: true);
+        using StreamReader reader = new StreamReader
+        (
+            stream,
+#if !NETCOREAPP
+            Encoding.UTF8,
+            bufferSize: 2048,
+            detectEncodingFromByteOrderMarks: false,
+#endif
+            leaveOpen: true
+        );
         JsonReader jsonReader = new JsonTextReader(reader);
         return JsonSerializer.Deserialize<T>(jsonReader);
     }
 }
 
-#endif

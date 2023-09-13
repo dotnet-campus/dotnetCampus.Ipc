@@ -1,5 +1,11 @@
-﻿#if NET6_0_OR_GREATER
-namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
+﻿namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
-public record JsonIpcDirectRoutedContext(string PeerName);
-#endif
+public class JsonIpcDirectRoutedContext
+{
+    public JsonIpcDirectRoutedContext(string peerName)
+    {
+        this.PeerName = peerName;
+    }
+
+    public string PeerName { get; }
+}

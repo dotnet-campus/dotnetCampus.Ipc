@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
@@ -18,6 +17,11 @@ public class RawByteIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     }
 
     private readonly IPeerProxy _peerProxy;
+
+#if NETCOREAPP
+
+    public Task NotfiyAsync(string routedPath, in IpcMessageBody data)
+        => NotfiyAsync(routedPath, data.AsSpan());
 
     public Task NotfiyAsync(string routedPath, Span<byte> data)
     {
@@ -42,7 +46,30 @@ public class RawByteIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
         return ToIpcMessage(memoryStream, $"Message To {routedPath}");
     }
+#else
+    public Task NotfiyAsync(string routedPath, IpcMessageBody data)
+    {
+        IpcMessage ipcMessage = BuildMessage(routedPath, data);
+        return _peerProxy.NotifyAsync(ipcMessage);
+    }
 
+    public async Task<IpcMessageBody> GetResponseAsync(string routedPath, IpcMessageBody ipcMessageBody)
+    {
+        IpcMessage ipcMessage = BuildMessage(routedPath, ipcMessageBody);
+
+        var response = await _peerProxy.GetResponseAsync(ipcMessage);
+        return response.Body;
+    }
+
+    private IpcMessage BuildMessage(string routedPath, in IpcMessageBody data)
+    {
+        using var memoryStream = new MemoryStream();
+        WriteHeader(memoryStream, routedPath);
+
+        memoryStream.Write(data.Buffer, data.Start, data.Length);
+
+        return ToIpcMessage(memoryStream, $"Message To {routedPath}");
+    }
+#endif
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.RawByteIpcDirectRoutedMessageHeader;
 }
-#endif
