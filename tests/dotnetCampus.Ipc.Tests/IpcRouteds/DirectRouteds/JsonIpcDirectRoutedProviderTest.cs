@@ -434,7 +434,7 @@ public class JsonIpcDirectRoutedProviderTest
             var routedPath = "Foo1";
 
             var taskCompletionSource = new TaskCompletionSource();
-            serverProvider.AddNotifyHandler(routedPath,()=>
+            serverProvider.AddNotifyHandler(routedPath, () =>
             {
                 taskCompletionSource.SetResult();
             });
