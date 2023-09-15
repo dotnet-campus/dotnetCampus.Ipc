@@ -160,6 +160,8 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             var context = new JsonIpcDirectRoutedContext(e.PeerName);
             e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
 
+            IpcProvider.IpcContext.LogReceiveJsonIpcDirectRoutedNotify(routedPath, e.PeerName, stream);
+
             try
             {
                 // 不等了，也没啥业务
@@ -321,6 +323,9 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         {
             var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
             var taskPool = IpcProvider.IpcContext.TaskPool;
+
+            IpcProvider.IpcContext.LogReceiveJsonIpcDirectRoutedRequest(routedPath, requestContext.Peer.PeerName,
+                stream);
 
             try
             {

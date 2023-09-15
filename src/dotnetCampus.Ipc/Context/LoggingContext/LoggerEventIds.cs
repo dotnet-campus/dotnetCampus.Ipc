@@ -18,4 +18,8 @@ internal static class LoggerEventIds
     /// 收到消息，业务消息
     /// </summary>
     public static EventId ReceiveMessageEventId => new EventId(2, "ReceiveMessage");
+
+    public static EventId ReceiveJsonIpcDirectRoutedNotifyEventId => new EventId(3, "ReceiveJsonIpcDirectRoutedNotify");
+
+    public static EventId ReceiveJsonIpcDirectRoutedRequestEventId => new EventId(4, "ReceiveJsonIpcDirectRoutedRequest");
 }

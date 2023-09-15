@@ -10,7 +10,7 @@ static class IpcMessageBodyFormatter
         // Send from {LocalPeerName} To {RemotePeerName}:
         return SendText.Length + FromText.Length + localPeerName.Length + ToText.Length +
                remotePeerName.Length +
-               ": ".Length;
+               " : ".Length;
     }
 
     public static void AppendSendHeader(StringBuilder stringBuilder, string localPeerName, string remotePeerName)
@@ -20,7 +20,7 @@ static class IpcMessageBodyFormatter
             .Append(localPeerName)
             .Append(ToText)
             .Append(remotePeerName)
-            .Append(": ");
+            .Append(" : ");
     }
 
     public static int GetReceiveHeaderLength(string localPeerName, string remotePeerName)
@@ -28,7 +28,7 @@ static class IpcMessageBodyFormatter
         // Receive from {RemotePeerName} To {LocalPeerName}:
         return ReceiveText.Length + FromText.Length + localPeerName.Length + ToText.Length +
                remotePeerName.Length +
-               ": ".Length;
+               " : ".Length;
     }
 
     public static void AppendReceiveHeader(StringBuilder stringBuilder, string localPeerName, string remotePeerName)
@@ -38,7 +38,7 @@ static class IpcMessageBodyFormatter
             .Append(remotePeerName)
             .Append(ToText)
             .Append(localPeerName)
-            .Append(": ");
+            .Append(" : ");
     }
 
     public static int GetIpcMessageBodyAsBinaryLength(IpcMessageBody ipcMessageBody)
