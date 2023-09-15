@@ -48,7 +48,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// </summary>
     /// <param name="serverPeerName"></param>
     /// <returns></returns>
-    /// todo 命名： 这里是叫 XxClientProxy 好，还是 XxServerProxy 好？
     public async Task<JsonIpcDirectRoutedClientProxy> GetAndConnectClientAsync(string serverPeerName)
     {
         var peer = await IpcProvider.GetAndConnectToPeerAsync(serverPeerName);
