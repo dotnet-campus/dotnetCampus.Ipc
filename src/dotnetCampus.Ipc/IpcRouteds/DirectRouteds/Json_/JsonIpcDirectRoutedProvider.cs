@@ -270,6 +270,12 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
+    /// <summary>
+    /// 处理请求的核心逻辑
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="requestContext"></param>
+    /// <returns></returns>
     protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext)
     {
         var routedPath = message.RoutedPath;
