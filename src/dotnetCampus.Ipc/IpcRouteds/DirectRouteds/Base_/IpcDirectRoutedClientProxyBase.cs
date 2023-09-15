@@ -6,6 +6,9 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 public abstract class IpcDirectRoutedClientProxyBase
 {
+    /// <summary>
+    /// 业务头
+    /// </summary>
     protected abstract ulong BusinessHeader { get; }
 
     protected void WriteHeader(MemoryStream stream, string routedPath)

@@ -48,7 +48,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// </summary>
     /// <param name="serverPeerName"></param>
     /// <returns></returns>
-    /// todo 命名： 这里是叫 XxClientProxy 好，还是 XxServerProxy 好？
     public async Task<JsonIpcDirectRoutedClientProxy> GetAndConnectClientAsync(string serverPeerName)
     {
         var peer = await IpcProvider.GetAndConnectToPeerAsync(serverPeerName);
@@ -56,6 +55,22 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     }
 
     #region Notify
+
+    /// <summary>
+    /// 添加通知的处理，无参
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddNotifyHandler(string routedPath, Action handler)
+        => AddNotifyHandler<JsonIpcDirectRoutedParameterlessType>(routedPath, _ => handler());
+
+    /// <summary>
+    /// 添加通知的处理，无参
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddNotifyHandler(string routedPath, Func<Task> handler)
+        => AddNotifyHandler<JsonIpcDirectRoutedParameterlessType>(routedPath, _ => handler());
 
     /// <summary>
     /// 添加通知的处理
@@ -131,8 +146,10 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, HandleNotify>();
 
+    /// <inheritdoc />
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
 
+    /// <inheritdoc />
     protected override void OnHandleNotify(IpcDirectRoutedMessage message, PeerMessageArgs e)
     {
         // 接下来进行调度
@@ -167,6 +184,24 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     #endregion
 
     #region Request Response
+
+    /// <summary>
+    /// 添加请求的处理，无参请求
+    /// </summary>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler<TResponse>(string routedPath, Func<TResponse> handler) =>
+        AddRequestHandler<JsonIpcDirectRoutedParameterlessType, TResponse>(routedPath, _ => handler());
+
+    /// <summary>
+    /// 添加请求的处理，无参请求
+    /// </summary>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <param name="routedPath"></param>
+    /// <param name="handler"></param>
+    public void AddRequestHandler<TResponse>(string routedPath, Func<Task<TResponse>> handler) =>
+        AddRequestHandler<JsonIpcDirectRoutedParameterlessType, TResponse>(routedPath, _ => handler());
 
     /// <summary>
     /// 添加请求的处理
@@ -271,6 +306,12 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     private ConcurrentDictionary<string, HandleRequest> HandleRequestDictionary { get; } =
         new ConcurrentDictionary<string, HandleRequest>();
 
+    /// <summary>
+    /// 处理请求的核心逻辑
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="requestContext"></param>
+    /// <returns></returns>
     protected override async Task<IIpcResponseMessage> OnHandleRequestAsync(IpcDirectRoutedMessage message, IIpcRequestContext requestContext)
     {
         var routedPath = message.RoutedPath;
@@ -329,4 +370,3 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         return JsonSerializer.Deserialize<T>(jsonReader);
     }
 }
-

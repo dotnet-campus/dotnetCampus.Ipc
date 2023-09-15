@@ -381,7 +381,6 @@ public class JsonIpcDirectRoutedProviderTest
             // 允许无参数，如果只是做客户端使用的话
             JsonIpcDirectRoutedProvider clientProvider = new();
             clientProvider.StartServer();
-            // todo 命名：这里叫 ClientProxy 正确还是 ServerProxy 正确
             var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
             await clientProxy.NotifyAsync(routedPath, argument);
@@ -390,6 +389,68 @@ public class JsonIpcDirectRoutedProviderTest
             await taskCompletionSource.Task.WaitTimeout(TimeSpan.FromSeconds(5));
             // 要求只进入一次
             Assert.AreEqual(1, enterCount);
+        });
+    }
+
+    /// <summary>
+    /// 测试无参版本
+    /// </summary>
+    [ContractTestCase]
+    public void TestParameterless()
+    {
+        "发送无参请求，可以让服务端收到请求".Test(async () =>
+        {
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_1";
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var routedPath = "Foo1";
+
+            // 注册无参数请求处理
+            serverProvider.AddRequestHandler(routedPath, () =>
+            {
+                return new FakeResult(nameof(TestParameterless));
+            });
+
+            serverProvider.StartServer();
+
+            // 创建客户端
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            clientProvider.StartServer();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+
+            // 请求无参数
+            var result = await clientProxy.GetResponseAsync<FakeResult>(routedPath);
+
+            // 如果能收到服务端返回值，证明请求成功
+            Assert.IsNotNull(result);
+            Assert.AreEqual(nameof(TestParameterless), result.Name);
+        });
+
+        "发送无参通知，可以让服务端收到通知".Test(async () =>
+        {
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_2";
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var routedPath = "Foo1";
+
+            var taskCompletionSource = new TaskCompletionSource();
+            serverProvider.AddNotifyHandler(routedPath,()=>
+            {
+                taskCompletionSource.SetResult();
+            });
+
+            serverProvider.StartServer();
+
+            // 创建客户端
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            clientProvider.StartServer();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+            await clientProxy.NotifyAsync(routedPath);
+
+            // 再等待一下，让服务端处理完成
+            await taskCompletionSource.Task.WaitTimeout(TimeSpan.FromSeconds(1));
+            // 预期是服务端能够执行完成
+            Assert.AreEqual(true, taskCompletionSource.Task.IsCompleted);
         });
     }
 
