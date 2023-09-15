@@ -155,7 +155,7 @@ namespace dotnetCampus.Ipc.Internals
             if (!success)
             {
                 // 没有成功哇
-                var tracker = CriticalTrackReceiveCore(ipcMessageResult, "接收消息未成功");
+                CriticalTrackReceiveCore(ipcMessageResult, "接收消息未成功");
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace dotnetCampus.Ipc.Internals
             // 只有业务的才能发给上层
             else if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.Business))
             {
-                var tracker = CriticalTrackReceiveCore(ipcMessageResult, "无法识别的端");
+                CriticalTrackReceiveCore(ipcMessageResult, "无法识别的端");
                 if (IsConnected)
                 {
                     OnMessageReceived(new PeerStreamMessageArgs(ipcMessageContext, PeerName, stream, ipcMessageContext.Ack, ipcMessageCommandType));
@@ -217,14 +217,15 @@ namespace dotnetCampus.Ipc.Internals
             }
             else
             {
-                var tracker = CriticalTrackReceiveCore(ipcMessageResult, "无法识别的消息");
+                CriticalTrackReceiveCore(ipcMessageResult, "无法识别的消息");
                 // 不知道这是啥消息哇
                 // 但是更新一下 ack 意思一下还可以
                 OnAckReceived(new AckArgs(PeerName, ipcMessageContext.Ack));
             }
         }
 
-        private IpcMessageTracker<IpcMessageContext> CriticalTrackReceiveCore(IpcMessageResult result, string message)
+        [Conditional("DEBUG")]
+        private void CriticalTrackReceiveCore(IpcMessageResult result, string message)
         {
             var tracker = new IpcMessageTracker<IpcMessageContext>(
                 IpcContext.PipeName,
@@ -236,7 +237,6 @@ namespace dotnetCampus.Ipc.Internals
                 result.IpcMessageContext.Ack,
                 new IpcMessageBody(result.IpcMessageContext.MessageBuffer, 0,
                     (int) result.IpcMessageContext.MessageLength));
-            return tracker;
         }
 
 #if false // 下面是注释的代码
