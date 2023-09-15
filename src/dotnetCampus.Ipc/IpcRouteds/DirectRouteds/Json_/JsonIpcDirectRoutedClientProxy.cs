@@ -20,11 +20,22 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     private JsonSerializer? _jsonSerializer;
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
 
+    /// <summary>
+    /// 不带参数的通知服务端
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <returns></returns>
+    public Task NotifyAsync(string routedPath)
+        => NotifyAsync(routedPath, JsonIpcDirectRoutedParameterlessType.Instance);
+
     public Task NotifyAsync<T>(string routedPath, T obj) where T : class
     {
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
         return _peerProxy.NotifyAsync(ipcMessage);
     }
+
+    public Task<TResponse?> GetResponseAsync<TResponse>(string routedPath) where TResponse : class
+        => GetResponseAsync<TResponse>(routedPath, JsonIpcDirectRoutedParameterlessType.Instance);
 
     public async Task<TResponse?> GetResponseAsync<TResponse>(string routedPath, object obj) where TResponse : class
     {
