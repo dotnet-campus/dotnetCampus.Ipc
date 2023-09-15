@@ -8,6 +8,10 @@ namespace dotnetCampus.Ipc.Utils.Logging
     /// </summary>
     public class IpcLogger : ILogger
     {
+        /// <summary>
+        /// 创建为 IPC 提供的日志
+        /// </summary>
+        /// <param name="name">当前的 Ipc 名。等同于管道名</param>
         public IpcLogger(string name)
         {
             Name = name;

@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Utils.Extensions;
@@ -159,6 +160,8 @@ namespace dotnetCampus.Ipc.Internals
                 return;
             }
 
+            IpcContext.LogReceiveOriginMessage(ipcMessageResult, PeerName);
+
             var stream = new ByteListMessageStream(ipcMessageContext);
 
             if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.PeerRegister))
@@ -208,11 +211,14 @@ namespace dotnetCampus.Ipc.Internals
                 CriticalTrackReceiveCore(ipcMessageResult, "无法识别的端");
                 if (IsConnected)
                 {
+                    IpcContext.LogReceiveMessage(stream, PeerName);
+
                     OnMessageReceived(new PeerStreamMessageArgs(ipcMessageContext, PeerName, stream, ipcMessageContext.Ack, ipcMessageCommandType));
                 }
                 else
                 {
                     // 还没注册完成哇
+                    Logger.Warning("[DispatchMessage] Receive business message before Connected. 在建立连接之前收到业务消息");
                 }
             }
             else

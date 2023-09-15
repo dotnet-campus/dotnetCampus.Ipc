@@ -47,7 +47,13 @@ namespace dotnetCampus.Ipc.Context
         /// <summary>
         /// 为 IPC 记录日志。
         /// </summary>
+        /// <remarks>根据当前的 Ipc 名获取到日志对象，一般写法是<code>IpcLoggerProvider = name => new IpcLogger(name)</code></remarks>
         public Func<string, IpcLogger>? IpcLoggerProvider { get; set; }
+
+        /// <summary>
+        /// 设置或获取最低的日志等级，只有大于此等级的日志才会被记录到 IpcLogger 里
+        /// </summary>
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Information;
 
         /// <summary>
         /// 处理通讯相关业务的定义

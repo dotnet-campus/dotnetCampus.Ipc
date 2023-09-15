@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
@@ -291,6 +292,8 @@ namespace dotnetCampus.Ipc.Pipes
                 tracker.Debug("IPC start writing...");
                 tracker.CriticalStep("SendCore", ack, tracker.Message.IpcBufferMessageList);
 
+                IpcContext.LogSendMessage(tracker.Message, PeerName);
+
                 // 发送消息。
                 await IpcMessageConverter.WriteAsync
                 (
@@ -347,6 +350,8 @@ namespace dotnetCampus.Ipc.Pipes
                 var ack = AckManager.GetAck();
                 tracker.Debug("IPC start writing...");
                 tracker.CriticalStep("SendCore", ack, ipcMessageBody);
+
+                IpcContext.LogSendMessage(in ipcMessageBody, PeerName);
 
                 // 发送消息。
                 await IpcMessageConverter.WriteAsync
@@ -406,6 +411,8 @@ namespace dotnetCampus.Ipc.Pipes
 
                     return;
                 }
+
+                IpcContext.LogSendMessage(buffer, offset, count, PeerName);
 
                 var stream = result.NamedPipeClientStream;
                 await IpcMessageConverter.WriteAsync
