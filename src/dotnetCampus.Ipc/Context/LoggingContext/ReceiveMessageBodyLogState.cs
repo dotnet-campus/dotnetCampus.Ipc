@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-
 using dotnetCampus.Ipc.Messages;
 
 namespace dotnetCampus.Ipc.Context.LoggingContext;
@@ -8,12 +7,13 @@ namespace dotnetCampus.Ipc.Context.LoggingContext;
 /// <summary>
 /// 收到的消息
 /// </summary>
-public readonly struct ReceiveMessageLog
+public readonly struct ReceiveMessageBodyLogState
 {
     /// <summary>
     /// 收到的消息
     /// </summary>
-    public ReceiveMessageLog(IpcMessageBody ipcMessageBody, string localPeerName, string? remotePeerName, bool isBusinessMessage)
+    public ReceiveMessageBodyLogState(IpcMessageBody ipcMessageBody, string localPeerName, string? remotePeerName,
+        bool isBusinessMessage)
     {
         IpcMessageBody = ipcMessageBody;
         LocalPeerName = localPeerName;
@@ -30,10 +30,12 @@ public readonly struct ReceiveMessageLog
     /// 消息内容
     /// </summary>
     public IpcMessageBody IpcMessageBody { get; }
+
     /// <summary>
     /// 本地当前的 Peer 名
     /// </summary>
     public string LocalPeerName { get; }
+
     /// <summary>
     /// 远端对方的 Peer 名
     /// </summary>
@@ -45,7 +47,8 @@ public readonly struct ReceiveMessageLog
     /// <returns></returns>
     public string FormatAsText()
     {
-        return $"Receive from {RemotePeerName} To {LocalPeerName}: {Encoding.UTF8.GetString(IpcMessageBody.Buffer, IpcMessageBody.Start, IpcMessageBody.Length)}";
+        return
+            $"Receive from {RemotePeerName} To {LocalPeerName}: {Encoding.UTF8.GetString(IpcMessageBody.Buffer, IpcMessageBody.Start, IpcMessageBody.Length)}";
     }
 
     /// <summary>
@@ -69,7 +72,7 @@ public readonly struct ReceiveMessageLog
     /// <param name="state"></param>
     /// <param name="exception"></param>
     /// <returns></returns>
-    public static string Format(ReceiveMessageLog state, Exception? exception)
+    public static string Format(ReceiveMessageBodyLogState state, Exception? exception)
     {
         return state.FormatAsBinary();
     }

@@ -25,9 +25,9 @@ internal static class LoggerExtension
             (int) (stream.Length - stream.Position));
 
         context.Logger.Log(logLevel, LoggerEventIds.ReceiveMessageEventId,
-            new ReceiveMessageLog(ipcMessageBody, context.PipeName, remotePeerName, isBusinessMessage: true),
+            new ReceiveMessageBodyLogState(ipcMessageBody, context.PipeName, remotePeerName, isBusinessMessage: true),
             null,
-            ReceiveMessageLog.Format);
+            ReceiveMessageBodyLogState.Format);
     }
 
     /// <summary>
@@ -48,9 +48,9 @@ internal static class LoggerExtension
         var ipcMessageBody = new IpcMessageBody(ipcMessageResult.IpcMessageContext.MessageBuffer, 0,
             (int) ipcMessageResult.IpcMessageContext.MessageLength);
         context.Logger.Log(logLevel, LoggerEventIds.ReceiveOriginMessageEventId,
-            new ReceiveMessageLog(ipcMessageBody, context.PipeName, remotePeerName, isBusinessMessage: false),
+            new ReceiveMessageBodyLogState(ipcMessageBody, context.PipeName, remotePeerName, isBusinessMessage: false),
             null,
-            ReceiveMessageLog.Format);
+            ReceiveMessageBodyLogState.Format);
     }
 
     /// <summary>
