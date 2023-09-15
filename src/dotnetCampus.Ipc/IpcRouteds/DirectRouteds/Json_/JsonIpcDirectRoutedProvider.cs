@@ -348,7 +348,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
     }
 
-#endregion
+    #endregion
 
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
