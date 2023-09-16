@@ -40,8 +40,14 @@ public readonly struct JsonIpcDirectRoutedMessageLogState
     {
         var action = state.MessageType switch
         {
-            JsonIpcDirectRoutedLogStateMessageType.Notify => "Notify",
-            JsonIpcDirectRoutedLogStateMessageType.Request => "Request",
+            JsonIpcDirectRoutedLogStateMessageType.ReceiveNotify => "Receive Notify",
+            JsonIpcDirectRoutedLogStateMessageType.ReceiveRequest => "Receive Request",
+            JsonIpcDirectRoutedLogStateMessageType.SendResponse => "Send Response",
+
+            JsonIpcDirectRoutedLogStateMessageType.SendNotify => "Send Notify",
+            JsonIpcDirectRoutedLogStateMessageType.SendRequest => "Send Request",
+            JsonIpcDirectRoutedLogStateMessageType.ReceiveResponse => "Receive Request",
+
             _ => string.Empty
         };
 

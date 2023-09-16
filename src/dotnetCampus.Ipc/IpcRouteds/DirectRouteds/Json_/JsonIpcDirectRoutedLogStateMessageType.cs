@@ -2,6 +2,13 @@
 
 public enum JsonIpcDirectRoutedLogStateMessageType
 {
-    Notify,
-    Request
+    // 服务端
+    ReceiveNotify,
+    ReceiveRequest,
+    SendResponse,
+
+    // 客户端
+    SendNotify,
+    SendRequest,
+    ReceiveResponse,
 }

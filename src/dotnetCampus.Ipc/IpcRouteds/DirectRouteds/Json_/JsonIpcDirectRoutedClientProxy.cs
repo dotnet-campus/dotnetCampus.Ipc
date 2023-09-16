@@ -15,11 +15,10 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     public JsonIpcDirectRoutedClientProxy(PeerProxy peerProxy)
     {
         _peerProxy = peerProxy;
-        IpcContext = peerProxy.IpcContext;
     }
 
     private readonly PeerProxy _peerProxy;
-    private IpcContext? IpcContext { get; }
+    private IpcContext IpcContext => _peerProxy.IpcContext;
     private JsonSerializer? _jsonSerializer;
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
 
@@ -34,6 +33,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     public Task NotifyAsync<T>(string routedPath, T obj) where T : class
     {
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
+        IpcContext.LogSendJsonIpcDirectRoutedNotify(routedPath, _peerProxy.PeerName, ipcMessage.Body);
         return _peerProxy.NotifyAsync(ipcMessage);
     }
 
@@ -43,9 +43,13 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     public async Task<TResponse?> GetResponseAsync<TResponse>(string routedPath, object obj) where TResponse : class
     {
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
+        IpcContext.LogSendJsonIpcDirectRoutedRequest(routedPath, _peerProxy.PeerName, ipcMessage.Body);
+
         var responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
 
-        using var memoryStream = new MemoryStream(responseMessage.Body.Buffer, responseMessage.Body.Start, responseMessage.Body.Length, writable: false);
+        using var memoryStream = responseMessage.Body.ToMemoryStream();
+        IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
+        
         using StreamReader reader = new StreamReader
         (
             memoryStream,

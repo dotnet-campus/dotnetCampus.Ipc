@@ -334,6 +334,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
                     return await handler(stream, context);
                 });
 
+                IpcProvider.IpcContext.LogSendJsonIpcDirectRoutedResponse(routedPath, requestContext.Peer.PeerName, ipcMessage.Body);
                 IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
                 return response;
             }
