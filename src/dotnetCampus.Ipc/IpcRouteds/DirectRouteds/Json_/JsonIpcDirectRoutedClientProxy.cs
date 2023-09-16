@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
-
+using dotnetCampus.Ipc.Pipes;
 using Newtonsoft.Json;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
@@ -14,9 +15,12 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
     public JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
     {
         _peerProxy = peerProxy;
+        Debug.Assert(peerProxy is PeerProxy);
+        IpcContext = (peerProxy as PeerProxy)?.IpcContext;
     }
 
     private readonly IPeerProxy _peerProxy;
+    private IpcContext? IpcContext { get; }
     private JsonSerializer? _jsonSerializer;
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
 
