@@ -12,14 +12,13 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 {
-    public JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
+    public JsonIpcDirectRoutedClientProxy(PeerProxy peerProxy)
     {
         _peerProxy = peerProxy;
-        Debug.Assert(peerProxy is PeerProxy);
-        IpcContext = (peerProxy as PeerProxy)?.IpcContext;
+        IpcContext = peerProxy.IpcContext;
     }
 
-    private readonly IPeerProxy _peerProxy;
+    private readonly PeerProxy _peerProxy;
     private IpcContext? IpcContext { get; }
     private JsonSerializer? _jsonSerializer;
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
