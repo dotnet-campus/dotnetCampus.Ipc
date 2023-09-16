@@ -16,7 +16,7 @@ public abstract class IpcDirectRoutedProviderBase
 {
     protected IpcDirectRoutedProviderBase(string? pipeName = null, IpcConfiguration? ipcConfiguration = null)
     {
-        pipeName ??= $"RawByteIpcDirectRouted_{Guid.NewGuid():N}";
+        pipeName ??= $"IpcDirectRouted_{Guid.NewGuid():N}";
         var ipcProvider = new IpcProvider(pipeName, ipcConfiguration);
         IpcProvider = ipcProvider;
     }
