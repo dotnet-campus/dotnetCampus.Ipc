@@ -70,7 +70,7 @@ public readonly struct JsonIpcDirectRoutedMessageLogState
 
             JsonIpcDirectRoutedLogStateMessageType.SendNotify => "Send Notify",
             JsonIpcDirectRoutedLogStateMessageType.SendRequest => "Send Request",
-            JsonIpcDirectRoutedLogStateMessageType.ReceiveResponse => "Receive Request",
+            JsonIpcDirectRoutedLogStateMessageType.ReceiveResponse => "Receive Response",
 
             _ => string.Empty
         };

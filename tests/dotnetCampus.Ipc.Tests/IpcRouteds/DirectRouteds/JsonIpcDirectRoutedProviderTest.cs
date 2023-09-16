@@ -103,8 +103,14 @@ public class JsonIpcDirectRoutedProviderTest
             serverProvider.StartServer();
 
             // 创建客户端
-            // 允许无参数，如果只是做客户端使用的话
-            JsonIpcDirectRoutedProvider clientProvider = new();
+            // 允许管道名无参数，如果只是做客户端使用的话
+            JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration:new IpcConfiguration()
+            {
+                IpcLoggerProvider = name => new IpcLogger(name)
+                {
+                    MinLogLevel = LogLevel.Debug,
+                }
+            });
             // 对于 clientProvider 来说，可选调用 StartServer 方法
             var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
