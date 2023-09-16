@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Utils.Logging;
@@ -15,7 +16,7 @@ internal static class JsonIpcDirectRoutedLoggerExtension
         string remotePeerName, MemoryStream stream)
     {
         const LogLevel logLevel = LogLevel.Debug;
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (!context.Logger.IsEnabled(logLevel))
         {
             return;
         }
@@ -32,14 +33,14 @@ internal static class JsonIpcDirectRoutedLoggerExtension
         string remotePeerName, MemoryStream stream)
     {
         const LogLevel logLevel = LogLevel.Debug;
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (!context.Logger.IsEnabled(logLevel))
         {
             return;
         }
 
         var eventId = LoggerEventIds.ReceiveJsonIpcDirectRoutedNotifyEventId;
 
-        var state = new JsonIpcDirectRoutedMessageLogState(routedPath, context.PipeName, remotePeerName,JsonIpcDirectRoutedLogStateMessageType.Notify, stream);
+        var state = new JsonIpcDirectRoutedMessageLogState(routedPath, context.PipeName, remotePeerName, JsonIpcDirectRoutedLogStateMessageType.Notify, stream);
 
         context.Logger.Log(logLevel, eventId, state, null,
             JsonIpcDirectRoutedMessageLogState.Format);

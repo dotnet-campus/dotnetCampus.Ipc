@@ -73,7 +73,10 @@ public class JsonIpcDirectRoutedProviderTest
             var serverName = "JsonIpcDirectRoutedProviderTest_Request_1";
             var serverProvider = new JsonIpcDirectRoutedProvider(serverName, new IpcConfiguration()
             {
-                MinLogLevel = LogLevel.Debug,
+                IpcLoggerProvider = name => new IpcLogger(name)
+                {
+                    MinLogLevel = LogLevel.Debug,
+                }
             });
             var argument = new FakeArgument("TestName", 1);
 

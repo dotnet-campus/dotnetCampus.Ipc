@@ -24,12 +24,37 @@ namespace dotnetCampus.Ipc.Utils.Logging
             Log(logLevel, state, exception, formatter);
         }
 
+        bool ILogger.IsEnabled(LogLevel logLevel)
+        {
+            return IsEnabled(logLevel);
+        }
+
+        /// <summary>
+        /// 设置或获取最低的日志等级，只有大于此等级的日志才会被记录到 IpcLogger 里
+        /// </summary>
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Information;
+
+        /// <summary>
+        /// 判断当前的日志等级是否可记
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <returns></returns>
+        protected virtual bool IsEnabled(LogLevel logLevel)
+        {
+            return logLevel >= MinLogLevel;
+        }
+
+        /// <summary>
+        /// 记录日志内容
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        /// <param name="logLevel"></param>
+        /// <param name="state"></param>
+        /// <param name="exception"></param>
+        /// <param name="formatter"></param>
         protected virtual void Log<TState>(LogLevel logLevel, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            if (logLevel >= LogLevel.Debug)
-            {
-                Debug.WriteLine(formatter(state, exception));
-            }
+            Debug.WriteLine($"[IPC][{logLevel}]{formatter(state, exception)}");
         }
 
         /// <summary>

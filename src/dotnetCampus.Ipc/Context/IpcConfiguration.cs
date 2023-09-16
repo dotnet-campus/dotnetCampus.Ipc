@@ -51,11 +51,6 @@ namespace dotnetCampus.Ipc.Context
         public Func<string, IpcLogger>? IpcLoggerProvider { get; set; }
 
         /// <summary>
-        /// 设置或获取最低的日志等级，只有大于此等级的日志才会被记录到 IpcLogger 里
-        /// </summary>
-        public LogLevel MinLogLevel { get; set; } = LogLevel.Information;
-
-        /// <summary>
         /// 处理通讯相关业务的定义
         /// </summary>
         public IIpcRequestHandler DefaultIpcRequestHandler { set; get; } = new EmptyIpcRequestHandler();
