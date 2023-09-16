@@ -4,7 +4,7 @@ using dotnetCampus.Ipc.Utils.Logging;
 
 namespace dotnetCampus.Ipc.Context.LoggingContext;
 
-internal static class LoggerExtension
+internal static class IpcContextLoggerExtension
 {
     /// <summary>
     /// 记录接收到业务消息
