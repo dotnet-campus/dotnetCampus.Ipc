@@ -54,6 +54,11 @@ namespace dotnetCampus.Ipc.Utils.Logging
         /// <param name="formatter"></param>
         protected virtual void Log<TState>(LogLevel logLevel, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
+            if (!IsEnabled(logLevel))
+            {
+                return;
+            }
+
             Debug.WriteLine($"[IPC][{logLevel}]{formatter(state, exception)}");
         }
 
