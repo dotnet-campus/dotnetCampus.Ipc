@@ -65,7 +65,9 @@ namespace dotnetCampus.Ipc.Internals
         {
             try
             {
-                IpcContext.Logger.Debug($"[ServerStreamMessageReader][Run] Start Run. LocalPeerName={IpcContext.PipeName}; RemotePeerName={PeerName};");
+                // 开始跑的时候一定还没有相连的 RemotePeer 因此 PeerName 一定是空
+                Debug.Assert(string.IsNullOrEmpty(PeerName));
+                IpcContext.Logger.Debug($"[ServerStreamMessageReader][Run] Start Run. LocalPeerName={IpcContext.PipeName}");
                 await RunAsync().ConfigureAwait(false);
             }
             catch (Exception e)
