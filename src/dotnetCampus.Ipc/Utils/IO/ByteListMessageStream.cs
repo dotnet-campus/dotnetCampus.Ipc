@@ -11,7 +11,9 @@ namespace dotnetCampus.Ipc.Utils.IO
     internal class ByteListMessageStream : MemoryStream
     {
         public ByteListMessageStream(byte[] buffer, int count) : base(buffer, 0,
-            count, false)
+            count, writable: false,
+            // 设置 publiclyVisible 属性，防止 GetBuffer 抛出 UnauthorizedAccessException 异常
+            publiclyVisible: true)
         {
         }
 
