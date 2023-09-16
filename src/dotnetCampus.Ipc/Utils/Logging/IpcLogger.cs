@@ -26,7 +26,7 @@ namespace dotnetCampus.Ipc.Utils.Logging
 
         protected virtual void Log<TState>(LogLevel logLevel, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            if (logLevel >= LogLevel.Information)
+            if (logLevel >= LogLevel.Debug)
             {
                 Debug.WriteLine(formatter(state, exception));
             }
