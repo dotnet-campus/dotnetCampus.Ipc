@@ -45,6 +45,6 @@ public readonly struct JsonIpcDirectRoutedMessageLogState
             _ => string.Empty
         };
 
-        return $"[JsonIpcDirectRouted][{action}] {state.RoutedPath} from {state.RemotePeerName} To {state.LocalPeerName} : {state.GetJsonText()}";
+        return $"[JsonIpcDirectRouted][{action}] Path={state.RoutedPath} Remote= {state.RemotePeerName} Local={state.LocalPeerName} Body={state.GetJsonText()}";
     }
 }
