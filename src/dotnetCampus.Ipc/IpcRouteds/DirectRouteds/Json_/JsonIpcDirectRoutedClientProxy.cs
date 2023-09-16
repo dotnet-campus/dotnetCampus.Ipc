@@ -11,7 +11,7 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 {
-    public JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
+    internal JsonIpcDirectRoutedClientProxy(IPeerProxy peerProxy)
     {
         _peerProxy = peerProxy;
     }
