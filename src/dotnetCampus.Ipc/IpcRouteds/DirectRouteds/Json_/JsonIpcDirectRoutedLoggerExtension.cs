@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Context.LoggingContext;
@@ -13,6 +9,13 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 internal static class JsonIpcDirectRoutedLoggerExtension
 {
+    /// <summary>
+    /// [客户端] 记录发送请求
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="ipcMessageBody"></param>
     public static void LogSendJsonIpcDirectRoutedRequest(this IpcContext context, string routedPath,
         string remotePeerName, in IpcMessageBody ipcMessageBody)
     {
@@ -30,6 +33,13 @@ internal static class JsonIpcDirectRoutedLoggerExtension
             JsonIpcDirectRoutedMessageLogState.Format);
     }
 
+    /// <summary>
+    /// [客户端] 记录收到响应
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="stream"></param>
     public static void LogReceiveJsonIpcDirectRoutedResponse(this IpcContext context, string routedPath,
         string remotePeerName, MemoryStream stream)
     {
@@ -46,6 +56,13 @@ internal static class JsonIpcDirectRoutedLoggerExtension
             JsonIpcDirectRoutedMessageLogState.Format);
     }
 
+    /// <summary>
+    /// [客户端] 记录发送通知
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="ipcMessageBody"></param>
     public static void LogSendJsonIpcDirectRoutedNotify(this IpcContext context, string routedPath,
         string remotePeerName, in IpcMessageBody ipcMessageBody)
     {
@@ -63,6 +80,13 @@ internal static class JsonIpcDirectRoutedLoggerExtension
             JsonIpcDirectRoutedMessageLogState.Format);
     }
 
+    /// <summary>
+    /// [服务端] 记录发送响应
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="ipcMessageBody"></param>
     public static void LogSendJsonIpcDirectRoutedResponse(this IpcContext context, string routedPath,
         string remotePeerName, in IpcMessageBody ipcMessageBody)
     {
@@ -80,6 +104,13 @@ internal static class JsonIpcDirectRoutedLoggerExtension
             JsonIpcDirectRoutedMessageLogState.Format);
     }
 
+    /// <summary>
+    /// [服务端] 记录收到请求
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="stream"></param>
     public static void LogReceiveJsonIpcDirectRoutedRequest(this IpcContext context, string routedPath,
         string remotePeerName, MemoryStream stream)
     {
@@ -97,6 +128,13 @@ internal static class JsonIpcDirectRoutedLoggerExtension
             JsonIpcDirectRoutedMessageLogState.Format);
     }
 
+    /// <summary>
+    /// [服务端] 记录发送通知
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="routedPath"></param>
+    /// <param name="remotePeerName"></param>
+    /// <param name="stream"></param>
     public static void LogReceiveJsonIpcDirectRoutedNotify(this IpcContext context, string routedPath,
         string remotePeerName, MemoryStream stream)
     {

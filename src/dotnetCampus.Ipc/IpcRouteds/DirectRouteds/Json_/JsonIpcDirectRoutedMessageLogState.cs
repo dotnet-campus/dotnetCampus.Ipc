@@ -3,9 +3,13 @@ using System.IO;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
+/// <summary>
+/// 用于日志记录 JsonIpcDirectRouted 消息的结构体
+/// </summary>
 public readonly struct JsonIpcDirectRoutedMessageLogState
 {
-    public JsonIpcDirectRoutedMessageLogState(string routedPath, string localPeerName, string remotePeerName, JsonIpcDirectRoutedLogStateMessageType messageType,
+    internal JsonIpcDirectRoutedMessageLogState(string routedPath, string localPeerName, string remotePeerName,
+        JsonIpcDirectRoutedLogStateMessageType messageType,
         MemoryStream stream)
     {
         RoutedPath = routedPath;
@@ -15,12 +19,32 @@ public readonly struct JsonIpcDirectRoutedMessageLogState
         Stream = stream;
     }
 
+    /// <summary>
+    /// 路由地址
+    /// </summary>
     public string RoutedPath { get; }
+
+    /// <summary>
+    /// 本地当前的 Peer 名
+    /// </summary>
     public string LocalPeerName { get; }
+
+    /// <summary>
+    /// 远端对方的 Peer 名
+    /// </summary>
     public string RemotePeerName { get; }
+
+    /// <summary>
+    /// 消息类型
+    /// </summary>
     public JsonIpcDirectRoutedLogStateMessageType MessageType { get; }
+
     private MemoryStream Stream { get; }
 
+    /// <summary>
+    /// 获取消息体的 Json 文本
+    /// </summary>
+    /// <returns></returns>
     public string GetJsonText()
     {
         var position = Stream.Position;
@@ -51,6 +75,7 @@ public readonly struct JsonIpcDirectRoutedMessageLogState
             _ => string.Empty
         };
 
-        return $"[JsonIpcDirectRouted][{action}] Path={state.RoutedPath} Remote={state.RemotePeerName} Local={state.LocalPeerName} Body={state.GetJsonText()}";
+        return
+            $"[JsonIpcDirectRouted][{action}] Path={state.RoutedPath} Remote={state.RemotePeerName} Local={state.LocalPeerName} Body={state.GetJsonText()}";
     }
 }

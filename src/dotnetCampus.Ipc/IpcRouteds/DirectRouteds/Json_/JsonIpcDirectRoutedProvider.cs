@@ -358,7 +358,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
-    private ILogger Logger => IpcProvider.IpcContext.Logger;
 
     private T? ToObject<T>(MemoryStream stream)
     {
