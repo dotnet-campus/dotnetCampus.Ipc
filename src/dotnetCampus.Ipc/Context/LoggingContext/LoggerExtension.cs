@@ -16,7 +16,7 @@ internal static class LoggerExtension
         string remotePeerName)
     {
         const LogLevel logLevel = LogLevel.Debug;
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (logLevel < context.IpcConfiguration.MinLogLevel)
         {
             return;
         }
@@ -40,7 +40,7 @@ internal static class LoggerExtension
         string? remotePeerName)
     {
         const LogLevel logLevel = LogLevel.Trace; // 一般框架信息是不关注的
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (logLevel < context.IpcConfiguration.MinLogLevel)
         {
             return;
         }
@@ -76,7 +76,7 @@ internal static class LoggerExtension
     public static void LogSendMessage(this IpcContext context, in IpcMessageBody ipcMessageBody, string remotePeerName)
     {
         const LogLevel logLevel = LogLevel.Debug;
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (logLevel < context.IpcConfiguration.MinLogLevel)
         {
             return;
         }
@@ -97,7 +97,7 @@ internal static class LoggerExtension
         string remotePeerName)
     {
         const LogLevel logLevel = LogLevel.Debug;
-        if (context.IpcConfiguration.MinLogLevel < logLevel)
+        if (logLevel < context.IpcConfiguration.MinLogLevel)
         {
             return;
         }
