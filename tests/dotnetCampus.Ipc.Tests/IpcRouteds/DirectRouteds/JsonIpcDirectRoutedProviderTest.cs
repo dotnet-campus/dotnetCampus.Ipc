@@ -5,10 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Tests.CompilerServices;
-
+using dotnetCampus.Ipc.Utils.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.Extensions.Contracts;
@@ -70,10 +71,16 @@ public class JsonIpcDirectRoutedProviderTest
         {
             // 初始化服务端
             var serverName = "JsonIpcDirectRoutedProviderTest_Request_1";
-            var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName, new IpcConfiguration()
+            {
+                IpcLoggerProvider = name => new IpcLogger(name)
+                {
+                    MinLogLevel = LogLevel.Debug,
+                }
+            });
             var argument = new FakeArgument("TestName", 1);
 
-            var responseText = Guid.NewGuid().ToString();
+            var responseText = $"OK_{Guid.NewGuid().ToString()}";
 
             int enterCount = 0;
             serverProvider.AddRequestHandler("Foo1", (FakeArgument arg) =>
@@ -83,7 +90,7 @@ public class JsonIpcDirectRoutedProviderTest
                 Assert.AreEqual(argument.Name, arg.Name);
                 Assert.AreEqual(argument.Count, arg.Count);
 
-                return new FakeResult("Ok");
+                return new FakeResult(responseText);
             });
 
             serverProvider.AddRequestHandler("Foo2", (FakeArgument arg, JsonIpcDirectRoutedContext context) =>
@@ -96,15 +103,21 @@ public class JsonIpcDirectRoutedProviderTest
             serverProvider.StartServer();
 
             // 创建客户端
-            // 允许无参数，如果只是做客户端使用的话
-            JsonIpcDirectRoutedProvider clientProvider = new();
+            // 允许管道名无参数，如果只是做客户端使用的话
+            JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration:new IpcConfiguration()
+            {
+                IpcLoggerProvider = name => new IpcLogger(name)
+                {
+                    MinLogLevel = LogLevel.Debug,
+                }
+            });
             // 对于 clientProvider 来说，可选调用 StartServer 方法
             var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
             var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
 
             // 可以获取到响应内容
-            Assert.AreEqual("Ok", result.Name);
+            Assert.AreEqual(responseText, result!.Name);
 
             // 要求只进入一次
             Assert.AreEqual(1, enterCount);

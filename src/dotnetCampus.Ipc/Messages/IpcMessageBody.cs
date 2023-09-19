@@ -79,7 +79,7 @@ namespace dotnetCampus.Ipc.Messages
         /// <param name="message"></param>
         /// <returns></returns>
         public static MemoryStream ToMemoryStream(this IpcMessageBody message) =>
-            new MemoryStream(message.Buffer, message.Start, message.Length, false);
+            new MemoryStream(message.Buffer, message.Start, message.Length, false, publiclyVisible: true);
 
 #if NETCOREAPP3_1_OR_GREATER
         /// <summary>

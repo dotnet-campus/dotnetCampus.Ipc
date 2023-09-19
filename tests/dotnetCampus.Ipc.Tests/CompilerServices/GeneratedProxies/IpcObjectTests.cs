@@ -228,11 +228,11 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices.GeneratedProxies
 
                 // 安放。
                 var int32Result = proxy.MethodWithSameParameterCountOverloading(1, 2);
-                var int64Result = proxy.MethodWithSameParameterCountOverloading(1l, 2l);
+                var int64Result = proxy.MethodWithSameParameterCountOverloading(1L, 2L);
 
                 // 植物。
                 Assert.AreEqual(3, int32Result);
-                Assert.AreEqual(2l, int64Result);
+                Assert.AreEqual(2L, int64Result);
             });
 
             "IPC 代理生成：异步返回值".Test(async () =>

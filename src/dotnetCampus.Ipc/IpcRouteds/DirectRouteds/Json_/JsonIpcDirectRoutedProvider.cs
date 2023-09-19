@@ -160,6 +160,8 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             var context = new JsonIpcDirectRoutedContext(e.PeerName);
             e.SetHandle("JsonIpcDirectRouted Handled in MessageReceived");
 
+            IpcProvider.IpcContext.LogReceiveJsonIpcDirectRoutedNotify(routedPath, e.PeerName, stream);
+
             try
             {
                 // 不等了，也没啥业务
@@ -322,6 +324,9 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             var context = new JsonIpcDirectRoutedContext(requestContext.Peer.PeerName);
             var taskPool = IpcProvider.IpcContext.TaskPool;
 
+            IpcProvider.IpcContext.LogReceiveJsonIpcDirectRoutedRequest(routedPath, requestContext.Peer.PeerName,
+                stream);
+
             try
             {
                 var ipcMessage = await taskPool.Run(async () =>
@@ -329,6 +334,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
                     return await handler(stream, context);
                 });
 
+                IpcProvider.IpcContext.LogSendJsonIpcDirectRoutedResponse(routedPath, requestContext.Peer.PeerName, ipcMessage.Body);
                 IIpcResponseMessage response = new IpcHandleRequestMessageResult(ipcMessage);
                 return response;
             }
@@ -352,7 +358,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
     private JsonSerializer? _jsonSerializer;
-    private ILogger Logger => IpcProvider.IpcContext.Logger;
 
     private T? ToObject<T>(MemoryStream stream)
     {

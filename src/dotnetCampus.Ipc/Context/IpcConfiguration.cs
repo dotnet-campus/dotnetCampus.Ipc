@@ -47,6 +47,7 @@ namespace dotnetCampus.Ipc.Context
         /// <summary>
         /// 为 IPC 记录日志。
         /// </summary>
+        /// <remarks>根据当前的 Ipc 名获取到日志对象，一般写法是<code>IpcLoggerProvider = name => new IpcLogger(name)</code></remarks>
         public Func<string, IpcLogger>? IpcLoggerProvider { get; set; }
 
         /// <summary>
