@@ -104,7 +104,7 @@ public class JsonIpcDirectRoutedProviderTest
 
             // 创建客户端
             // 允许管道名无参数，如果只是做客户端使用的话
-            JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration:new IpcConfiguration()
+            JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: new IpcConfiguration()
             {
                 IpcLoggerProvider = name => new IpcLogger(name)
                 {

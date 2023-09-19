@@ -186,9 +186,9 @@ public abstract class IpcDirectRoutedProviderBase
         public IpcDirectRoutedMessage(string routedPath, MemoryStream stream,
             IpcMessage payloadIpcMessage)
         {
-           RoutedPath = routedPath;
-           Stream = stream;
-           PayloadIpcMessage = payloadIpcMessage;
+            RoutedPath = routedPath;
+            Stream = stream;
+            PayloadIpcMessage = payloadIpcMessage;
         }
 
         /// <summary>
