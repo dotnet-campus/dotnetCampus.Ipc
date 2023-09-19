@@ -75,7 +75,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
         using var memoryStream = responseMessage.Body.ToMemoryStream();
         IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
-        
+
         using StreamReader reader = new StreamReader
         (
             memoryStream,
