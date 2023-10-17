@@ -210,10 +210,23 @@ namespace dotnetCampus.Ipc.Pipes
 
             void ConnectNamedPipe()
             {
-                namedPipeClientStream.Connect();
+                try
+                {
+                    namedPipeClientStream.Connect();
 
-                // 强行捕获变量，方便调试是在等待哪个连接
-                Logger.Trace($"Connected NamedPipe by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:'{localClient}';RemoteServer:'{remoteServer}'");
+                    // 强行捕获变量，方便调试是在等待哪个连接
+                    Logger.Trace($"Connected NamedPipe by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:'{localClient}';RemoteServer:'{remoteServer}'");
+                }
+                catch (Exception e)
+                {
+                    // 管道连接失败了，比如抛出的是 UnauthorizedAccessException 异常
+                    var message =
+                        $"IPC Pipe connect to `{remoteServer}` exception by {nameof(DefaultConnectNamedPipeAsync)}. LocalClient:`{localClient}`;RemoteServer:`{remoteServer}`. Exception:{e.Message}";
+
+                    Logger.Trace(message);
+
+                    throw new IpcPipeConnectionException(remoteServer, localClient, remoteServer, message, e);
+                }
             }
         }
 
