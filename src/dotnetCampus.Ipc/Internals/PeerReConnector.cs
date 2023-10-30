@@ -34,18 +34,26 @@ namespace dotnetCampus.Ipc.Internals
 
         private async void Reconnect()
         {
-            var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
-            var success = await TryReconnectAsync(ipcClientService);
-
-            if (success)
+            try
             {
-                _peerProxy.Reconnect(ipcClientService);
+                var ipcClientService = _ipcProvider.CreateIpcClientService(_peerProxy.PeerName);
+                var success = await TryReconnectAsync(ipcClientService);
+
+                if (success)
+                {
+                    _peerProxy.Reconnect(ipcClientService);
+                }
+                else
+                {
+                    _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
+
+                    ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider));
+                }
             }
-            else
+            catch (Exception e)
             {
-                _ipcProvider.IpcContext.Logger.Error($"[PeerReConnector][Reconnect] Fail. PeerName={_peerProxy.PeerName}");
-
-                ReconnectFail?.Invoke(this, new ReconnectFailEventArgs(_peerProxy, _ipcProvider));
+                // 线程顶层，吃掉所有的异常
+                _ipcProvider.IpcContext.Logger.Error(e, $"[PeerReConnector][Reconnect] Reconnect Peer Fail. PeerName={_peerProxy.PeerName}");
             }
         }
 
