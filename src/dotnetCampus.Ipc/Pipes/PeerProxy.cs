@@ -7,6 +7,7 @@ using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Utils.Extensions;
 using Newtonsoft.Json.Schema;
 
 namespace dotnetCampus.Ipc.Pipes
@@ -212,14 +213,22 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         internal async void Reconnect(IpcClientService ipcClientService)
         {
-            Debug.Assert(ipcClientService.PeerName == PeerName);
+            try
+            {
+                Debug.Assert(ipcClientService.PeerName == PeerName);
 
-            IpcClientService = ipcClientService;
+                IpcClientService = ipcClientService;
 
-            // 等待完成更新之后，再进行通知，否则将会在收到事件时，还在准备完成所有逻辑
-            await WaitForFinishedTaskCompletionSource.Task;
+                // 等待完成更新之后，再进行通知，否则将会在收到事件时，还在准备完成所有逻辑
+                await WaitForFinishedTaskCompletionSource.Task;
 
-            PeerReconnected?.Invoke(this, new PeerReconnectedArgs());
+                PeerReconnected?.Invoke(this, new PeerReconnectedArgs());
+            }
+            catch (Exception e)
+            {
+                // 线程顶层，不能再抛出异常
+                IpcContext.Logger.Error(e, $"[PeerProxy] Reconnect Fail. PeerName={PeerName}");
+            }
         }
 
         private void ServerStreamMessageReader_PeerConnectBroke(object? sender, PeerConnectionBrokenArgs e)
