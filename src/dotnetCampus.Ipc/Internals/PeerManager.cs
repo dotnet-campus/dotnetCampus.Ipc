@@ -35,7 +35,7 @@ namespace dotnetCampus.Ipc.Internals
         {
             if (!peerProxy.IsBroken)
             {
-                throw new ArgumentException($"Must remove the Broken peer");
+                throw new ArgumentException($"Must remove the Broken peer. PeerName={peerProxy.PeerName}");
             }
 
             ConnectedServerManagerList.TryRemove(peerProxy.PeerName, out var value);
