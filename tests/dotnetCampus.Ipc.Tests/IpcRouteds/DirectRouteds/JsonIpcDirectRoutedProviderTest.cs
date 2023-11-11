@@ -218,6 +218,34 @@ public class JsonIpcDirectRoutedProviderTest
         });
     }
 
+    //[ContractTestCase] // 这一条调试下行为可能不同，于是先注释掉
+    public void TestException()
+    {
+        "如果请求的对象出现了异常，可以正确收到请求响应结束，而不会进入无限等待".Test(async () =>
+        {
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_TestException_1";
+            var jsonIpcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var path = "Foo";
+            jsonIpcDirectRoutedProvider.AddRequestHandler(path, (FakeArgument fakeArgument) =>
+            {
+                if (!string.IsNullOrEmpty(fakeArgument.Name))
+                {
+                    throw new Exception("Foo");
+                }
+
+                return new FakeResult("xx");
+            });
+            jsonIpcDirectRoutedProvider.StartServer();
+
+            var t = new JsonIpcDirectRoutedProvider();
+            var client = await t.GetAndConnectClientAsync(serverName);
+            var response = await client.GetResponseAsync<FakeResult>(path,new FakeArgument("xx",1));
+            // 能够等到响应结束就是成功
+            GC.KeepAlive(response); // 这句话只是方便打断点
+        });
+    }
+
     [ContractTestCase]
     public void AddNotifyHandler()
     {
