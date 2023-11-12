@@ -32,7 +32,7 @@ namespace dotnetCampus.Ipc.Utils.Logging
         /// <summary>
         /// 设置或获取最低的日志等级，只有大于此等级的日志才会被记录到 IpcLogger 里
         /// </summary>
-        public LogLevel MinLogLevel { get; set; } = LogLevel.Information;
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
 
         /// <summary>
         /// 判断当前的日志等级是否可记
@@ -58,8 +58,9 @@ namespace dotnetCampus.Ipc.Utils.Logging
             {
                 return;
             }
-
-            Debug.WriteLine($"[IPC][{logLevel}]{formatter(state, exception)}");
+#if NET6_0_OR_GREATER
+            Console.WriteLine($"[{Environment.ProcessId}][IPC][{logLevel}]{formatter(state, exception)}");
+#endif
         }
 
         /// <summary>
