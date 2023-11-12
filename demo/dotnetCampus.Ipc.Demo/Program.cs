@@ -31,18 +31,15 @@ namespace dotnetCampus.Ipc.Demo
                 // 这是被启动的进程，主动连接发送消息
                 Console.WriteLine($"[{Environment.ProcessId}] 开始连接对方进程");
 
-                await Task.Run(async () =>
+                var peer = await ipcProvider.GetAndConnectToPeerAsync(args[0]);
+                peer.MessageReceived += (sender, messageArgs) =>
                 {
-                    var peer = await ipcProvider.GetAndConnectToPeerAsync(args[0]);
-                    peer.MessageReceived += (sender, messageArgs) =>
-                    {
-                        Console.WriteLine(
-                            $"[{Environment.ProcessId}] 收到 {peer.PeerName} 的回复消息：{Encoding.UTF8.GetString(messageArgs.Message.Body.AsSpan())}");
-                    };
-                    await peer.NotifyAsync(new IpcMessage("Hello",
-                        Encoding.UTF8.GetBytes($"Hello,进程号是 {Environment.ProcessId} 发送过来消息")));
-                    Console.WriteLine($"[{Environment.ProcessId}] 完成发送消息");
-                });
+                    Console.WriteLine(
+                        $"[{Environment.ProcessId}] 收到 {peer.PeerName} 的回复消息：{Encoding.UTF8.GetString(messageArgs.Message.Body.AsSpan())}");
+                };
+                await peer.NotifyAsync(new IpcMessage("Hello",
+                    Encoding.UTF8.GetBytes($"Hello,进程号是 {Environment.ProcessId} 发送过来消息")));
+                Console.WriteLine($"[{Environment.ProcessId}] 完成发送消息");
             }
 
             ipcProvider.PeerConnected += (sender, connectedArgs) =>
