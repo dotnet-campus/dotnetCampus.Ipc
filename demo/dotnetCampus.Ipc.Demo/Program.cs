@@ -61,23 +61,7 @@ namespace dotnetCampus.Ipc.Demo
 
             Console.WriteLine($"[{Environment.ProcessId}] 等待退出");
             Console.Read();
-            for (int i = 0; i < int.MaxValue; i++)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
             Console.WriteLine($"[{Environment.ProcessId}] 进程准备退出");
-        }
-    }
-
-    class ConsoleIpcLogger : IpcLogger
-    {
-        public ConsoleIpcLogger(string name) : base(name)
-        {
-        }
-
-        protected override void Log<TState>(LogLevel logLevel, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            Console.WriteLine($"[{Environment.ProcessId}][IPC][{logLevel}]{formatter(state, exception)}");
         }
     }
 }
