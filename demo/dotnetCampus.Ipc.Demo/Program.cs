@@ -31,7 +31,7 @@ namespace dotnetCampus.Ipc.Demo
                 // 这是被启动的进程，主动连接发送消息
                 Console.WriteLine($"[{Environment.ProcessId}] 开始连接对方进程");
 
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     var peer = await ipcProvider.GetAndConnectToPeerAsync(args[0]);
                     peer.MessageReceived += (sender, messageArgs) =>
