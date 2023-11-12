@@ -61,6 +61,7 @@ namespace dotnetCampus.Ipc.Demo
                 };
             };
 
+            Console.WriteLine($"[{Environment.ProcessId}] 等待输入");
             Console.Read();
             Console.WriteLine($"[{Environment.ProcessId}] 进程准备退出");
         }
