@@ -81,6 +81,9 @@ namespace dotnetCampus.Ipc.Internals
         {
             while (!_isDisposed)
             {
+#if NET6_0_OR_GREATER
+                Logger.Trace($"[{Environment.ProcessId}][ServerStreamMessageReader] Loop");
+#endif
                 try
                 {
                     var ipcMessageResult = await IpcMessageConverter.ReadAsync(Stream,
