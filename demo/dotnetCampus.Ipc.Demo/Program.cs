@@ -15,11 +15,7 @@ namespace dotnetCampus.Ipc.Demo
     {
         private static async Task Main(string[] args)
         {
-            var ipcProvider = new IpcProvider(Guid.NewGuid().ToString(), new IpcConfiguration()
-            {
-                //IpcLoggerProvider = name => new ConsoleIpcLogger(name),
-                //IpcTaskScheduling = IpcTaskScheduling.LocalOneByOne,
-            });
+            var ipcProvider = new IpcProvider();
             ipcProvider.StartServer();
 
             if (args.Length == 0)
@@ -33,10 +29,10 @@ namespace dotnetCampus.Ipc.Demo
             else
             {
                 // 这是被启动的进程，主动连接发送消息
-                Task.Run(async () => // 如果没有 Task.Run 那么在 Linux 下 MessageReceived 将收不到对方的回复消息。细节还没调试到，可能是多线程调度差异
+                Console.WriteLine($"[{Environment.ProcessId}] 开始连接对方进程");
+                var peer = await ipcProvider.GetAndConnectToPeerAsync(args[0]);
+                Task.Run(async () =>
                 {
-                    Console.WriteLine($"[{Environment.ProcessId}] 开始连接对方进程");
-                    var peer = await ipcProvider.GetAndConnectToPeerAsync(args[0]);
                     peer.MessageReceived += (sender, messageArgs) =>
                     {
                         Console.WriteLine(
@@ -56,7 +52,7 @@ namespace dotnetCampus.Ipc.Demo
                 {
                     Console.WriteLine($"[{Environment.ProcessId}] 收到 {messageArgs.PeerName} 的消息：{Encoding.UTF8.GetString(messageArgs.Message.Body.AsSpan())}");
 
-                    await Task.Delay(TimeSpan.FromSeconds(3));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
 
                     // 反向发送消息给对方
                     Console.WriteLine($"[{Environment.ProcessId}] 向 {connectedArgs.Peer.PeerName} 回复消息");
@@ -66,6 +62,7 @@ namespace dotnetCampus.Ipc.Demo
             };
 
             Console.Read();
+            Console.WriteLine($"[{Environment.ProcessId}] 进程准备退出");
         }
     }
 
