@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
-using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.Internals
 {
@@ -96,7 +95,6 @@ namespace dotnetCampus.Ipc.Internals
 
         public void Dispose()
         {
-            _ipcProvider.IpcContext.Logger.Trace($"[PeerManager] Dispose");
             foreach (var pair in ConnectedServerManagerList)
             {
                 var peer = pair.Value;
