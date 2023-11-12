@@ -60,6 +60,7 @@ namespace dotnetCampus.Ipc.Demo
             };
 
             Console.WriteLine($"[{Environment.ProcessId}] 等待退出");
+            Console.Read();
             for (int i = 0; i < int.MaxValue; i++)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
