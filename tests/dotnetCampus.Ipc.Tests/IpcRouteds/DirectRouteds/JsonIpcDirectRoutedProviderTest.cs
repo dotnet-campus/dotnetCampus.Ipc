@@ -240,7 +240,7 @@ public class JsonIpcDirectRoutedProviderTest
 
             var t = new JsonIpcDirectRoutedProvider();
             var client = await t.GetAndConnectClientAsync(serverName);
-            var response = await client.GetResponseAsync<FakeResult>(path,new FakeArgument("xx",1));
+            var response = await client.GetResponseAsync<FakeResult>(path, new FakeArgument("xx", 1));
             // 能够等到响应结束就是成功
             GC.KeepAlive(response); // 这句话只是方便打断点
         });
