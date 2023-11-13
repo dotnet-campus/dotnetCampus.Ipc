@@ -341,7 +341,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             catch (Exception exception)
             {
                 // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
-                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handler.Method}");
+                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleRequest Method={handler.Method} RoutedPath={routedPath}");
                 // 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
                 return KnownIpcResponseMessages.CannotHandle;
             }
