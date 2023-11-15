@@ -1,0 +1,10 @@
+{
+	"profiles": {
+		"IpcUno.Windows (Unpackaged)": {
+			"commandName": "Project"
+		},
+		"IpcUno.Windows (Package)": {
+			"commandName": "MsixPackage"
+		}
+	}
+}
