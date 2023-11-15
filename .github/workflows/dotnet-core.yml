@@ -1,4 +1,4 @@
-name: .NET Core
+﻿name: .NET Core
 
 on: [push]
 
@@ -15,7 +15,7 @@ jobs:
         dotnet-version: |
           3.1.x
           5.0.x
-          6.0.100
+          6.0.x
           7.0.x
 
     - name: Build
@@ -26,4 +26,3 @@ jobs:
 
     - name: Pack
       run: dotnet pack --configuration Release --no-build
-       
