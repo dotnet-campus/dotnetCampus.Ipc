@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <!--
     If working on a single target framework, copy solution-config.props.sample to solution-config.props
@@ -24,8 +24,9 @@
       NETSDK1201: Warning that specifying RID won't create self containing app
       NETSDK1023:	Microsoft.Maui.Graphics reference required to avoid build error causes warning because it's already implicitly referenced by Maui SDK
       PRI257: Ignore default language (en) not being one of the included resources (eg en-us, en-uk)
+      CA1416: 平台调用，本文就是平台调用，可以忽略此问题
     -->
-    <NoWarn>$(NoWarn);NU1507;NETSDK1201;NETSDK1023;PRI257</NoWarn>
+    <NoWarn>$(NoWarn);NU1507;NETSDK1201;NETSDK1023;PRI257;CA1416</NoWarn>
 
     <DefaultLanguage>en</DefaultLanguage>
 
