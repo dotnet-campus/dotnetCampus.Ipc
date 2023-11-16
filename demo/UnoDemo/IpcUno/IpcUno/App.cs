@@ -64,7 +64,7 @@ namespace IpcUno
             MainWindow = builder.Window;
 
 #if DEBUG
-        MainWindow.EnableHotReload();
+            MainWindow.EnableHotReload();
 #endif
 
             Host = await builder.NavigateAsync<Shell>();
@@ -74,7 +74,8 @@ namespace IpcUno
         {
             views.Register(
                 new ViewMap(ViewModel: typeof(ShellViewModel)),
-                new ViewMap<MainPage, MainViewModel>(),
+                new ViewMap<ServerPage, ServerViewModel>(),
+                new DataViewMap<MainPage, MainViewModel, IpcServerEntity>(),
                 new DataViewMap<SecondPage, SecondViewModel, Entity>()
             );
 

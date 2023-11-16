@@ -2,7 +2,10 @@ namespace IpcUno.Presentation
 {
     public partial class MainViewModel : ObservableObject
     {
-        private INavigator _navigator;
+        private readonly INavigator _navigator;
+
+        [ObservableProperty]
+        private string _currentServerName = "dotnet_campus";
 
         [ObservableProperty]
         private string? name;
@@ -12,13 +15,11 @@ namespace IpcUno.Presentation
         [ObservableProperty]
         private string counterText = "Press Me";
 
-        public MainViewModel(
-            IOptions<AppConfig> appInfo,
-            INavigator navigator)
+        public MainViewModel(IpcServerEntity entity)
         {
-            _navigator = navigator;
+            _currentServerName = entity.Name;
+            _navigator = null!;
             Title = "Main";
-            Title += $" - {appInfo?.Value?.Environment}";
             GoToSecond = new AsyncRelayCommand(GoToSecondView);
             Counter = new RelayCommand(OnCount);
         }

@@ -13,7 +13,7 @@ namespace IpcUno.Presentation
 
         public async Task Start()
         {
-            await _navigator.NavigateViewModelAsync<MainViewModel>(this);
+            await _navigator.NavigateViewModelAsync<ServerViewModel>(this);
         }
     }
 }

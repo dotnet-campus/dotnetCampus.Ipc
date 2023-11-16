@@ -10,5 +10,11 @@
 
   </ResourceDictionary.MergedDictionaries>
   <!-- Add resources here -->
+  <Style TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+  </Style>
+  <Style TargetType="Button">
+    <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+  </Style>
 
 </ResourceDictionary>

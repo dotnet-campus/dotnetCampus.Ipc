@@ -1,4 +1,4 @@
-﻿namespace IpcUno.Presentation
+namespace IpcUno.Presentation
 {
     public sealed partial class MainPage : Page
     {
@@ -6,5 +6,7 @@
         {
             this.InitializeComponent();
         }
+
+        public MainViewModel ViewModel => (MainViewModel) DataContext;
     }
 }
