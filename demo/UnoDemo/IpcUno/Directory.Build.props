@@ -26,7 +26,7 @@
       PRI257: Ignore default language (en) not being one of the included resources (eg en-us, en-uk)
       CA1416: 平台调用，本文就是平台调用，可以忽略此问题
     -->
-    <NoWarn>$(NoWarn);NU1507;NETSDK1201;NETSDK1023;PRI257;CA1416</NoWarn>
+    <NoWarn>$(NoWarn);NU1507;NETSDK1201;NETSDK1023;PRI257;CA1416;IDE0090</NoWarn>
 
     <DefaultLanguage>en</DefaultLanguage>
 
