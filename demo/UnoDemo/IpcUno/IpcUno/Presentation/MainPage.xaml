@@ -54,7 +54,8 @@
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
-          <Button x:Name="AddConnectButton" Grid.Row="1" Margin="10,10,10,10" Content="+" Click="AddConnectButton_Click"></Button>
+          <Button x:Name="AddConnectButton" Grid.Row="1" Margin="10,10,10,10" Content="+"
+                  HorizontalAlignment="Stretch" Click="AddConnectButton_Click"></Button>
         </Grid>
         <Grid Grid.Column="1">
           <Grid.RowDefinitions>
