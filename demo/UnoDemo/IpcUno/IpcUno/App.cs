@@ -67,10 +67,8 @@ namespace IpcUno
 #if DEBUG
             MainWindow.EnableHotReload();
 #endif
-            MainWindow.VisibilityChanged += (s, e) =>
-            {
-                Dispatcher = MainWindow.DispatcherQueue;
-            };
+
+            Dispatcher = MainWindow.DispatcherQueue;
             Host = await builder.NavigateAsync<Shell>();
         }
 
