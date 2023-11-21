@@ -47,10 +47,10 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
           </Grid.RowDefinitions>
-          <ListView x:Name="ConnectedPeerListView" ItemsSource="{Binding ConnectedPeerModelList}" SelectionChanged="ConnectedPeerListView_SelectionChanged">
+          <ListView x:Name="ConnectedPeerListView" BorderThickness="1" BorderBrush="Gray" ItemsSource="{Binding ConnectedPeerModelList}" SelectionChanged="ConnectedPeerListView_SelectionChanged">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="model:ConnectedPeerModel">
-                <TextBlock Text="{Binding Path=PeerName}"></TextBlock>
+                <TextBlock Margin="5 0 0 0" Text="{Binding Path=PeerName}"></TextBlock>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>

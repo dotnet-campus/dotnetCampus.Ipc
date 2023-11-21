@@ -37,13 +37,15 @@ namespace IpcUno.Presentation
 
         private void ShowAddConnectPage()
         {
+            ConnectedPeerListView.SelectedItem = null;
+
             AddConnectPage addConnectPage = new AddConnectPage();
             addConnectPage.ServerConnecting += async (s, e) =>
             {
                 var serverName = e;
                 await ViewModel.ConnectAsync(serverName);
 
-                ConnectedPeerListView.SelectedItem = ViewModel.ConnectedPeerModelList.FirstOrDefault(t=>t.PeerName == serverName);
+                ConnectedPeerListView.SelectedItem = ViewModel.ConnectedPeerModelList.FirstOrDefault(t => t.PeerName == serverName);
             };
 
             MainPanelContentControl.Content = addConnectPage;
