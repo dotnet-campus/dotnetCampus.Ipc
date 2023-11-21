@@ -64,7 +64,8 @@
           </Grid.RowDefinitions>
           <Grid>
             <Border Background="#A6A6A6"></Border>
-            <ContentControl x:Name="MainPanelContentControl"></ContentControl>
+            <ContentControl x:Name="MainPanelContentControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></ContentControl>
           </Grid>
           <Grid Grid.Row="1" Margin="10,10,10,10">
             <TextBox x:Name="LogTextBox" TextWrapping="Wrap" AcceptsReturn="True" ></TextBox>

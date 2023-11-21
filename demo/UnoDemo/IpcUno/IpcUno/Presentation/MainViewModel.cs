@@ -26,12 +26,12 @@ namespace IpcUno.Presentation
 
         private void IpcProvider_PeerConnected(object? sender, dotnetCampus.Ipc.Context.PeerConnectedArgs e)
         {
-            AddPeer(e.Peer);
+            _ = AddPeer(e.Peer);
         }
 
-        private void AddPeer(PeerProxy peer)
+        private async Task AddPeer(PeerProxy peer)
         {
-            _ = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
                 if (currentPeer != null)
@@ -59,6 +59,12 @@ namespace IpcUno.Presentation
 
         public void Inject(IServiceProvider entity)
         {
+        }
+
+        public async Task ConnectAsync(string serverName)
+        {
+            var peer = await _ipcProvider.GetAndConnectToPeerAsync(serverName);
+            await AddPeer(peer);
         }
     }
 }
