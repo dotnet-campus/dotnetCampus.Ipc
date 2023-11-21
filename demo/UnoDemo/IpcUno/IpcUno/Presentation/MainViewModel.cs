@@ -33,7 +33,7 @@ namespace IpcUno.Presentation
 
         private async Task AddPeer(PeerProxy peer)
         {
-            DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
                 if (currentPeer != null)
@@ -46,10 +46,6 @@ namespace IpcUno.Presentation
 
                 peer.PeerConnectionBroken += Peer_PeerConnectBroke;
             });
-            //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //{
-                
-            //});
         }
 
         private void Peer_PeerConnectBroke(object? sender, IPeerConnectionBrokenArgs e)
