@@ -33,7 +33,25 @@ namespace IpcUno.Presentation
 
         private async Task AddPeer(PeerProxy peer)
         {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread(); // WinUI: null
+            //var currentView = CoreApplication.GetCurrentView();// WinUI: System.Runtime.InteropServices.COMException:“Element not found.
+            //var dispatcher = ((IpcUno.App) IpcUno.App.Current).Dispatcher;
+            //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
+            //    if (currentPeer != null)
+            //    {
+            //        currentPeer.Peer.PeerConnectionBroken -= Peer_PeerConnectBroke;
+            //        ConnectedPeerModelList.Remove(currentPeer);
+            //    }
+
+            //    ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
+
+            //    peer.PeerConnectionBroken += Peer_PeerConnectBroke;
+            //});
+
+            var dispatcher = ((IpcUno.App) IpcUno.App.Current).Dispatcher;
+            dispatcher.TryEnqueue(() =>
             {
                 var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
                 if (currentPeer != null)

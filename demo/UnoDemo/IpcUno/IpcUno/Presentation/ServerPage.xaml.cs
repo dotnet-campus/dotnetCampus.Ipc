@@ -4,7 +4,7 @@ namespace IpcUno.Presentation
     {
         public ServerPage()
         {
-            this.InitializeComponent();
+            this.InitializeComponent();            
         }
 
         public ServerViewModel ViewModel => (ServerViewModel) DataContext;

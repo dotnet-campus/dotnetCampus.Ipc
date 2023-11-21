@@ -2,6 +2,7 @@ namespace IpcUno
 {
     public class App : EmbeddingApplication
     {
+        public Microsoft.UI.Dispatching.DispatcherQueue Dispatcher { private set; get; } = null!;
         protected Window? MainWindow { get; private set; }
         protected IHost? Host { get; private set; }
 
@@ -66,7 +67,10 @@ namespace IpcUno
 #if DEBUG
             MainWindow.EnableHotReload();
 #endif
-
+            MainWindow.VisibilityChanged += (s, e) =>
+            {
+                Dispatcher = MainWindow.DispatcherQueue;
+            };
             Host = await builder.NavigateAsync<Shell>();
         }
 
