@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
 
+using Microsoft.UI.Dispatching;
+
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 
@@ -31,7 +33,7 @@ namespace IpcUno.Presentation
 
         private async Task AddPeer(PeerProxy peer)
         {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
             {
                 var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
                 if (currentPeer != null)
@@ -44,6 +46,10 @@ namespace IpcUno.Presentation
 
                 peer.PeerConnectionBroken += Peer_PeerConnectBroke;
             });
+            //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+                
+            //});
         }
 
         private void Peer_PeerConnectBroke(object? sender, IPeerConnectionBrokenArgs e)
@@ -63,7 +69,7 @@ namespace IpcUno.Presentation
 
         public async Task ConnectAsync(string serverName)
         {
-            var peer = await _ipcProvider.GetAndConnectToPeerAsync(serverName);
+            var peer = await _ipcProvider.GetAndConnectToPeerAsync(serverName).ConfigureAwait(false);
             await AddPeer(peer);
         }
     }
