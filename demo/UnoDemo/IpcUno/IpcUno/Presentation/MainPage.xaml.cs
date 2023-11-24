@@ -27,8 +27,12 @@ namespace IpcUno.Presentation
         private void ViewModel_AddedLogMessage(object? sender, string message)
         {
             // 收到日志
-            LogTextBox.Text += $"{message}\r\n";
-            ScrollToBottom(LogTextBox);
+            LogTextBox.Text += $"{DateTime.Now:hh:mm:ss,fff} {message}\r\n";
+            // 延迟一下，防止界面还没刷新就执行滚动
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+            {
+                ScrollToBottom(LogTextBox);
+            });
         }
 
         private void ScrollToBottom(TextBox textBox)
