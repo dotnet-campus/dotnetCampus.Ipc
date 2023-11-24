@@ -17,6 +17,8 @@ namespace IpcUno.Skia.Gtk
             };
 
             var host = new GtkHost(() => new AppHead());
+            // 修复虚拟机界面闪烁
+            host.RenderSurfaceType = RenderSurfaceType.Software;
 
             host.Run();
         }
