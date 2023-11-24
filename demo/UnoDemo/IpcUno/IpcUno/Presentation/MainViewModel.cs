@@ -28,6 +28,7 @@ namespace IpcUno.Presentation
 
         private void IpcProvider_PeerConnected(object? sender, dotnetCampus.Ipc.Context.PeerConnectedArgs e)
         {
+            Log($"[被动连接] {e.Peer.PeerName}");
             _ = AddPeer(e.Peer);
         }
 
@@ -51,6 +52,7 @@ namespace IpcUno.Presentation
             //});
 
             var dispatcher = ((IpcUno.App) IpcUno.App.Current).Dispatcher;
+            TaskCompletionSource source = new();
             dispatcher.TryEnqueue(() =>
             {
                 var currentPeer = ConnectedPeerModelList.FirstOrDefault(temp => temp.PeerName == peer.PeerName);
@@ -63,7 +65,9 @@ namespace IpcUno.Presentation
                 ConnectedPeerModelList.Add(new ConnectedPeerModel(peer));
 
                 peer.PeerConnectionBroken += Peer_PeerConnectBroke;
+                source.SetResult();
             });
+            await source.Task;
         }
 
         private void Peer_PeerConnectBroke(object? sender, IPeerConnectionBrokenArgs e)
@@ -74,8 +78,10 @@ namespace IpcUno.Presentation
 
         private void Log(string message)
         {
-
+            AddedLogMessage?.Invoke(this, message);
         }
+
+        public event EventHandler<string>? AddedLogMessage;
 
         public void Inject(IServiceProvider entity)
         {
@@ -83,8 +89,10 @@ namespace IpcUno.Presentation
 
         public async Task ConnectAsync(string serverName)
         {
+            Log($"[开始连接] {serverName}");
             var peer = await _ipcProvider.GetAndConnectToPeerAsync(serverName).ConfigureAwait(false);
             await AddPeer(peer);
+            Log($"[完成连接] {serverName}");
         }
     }
 }

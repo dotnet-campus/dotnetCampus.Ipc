@@ -68,7 +68,7 @@
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></ContentControl>
           </Grid>
           <Grid Grid.Row="1" Margin="10,10,10,10">
-            <TextBox x:Name="LogTextBox" TextWrapping="Wrap" AcceptsReturn="True" ></TextBox>
+            <TextBox x:Name="LogTextBox" FontFamily="Microsoft YaHei UI" TextWrapping="Wrap" IsReadOnly="true" AcceptsReturn="True" VerticalContentAlignment="Top"></TextBox>
           </Grid>
         </Grid>
       </Grid>

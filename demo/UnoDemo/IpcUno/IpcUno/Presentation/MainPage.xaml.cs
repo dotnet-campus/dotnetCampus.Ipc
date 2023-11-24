@@ -1,3 +1,7 @@
+using System.Diagnostics;
+
+using IpcUno.Utils;
+
 namespace IpcUno.Presentation
 {
     public sealed partial class MainPage : Page
@@ -16,7 +20,24 @@ namespace IpcUno.Presentation
 
         private void MainPage_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
+            // 在这个时机可以拿到 ViewModel 对象
+            ViewModel.AddedLogMessage += ViewModel_AddedLogMessage;
+        }
 
+        private void ViewModel_AddedLogMessage(object? sender, string message)
+        {
+            // 收到日志
+            LogTextBox.Text += $"{message}\r\n";
+            ScrollToBottom(LogTextBox);
+        }
+
+        private void ScrollToBottom(TextBox textBox)
+        {
+            //textBox.Spy();
+            if(textBox.VisualDescendant<ScrollViewer>() is { } scrollViewer)
+            {
+                scrollViewer.ChangeView(0.0f, scrollViewer.ExtentHeight, 1.0f, true);
+            }
         }
 
         public MainViewModel ViewModel => (MainViewModel) DataContext;
