@@ -31,17 +31,8 @@ namespace IpcUno.Presentation
             // 延迟一下，防止界面还没刷新就执行滚动
             _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
             {
-                ScrollToBottom(LogTextBox);
+                LogTextBox.ScrollToBottom();
             });
-        }
-
-        private void ScrollToBottom(TextBox textBox)
-        {
-            //textBox.Spy();
-            if(textBox.VisualDescendant<ScrollViewer>() is { } scrollViewer)
-            {
-                scrollViewer.ChangeView(0.0f, scrollViewer.ExtentHeight, 1.0f, true);
-            }
         }
 
         public MainViewModel ViewModel => (MainViewModel) DataContext;
