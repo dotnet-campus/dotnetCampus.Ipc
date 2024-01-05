@@ -91,21 +91,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// <param name="handler"></param>
     public void AddNotifyHandler<T>(string routedPath, Func<T, JsonIpcDirectRoutedContext, Task> handler)
     {
-        // ReSharper disable once AsyncVoidLambda
-        // ReSharper disable once ConvertToLocalFunction
-        Action<T, JsonIpcDirectRoutedContext> notifyHandler = async (argument, context) =>
-        {
-            try
-            {
-                await handler(argument, context);
-            }
-            catch (Exception e)
-            {
-                // 后台顶层，抛出就没了哦
-                Logger.Warning($"Handle {routedPath} with exception. {e}");
-            }
-        };
-        AddNotifyHandler(routedPath, notifyHandler);
+        AddNotifyHandler(routedPath, CreateHandleNotify(handler));
     }
 
     /// <summary>
@@ -128,23 +114,49 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// <exception cref="InvalidOperationException"></exception>
     public void AddNotifyHandler<T>(string routedPath, Action<T, JsonIpcDirectRoutedContext> handler)
     {
+        AddNotifyHandler(routedPath, CreateHandleNotify(handler));
+    }
+
+    private void AddNotifyHandler(string routedPath, NotifyHandler notifyHandler)
+    {
         ThrowIfStarted();
 
-        if (!HandleNotifyDictionary.TryAdd(routedPath, HandleNotify))
+        if (!HandleNotifyDictionary.TryAdd(routedPath, notifyHandler))
         {
             throw new InvalidOperationException($"重复添加对 {routedPath} 的处理");
         }
+    }
 
+    private class NotifyHandler
+    {
+        public Func<MemoryStream, JsonIpcDirectRoutedContext, Task>? AsyncHandler { get; set; }
+        public Action<MemoryStream, JsonIpcDirectRoutedContext>? SyncHandler { get; set; }
+    }
+
+    private NotifyHandler CreateHandleNotify<T>(Action<T, JsonIpcDirectRoutedContext> handler)
+    {
         void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
         {
             var argument = ToObject<T>(stream);
             handler(argument!, context);
         }
+
+        return new NotifyHandler() { SyncHandler = HandleNotify };
     }
 
-    private delegate void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context);
+    private NotifyHandler CreateHandleNotify<T>(Func<T, JsonIpcDirectRoutedContext, Task> handler)
+    {
+        Task HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
+        {
+            var argument = ToObject<T>(stream);
+            return handler(argument!, context);
+        }
 
-    private ConcurrentDictionary<string, HandleNotify> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, HandleNotify>();
+        return new NotifyHandler() { AsyncHandler = HandleNotify };
+    }
+
+
+    private ConcurrentDictionary<string, NotifyHandler> HandleNotifyDictionary { get; } = new ConcurrentDictionary<string, NotifyHandler>();
 
     /// <inheritdoc />
     protected override ulong BusinessHeader => (ulong) KnownMessageHeaders.JsonIpcDirectRoutedMessageHeader;
@@ -164,16 +176,34 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
             try
             {
-                // 不等了，也没啥业务
-                _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                // 分为同步和异步两个版本，防止异步版本执行过程没有等待，导致原本期望顺序执行的业务变成了并发执行
+                if (handleNotify.SyncHandler is {} syncHandler)
                 {
-                    handleNotify(stream, context);
-                });
+                    // 不等了，也没啥业务
+                    _ = IpcProvider.IpcContext.TaskPool.Run(() =>
+                    {
+                        syncHandler(stream, context);
+                    });
+                }
+                else if (handleNotify.AsyncHandler is {} asyncHandler)
+                {
+                    // 不等了，也没啥业务
+                    _ = IpcProvider.IpcContext.TaskPool.Run(async () =>
+                    {
+                        await asyncHandler(stream, context);
+                        return true;
+                    });
+                }
+                else
+                {
+                    // 不能吧，如果进入此分支则表示框架里面的代码有问题
+                    Logger.Error($"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify not found any handler. IPC Library internal error! 框架内部异常");
+                }
             }
             catch (Exception exception)
             {
                 // 不能让这里的异常对外抛出，否则其他业务也许莫名不执行
-                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.Method}");
+                Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleNotify Method={handleNotify.SyncHandler?.Method ?? handleNotify.AsyncHandler?.Method}");
             }
         }
         else
