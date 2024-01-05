@@ -1,0 +1,40 @@
+﻿<Project ToolsVersion="15.0">
+  <ItemGroup>
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageVersion Include="dotnetCampus.Ipc" Version="2.0.0-alpha409" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0-rc.2.23479.6" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="NUnit" Version="3.13.3" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="SkiaSharp.Skottie" Version="2.88.6" />
+    <PackageVersion Include="SkiaSharp.Views.Uno.WinUI" Version="2.88.6" />
+    <PackageVersion Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
+    <PackageVersion Include="Uno.Extensions.Core.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Configuration" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Hosting" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Hosting.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Logging.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Maui.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Navigation" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Navigation.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Extensions.Navigation.Toolkit.WinUI" Version="3.0.11" />
+    <PackageVersion Include="Uno.Material.WinUI" Version="4.0.6" />
+    <PackageVersion Include="Uno.Toolkit.WinUI" Version="5.0.17" />
+    <PackageVersion Include="Uno.Toolkit.WinUI.Material" Version="5.0.17" />
+    <PackageVersion Include="Uno.Resizetizer" Version="1.2.0" />
+    <PackageVersion Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="5.0.41" />
+    <PackageVersion Include="Uno.UniversalImageLoader" Version="1.9.36" />
+    <PackageVersion Include="Uno.WinUI" Version="5.0.41" />
+    <PackageVersion Include="Uno.WinUI.Lottie" Version="5.0.41" />
+    <PackageVersion Include="Uno.WinUI.DevServer" Version="5.0.41" />
+    <PackageVersion Include="Uno.WinUI.Skia.Gtk" Version="5.0.41" />
+    <PackageVersion Include="Uno.WinUI.Skia.Wpf" Version="5.0.41" />
+    <PackageVersion Include="Uno.UITest.Helpers" Version="1.1.0-dev.70" />
+    <PackageVersion Include="Xamarin.UITest" Version="4.3.0" />
+  </ItemGroup>
+</Project>
