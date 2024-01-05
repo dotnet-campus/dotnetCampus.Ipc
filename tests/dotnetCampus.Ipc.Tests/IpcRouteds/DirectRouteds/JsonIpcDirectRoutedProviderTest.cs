@@ -493,6 +493,65 @@ public class JsonIpcDirectRoutedProviderTest
             // 预期是服务端能够执行完成
             Assert.AreEqual(true, taskCompletionSource.Task.IsCompleted);
         });
+
+        "发送无参请求，服务端订阅有参，依然可以让服务端收到请求".Test(async () =>
+        {
+            // 可能是版本兼容，一个客户端版本软件是旧版本发送时不带参数，后续的服务端新版本写了带参数处理
+            // 期望这样的情况服务端依然能够收到请求，达成兼容
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_3";
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var routedPath = "Foo1";
+
+            // 服务端订阅有参
+            serverProvider.AddRequestHandler(routedPath, (FakeArgument arg) =>
+            {
+                Assert.IsNotNull(arg);
+
+                return new FakeResult(nameof(TestParameterless));
+            });
+
+            serverProvider.StartServer();
+
+            // 创建客户端
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            clientProvider.StartServer();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+
+            // 请求无参数
+            var result = await clientProxy.GetResponseAsync<FakeResult>(routedPath);
+
+            // 如果能收到服务端返回值，证明请求成功
+            Assert.IsNotNull(result);
+            Assert.AreEqual(nameof(TestParameterless), result.Name);
+        });
+
+        "客户端发送有参请求，服务端订阅无参，依然可以让服务端收到请求".Test(async () =>
+        {
+            var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_4";
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+            var routedPath = "Foo1";
+
+            // 服务端订阅无参
+            serverProvider.AddRequestHandler(routedPath, () =>
+            {
+                return new FakeResult(nameof(TestParameterless));
+            });
+
+            serverProvider.StartServer();
+
+            // 创建客户端
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            clientProvider.StartServer();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+
+            // 发送有参请求
+            var result = await clientProxy.GetResponseAsync<FakeResult>(routedPath, new FakeArgument("foo", 2));
+
+            // 如果能收到服务端返回值，证明请求成功
+            Assert.IsNotNull(result);
+            Assert.AreEqual(nameof(TestParameterless), result.Name);
+        });
     }
 
     record class FakeArgument(string Name, int Count)
