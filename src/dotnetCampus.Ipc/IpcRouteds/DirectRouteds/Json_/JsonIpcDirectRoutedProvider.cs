@@ -117,7 +117,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// <typeparam name="T"></typeparam>
     /// <param name="routedPath"></param>
     /// <param name="handler"></param>
-    /// <exception cref="InvalidOperationException"></exception>
     public void AddNotifyHandler<T>(string routedPath, Action<T, JsonIpcDirectRoutedContext> handler)
     {
         void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
@@ -129,6 +128,12 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         AddNotifyHandler(routedPath, new NotifyHandler() { SyncHandler = HandleNotify });
     }
 
+    /// <summary>
+    /// 添加通知的处理
+    /// </summary>
+    /// <param name="routedPath"></param>
+    /// <param name="notifyHandler"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     private void AddNotifyHandler(string routedPath, NotifyHandler notifyHandler)
     {
         ThrowIfStarted();
