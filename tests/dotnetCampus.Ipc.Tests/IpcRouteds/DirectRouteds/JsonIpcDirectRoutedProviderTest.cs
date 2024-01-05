@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Tests.CompilerServices;
+using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -430,6 +432,53 @@ public class JsonIpcDirectRoutedProviderTest
             await taskCompletionSource.Task.WaitTimeout(TimeSpan.FromSeconds(5));
             // 要求只进入一次
             Assert.AreEqual(1, enterCount);
+        });
+    }
+
+    [ContractTestCase]
+    public void TestNotifyLocalOneByOne()
+    {
+        "配置 LocalOneByOne 即可让服务端收到的通知消息是一条条按照顺序接收的".Test(async () =>
+        {
+            // 初始化服务端
+            var serverName = "JsonIpcDirectRoutedProviderTest_Test_NotifyLocalOneByOne_1";
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName,new IpcConfiguration()
+            {
+                IpcTaskScheduling = IpcTaskScheduling.LocalOneByOne,
+            });
+
+            var count = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                var n = i;
+                serverProvider.AddNotifyHandler($"Foo{n}", async () =>
+                {
+                    // 如果是按照顺序进来的，那就是按照数字顺序
+                    Assert.AreEqual(n,count);
+                    count++;
+                    // 模拟异步处理
+                    await Task.Delay(100);
+                });
+            }
+
+            serverProvider.StartServer();
+
+            // 创建客户端
+            JsonIpcDirectRoutedProvider clientProvider = new();
+            clientProvider.StartServer();
+            var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+
+            // 发送 10 条通知
+            for (int i = 0; i < 10; i++)
+            {
+                await clientProxy.NotifyAsync($"Foo{i}");
+            }
+
+            // 等待接收完成，以上的 await 返回仅仅只是发送出去，不代表对方已接收到
+            for (int i = 0; i < 1000 && count != 10; i++)
+            {
+                await Task.Delay(100);
+            }
         });
     }
 
