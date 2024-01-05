@@ -172,7 +172,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             try
             {
                 // 分为同步和异步两个版本，防止异步版本执行过程没有等待，导致原本期望顺序执行的业务变成了并发执行
-                if (handleNotify.SyncHandler is {} syncHandler)
+                if (handleNotify.SyncHandler is { } syncHandler)
                 {
                     // 不等了，也没啥业务
                     _ = IpcProvider.IpcContext.TaskPool.Run(() =>
@@ -180,7 +180,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
                         syncHandler(stream, context);
                     });
                 }
-                else if (handleNotify.AsyncHandler is {} asyncHandler)
+                else if (handleNotify.AsyncHandler is { } asyncHandler)
                 {
                     // 不等了，也没啥业务
                     _ = IpcProvider.IpcContext.TaskPool.Run(async () =>

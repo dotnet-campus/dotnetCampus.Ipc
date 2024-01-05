@@ -442,7 +442,7 @@ public class JsonIpcDirectRoutedProviderTest
         {
             // 初始化服务端
             var serverName = "JsonIpcDirectRoutedProviderTest_Test_NotifyLocalOneByOne_1";
-            var serverProvider = new JsonIpcDirectRoutedProvider(serverName,new IpcConfiguration()
+            var serverProvider = new JsonIpcDirectRoutedProvider(serverName, new IpcConfiguration()
             {
                 IpcTaskScheduling = IpcTaskScheduling.LocalOneByOne,
             });
@@ -454,7 +454,7 @@ public class JsonIpcDirectRoutedProviderTest
                 serverProvider.AddNotifyHandler($"Foo{n}", async () =>
                 {
                     // 如果是按照顺序进来的，那就是按照数字顺序
-                    Assert.AreEqual(n,count);
+                    Assert.AreEqual(n, count);
                     count++;
                     // 模拟异步处理
                     await Task.Delay(100);
