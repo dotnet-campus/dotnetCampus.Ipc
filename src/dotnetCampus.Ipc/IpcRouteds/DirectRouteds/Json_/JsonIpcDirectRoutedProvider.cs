@@ -91,7 +91,13 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// <param name="handler"></param>
     public void AddNotifyHandler<T>(string routedPath, Func<T, JsonIpcDirectRoutedContext, Task> handler)
     {
-        AddNotifyHandler(routedPath, CreateHandleNotify(handler));
+        Task HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
+        {
+            var argument = ToObject<T>(stream);
+            return handler(argument!, context);
+        }
+
+        AddNotifyHandler(routedPath, new NotifyHandler() { AsyncHandler = HandleNotify });
     }
 
     /// <summary>
@@ -114,7 +120,13 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     /// <exception cref="InvalidOperationException"></exception>
     public void AddNotifyHandler<T>(string routedPath, Action<T, JsonIpcDirectRoutedContext> handler)
     {
-        AddNotifyHandler(routedPath, CreateHandleNotify(handler));
+        void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
+        {
+            var argument = ToObject<T>(stream);
+            handler(argument!, context);
+        }
+
+        AddNotifyHandler(routedPath, new NotifyHandler() { SyncHandler = HandleNotify });
     }
 
     private void AddNotifyHandler(string routedPath, NotifyHandler notifyHandler)
@@ -131,28 +143,6 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
     {
         public Func<MemoryStream, JsonIpcDirectRoutedContext, Task>? AsyncHandler { get; set; }
         public Action<MemoryStream, JsonIpcDirectRoutedContext>? SyncHandler { get; set; }
-    }
-
-    private NotifyHandler CreateHandleNotify<T>(Action<T, JsonIpcDirectRoutedContext> handler)
-    {
-        void HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
-        {
-            var argument = ToObject<T>(stream);
-            handler(argument!, context);
-        }
-
-        return new NotifyHandler() { SyncHandler = HandleNotify };
-    }
-
-    private NotifyHandler CreateHandleNotify<T>(Func<T, JsonIpcDirectRoutedContext, Task> handler)
-    {
-        Task HandleNotify(MemoryStream stream, JsonIpcDirectRoutedContext context)
-        {
-            var argument = ToObject<T>(stream);
-            return handler(argument!, context);
-        }
-
-        return new NotifyHandler() { AsyncHandler = HandleNotify };
     }
 
 
