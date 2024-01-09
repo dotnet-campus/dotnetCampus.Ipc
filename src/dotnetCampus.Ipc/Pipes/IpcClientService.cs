@@ -328,8 +328,8 @@ namespace dotnetCampus.Ipc.Pipes
                 {
                     // 比如 Pipe is broken. 等异常
                     tracker.Debug("IPC write fail.");
-                    // 此时无法知道是对方断开了连接，还是其他异常，因此决定这里抛出的是 IpcException 异常
-                    throw new IpcException($"IPC write fail. Tag={tracker.Tag} LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'", e);
+                    // 重新封装异常，让上层可以获取到更多信息，且可以使用 IPC 的异常类型进行判断
+                    throw new IpcRemoteException($"IPC write fail. Tag={tracker.Tag} LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'", e);
                 }
             }
         }
