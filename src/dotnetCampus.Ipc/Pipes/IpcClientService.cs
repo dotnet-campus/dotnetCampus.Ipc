@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
@@ -269,7 +270,7 @@ namespace dotnetCampus.Ipc.Pipes
                 // 这里的 InvalidOperationException 对应 DoubleBufferTask.AddTask 里抛出的异常。
                 // 在逻辑上确实是使用错误，抛出 InvalidOperationException 是合适的；
                 // 但因为 IPC 的断开发生在任何时刻，根本无法提前规避，所以实际上这里指的是 IPC 远端异常。
-                throw new IpcRemoteException($"因为已无法连接对方，所以 IPC 消息发送失败。Tag={tracker.Tag}", ex);
+                throw new IpcRemoteException($"因为已无法连接对方，所以 IPC 消息发送失败。Tag={tracker.Tag} LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'", ex);
                 // @lindexi，这里违背了异常处理原则里的“不应捕获使用异常”的原则，所以 DoubleBufferTask 的设计需要修改，加一个 TryAddTaskAsync 以应对并发场景。
             }
 
@@ -307,19 +308,29 @@ namespace dotnetCampus.Ipc.Pipes
 
                 IpcContext.LogSendMessage(tracker.Message, PeerName);
 
-                // 发送消息。
-                await IpcMessageConverter.WriteAsync
-                (
-                    stream,
-                    IpcConfiguration.MessageHeader,
-                    ack,
-                    tracker.Message,
-                    IpcConfiguration.SharedArrayPool
-                ).ConfigureAwait(false);
-                await stream.FlushAsync().ConfigureAwait(false);
+                try
+                {
+                    // 发送消息。
+                    await IpcMessageConverter.WriteAsync
+                    (
+                        stream,
+                        IpcConfiguration.MessageHeader,
+                        ack,
+                        tracker.Message,
+                        IpcConfiguration.SharedArrayPool
+                    ).ConfigureAwait(false);
+                    await stream.FlushAsync().ConfigureAwait(false);
 
-                // 追踪消息。
-                tracker.Debug("IPC finish writing.");
+                    // 追踪消息。
+                    tracker.Debug("IPC finish writing.");
+                }
+                catch (IOException e)
+                {
+                    // 比如 Pipe is broken. 等异常
+                    tracker.Debug("IPC write fail.");
+                    // 重新封装异常，让上层可以获取到更多信息，且可以使用 IPC 的异常类型进行判断
+                    throw new IpcRemoteException($"IPC write fail. Tag={tracker.Tag} LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'", e);
+                }
             }
         }
 
