@@ -121,7 +121,15 @@ var response = await ipcReceivingObjectA.GetResponseAsync<IpcResponse>("请求�
 
 ```
 
+#### 调用关系图
+
+![](./docs/image/README/zh-CN/sample0.png)
+
 *更多案例详见：* [Demo](https://github.com/dotnet-campus/dotnetCampus.Ipc/tree/master/demo)
+
+## 项目结构图
+
+![](./docs/image/README/zh-CN/Architecture0.png)
 
 ## 特点
 
