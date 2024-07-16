@@ -39,9 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Walterlv.NullableAttributes.Source" PrivateAssets="all" />
+    <PackageReference Include="dotnetCampus.LatestCSharpFeatures" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json"/>
+    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="Microsoft.CSharp" />
   </ItemGroup>
