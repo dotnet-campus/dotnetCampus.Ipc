@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.PipeCore
 {

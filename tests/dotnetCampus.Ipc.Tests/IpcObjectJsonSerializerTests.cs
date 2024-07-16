@@ -1,34 +1,24 @@
 ﻿using dotnetCampus.Ipc.Serialization;
-using dotnetCampus.Ipc.Utils;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using MSTest.Extensions.Contracts;
 
 namespace dotnetCampus.Ipc.Tests
 {
     [TestClass]
     public class IpcObjectJsonSerializerTests
     {
-        [ContractTestCase]
+        [TestMethod("序列化对象之后，能通过二进制反序列化回对象")]
         public void Serialize()
         {
-            "序列化对象之后，能通过二进制反序列化回对象".Test(() =>
-            {
-                // Arrange
-                IIpcObjectSerializer ipcObjectSerializer = new IpcObjectJsonSerializer();
-                var foo = new Foo()
-                {
-                    Name = "林德熙是逗比"
-                };
+            // Arrange
+            IIpcObjectSerializer ipcObjectSerializer = new IpcObjectJsonSerializer();
+            var foo = new Foo() { Name = "林德熙是逗比" };
 
-                // Action
-                var byteList = ipcObjectSerializer.Serialize(foo);
-                var deserializeFoo = ipcObjectSerializer.Deserialize<Foo>(byteList);
+            // Action
+            var byteList = ipcObjectSerializer.Serialize(foo);
+            var deserializeFoo = ipcObjectSerializer.Deserialize<Foo>(byteList);
 
-                // Assert
-                Assert.AreEqual(foo.Name, deserializeFoo.Name);
-            });
+            // Assert
+            Assert.AreEqual(foo.Name, deserializeFoo.Name);
         }
 
         public class Foo
