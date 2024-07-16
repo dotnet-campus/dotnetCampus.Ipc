@@ -1,22 +1,43 @@
 ﻿<Project>
+
   <Import Project="build\Version.props" />
+
+  <!-- Framework and language -->
   <PropertyGroup>
+    <!-- Language -->
     <LangVersion>latest</LangVersion>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</PackageOutputPath>
-    <Company>dotnet campus（.NET 职业技术学院）</Company>
-
-    <Authors>dotnet-campus</Authors>
-    <RepositoryUrl>https://github.com/dotnet-campus/dotnetCampus.Ipc</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/dotnet-campus/dotnetCampus.Ipc</PackageProjectUrl>
-    <Description>本机内多进程通讯库，稳定 IPC 通讯库</Description>
-
-    <RepositoryType>git</RepositoryType>
-    <Copyright>Copyright © 2020-2024 dotnet campus, All Rights Reserved.</Copyright>
-
-    <NoWarn>$(NoWarn);NU1803</NoWarn>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Build -->
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Deterministic>true</Deterministic>
+    <!--
+      Add NoWarn to remove build warnings
+      NU1803: Using an insecure http NuGet source
+    -->
+    <NoWarn>$(NoWarn);NU1507;NU1803;NETSDK1201;PRI257</NoWarn>
+    <!--
+      CA1416: Platform compatibility warning
+    -->
+    <WarningsAsErrors>$(WarningAsErrors);CA1416</WarningsAsErrors>
   </PropertyGroup>
 
-  <ItemGroup>
-    <SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
-  </ItemGroup>
+  <!-- Custom properties -->
+  <PropertyGroup>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <ThisYear>$([System.DateTime]::Now.ToString(`yyyy`))</ThisYear>
+  </PropertyGroup>
+
+  <!-- Package and project properties -->
+  <PropertyGroup>
+    <Description>本机内多进程通讯库，稳定 IPC 通讯库</Description>
+    <Company>dotnet campus（.NET 职业技术学院）</Company>
+    <Authors>dotnet-campus</Authors>
+    <Copyright>Copyright © 2020-$(ThisYear) dotnet campus, All Rights Reserved.</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/dotnet-campus/dotnetCampus.Ipc</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dotnet-campus/dotnetCampus.Ipc</PackageProjectUrl>
+  </PropertyGroup>
+
 </Project>

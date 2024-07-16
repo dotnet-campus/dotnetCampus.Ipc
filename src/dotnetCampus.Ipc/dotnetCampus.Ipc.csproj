@@ -35,15 +35,15 @@
 
   <ItemGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <!-- 链接源代码到 GitHub 仓库，方便调试 -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Walterlv.NullableAttributes.Source" Version="7.4.0" PrivateAssets="all" />
-    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.7.0" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Walterlv.NullableAttributes.Source" PrivateAssets="all" />
+    <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json"/>
+    <PackageReference Include="System.ValueTuple" />
+    <PackageReference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>
