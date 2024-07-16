@@ -1,5 +1,4 @@
-﻿using dotnetCampus.Ipc.DiagnosticAnalyzers.Compiling;
-
+﻿using dotnetCampus.Ipc.Analyzers.Compiling;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace dotnetCampus.Ipc.CodeAnalysis.Utils;

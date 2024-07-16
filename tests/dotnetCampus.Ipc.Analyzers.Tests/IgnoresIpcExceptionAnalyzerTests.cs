@@ -5,8 +5,8 @@ using dotnetCampus.Ipc.CodeAnalysis.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using VerifyCS = dotnetCampus.Ipc.Analyzers.Tests.CSharpCodeFixVerifier<
-    dotnetCampus.Ipc.DiagnosticAnalyzers.IgnoresIpcExceptionIsRecommendedAnalyzer,
-    dotnetCampus.Ipc.CodeFixeProviders.IgnoresIpcExceptionIsRecommendedCodeFixProvider>;
+    dotnetCampus.Ipc.Analyzers.IgnoresIpcExceptionIsRecommendedAnalyzer,
+    dotnetCampus.Ipc.CodeFixes.IgnoresIpcExceptionIsRecommendedCodeFixProvider>;
 
 namespace dotnetCampus.Ipc.Analyzers.Tests;
 
