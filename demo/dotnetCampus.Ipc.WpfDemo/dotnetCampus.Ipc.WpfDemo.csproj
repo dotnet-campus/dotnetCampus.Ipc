@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="dotnetCampus.CommandLine" Version="3.3.0" />
+      <PackageReference Include="dotnetCampus.CommandLine" />
     <ProjectReference Include="..\..\src\dotnetCampus.Ipc\dotnetCampus.Ipc.csproj" />
   </ItemGroup>
 
