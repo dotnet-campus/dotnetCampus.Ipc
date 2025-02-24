@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_0_OR_GREATER
+using System;
 
 namespace dotnetCampus.Ipc.CompilerServices.Attributes;
 
@@ -26,3 +27,4 @@ class IpcShapeAttribute : IpcPublicAttribute
     /// </summary>
     public Type ContractType { get; }
 }
+#endif
