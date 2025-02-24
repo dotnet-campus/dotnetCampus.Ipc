@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_0_OR_GREATER
-using System;
+﻿using System;
 using System.ComponentModel;
 
 namespace dotnetCampus.Ipc.CompilerServices.Attributes;
@@ -52,4 +51,3 @@ class IpcPublicAttribute : Attribute
     [DefaultValue(0)]
     public int Timeout { get; set; }
 }
-#endif

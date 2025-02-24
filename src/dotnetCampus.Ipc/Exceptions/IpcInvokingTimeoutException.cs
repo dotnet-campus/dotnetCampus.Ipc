@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-using System;
+﻿using System;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
@@ -58,4 +57,3 @@ internal class IpcInvokingTimeoutException : IpcLocalException
         return timeout;
     }
 }
-#endif
