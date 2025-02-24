@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;net461</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1;net461;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -47,7 +47,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\analyzers\dotnetCampus.Ipc.SourceGenerators\dotnetCampus.Ipc.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <!-- 这是一个内部的分析器，现在只用来生成 GeneratedIpcJoint.generic.cs 文件。但为了重新加回 .NET Framework 4.5 的支持，只好手动拷贝代码，而不是继续引用分析器项目 -->
+    <!-- <ProjectReference Include="..\..\analyzers\dotnetCampus.Ipc.SourceGenerators\dotnetCampus.Ipc.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> -->
   </ItemGroup>
 
   <!-- 生成 NuGet 包。 -->

@@ -87,7 +87,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="methodInvoker">对接实现。</param>
     protected void MatchMethod(ulong memberId, Action methodInvoker)
     {
-        _methods.Add(memberId, (Array.Empty<Type>(), _ =>
+        _methods.Add(memberId, (EmptyTypeArray, _ =>
         {
             methodInvoker();
             return DefaultGarm;
@@ -102,7 +102,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="methodInvoker">对接实现。</param>
     protected void MatchMethod<TReturn>(ulong memberId, Func<Garm<TReturn>> methodInvoker)
     {
-        _methods.Add(memberId, (Array.Empty<Type>(), _ => methodInvoker()));
+        _methods.Add(memberId, (EmptyTypeArray, _ => methodInvoker()));
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="methodInvoker">对接实现。</param>
     protected void MatchMethod(ulong memberId, Func<Task> methodInvoker)
     {
-        _asyncMethods.Add(memberId, (Array.Empty<Type>(), async _ =>
+        _asyncMethods.Add(memberId, (EmptyTypeArray, async _ =>
         {
             await methodInvoker().ConfigureAwait(false);
             return DefaultGarm;
@@ -127,7 +127,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="methodInvoker">对接实现。</param>
     protected void MatchMethod<TReturn>(ulong memberId, Func<Task<Garm<TReturn>>> methodInvoker)
     {
-        _asyncMethods.Add(memberId, (Array.Empty<Type>(), async _ => await methodInvoker().ConfigureAwait(false)));
+        _asyncMethods.Add(memberId, (EmptyTypeArray, async _ => await methodInvoker().ConfigureAwait(false)));
     }
 
     /// <summary>
@@ -144,6 +144,15 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
         }
         ));
     }
+
+    private static Type[] EmptyTypeArray
+
+#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+        => Array.Empty<Type>();
+#else
+        => new Type[0];
+#endif
+
 
     /// <summary>
     /// 匹配一个 IPC 目标对象上的某个方法，使其他 IPC 节点访问此 IPC 对象时能执行 <paramref name="methodInvoker"/> 所指向的具体实现。
@@ -187,7 +196,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="getter">get 的对接实现。</param>
     protected void MatchProperty<T>(ulong getPropertyId, Func<Garm<T>> getter)
     {
-        _propertyGetters.Add(getPropertyId, (Array.Empty<Type>(), () => getter()));
+        _propertyGetters.Add(getPropertyId, (EmptyTypeArray, () => getter()));
     }
 
     /// <summary>
@@ -199,7 +208,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// <param name="setter">set 的对接实现。</param>
     protected void MatchProperty<T>(ulong getPropertyId, ulong setPropertyId, Func<Garm<T>> getter, Action<T> setter)
     {
-        _propertyGetters.Add(getPropertyId, (Array.Empty<Type>(), () => getter()));
+        _propertyGetters.Add(getPropertyId, (EmptyTypeArray, () => getter()));
         _propertySetters.Add(setPropertyId, (new[] { typeof(T) }, value => setter(CastArg<T>(value)!)));
     }
 
