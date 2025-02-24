@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -140,4 +139,3 @@ internal class IpcProxyInvokingHelper
         }
     }
 }
-#endif

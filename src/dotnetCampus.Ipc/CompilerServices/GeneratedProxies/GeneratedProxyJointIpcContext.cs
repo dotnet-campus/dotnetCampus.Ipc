@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
-using dotnetCampus.Ipc.Context;
+﻿using dotnetCampus.Ipc.Context;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 {
@@ -29,4 +28,3 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         public IIpcRequestHandler RequestHandler { get; }
     }
 }
-#endif

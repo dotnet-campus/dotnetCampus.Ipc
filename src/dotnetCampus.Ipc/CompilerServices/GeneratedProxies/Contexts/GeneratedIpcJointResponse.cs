@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Messages;
 
@@ -30,4 +29,3 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Contexts
         }
     }
 }
-#endif

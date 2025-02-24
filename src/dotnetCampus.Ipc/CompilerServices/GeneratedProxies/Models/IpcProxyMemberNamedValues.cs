@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
-#pragma warning disable format
+﻿#pragma warning disable format
 using System;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -61,4 +60,3 @@ partial class GeneratedIpcProxy
         public bool? WaitsVoid { get; set; }
     }
 }
-#endif

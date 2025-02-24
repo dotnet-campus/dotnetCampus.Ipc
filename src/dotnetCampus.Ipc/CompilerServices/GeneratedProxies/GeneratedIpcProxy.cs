@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
@@ -272,4 +271,3 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
         }
     }
 }
-#endif

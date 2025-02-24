@@ -35,9 +35,7 @@ namespace dotnetCampus.Ipc.Context
             IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
-#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
             GeneratedProxyJointIpcContext = new GeneratedProxyJointIpcContext(this);
-#endif
 
             IpcClientPipeConnector = IpcConfiguration.IpcClientPipeConnector;
 
@@ -58,9 +56,8 @@ namespace dotnetCampus.Ipc.Context
         }
 
         internal AckManager AckManager { get; }
-#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+
         internal GeneratedProxyJointIpcContext GeneratedProxyJointIpcContext { get; }
-#endif
 
         /// <inheritdoc />
         public override string ToString()

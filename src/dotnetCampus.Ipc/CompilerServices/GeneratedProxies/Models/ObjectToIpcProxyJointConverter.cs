@@ -1,5 +1,4 @@
-﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
@@ -102,4 +101,3 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models
         }
     }
 }
-#endif
