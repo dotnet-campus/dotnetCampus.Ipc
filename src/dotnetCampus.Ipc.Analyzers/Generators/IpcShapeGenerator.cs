@@ -55,12 +55,10 @@ public class IpcShapeGenerator : IIncrementalGenerator
     /// <returns>程序集特性的源代码。</returns>
     private string GenerateAssemblySource(IpcShapeCompilation sc)
     {
-        var sourceCode = @$"#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_0_OR_GREATER
-using dotnetCampus.Ipc.CompilerServices.Attributes;
+        var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {sc.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}), typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]
-#endif";
+[assembly: {GetAttributeName(typeof(AssemblyIpcProxyAttribute).Name)}(typeof({sc.ContractType}), typeof({sc.IpcType}), typeof(__{sc.IpcType.Name}IpcProxy))]";
         return sourceCode;
     }
 }
