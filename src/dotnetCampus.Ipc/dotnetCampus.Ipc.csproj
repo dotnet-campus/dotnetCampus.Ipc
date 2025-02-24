@@ -54,7 +54,7 @@
   <!-- 生成 NuGet 包。 -->
   <Target Name="_IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
-      <None Include="..\dotnetCampus.Ipc.Analyzers\bin\$(Configuration)\**\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
+      <None Include="$(ArtifactsPath)\bin\dotnetCampus.Ipc.Analyzers\$(Configuration)\**\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
     </ItemGroup>
   </Target>
 
