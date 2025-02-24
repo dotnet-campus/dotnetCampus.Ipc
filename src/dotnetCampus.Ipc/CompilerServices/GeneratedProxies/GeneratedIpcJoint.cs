@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -285,3 +287,4 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
         return new NotImplementedException($"无法对接 Id 为 {memberId} 的 {typeof(TContract).FullName}.{methodName} 方法，因为没有在 {GetType().FullName} 的 IPC 对接类中进行匹配。");
     }
 }
+#endif

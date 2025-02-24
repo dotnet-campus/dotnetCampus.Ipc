@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
+using System;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
@@ -70,3 +71,4 @@ internal readonly record struct Garm : IGarmObject
             IpcType);
     }
 }
+#endif

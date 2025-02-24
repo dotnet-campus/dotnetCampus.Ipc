@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
+using System;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// <summary>
@@ -26,3 +27,4 @@ internal static class GarmObjectExtensions
 {
     internal static IGarmObject Default { get; } = new Garm<object?>();
 }
+#endif

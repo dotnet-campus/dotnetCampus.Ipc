@@ -34,7 +34,9 @@ namespace dotnetCampus.Ipc.Pipes
         public IpcProvider(string pipeName, IpcConfiguration? ipcConfiguration = null)
         {
             IpcContext = new IpcContext(this, pipeName, ipcConfiguration);
+#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
             IpcContext.IpcConfiguration.AddFrameworkRequestHandlers(IpcContext.GeneratedProxyJointIpcContext.RequestHandler);
+#endif
             IpcContext.Logger.Trace($"[IpcProvider] 本地服务名 {pipeName}");
 
             PeerManager = new PeerManager(this);

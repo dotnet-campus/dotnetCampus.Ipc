@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#if NET461_OR_GREATER ||  NETCOREAPP3_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
@@ -48,3 +49,4 @@ internal class GeneratedProxyObjectModel
         return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(Value);
     }
 }
+#endif

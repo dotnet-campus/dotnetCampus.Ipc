@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
+using System;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
@@ -76,3 +77,4 @@ public readonly struct Garm<T> : IGarmObject
         return new Garm<T>(value);
     }
 }
+#endif

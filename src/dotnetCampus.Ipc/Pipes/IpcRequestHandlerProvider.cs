@@ -127,7 +127,9 @@ namespace dotnetCampus.Ipc.Pipes
 
         private string FormatHandlerAsErrorMessage(IIpcRequestHandler handler) => handler switch
         {
+#if NET461_OR_GREATER || NETCOREAPP3_0_OR_GREATER
             GeneratedProxyJointIpcRequestHandler gpjirh => string.Join(", ", gpjirh.Owner.JointManager.EnumerateJointNames()),
+#endif
             DelegateIpcRequestHandler dirh => nameof(DelegateIpcRequestHandler),
             EmptyIpcRequestHandler eirh => nameof(EmptyIpcRequestHandler),
             null => "null",
