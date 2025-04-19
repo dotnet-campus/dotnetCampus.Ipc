@@ -6,7 +6,17 @@ namespace dotnetCampus.Ipc.Serialization
 {
     public class IpcObjectJsonSerializer : IIpcObjectSerializer
     {
-        private JsonSerializer JsonSerializer { get; } = JsonSerializer.CreateDefault();
+        public IpcObjectJsonSerializer()
+        {
+            JsonSerializer = JsonSerializer.CreateDefault();
+        }
+
+        public IpcObjectJsonSerializer(JsonSerializer jsonSerializer)
+        {
+            JsonSerializer = jsonSerializer;
+        }
+
+        private JsonSerializer JsonSerializer { get; }
 
         public byte[] Serialize(object value)
         {
