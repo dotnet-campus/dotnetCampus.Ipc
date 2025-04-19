@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace IpcDirectRoutedAotDemo;
 
-[JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(NotifyInfo))]
+[JsonSerializable(typeof(DemoRequest))]
+[JsonSerializable(typeof(DemoResponse))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
