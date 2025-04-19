@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DefineConstants>$(DefineConstants)TRACE;PublicAsInternal</DefineConstants>
+    <PublishTrimmed Condition="'$(TargetFramework)'=='net6.0'">true</PublishTrimmed>
   </PropertyGroup>
 
   <!-- 在 GitHub 的 Action 构建会添加 GITHUB_ACTIONS 变量 -->
