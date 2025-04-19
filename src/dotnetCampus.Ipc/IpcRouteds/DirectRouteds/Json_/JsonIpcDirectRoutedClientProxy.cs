@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
-using Newtonsoft.Json;
+using dotnetCampus.Ipc.Serialization;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
@@ -25,8 +25,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
     private readonly PeerProxy _peerProxy;
     private IpcContext IpcContext => _peerProxy.IpcContext;
-    private JsonSerializer? _jsonSerializer;
-    private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
+    private IIpcObjectSerializer JsonSerializer => IpcContext.IpcConfiguration.IpcObjectSerializer;
 
     /// <summary>
     /// 不带参数的通知服务端
@@ -76,18 +75,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = responseMessage.Body.ToMemoryStream();
         IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
 
-        using StreamReader reader = new StreamReader
-        (
-            memoryStream,
-#if !NETCOREAPP
-            Encoding.UTF8,
-            detectEncodingFromByteOrderMarks: false,
-            bufferSize: 2048,
-#endif
-            leaveOpen: true
-        );
-        JsonReader jsonReader = new JsonTextReader(reader);
-        return JsonSerializer.Deserialize<TResponse>(jsonReader);
+        return JsonSerializer.Deserialize<TResponse>(memoryStream);
     }
 
     private IpcMessage BuildMessage(string routedPath, object obj)
@@ -95,10 +83,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = new MemoryStream();
         WriteHeader(memoryStream, routedPath);
 
-        using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true, bufferSize: 2048))
-        {
-            JsonSerializer.Serialize(textWriter, obj);
-        }
+        JsonSerializer.Serialize(memoryStream, obj);
 
         return ToIpcMessage(memoryStream, $"Message {routedPath}");
     }
