@@ -74,6 +74,11 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
 }
 
 [JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
+[JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(int))]
+[JsonSerializable(typeof(long))]
+[JsonSerializable(typeof(short))]
+[JsonSerializable(typeof(bool))]
 internal partial class IpcInternalJsonSerializerContext : JsonSerializerContext
 {
 }

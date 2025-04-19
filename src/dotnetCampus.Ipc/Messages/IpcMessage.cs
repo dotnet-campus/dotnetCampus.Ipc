@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using dotnetCampus.Ipc.Context;
 
 namespace dotnetCampus.Ipc.Messages
@@ -79,6 +80,22 @@ namespace dotnetCampus.Ipc.Messages
             var ipcBufferMessageContext =
                 new IpcBufferMessageContext(Tag, ipcMessageCommandType, new IpcMessageBody(header), Body);
             return ipcBufferMessageContext;
+        }
+
+        internal string ToDebugString()
+        {
+            var guessBodyText = "";
+            try
+            {
+                // 猜测 Body 的内容
+                guessBodyText = Encoding.UTF8.GetString(Body.Buffer, Body.Start, Body.Length);
+            }
+            catch
+            {
+                // 忽略
+            }
+
+            return $"[IpcMessage] Header={Header};Tag={Tag};Body=[{string.Join(" ", Body.Buffer.Skip(Body.Start).Take(Body.Length).Select(t=>t.ToString("X2")))}](GuessText={guessBodyText})";
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Serialization;
@@ -70,12 +71,20 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
         IpcContext.LogSendJsonIpcDirectRoutedRequest(routedPath, _peerProxy.PeerName, ipcMessage.Body);
 
-        var responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
+        IpcMessage responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
 
         using var memoryStream = responseMessage.Body.ToMemoryStream();
         IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
 
-        return IpcObjectSerializer.Deserialize<TResponse>(memoryStream);
+        try
+        {
+            return IpcObjectSerializer.Deserialize<TResponse>(memoryStream);
+        }
+        catch (Exception e)
+        {
+            // 序列化错误
+            throw new JsonIpcDirectRouteSerializeLocalException(responseMessage, typeof(TResponse), e);
+        }
     }
 
     private IpcMessage BuildMessage(string routedPath, object obj)
