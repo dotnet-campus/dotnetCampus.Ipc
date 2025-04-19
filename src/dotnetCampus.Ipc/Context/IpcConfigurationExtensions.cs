@@ -18,4 +18,13 @@ public static class IpcConfigurationExtensions
 
         return configuration;
     }
+
+#if NET6_0_OR_GREATER
+    public static IpcConfiguration UseSystemJsonIpcObjectSerializer(this IpcConfiguration configuration,
+        System.Text.Json.Serialization.JsonSerializerContext context)
+    {
+        configuration.IpcObjectSerializer = new IpcObjectSystemJsonSerializer(context);
+        return configuration;
+    }
+#endif
 }

@@ -10,13 +10,15 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
+using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
+
 namespace dotnetCampus.Ipc.Serialization;
 
 public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
 {
     public IpcObjectSystemJsonSerializer(JsonSerializerContext jsonSerializerContext)
     {
-        JsonSerializerContext = jsonSerializerContext;
+        JsonSerializerContext = new IpcDefaultJsonSerializerContext(jsonSerializerContext);
     }
 
     public JsonSerializerContext JsonSerializerContext { get; }
@@ -28,7 +30,7 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
             return "{}"u8.ToArray();
         }
 
-        var json = JsonSerializer.Serialize(value,value.GetType(), JsonSerializerContext);
+        var json = JsonSerializer.Serialize(value, value.GetType(), JsonSerializerContext);
         return Encoding.UTF8.GetBytes(json);
     }
 
@@ -52,6 +54,28 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
     {
         return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
+}
+
+file class IpcDefaultJsonSerializerContext : JsonSerializerContext
+{
+    public IpcDefaultJsonSerializerContext(JsonSerializerContext businessContext) : base(null)
+    {
+        _businessContext = businessContext;
+    }
+
+    private readonly JsonSerializerContext _businessContext;
+
+    public override JsonTypeInfo? GetTypeInfo(Type type)
+    {
+        return _businessContext.GetTypeInfo(type) ?? IpcInternalJsonSerializerContext.Default.GetTypeInfo(type);
+    }
+
+    protected override JsonSerializerOptions GeneratedSerializerOptions => _businessContext.Options;
+}
+
+[JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
+internal partial class IpcInternalJsonSerializerContext : JsonSerializerContext
+{
 }
 
 #endif
