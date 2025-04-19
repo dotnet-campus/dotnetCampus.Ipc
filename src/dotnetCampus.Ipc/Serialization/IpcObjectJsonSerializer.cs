@@ -14,7 +14,7 @@ namespace dotnetCampus.Ipc.Serialization
             return Encoding.UTF8.GetBytes(json);
         }
 
-        public void Serialize(Stream stream, object value)
+        public void Serialize(Stream stream, object? value)
         {
             using var textWriter = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true, bufferSize: 2048);
             JsonSerializer.Serialize(textWriter, value);

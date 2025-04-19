@@ -12,7 +12,7 @@
         /// <returns></returns>
         byte[] Serialize(object value);
 
-        void Serialize(Stream stream, object value);
+        void Serialize(Stream stream, object? value);
 
         /// <summary>
         /// 反序列化对象
