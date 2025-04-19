@@ -30,7 +30,7 @@ namespace dotnetCampus.Ipc.Serialization
             JsonSerializer.Serialize(textWriter, value);
         }
 
-        public T Deserialize<T>(byte[] byteList)
+        public T? Deserialize<T>(byte[] byteList)
         {
             var json = Encoding.UTF8.GetString(byteList);
             return JsonConvert.DeserializeObject<T>(json);

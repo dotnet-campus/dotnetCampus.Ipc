@@ -1,0 +1,57 @@
+﻿#if NET6_0_OR_GREATER
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using System.Threading.Tasks;
+
+namespace dotnetCampus.Ipc.Serialization;
+
+public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
+{
+    public IpcObjectSystemJsonSerializer(JsonSerializerContext jsonSerializerContext)
+    {
+        JsonSerializerContext = jsonSerializerContext;
+    }
+
+    public JsonSerializerContext JsonSerializerContext { get; }
+
+    public byte[] Serialize(object? value)
+    {
+        if (value is null)
+        {
+            return "{}"u8.ToArray();
+        }
+
+        var json = JsonSerializer.Serialize(value,value.GetType(), JsonSerializerContext);
+        return Encoding.UTF8.GetBytes(json);
+    }
+
+    public void Serialize(Stream stream, object? value)
+    {
+        if (value is null)
+        {
+            stream.Write("{}"u8);
+            return;
+        }
+
+        JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
+    }
+
+    public T? Deserialize<T>(byte[] data)
+    {
+        return JsonSerializer.Deserialize<T>(data, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+    }
+
+    public T? Deserialize<T>(Stream stream)
+    {
+        return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+    }
+}
+
+#endif
