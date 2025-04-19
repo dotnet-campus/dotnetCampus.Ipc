@@ -25,7 +25,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
     private readonly PeerProxy _peerProxy;
     private IpcContext IpcContext => _peerProxy.IpcContext;
-    private IIpcObjectSerializer JsonSerializer => IpcContext.IpcConfiguration.IpcObjectSerializer;
+    private IIpcObjectSerializer IpcObjectSerializer => IpcContext.IpcConfiguration.IpcObjectSerializer;
 
     /// <summary>
     /// 不带参数的通知服务端
@@ -75,7 +75,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = responseMessage.Body.ToMemoryStream();
         IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
 
-        return JsonSerializer.Deserialize<TResponse>(memoryStream);
+        return IpcObjectSerializer.Deserialize<TResponse>(memoryStream);
     }
 
     private IpcMessage BuildMessage(string routedPath, object obj)
@@ -83,7 +83,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = new MemoryStream();
         WriteHeader(memoryStream, routedPath);
 
-        JsonSerializer.Serialize(memoryStream, obj);
+        IpcObjectSerializer.Serialize(memoryStream, obj);
 
         return ToIpcMessage(memoryStream, $"Message {routedPath}");
     }
