@@ -4,9 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
-using Newtonsoft.Json;
+using dotnetCampus.Ipc.Serialization;
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
@@ -25,8 +26,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
     private readonly PeerProxy _peerProxy;
     private IpcContext IpcContext => _peerProxy.IpcContext;
-    private JsonSerializer? _jsonSerializer;
-    private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
+    private IIpcObjectSerializer IpcObjectSerializer => IpcContext.IpcConfiguration.IpcObjectSerializer;
 
     /// <summary>
     /// 不带参数的通知服务端
@@ -71,23 +71,20 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         IpcMessage ipcMessage = BuildMessage(routedPath, obj);
         IpcContext.LogSendJsonIpcDirectRoutedRequest(routedPath, _peerProxy.PeerName, ipcMessage.Body);
 
-        var responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
+        IpcMessage responseMessage = await _peerProxy.GetResponseAsync(ipcMessage);
 
         using var memoryStream = responseMessage.Body.ToMemoryStream();
         IpcContext.LogReceiveJsonIpcDirectRoutedResponse(routedPath, _peerProxy.PeerName, memoryStream);
 
-        using StreamReader reader = new StreamReader
-        (
-            memoryStream,
-#if !NETCOREAPP
-            Encoding.UTF8,
-            detectEncodingFromByteOrderMarks: false,
-            bufferSize: 2048,
-#endif
-            leaveOpen: true
-        );
-        JsonReader jsonReader = new JsonTextReader(reader);
-        return JsonSerializer.Deserialize<TResponse>(jsonReader);
+        try
+        {
+            return IpcObjectSerializer.Deserialize<TResponse>(memoryStream);
+        }
+        catch (Exception e)
+        {
+            // 序列化错误
+            throw new JsonIpcDirectRouteSerializeLocalException(responseMessage, typeof(TResponse), e);
+        }
     }
 
     private IpcMessage BuildMessage(string routedPath, object obj)
@@ -95,10 +92,7 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
         using var memoryStream = new MemoryStream();
         WriteHeader(memoryStream, routedPath);
 
-        using (var textWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true, bufferSize: 2048))
-        {
-            JsonSerializer.Serialize(textWriter, obj);
-        }
+        IpcObjectSerializer.Serialize(memoryStream, obj);
 
         return ToIpcMessage(memoryStream, $"Message {routedPath}");
     }

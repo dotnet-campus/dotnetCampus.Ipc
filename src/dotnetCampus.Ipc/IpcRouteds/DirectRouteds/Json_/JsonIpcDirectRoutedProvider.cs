@@ -10,6 +10,7 @@ using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Serialization;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 
@@ -303,20 +304,8 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             var argument = ToObject<TRequest>(stream);
             var response = await handler(argument!, context);
             var responseMemoryStream = new MemoryStream();
-            using
-            (
-                TextWriter textWriter = new StreamWriter
-                (
-                    responseMemoryStream, Encoding.UTF8
-#if !NETCOREAPP
-                    , bufferSize: 2048
-#endif
-                    , leaveOpen: true
-                )
-            )
-            {
-                JsonSerializer.Serialize(textWriter, response);
-            }
+
+            JsonSerializer.Serialize(responseMemoryStream, response);
 
             var buffer = responseMemoryStream.GetBuffer();
             var length = (int) responseMemoryStream.Position;
@@ -381,22 +370,10 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
     #endregion
 
-    private JsonSerializer JsonSerializer => _jsonSerializer ??= JsonSerializer.CreateDefault();
-    private JsonSerializer? _jsonSerializer;
+    private IIpcObjectSerializer JsonSerializer => IpcProvider.IpcContext.IpcConfiguration.IpcObjectSerializer;
 
     private T? ToObject<T>(MemoryStream stream)
     {
-        using StreamReader reader = new StreamReader
-        (
-            stream,
-#if !NETCOREAPP
-            Encoding.UTF8,
-            bufferSize: 2048,
-            detectEncodingFromByteOrderMarks: false,
-#endif
-            leaveOpen: true
-        );
-        JsonReader jsonReader = new JsonTextReader(reader);
-        return JsonSerializer.Deserialize<T>(jsonReader);
+        return JsonSerializer.Deserialize<T>(stream);
     }
 }

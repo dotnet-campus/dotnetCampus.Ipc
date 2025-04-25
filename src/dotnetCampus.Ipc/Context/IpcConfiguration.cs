@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Pipes.PipeConnectors;
+using dotnetCampus.Ipc.Serialization;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Buffers;
 using dotnetCampus.Ipc.Utils.Logging;
@@ -100,5 +101,24 @@ namespace dotnetCampus.Ipc.Context
                 yield return @default;
             }
         }
+
+        /// <summary>
+        /// 用在 IPC 里面的对象序列化器
+        /// </summary>
+        public IIpcObjectSerializer IpcObjectSerializer
+        {
+            get => _ipcObjectSerializer ??= DefaultNewtonsoftJsonSerializer;
+            set => _ipcObjectSerializer = value;
+        }
+
+        private IIpcObjectSerializer? _ipcObjectSerializer;
+
+        /// <summary>
+        /// 默认的 Newtonsoft Json 序列化器
+        /// </summary>
+        public static IpcObjectJsonSerializer DefaultNewtonsoftJsonSerializer
+        // 不加上锁了，这里不管线程安全，最多就是多创建几个对象而已，不会影响业务逻辑
+            => _defaultNewtonsoftJsonSerializer ??= new IpcObjectJsonSerializer();
+        private static IpcObjectJsonSerializer? _defaultNewtonsoftJsonSerializer;
     }
 }
