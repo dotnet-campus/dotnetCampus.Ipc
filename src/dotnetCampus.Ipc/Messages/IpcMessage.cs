@@ -95,7 +95,7 @@ namespace dotnetCampus.Ipc.Messages
                 // 忽略
             }
 
-            return $"[IpcMessage] Header={Header};Tag={Tag};Body=[{string.Join(" ", Body.Buffer.Skip(Body.Start).Take(Body.Length).Select(t=>t.ToString("X2")))}](GuessText={guessBodyText})";
+            return $"[IpcMessage] Header={Header};Tag={Tag};Body=[{string.Join(" ", Body.Buffer.Skip(Body.Start).Take(Body.Length).Select(t => t.ToString("X2")))}](GuessText={guessBodyText})";
         }
     }
 }

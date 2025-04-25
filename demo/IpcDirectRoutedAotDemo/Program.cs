@@ -18,7 +18,7 @@ if (args.Length == 0)
     string pipeName = Guid.NewGuid().ToString();
     var ipcProvider = new IpcProvider(pipeName, new IpcConfiguration()
     {
-        
+
     }.UseSystemJsonIpcObjectSerializer(SourceGenerationContext.Default));
     var ipcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(ipcProvider);
     ipcDirectRoutedProvider.AddNotifyHandler(notifyPath, () =>
@@ -49,7 +49,7 @@ else
 {
     var peerName = args[0];
     Console.WriteLine($"[{Environment.ProcessId}] 客户端进程启动");
-    var jsonIpcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration:new IpcConfiguration()
+    var jsonIpcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration: new IpcConfiguration()
         .UseSystemJsonIpcObjectSerializer(SourceGenerationContext.Default));
     JsonIpcDirectRoutedClientProxy jsonIpcDirectRoutedClientProxy = await jsonIpcDirectRoutedProvider.GetAndConnectClientAsync(peerName);
 
