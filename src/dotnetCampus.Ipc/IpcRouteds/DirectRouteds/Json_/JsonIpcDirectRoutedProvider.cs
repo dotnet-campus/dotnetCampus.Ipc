@@ -14,8 +14,6 @@ using dotnetCampus.Ipc.Serialization;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
 
-using Newtonsoft.Json;
-
 #if !NETCOREAPP
 using ValueTask = System.Threading.Tasks.Task;
 #endif
