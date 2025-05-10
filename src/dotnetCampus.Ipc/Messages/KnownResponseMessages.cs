@@ -25,6 +25,17 @@ namespace dotnetCampus.Ipc.Messages
         }
 
         /// <summary>
+        /// 是否自定义的“不会/能处理”响应消息。
+        /// </summary>
+        /// <param name="responseMessage"></param>
+        /// <returns></returns>
+        internal static bool IsCustomCanNotHandleResponseMessage(IIpcResponseMessage responseMessage)
+        {
+            return responseMessage is NamedCanNotHandleIpcResponseMessage namedCanNotHandleIpcResponseMessage &&
+                   namedCanNotHandleIpcResponseMessage.ResponseMessage.Body.Length > 0;
+        }
+
+        /// <summary>
         /// 创建带特殊信息的“不会/能处理”响应消息。
         /// </summary>
         /// <param name="responseMessage"></param>

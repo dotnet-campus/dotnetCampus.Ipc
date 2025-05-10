@@ -89,6 +89,7 @@ namespace dotnetCampus.Ipc.Pipes
         private async Task<IIpcResponseMessage> HandleRequestAsync(IpcMessageTracker<IpcRequestMessageContext> context, string remotePeerName)
         {
             IIpcResponseMessage? result = null;
+            IIpcResponseMessage? customCanNotHandleRequestResult = null;
 
             context.CriticalStep("ReceiveCore", null, context.Message.IpcBufferMessage.Body);
             var handlers = IpcContext.IpcConfiguration.GetIpcRequestHandlers();
@@ -109,6 +110,15 @@ namespace dotnetCampus.Ipc.Pipes
                 {
                     break;
                 }
+                else
+                {
+                    // 如果当前的 Handler 不能处理消息，则继续到下一个 Handler 来尝试处理
+                    // 如果当前的 Handler 返回了自定义的不能处理消息，则保存下来
+                    if (KnownIpcResponseMessages.IsCustomCanNotHandleResponseMessage(result))
+                    {
+                        customCanNotHandleRequestResult = result;
+                    }
+                }
             }
 
             if (result == null || KnownIpcResponseMessages.IsCanNotHandleResponseMessage(result) || result.ResponseMessage.Body.Length <= 0)
@@ -125,9 +135,17 @@ namespace dotnetCampus.Ipc.Pipes
                 //                // 这里一定说明业务代码写错了，缺少对应的 Handler。
                 //                throw new InvalidOperationException(logMessage);
                 //#endif
+
+                if (customCanNotHandleRequestResult != null)
+                {
+                    result = customCanNotHandleRequestResult;
+                }
+
+                // 如果没有自定义的不能处理消息，则返回一个默认的不能处理消息
+                result ??= KnownIpcResponseMessages.CannotHandle;
             }
 
-            return result ?? KnownIpcResponseMessages.CannotHandle;
+            return result;
         }
 
         private string FormatHandlerAsErrorMessage(IIpcRequestHandler handler) => handler switch
