@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
+
 namespace dotnetCampus.Ipc.Serialization;
 
 public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
@@ -73,7 +74,12 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
     protected override JsonSerializerOptions GeneratedSerializerOptions => _businessContext.Options;
 }
 
+
 [JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
+// 异常信息
+[JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse))]
+[JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo))]
+
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(long))]

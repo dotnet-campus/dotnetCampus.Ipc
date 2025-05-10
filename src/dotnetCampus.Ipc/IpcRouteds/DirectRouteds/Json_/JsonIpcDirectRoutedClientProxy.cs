@@ -78,7 +78,42 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
 
         try
         {
+            // 反序列化响应。正常情况下，会需要反序列化两次
+            // 第一次，获取是否存在异常信息
+            // 第二次，读取真正的响应数据
+            var exceptionResponse =
+                IpcObjectSerializer.Deserialize<JsonIpcDirectRoutedHandleRequestExceptionResponse>(memoryStream);
+
+            // 是否为没有找到处理器的情况
+            if (JsonIpcDirectRoutedCanNotFindRequestHandlerExceptionInfo
+                .IsCanNotFindRequestHandlerException(exceptionResponse))
+            {
+                throw new JsonIpcDirectRoutedCanNotFindRequestHandlerException(_peerProxy, routedPath,
+                    exceptionResponse);
+            }
+
+            // 是否为存在异常的情况，判断方式就是判断是否存在异常类型。因为异常类型在框架内是必然有异常就会赋值的
+            bool existsException = !string.IsNullOrEmpty(exceptionResponse?.ExceptionInfo?.ExceptionType);
+            if (existsException)
+            {
+                Debug.Assert(exceptionResponse != null);
+                Debug.Assert(exceptionResponse!.ExceptionInfo != null);
+                // 远端异常，准备构建异常信息抛出
+                throw new JsonIpcDirectRoutedHandleRequestRemoteException(_peerProxy, routedPath, exceptionResponse);
+            }
+            else
+            {
+                // 没异常，正常处理
+                // 重新设置内存流的位置，前面反序列化异常信息时已经读取了内存流
+                memoryStream.Position = 0;
+            }
+
             return IpcObjectSerializer.Deserialize<TResponse>(memoryStream);
+        }
+        catch (IpcException)
+        {
+            // 自己框架内抛出的异常，那就原封不动继续抛出
+            throw;
         }
         catch (Exception e)
         {

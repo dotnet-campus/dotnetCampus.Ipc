@@ -58,7 +58,7 @@ public abstract class IpcDirectRoutedProviderBase
 
         // 处理请求消息
         var requestHandler = new RequestHandler(this);
-        IpcProvider.IpcContext.IpcConfiguration.AddFrameworkRequestHandlers(requestHandler);
+        IpcProvider.IpcContext.IpcConfiguration.AddFrameworkRequestHandler(requestHandler);
 
         IpcProvider.StartServer();
         // 处理 Notify 消息
@@ -94,8 +94,6 @@ public abstract class IpcDirectRoutedProviderBase
         // 这里是全部的消息都会进入的，但是这里通过判断业务头，只处理感兴趣的
         if (TryHandleMessage(e.Message, out var message))
         {
-            // 这是一个 MemoryStream 释放或不释放都没啥差别
-            //using (stream) ;
             try
             {
                 OnHandleNotify(message.Value, e);

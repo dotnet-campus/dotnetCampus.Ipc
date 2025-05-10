@@ -86,6 +86,12 @@ namespace dotnetCampus.Ipc.Context
             _ipcRequestHandlers.AddRange(handlers);
         }
 
+        /// <inheritdoc cref="AddFrameworkRequestHandlers"/>
+        internal void AddFrameworkRequestHandler(IIpcRequestHandler handler)
+        {
+            _ipcRequestHandlers.Add(handler);
+        }
+
         /// <summary>
         /// 获取框架和业务的请求处理器。
         /// </summary>

@@ -12,15 +12,52 @@ namespace dotnetCampus.Ipc.Messages
         /// <summary>
         /// 不会处理此种类型的 IPC 消息，因此返回了一个“不会处理”响应。
         /// </summary>
-        public static IIpcResponseMessage CannotHandle { get; } = new NamedIpcResponseMessage(nameof(CannotHandle));
+        public static IIpcResponseMessage CannotHandle { get; } = new NamedCanNotHandleIpcResponseMessage(nameof(CannotHandle));
+
+        /// <summary>
+        /// 是否传入的响应消息是一个“不会/能处理”响应消息。
+        /// </summary>
+        /// <param name="responseMessage"></param>
+        /// <returns></returns>
+        internal static bool IsCanNotHandleResponseMessage(IIpcResponseMessage responseMessage)
+        {
+            return responseMessage is NamedCanNotHandleIpcResponseMessage;
+        }
+
+        /// <summary>
+        /// 是否自定义的“不会/能处理”响应消息。
+        /// </summary>
+        /// <param name="responseMessage"></param>
+        /// <returns></returns>
+        internal static bool IsCustomCanNotHandleResponseMessage(IIpcResponseMessage responseMessage)
+        {
+            return responseMessage is NamedCanNotHandleIpcResponseMessage namedCanNotHandleIpcResponseMessage &&
+                   namedCanNotHandleIpcResponseMessage.ResponseMessage.Body.Length > 0;
+        }
+
+        /// <summary>
+        /// 创建带特殊信息的“不会/能处理”响应消息。
+        /// </summary>
+        /// <param name="responseMessage"></param>
+        /// <returns></returns>
+        internal static IIpcResponseMessage CreateCanNotHandleResponseMessage(IpcMessage responseMessage)
+        {
+            return new NamedCanNotHandleIpcResponseMessage(responseMessage);
+        }
 
         [DebuggerDisplay("IpcResponseMessage.{" + nameof(Name) + ",nq}")]
-        private sealed class NamedIpcResponseMessage : IIpcResponseMessage, IEquatable<NamedIpcResponseMessage>
+        private sealed class NamedCanNotHandleIpcResponseMessage : IIpcResponseMessage, IEquatable<NamedCanNotHandleIpcResponseMessage>
         {
-            public NamedIpcResponseMessage(string name)
+            public NamedCanNotHandleIpcResponseMessage(string name)
             {
                 Name = name;
                 ResponseMessage = new(name, new byte[0]);
+            }
+
+            public NamedCanNotHandleIpcResponseMessage( IpcMessage responseMessage)
+            {
+                Name = responseMessage.Tag;
+                ResponseMessage = responseMessage;
             }
 
             internal string Name { get; }
@@ -29,10 +66,10 @@ namespace dotnetCampus.Ipc.Messages
 
             public override bool Equals(object? obj)
             {
-                return obj is NamedIpcResponseMessage message && Equals(message);
+                return obj is NamedCanNotHandleIpcResponseMessage message && Equals(message);
             }
 
-            public bool Equals(NamedIpcResponseMessage? other)
+            public bool Equals(NamedCanNotHandleIpcResponseMessage? other)
             {
                 return other is not null && Name == other.Name;
             }
@@ -42,12 +79,12 @@ namespace dotnetCampus.Ipc.Messages
                 return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
             }
 
-            public static bool operator ==(NamedIpcResponseMessage left, NamedIpcResponseMessage right)
+            public static bool operator ==(NamedCanNotHandleIpcResponseMessage left, NamedCanNotHandleIpcResponseMessage right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator !=(NamedIpcResponseMessage left, NamedIpcResponseMessage right)
+            public static bool operator !=(NamedCanNotHandleIpcResponseMessage left, NamedCanNotHandleIpcResponseMessage right)
             {
                 return !(left == right);
             }
