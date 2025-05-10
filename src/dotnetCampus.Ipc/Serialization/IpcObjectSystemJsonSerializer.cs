@@ -80,9 +80,6 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo))]
 
-[JsonSerializable(typeof(JsonIpcDirectRoutedCanNotFindRequestHandlerResponse))]
-[JsonSerializable(typeof(JsonIpcDirectRoutedCanNotFindRequestHandlerResponse.RequestHandlerCanNotFindExceptionInfo))]
-
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(long))]

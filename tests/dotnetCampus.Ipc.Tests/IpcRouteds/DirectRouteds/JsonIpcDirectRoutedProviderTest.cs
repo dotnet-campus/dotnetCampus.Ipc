@@ -202,7 +202,7 @@ public class JsonIpcDirectRoutedProviderTest
         Assert.AreEqual(1, enterCount);
     }
 
-    [TestMethod("请求不存在的路径，也能收到响应")]
+    [TestMethod("请求不存在的路径，能收到异常")]
     public async Task TestRequest4()
     {
         // 初始化服务端
@@ -221,10 +221,12 @@ public class JsonIpcDirectRoutedProviderTest
         JsonIpcDirectRoutedProvider clientProvider = new();
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
         var argument = new FakeArgument("TestName", 1);
-        var result = await clientProxy.GetResponseAsync<FakeResult>("不存在", argument);
 
-        Assert.IsNotNull(result);
-
+        await Assert.ThrowsExceptionAsync<JsonIpcDirectRoutedCanNotFindRequestHandlerException>(async () =>
+        {
+            var result = await clientProxy.GetResponseAsync<FakeResult>("不存在", argument);
+            _ = result;
+        });
     }
 
     [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束和具体的远端异常信息，而不会进入无限等待")] // 这一条调试下行为可能不同，于是先注释掉

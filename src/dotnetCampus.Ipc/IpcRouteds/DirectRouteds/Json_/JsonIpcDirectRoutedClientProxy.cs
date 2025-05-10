@@ -83,6 +83,15 @@ public class JsonIpcDirectRoutedClientProxy : IpcDirectRoutedClientProxyBase
             // 第二次，读取真正的响应数据
             var exceptionResponse =
                 IpcObjectSerializer.Deserialize<JsonIpcDirectRoutedHandleRequestExceptionResponse>(memoryStream);
+
+            // 是否为没有找到处理器的情况
+            if (JsonIpcDirectRoutedCanNotFindRequestHandlerExceptionInfo
+                .IsCanNotFindRequestHandlerException(exceptionResponse))
+            {
+                throw new JsonIpcDirectRoutedCanNotFindRequestHandlerException(_peerProxy, routedPath,
+                    exceptionResponse);
+            }
+
             // 是否为存在异常的情况，判断方式就是判断是否存在异常类型。因为异常类型在框架内是必然有异常就会赋值的
             bool existsException = !string.IsNullOrEmpty(exceptionResponse?.ExceptionInfo?.ExceptionType);
             if (existsException)

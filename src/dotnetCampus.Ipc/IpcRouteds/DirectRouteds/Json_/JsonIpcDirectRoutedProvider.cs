@@ -377,15 +377,9 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
         }
         else
         {
-            var response = new JsonIpcDirectRoutedCanNotFindRequestHandlerResponse()
-            {
-                ExceptionInfo = new JsonIpcDirectRoutedCanNotFindRequestHandlerResponse.RequestHandlerCanNotFindExceptionInfo()
-                {
-                    // 尽管说客户端能够推测出 RoutedPath 是什么，但这个类型仅仅是为了以后方便扩展
-                    // 和让输出有东西，方便抓取信息了解内容
-                    RoutedPath = routedPath,
-                }
-            };
+            // 尽管说客户端能够推测出 RoutedPath 是什么，但这个类型仅仅是为了以后方便扩展
+            // 和让输出有东西，方便抓取信息了解内容
+            var response = JsonIpcDirectRoutedCanNotFindRequestHandlerExceptionInfo.CreateExceptionResponse(routedPath);
 
             IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
             var ipcMessage = new IpcMessage($"Can not find '{routedPath}' request Handler", ipcMessageBody);
