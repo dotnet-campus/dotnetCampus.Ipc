@@ -358,7 +358,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
                 //// 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
                 //return KnownIpcResponseMessages.CannotHandle;
                 
-                var exceptionInfo = new JsonIpcDirectRoutedHandleRequestExceptionResponse()
+                var response = new JsonIpcDirectRoutedHandleRequestExceptionResponse()
                 {
                     ExceptionInfo = new JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo()
                     {
@@ -370,16 +370,30 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
                     }
                 };
 
-                IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(exceptionInfo);
+                IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
                 var ipcMessage = new IpcMessage($"Handle '{routedPath}' response exception", ipcMessageBody);
                 return new IpcHandleRequestMessageResult(ipcMessage);
             }
         }
         else
         {
+            var response = new JsonIpcDirectRoutedCanNotFindRequestHandlerResponse()
+            {
+                ExceptionInfo = new JsonIpcDirectRoutedCanNotFindRequestHandlerResponse.RequestHandlerCanNotFindExceptionInfo()
+                {
+                    // 尽管说客户端能够推测出 RoutedPath 是什么，但这个类型仅仅是为了以后方便扩展
+                    // 和让输出有东西，方便抓取信息了解内容
+                    RoutedPath = routedPath,
+                }
+            };
+
+            IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
+            var ipcMessage = new IpcMessage($"Can not find '{routedPath}' request Handler", ipcMessageBody);
+
             // 考虑可能有多个实例，每个实例处理不同的业务情况
             //JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
-            return KnownIpcResponseMessages.CannotHandle;
+            // 返回不能处理即可。最后一次返回不能处理则会将此信息传递给到客户端。如果后续还有其他的实例处理了请求信息，则能够覆盖本条信息。正常来说不会有非常多个实例，即使有所浪费，预计也不多
+            return KnownIpcResponseMessages.CreateCanNotHandleResponseMessage(ipcMessage);
         }
     }
 

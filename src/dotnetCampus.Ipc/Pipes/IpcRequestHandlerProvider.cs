@@ -103,26 +103,31 @@ namespace dotnetCampus.Ipc.Pipes
                     throw new InvalidOperationException(errorMessage);
 #endif
                 }
-                if (result != KnownIpcResponseMessages.CannotHandle)
+
+                // 如果非不能响应，则代表已经处理完了
+                if (!KnownIpcResponseMessages.IsCanNotHandleResponseMessage(result))
                 {
                     break;
                 }
             }
 
-            if (result == null || result == KnownIpcResponseMessages.CannotHandle || result.ResponseMessage.Body.Length <= 0)
+            if (result == null || KnownIpcResponseMessages.IsCanNotHandleResponseMessage(result) || result.ResponseMessage.Body.Length <= 0)
             {
-                var possibeMessageContent = Encoding.UTF8.GetString(context.Message.IpcBufferMessage.Body.Buffer, context.Message.IpcBufferMessage.Body.Start, context.Message.IpcBufferMessage.Body.Length);
+                var possibleMessageContent = Encoding.UTF8.GetString(context.Message.IpcBufferMessage.Body.Buffer, context.Message.IpcBufferMessage.Body.Start, context.Message.IpcBufferMessage.Body.Length);
                 var errorMessage = $"IPC 端 {remotePeerName} 正在等待返回，因此必须至少有一个 IPC 处理器正常处理此消息返回。出现此异常代表代码编写出现了错误，必须修复。";
+                // 重新再拿一次，防止枚举遍历不正确
+                handlers = IpcContext.IpcConfiguration.GetIpcRequestHandlers();
                 var errorHandlers = string.Join("\r\n", handlers.Select(FormatHandlerAsErrorMessage));
-                var logMessage = $"{errorMessage}\r\n消息内容猜测为：\r\n{possibeMessageContent}\r\n消息处理器有：\r\n{errorHandlers}\r\n说明所有这些消息处理器都没有处理此条消息，请添加更多的消息处理器。";
+                var logMessage = $"{errorMessage}\r\n消息内容猜测为：\r\n{possibleMessageContent}\r\n消息处理器有：\r\n{errorHandlers}\r\n说明所有这些消息处理器都没有处理此条消息，请添加更多的消息处理器。";
                 IpcContext.Logger.Error(logMessage);
-#if DEBUG
-                // 这里一定说明业务代码写错了，缺少对应的 Handler。
-                throw new InvalidOperationException(logMessage);
-#endif
+                // 由于业务代码肯定引用的是 IPC 库，以下的 DEBUG 异常一定不会在业务代码中抛出，因此除了开发过程中提示 IPC 库的开发者外，生产环境中不会有什么作用。现在 IPC 库已经稳定，以下代码先注释，方便编写单元测试
+                //#if DEBUG
+                //                // 这里一定说明业务代码写错了，缺少对应的 Handler。
+                //                throw new InvalidOperationException(logMessage);
+                //#endif
             }
 
-            return result;
+            return result ?? KnownIpcResponseMessages.CannotHandle;
         }
 
         private string FormatHandlerAsErrorMessage(IIpcRequestHandler handler) => handler switch

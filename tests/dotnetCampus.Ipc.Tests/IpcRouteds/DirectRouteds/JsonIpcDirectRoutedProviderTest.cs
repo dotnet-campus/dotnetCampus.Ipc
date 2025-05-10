@@ -195,10 +195,36 @@ public class JsonIpcDirectRoutedProviderTest
         var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
 
         // 可以获取到响应内容
+        Assert.IsNotNull(result);
         Assert.AreEqual(responseText, result.Name);
 
         // 要求只进入一次
         Assert.AreEqual(1, enterCount);
+    }
+
+    [TestMethod("请求不存在的路径，也能收到响应")]
+    public async Task TestRequest4()
+    {
+        // 初始化服务端
+        var serverName = "JsonIpcDirectRoutedProviderTest_Request_4";
+
+        IpcProvider ipcProvider = new(serverName);
+        var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
+
+        serverProvider1.AddRequestHandler("F1", (FakeArgument arg) =>
+        {
+            return new FakeResult("F123");
+        });
+        serverProvider1.StartServer();
+
+        // 创建客户端
+        JsonIpcDirectRoutedProvider clientProvider = new();
+        var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+        var argument = new FakeArgument("TestName", 1);
+        var result = await clientProxy.GetResponseAsync<FakeResult>("不存在", argument);
+
+        Assert.IsNotNull(result);
+
     }
 
     [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束和具体的远端异常信息，而不会进入无限等待")] // 这一条调试下行为可能不同，于是先注释掉
