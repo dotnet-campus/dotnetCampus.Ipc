@@ -229,7 +229,7 @@ public class JsonIpcDirectRoutedProviderTest
         });
     }
 
-    [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束和具体的远端异常信息，而不会进入无限等待")] // 这一条调试下行为可能不同，于是先注释掉
+    [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束和具体的远端异常信息，而不会进入无限等待")]
     public async Task TestException1()
     {
         // 初始化服务端
