@@ -54,7 +54,7 @@ namespace dotnetCampus.Ipc.Messages
                 ResponseMessage = new(name, new byte[0]);
             }
 
-            public NamedCanNotHandleIpcResponseMessage( IpcMessage responseMessage)
+            public NamedCanNotHandleIpcResponseMessage(IpcMessage responseMessage)
             {
                 Name = responseMessage.Tag;
                 ResponseMessage = responseMessage;

@@ -357,7 +357,7 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 
                 //// 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
                 //return KnownIpcResponseMessages.CannotHandle;
-                
+
                 var response = new JsonIpcDirectRoutedHandleRequestExceptionResponse()
                 {
                     ExceptionInfo = new JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo()
