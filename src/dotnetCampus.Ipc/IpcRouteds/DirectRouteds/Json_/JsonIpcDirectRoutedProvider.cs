@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -13,8 +14,6 @@ using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Serialization;
 using dotnetCampus.Ipc.Utils.Extensions;
 using dotnetCampus.Ipc.Utils.Logging;
-
-using Newtonsoft.Json;
 
 #if !NETCOREAPP
 using ValueTask = System.Threading.Tasks.Task;
@@ -302,14 +301,11 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
 #endif
         {
             var argument = ToObject<TRequest>(stream);
+            // 业务端处理参数，返回响应内容
             var response = await handler(argument!, context);
-            var responseMemoryStream = new MemoryStream();
 
-            JsonSerializer.Serialize(responseMemoryStream, response);
-
-            var buffer = responseMemoryStream.GetBuffer();
-            var length = (int) responseMemoryStream.Position;
-            return new IpcMessage($"Handle {routedPath} response", new IpcMessageBody(buffer, 0, length));
+            IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
+            return new IpcMessage($"Handle '{routedPath}' response", ipcMessageBody);
         }
     }
 
@@ -356,16 +352,54 @@ public class JsonIpcDirectRoutedProvider : IpcDirectRoutedProviderBase
             {
                 // 由于 handler 是业务端传过来的，在框架层需要接住异常，否则 IPC 框架将会因为某个业务抛出异常然后丢失消息
                 Logger.Error(exception, $"[{nameof(JsonIpcDirectRoutedProvider)}] HandleRequest Method={handler.Method} RoutedPath={routedPath}");
-                // 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
-                return KnownIpcResponseMessages.CannotHandle;
+                // 经过实际业务大量测试，不会有因为错误调度而导致进入非预期分支的异常，能够进入到此异常的，都是业务端报错。更加正确的处理是将其返回给到另一端 Peer 端，返回时，给出异常信息，这样才能更好的方便上层业务调试
+                // 经过实际业务大量测试发现，很多时候服务端的业务执行逻辑抛出了异常，但客户端业务层没有收到，开发者经常都会第一时间尝试调查客户端业务层，结果毫无所获。为了更好的调试体验，决定在此出现异常时，包装为 IPC 远端异常数据返回。当前只有 JsonIpc 方式能够进行包装，暂不知道 RawByte 等方式可以进行如何封装
+
+                //// 也有可能是错误处理了不应该调度到这里的业务处理的消息从而抛出异常，继续调度到下一项
+                //return KnownIpcResponseMessages.CannotHandle;
+                
+                var response = new JsonIpcDirectRoutedHandleRequestExceptionResponse()
+                {
+                    ExceptionInfo = new JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo()
+                    {
+                        ExceptionType = exception.GetType().FullName,
+                        ExceptionMessage = exception.Message,
+                        ExceptionStackTrace = exception.StackTrace,
+                        // 在 ToString 过程里面会包含 Inner 异常等的信息，一般靠这个就足够了
+                        ExceptionToString = exception.ToString(),
+                    }
+                };
+
+                IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
+                var ipcMessage = new IpcMessage($"Handle '{routedPath}' response exception", ipcMessageBody);
+                return new IpcHandleRequestMessageResult(ipcMessage);
             }
         }
         else
         {
+            // 尽管说客户端能够推测出 RoutedPath 是什么，但这个类型仅仅是为了以后方便扩展
+            // 和让输出有东西，方便抓取信息了解内容
+            var response = JsonIpcDirectRoutedCanNotFindRequestHandlerExceptionInfo.CreateExceptionResponse(routedPath);
+
+            IpcMessageBody ipcMessageBody = ResponseToIpcMessageBody(response);
+            var ipcMessage = new IpcMessage($"Can not find '{routedPath}' request Handler", ipcMessageBody);
+
             // 考虑可能有多个实例，每个实例处理不同的业务情况
             //JsonIpcDirectRoutedProvider.IpcProvider.IpcContext.Logger.Warning($"找不到对 {routedPath} 的 {nameof(JsonIpcDirectRoutedProvider)} 处理，是否忘记调用 {nameof(AddRequestHandler)} 添加处理");
-            return KnownIpcResponseMessages.CannotHandle;
+            // 返回不能处理即可。最后一次返回不能处理则会将此信息传递给到客户端。如果后续还有其他的实例处理了请求信息，则能够覆盖本条信息。正常来说不会有非常多个实例，即使有所浪费，预计也不多
+            return KnownIpcResponseMessages.CreateCanNotHandleResponseMessage(ipcMessage);
         }
+    }
+
+    private IpcMessageBody ResponseToIpcMessageBody<TResponse>(TResponse response)
+    {
+        var responseMemoryStream = new MemoryStream();
+
+        JsonSerializer.Serialize(responseMemoryStream, response);
+
+        var buffer = responseMemoryStream.GetBuffer();
+        var length = (int) responseMemoryStream.Position;
+        return new IpcMessageBody(buffer, 0, length);
     }
 
     #endregion

@@ -1,10 +1,12 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Tests.CompilerServices;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Logging;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace dotnetCampus.Ipc.Tests.IpcRouteds.DirectRouteds;
@@ -193,14 +195,42 @@ public class JsonIpcDirectRoutedProviderTest
         var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
 
         // 可以获取到响应内容
+        Assert.IsNotNull(result);
         Assert.AreEqual(responseText, result.Name);
 
         // 要求只进入一次
         Assert.AreEqual(1, enterCount);
     }
 
-    // [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束，而不会进入无限等待")] // 这一条调试下行为可能不同，于是先注释掉
-    public async Task TestException()
+    [TestMethod("请求不存在的路径，能收到异常")]
+    public async Task TestRequest4()
+    {
+        // 初始化服务端
+        var serverName = "JsonIpcDirectRoutedProviderTest_Request_4";
+
+        IpcProvider ipcProvider = new(serverName);
+        var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
+
+        serverProvider1.AddRequestHandler("F1", (FakeArgument arg) =>
+        {
+            return new FakeResult("F123");
+        });
+        serverProvider1.StartServer();
+
+        // 创建客户端
+        JsonIpcDirectRoutedProvider clientProvider = new();
+        var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
+        var argument = new FakeArgument("TestName", 1);
+
+        await Assert.ThrowsExceptionAsync<JsonIpcDirectRoutedCanNotFindRequestHandlerException>(async () =>
+        {
+            var result = await clientProxy.GetResponseAsync<FakeResult>("不存在", argument);
+            _ = result;
+        });
+    }
+
+    [TestMethod("如果请求的对象出现了异常，可以正确收到请求响应结束和具体的远端异常信息，而不会进入无限等待")]
+    public async Task TestException1()
     {
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_TestException_1";
@@ -210,7 +240,7 @@ public class JsonIpcDirectRoutedProviderTest
         {
             if (!string.IsNullOrEmpty(fakeArgument.Name))
             {
-                throw new Exception("Foo");
+                throw new FooException1("FooExceptionInfo");
             }
 
             return new FakeResult("xx");
@@ -219,9 +249,22 @@ public class JsonIpcDirectRoutedProviderTest
 
         var t = new JsonIpcDirectRoutedProvider();
         var client = await t.GetAndConnectClientAsync(serverName);
-        var response = await client.GetResponseAsync<FakeResult>(path, new FakeArgument("xx", 1));
-        // 能够等到响应结束就是成功
-        GC.KeepAlive(response); // 这句话只是方便打断点
+        try
+        {
+            var response = await client.GetResponseAsync<FakeResult>(path, new FakeArgument("xx", 1));
+            _ = response;
+        }
+        catch (JsonIpcDirectRoutedHandleRequestRemoteException e)
+        {
+            // 不要使用 Assert.ThrowsException 方法，这个方法不适合同时将单元测试作为调试程序，不方便看到具体异常信息内容
+            // e.RemoteExceptionType 是 dotnetCampus.Ipc.Tests.IpcRouteds.DirectRouteds.JsonIpcDirectRoutedProviderTest+FooException1
+            Assert.IsTrue(e.RemoteExceptionType.Contains(nameof(FooException1)));
+            Assert.IsTrue(e.RemoteExceptionMessage == "FooExceptionInfo");
+
+            return;
+        }
+        // 预期能进入到 catch 分支进行返回
+        Assert.Fail("必定能进入到 catch 分支");
     }
 
     [TestMethod("重复调用 JsonIpcDirectRoutedProvider 添加通知处理相同的消息，将会抛出异常")]
@@ -571,4 +614,11 @@ public class JsonIpcDirectRoutedProviderTest
     }
 
     record class FakeResult(string Name);
+
+    class FooException1 : Exception
+    {
+        public FooException1(string? message) : base(message)
+        {
+        }
+    }
 }
