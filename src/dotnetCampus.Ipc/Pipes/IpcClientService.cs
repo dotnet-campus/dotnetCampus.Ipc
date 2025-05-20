@@ -205,7 +205,22 @@ namespace dotnetCampus.Ipc.Pipes
                     timeout = 10;
                 }
 
-                await DefaultConnectNamedPipeAsync(namedPipeClientStream, timeout);
+                try
+                {
+                    await DefaultConnectNamedPipeAsync(namedPipeClientStream, timeout);
+                }
+                catch (Exception e)
+                {
+                    if (onlyConnectExistsPeer && e is IpcPipeConnectionException ipcPipeConnectionException)
+                    {
+                        if (ipcPipeConnectionException.InnerException is TimeoutException)
+                        {
+                            return false;
+                        }
+                    }
+
+                    throw;
+                }
                 return true;
             }
             else
