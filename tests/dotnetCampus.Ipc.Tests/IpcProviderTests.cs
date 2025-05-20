@@ -13,4 +13,18 @@ public class IpcProviderTests
         var result = await ipcProvider.TryGetOrConnectExistsPeerAsync("The_Not_Exists_Peer_Name_E6EE8975-EF9A-480B-912D-B3C4530294E0");
         Assert.IsFalse(result.IsSuccess);
     }
+
+    [TestMethod("使用 TryGetOrConnectExistsPeerAsync 尝试连接存在的对方，可以返回连接成功")]
+    public async Task TestTryGetOrConnectExistsPeerAsync2()
+    {
+        var peerName = "The_Exists_Peer_Name_E6EE8975-EF9A-480B-912D-B3C4530294E0";
+        var ipcProvider1 = new IpcProvider(peerName);
+        ipcProvider1.StartServer();
+        var ipcProvider2 = new IpcProvider();
+        ipcProvider2.StartServer();
+
+        var result = await ipcProvider1.TryGetOrConnectExistsPeerAsync(peerName);
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.PeerProxy);
+    }
 }

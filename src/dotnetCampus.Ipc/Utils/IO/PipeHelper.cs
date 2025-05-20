@@ -11,6 +11,11 @@ namespace dotnetCampus.Ipc.Utils.IO;
 
 internal static class PipeHelper
 {
+    /// <summary>
+    /// 判断传入的管道是否存在。只有明确能判断不存在时，才返回 false 值，其他情况返回 true 值
+    /// </summary>
+    /// <param name="pipeName"></param>
+    /// <returns>只有返回 false 是可信的。存在或不支持都返回 true 值</returns>
     public static bool IsPipeExists(string pipeName)
     {
         bool isWindows;
