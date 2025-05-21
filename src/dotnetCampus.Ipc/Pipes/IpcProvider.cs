@@ -354,7 +354,12 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 try
                 {
+#if NET6_0_OR_GREATER
+                    // 正常预期就是瞬间连接上的，不会说要等待5秒这么久的，除非系统卡住了，没有执行线程调度。或进入调试断点状态
+                    await peerConnectFinishedTask.WaitAsync(TimeSpan.FromSeconds(5));
+#else
                     await peerConnectFinishedTask;
+#endif
                 }
                 catch (IpcPeerConnectionBrokenException e)
                 {
