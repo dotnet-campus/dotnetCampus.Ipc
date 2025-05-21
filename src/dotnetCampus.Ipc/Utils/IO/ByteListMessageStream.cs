@@ -24,5 +24,11 @@ namespace dotnetCampus.Ipc.Utils.IO
         }
 
         public IpcMessageContext IpcMessageContext { get; }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            IpcMessageContext.SharedArrayPool.Return(IpcMessageContext.MessageBuffer);
+        }
     }
 }
