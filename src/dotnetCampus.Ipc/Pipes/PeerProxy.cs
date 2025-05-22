@@ -261,6 +261,9 @@ namespace dotnetCampus.Ipc.Pipes
         {
             IsBroken = true;
 
+            // 需要将旧的设置为断开状态，返回监听 WaitForFinishedTaskCompletionSource 的逻辑无限等待
+            WaitForFinishedTaskCompletionSource.TrySetException(new IpcPeerConnectionBrokenException());
+
             if (AutoReconnectPeers)
             {
                 WaitForFinishedTaskCompletionSource = new TaskCompletionSource<bool>();

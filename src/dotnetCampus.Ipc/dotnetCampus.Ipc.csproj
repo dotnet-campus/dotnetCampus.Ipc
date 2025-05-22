@@ -7,6 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DefineConstants>$(DefineConstants)TRACE;PublicAsInternal</DefineConstants>
     <IsTrimmable Condition="'$(TargetFramework)'=='net6.0'">true</IsTrimmable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <!-- 在 GitHub 的 Action 构建会添加 GITHUB_ACTIONS 变量 -->
@@ -40,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="dotnetCampus.LatestCSharpFeatures" PrivateAssets="all"/>
+    <PackageReference Include="dotnetCampus.LatestCSharpFeatures" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="System.ValueTuple" />

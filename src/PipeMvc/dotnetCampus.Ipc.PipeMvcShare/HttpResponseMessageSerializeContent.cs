@@ -13,6 +13,7 @@ namespace dotnetCampus.Ipc.PipeMvcServer.IpcFramework
             ContentHeaders = message.Content?.Headers;
         }
         public HttpResponseHeaders Headers { get; set; }
+#nullable enable
         public HttpContentHeaders? ContentHeaders { get; set; }
     }
 }

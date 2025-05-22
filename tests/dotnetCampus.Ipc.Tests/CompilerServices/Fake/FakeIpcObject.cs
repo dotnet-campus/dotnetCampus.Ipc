@@ -31,7 +31,7 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         public string? NullableStringProperty { get; set; } = "Title";
 #nullable restore
 
-#nullable disable
+#nullable enable
         public string? NonNullableStringProperty { get; set; } = "Description";
 #nullable restore
 

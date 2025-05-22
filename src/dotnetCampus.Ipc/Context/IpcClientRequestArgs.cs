@@ -14,6 +14,7 @@ namespace dotnetCampus.Ipc.Context
         /// </summary>
         /// <param name="messageId"></param>
         /// <param name="ipcBufferMessage"></param>
+        /// <param name="messageCommandType">消息命令类型</param>
         internal IpcClientRequestArgs(in IpcClientRequestMessageId messageId, in IpcMessageBody ipcBufferMessage, IpcMessageCommandType messageCommandType)
         {
             MessageId = messageId;

@@ -200,6 +200,7 @@ namespace dotnetCampus.Ipc.Internals
                 return new StreamReadResult<IpcMessageResult>(ipcMessageResult);
             }
 
+            // todo 这里申请的内存看起来没有被释放
             var messageBuffer = sharedArrayPool.Rent((int) messageLength);
             // byte[] Content        实际的内容
             var readCountResult = await ReadBufferAsync(stream, messageBuffer, (int) messageLength);

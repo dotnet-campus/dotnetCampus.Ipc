@@ -6,6 +6,7 @@ jobs:
   build:
 
     runs-on: windows-latest
+    timeout-minutes: 15
 
     steps:
     - uses: actions/checkout@v1
@@ -22,7 +23,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test --configuration Release
+      run: dotnet test --configuration Release -v:n --tl:off --no-build
 
     - name: Pack
       run: dotnet pack --configuration Release --no-build

@@ -206,6 +206,8 @@ namespace dotnetCampus.Ipc.Internals
                 {
                     // 版本不对？消息明明是说注册的，然而解析失败
                 }
+
+                stream.Dispose();
             }
             // 只有业务的才能发给上层
             else if (ipcMessageCommandType.HasFlag(IpcMessageCommandType.Business))
@@ -229,6 +231,8 @@ namespace dotnetCampus.Ipc.Internals
                 // 不知道这是啥消息哇
                 // 但是更新一下 ack 意思一下还可以
                 OnAckReceived(new AckArgs(PeerName, ipcMessageContext.Ack));
+
+                stream.Dispose();
             }
         }
 
