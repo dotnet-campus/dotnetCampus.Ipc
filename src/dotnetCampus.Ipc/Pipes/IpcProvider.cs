@@ -321,7 +321,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <param name="shouldWaitPeerConnectFinished">是否应该等待对方连接回来完成，完全完成双向连接。如设置为 false 则需要自己通过 <see cref="ConnectExistsPeerResult.PeerConnectFinishedTask"/> 进行等待。默认为 true 表示等待所有准备完成再返回</param>
         /// <returns></returns>
         /// 为什么会存在 <paramref name="shouldWaitPeerConnectFinished"/> 参数，这是为了解决极端情况下，刚好本进程能连接到对方，连接完成瞬间，对方挂了，无法反向连接回来的情况。正常不需要设置此参数
-        public async Task<ConnectExistsPeerResult> TryGetOrConnectExistsPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
+        public async Task<ConnectExistsPeerResult> TryConnectToExistingPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
         {
             if (PeerManager.TryGetValue(peerName, out var peerProxy))
             {
@@ -336,7 +336,7 @@ namespace dotnetCampus.Ipc.Pipes
 
                 var ipcClientService = CreateIpcClientService(peerName);
 
-                var result = await ipcClientService.TryConnectExistsPeerAsync().ConfigureAwait(false);
+                var result = await ipcClientService.TryConnectToExistingPeerAsync().ConfigureAwait(false);
                 if (!result)
                 {
                     // 对方不存在

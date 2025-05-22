@@ -115,13 +115,11 @@ namespace dotnetCampus.Ipc.Pipes
             }
         }
 
-
-
         /// <summary>
         /// 尝试连接到已经存在的 Peer 方法
         /// </summary>
         /// <returns></returns>
-        internal Task<bool> TryConnectExistsPeerAsync()
+        internal Task<bool> TryConnectToExistingPeerAsync()
         {
             return StartInternalAsync(isReConnect: false, shouldRegisterToPeer: true, onlyConnectExistsPeer: true);
         }
