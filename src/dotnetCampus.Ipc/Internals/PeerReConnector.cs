@@ -63,7 +63,7 @@ namespace dotnetCampus.Ipc.Internals
             {
                 try
                 {
-                    return await ipcClientService.StartInternalAsync(isReConnect: true, shouldRegisterToPeer: true, onlyConnectExistsPeer: false);
+                    return await ipcClientService.StartInternalAsync(isReConnect: true, shouldRegisterToPeer: true, onlyConnectToExistingPeer: false);
                 }
                 // ## 此异常有两种
                 catch (FileNotFoundException)

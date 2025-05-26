@@ -13,9 +13,9 @@ namespace dotnetCampus.Ipc.Context;
 /// <summary>
 /// 连接已经存在的 Peer 的结果
 /// </summary>
-public readonly struct ConnectExistsPeerResult
+public readonly struct ConnectToExistingPeerResult
 {
-    internal ConnectExistsPeerResult(PeerProxy? peerProxy, Task peerConnectFinishedTask)
+    internal ConnectToExistingPeerResult(PeerProxy? peerProxy, Task peerConnectFinishedTask)
     {
         PeerProxy = peerProxy;
         PeerConnectFinishedTask = peerConnectFinishedTask;
@@ -37,5 +37,5 @@ public readonly struct ConnectExistsPeerResult
     [MemberNotNullWhen(true, nameof(PeerProxy))]
     public bool IsSuccess => PeerProxy != null;
 
-    internal static ConnectExistsPeerResult Fail() => new ConnectExistsPeerResult(null, TaskUtils.CompletedTask);
+    internal static ConnectToExistingPeerResult Fail() => new ConnectToExistingPeerResult(null, TaskUtils.CompletedTask);
 }
