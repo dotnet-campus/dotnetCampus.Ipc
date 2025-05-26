@@ -325,7 +325,7 @@ namespace dotnetCampus.Ipc.Pipes
         {
             if (PeerManager.TryGetValue(peerName, out var peerProxy))
             {
-                
+
             }
             else
             {

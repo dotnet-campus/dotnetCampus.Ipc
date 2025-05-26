@@ -107,7 +107,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         public async Task Start(bool shouldRegisterToPeer = true)
         {
-            var result = await StartInternalAsync(isReConnect: false, shouldRegisterToPeer,onlyConnectExistsPeer: false/*不是只连接存在的对方，如果对方还不存在，则进行等待*/);
+            var result = await StartInternalAsync(isReConnect: false, shouldRegisterToPeer, onlyConnectExistsPeer: false/*不是只连接存在的对方，如果对方还不存在，则进行等待*/);
 
             if (!result)
             {
