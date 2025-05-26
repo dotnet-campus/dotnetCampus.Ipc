@@ -38,7 +38,7 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
         var namedPipeClientStream = ipcClientPipeConnectionContext.NamedPipeClientStream;
 
         int stepCount = 0;
-        while (true)
+        while (!ipcClientPipeConnectionContext.CancellationToken.IsCancellationRequested)
         {
             try
             {
@@ -69,6 +69,8 @@ public class IpcClientPipeConnector : IIpcClientPipeConnector
                 return new IpcClientNamedPipeConnectResult(false, "CanContinue return false");
             }
         }
+
+        return new IpcClientNamedPipeConnectResult(false, "Timeout");
     }
 
     /// <summary>

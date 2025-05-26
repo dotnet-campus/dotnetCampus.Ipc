@@ -149,7 +149,7 @@ A: 此 Ipc 库支持 AOT，但需要注意以下几点：
 
 或者注入 IpcConfiguration 的 IpcObjectSerializer 属性，进行更加灵活的序列化配置。此时将不仅限于使用 System.Text.Json 进行序列化，也可以使用其他的序列化方式，如二进制序列化等等
 
-Q: 采用 直接路由 Json 通信（JsonIpcDirectRoutedProvider）时，如果改造让其支持 AOT 编译？
+Q: 采用 直接路由 Json 通信（JsonIpcDirectRoutedProvider）时，如何改造让其支持 AOT 编译？
 
 A：如上问所述，可在 IpcConfiguration 里面设置 IpcObjectSerializer 属性，或调用 UseSystemJsonIpcObjectSerializer 扩展辅助方法。如以下示代码所示
 

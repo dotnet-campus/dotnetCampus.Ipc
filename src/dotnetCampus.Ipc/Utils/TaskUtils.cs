@@ -8,5 +8,21 @@ namespace dotnetCampus.Ipc.Utils
         {
             return await sourceTask.ConfigureAwait(false);
         }
+
+#if NET45
+        private static readonly Task TheCompletedTask = Task.FromResult(0);
+#endif
+
+        public static Task CompletedTask
+        {
+            get
+            {
+#if NET45
+                return TheCompletedTask;
+#else
+                return Task.CompletedTask;
+#endif
+            }
+        }
     }
 }

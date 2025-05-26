@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace dotnetCampus.Ipc.Context
@@ -7,6 +8,9 @@ namespace dotnetCampus.Ipc.Context
     /// 从服务器返回的信息
     /// </summary>
     /// Copy From: https://github.com/jacqueskang/IpcServiceFramework.git
+    [Obsolete("此类型不再使用，等待下次大版本更新一起删掉")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    // todo 等待下次大版本更新一起删掉
     public class IpcResponse
     {
         public static IpcResponse Success(object data)

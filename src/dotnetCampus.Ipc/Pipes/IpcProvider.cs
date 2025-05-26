@@ -7,6 +7,7 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
+using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
 
 namespace dotnetCampus.Ipc.Pipes
@@ -311,6 +312,63 @@ namespace dotnetCampus.Ipc.Pipes
             await PeerManager.WaitForPeerConnectFinishedAsync(peerProxy);
 
             return peerProxy;
+        }
+
+        /// <summary>
+        /// 尝试获取或连接到已经存在的 Peer 上。如果当前的 Peer 还没起来，则不等待连接，直接返回失败
+        /// </summary>
+        /// <param name="peerName">对方</param>
+        /// <param name="shouldWaitPeerConnectFinished">是否应该等待对方连接回来完成，完全完成双向连接。如设置为 false 则需要自己通过 <see cref="ConnectExistsPeerResult.PeerConnectFinishedTask"/> 进行等待。默认为 true 表示等待所有准备完成再返回</param>
+        /// <returns></returns>
+        /// 为什么会存在 <paramref name="shouldWaitPeerConnectFinished"/> 参数，这是为了解决极端情况下，刚好本进程能连接到对方，连接完成瞬间，对方挂了，无法反向连接回来的情况。正常不需要设置此参数
+        public async Task<ConnectExistsPeerResult> TryConnectToExistingPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
+        {
+            if (PeerManager.TryGetValue(peerName, out var peerProxy))
+            {
+                
+            }
+            else
+            {
+                // 如果之前没有建立过连接，则尝试连接
+
+                // 这里无视多次加入，这里的多线程问题也可以忽略
+                StartServer();
+
+                var ipcClientService = CreateIpcClientService(peerName);
+
+                var result = await ipcClientService.TryConnectToExistingPeerAsync().ConfigureAwait(false);
+                if (!result)
+                {
+                    // 对方不存在
+                    return ConnectExistsPeerResult.Fail();
+                }
+
+                // 需要确定能连接上对方了，才能加入到 PeerManager 里面。确保不会在下次进来的时候，拿到了一个无法建立连接的 Peer 对象。这里的添加顺序是先确保连接再添加，这就意味着在并行的时候，可能会多次尝试连接。这是符合预期的，本身连接也没有多少损耗，最多只会多创建一个管道而已
+                peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
+                PeerManager.TryAdd(peerProxy);
+            }
+
+            // 等待对方回连，建立双向连接
+            Task peerConnectFinishedTask = PeerManager.WaitForPeerConnectFinishedAsync(peerProxy);
+            if (shouldWaitPeerConnectFinished)
+            {
+                try
+                {
+#if NET6_0_OR_GREATER
+                    // 正常预期就是瞬间连接上的，不会说要等待5秒这么久的，除非系统卡住了，没有执行线程调度。或进入调试断点状态
+                    await peerConnectFinishedTask.WaitAsync(TimeSpan.FromSeconds(5));
+#else
+                    await peerConnectFinishedTask;
+#endif
+                }
+                catch (IpcPeerConnectionBrokenException e)
+                {
+                    // 对方连接断开了
+                    return ConnectExistsPeerResult.Fail();
+                }
+            }
+
+            return new ConnectExistsPeerResult(peerProxy, peerConnectFinishedTask);
         }
 
         /// <summary>

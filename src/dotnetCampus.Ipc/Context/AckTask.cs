@@ -8,6 +8,7 @@ namespace dotnetCampus.Ipc.Context
     /// <summary>
     /// 回复 Ack 的任务，用于在 <see cref="AckManager"/> 收到回复的时候设置任务完成
     /// </summary>
+    // todo 此类型可以准备删除
     class AckTask
     {
         /// <summary>

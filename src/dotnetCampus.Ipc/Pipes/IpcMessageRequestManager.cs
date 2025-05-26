@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Utils.IO;
 
 namespace dotnetCampus.Ipc.Pipes
 {
@@ -139,17 +141,33 @@ namespace dotnetCampus.Ipc.Pipes
                 // 标记在这一级消费
                 args.SetHandle(message: nameof(HandleRequest));
 
+                var currentPosition = message.Position;
+
                 var binaryReader = new BinaryReader(message);
                 var messageId = binaryReader.ReadUInt64();
                 var requestMessageLength = binaryReader.ReadInt32();
 
-                var currentPosition = message.Position;
+                var headLength = sizeof(ulong)/*messageId*/ + sizeof(int)/*requestMessageLength*/;
                 try
                 {
-                    var requestMessageByteList = binaryReader.ReadBytes(requestMessageLength);
+                    IpcMessageBody ipcBufferMessage;
+                    if (message is ByteListMessageStream byteListMessageStream)
+                    {
+                        var messageBuffer = byteListMessageStream.IpcMessageContext.MessageBuffer;
+                        // 开始等于原来读取掉的，加上当前的头的长度
+                        var start = (int) currentPosition + headLength;
+
+                        ipcBufferMessage = new IpcMessageBody(messageBuffer, start, requestMessageLength);
+                    }
+                    else
+                    {
+                        var requestMessageByteList = binaryReader.ReadBytes(requestMessageLength);
+                        ipcBufferMessage = new IpcMessageBody(requestMessageByteList);
+                    }
+
                     var ipcClientRequestArgs =
                         new IpcClientRequestArgs(new IpcClientRequestMessageId(messageId),
-                            new IpcMessageBody(requestMessageByteList),
+                            ipcBufferMessage,
                             args.MessageCommandType);
                     OnIpcClientRequestReceived?.Invoke(this, ipcClientRequestArgs);
                 }
