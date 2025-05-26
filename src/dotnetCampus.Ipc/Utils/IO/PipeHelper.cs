@@ -23,8 +23,8 @@ internal static class PipeHelper
         // 对于 .NET Framework 来说，那就一定是 Windows 系统了
         isWindows = true;
 #elif NETCOREAPP3_1_OR_GREATER
-            // 对于 .NET Core 3.1 和 .NET 5 来说，Windows 和 Linux 都可以
-            isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        // 对于 .NET Core 3.1 和 .NET 5 来说，Windows 和 Linux 都可以
+        isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
         if (isWindows)
         {
