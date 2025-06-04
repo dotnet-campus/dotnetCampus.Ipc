@@ -346,6 +346,9 @@ namespace dotnetCampus.Ipc.Pipes
 
                 var ipcClientService = CreateIpcClientService(peerName);
 
+                // 尝试连接对方
+                // 连接的时候不会立刻向对方注册自己，只是建立连接关系而已
+                // 这样是因为一旦向对方注册自己，那对方将会反过来向自己注册。然而此时存在多线程安全问题，此时的 PeerManager 还没加入对方。导致以下代码里面的 PeerManager.WaitForPeerConnectFinishedAsync 无法完成等待，导致单元测试失败
                 var result = await ipcClientService.TryConnectToExistingPeerAsync().ConfigureAwait(false);
                 if (!result)
                 {
@@ -356,6 +359,9 @@ namespace dotnetCampus.Ipc.Pipes
                 // 需要确定能连接上对方了，才能加入到 PeerManager 里面。确保不会在下次进来的时候，拿到了一个无法建立连接的 Peer 对象。这里的添加顺序是先确保连接再添加，这就意味着在并行的时候，可能会多次尝试连接。这是符合预期的，本身连接也没有多少损耗，最多只会多创建一个管道而已
                 peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
                 PeerManager.TryAdd(peerProxy);
+
+                // 在 PeerProxy 加入到管理之后，才能向对方注册自己，确保对方收到注册之后，反过来向自己注册时，可以从管理里面拿到注册的对方信息，从而让 PeerManager.WaitForPeerConnectFinishedAsync 能够完成
+                await ipcClientService.RegisterToPeerAsync();
             }
 
             // 等待对方回连，建立双向连接

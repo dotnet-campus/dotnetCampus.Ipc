@@ -121,7 +121,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         internal Task<bool> TryConnectToExistingPeerAsync()
         {
-            return StartInternalAsync(isReConnect: false, shouldRegisterToPeer: true, onlyConnectToExistingPeer: true);
+            return StartInternalAsync(isReConnect: false, shouldRegisterToPeer: false, onlyConnectToExistingPeer: true);
         }
 
         /// <inheritdoc cref="Start"/>
@@ -175,7 +175,7 @@ namespace dotnetCampus.Ipc.Pipes
             if (shouldRegisterToPeer)
             {
                 // 启动之后，向对方注册，此时对方是服务器
-                await RegisterToPeer();
+                await RegisterToPeerAsync();
             }
 
             return true;
@@ -293,7 +293,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
         }
 
-        private async Task RegisterToPeer()
+        internal async Task RegisterToPeerAsync()
         {
             Logger.Trace($"[{nameof(IpcClientService)}] StartRegisterToPeer PipeName={IpcContext.PipeName}");
 
