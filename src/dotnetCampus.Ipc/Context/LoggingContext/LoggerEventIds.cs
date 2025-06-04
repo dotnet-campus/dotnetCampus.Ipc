@@ -4,6 +4,8 @@ namespace dotnetCampus.Ipc.Context.LoggingContext;
 
 internal static class LoggerEventIds
 {
+    public static EventId CommonDebugEventId => new EventId(0, "Debug");
+
     /// <summary>
     /// 发送消息
     /// </summary>

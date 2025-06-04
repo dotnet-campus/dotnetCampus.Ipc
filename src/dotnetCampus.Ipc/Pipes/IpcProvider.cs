@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
+using dotnetCampus.Ipc.Utils.Logging;
 
 namespace dotnetCampus.Ipc.Pipes
 {
@@ -80,7 +82,7 @@ namespace dotnetCampus.Ipc.Pipes
                 var ipcServerService = new IpcServerService(IpcContext);
                 _ipcServerService = ipcServerService;
 
-                ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
+                ipcServerService.PeerConnected += IpcServerService_OnPeerConnected;
 
                 // 以下的 Start 是一个循环，不会返回的
                 await ipcServerService.Start().ConfigureAwait(false);
@@ -100,13 +102,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void NamedPipeServerStreamPoolPeerConnected(object? sender, IpcInternalPeerConnectedArgs e)
+        private async void IpcServerService_OnPeerConnected(object? sender, IpcInternalPeerConnectedArgs e)
         {
             try
             {
+                IpcContext.Logger.Debug($"[OnPeerConnected]IpcProvider.OnPeerConnected PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                 // 也许是对方反过来连接
                 if (PeerManager.TryGetValue(e.PeerName, out var peerProxy))
                 {
+                    IpcContext.Logger.Debug($"[OnPeerConnected]PeerManager.TryGetValue Success. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                     // 如果当前的 Peer 已断开且不需要重新连接，那么重新创建 Peer 反过来连接对方的服务器端
                     if (peerProxy.IsBroken && !IpcContext.IpcConfiguration.AutoReconnectPeers)
                     {
@@ -121,6 +127,8 @@ namespace dotnetCampus.Ipc.Pipes
                 }
                 else
                 {
+                    IpcContext.Logger.Debug($"[OnPeerConnected]PeerManager.TryGetValue Fail. ConnectBackToPeer. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                     // 其他客户端连接，需要反过来连接对方的服务器端
                     await ConnectBackToPeer(e);
                 }
@@ -136,6 +144,8 @@ namespace dotnetCampus.Ipc.Pipes
         {
             try
             {
+                IpcContext.Logger.Debug($"[OnPeerConnected] ConnectBackToPeer. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                 await ConnectBackToPeerCore(e);
             }
             catch (ObjectDisposedException)

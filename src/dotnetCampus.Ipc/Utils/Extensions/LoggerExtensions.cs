@@ -1,5 +1,6 @@
 ﻿using System;
 
+using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Utils.Logging;
 
 namespace dotnetCampus.Ipc.Utils.Extensions
@@ -13,7 +14,7 @@ namespace dotnetCampus.Ipc.Utils.Extensions
 
         public static void Debug(this ILogger? logger, string message)
         {
-            logger?.Log(LogLevel.Debug, default, message, null, FormatOnlyMessage);
+            logger?.Log(LogLevel.Debug, LoggerEventIds.CommonDebugEventId, message, null, FormatOnlyMessage);
         }
 
         public static void Information(this ILogger? logger, string message)

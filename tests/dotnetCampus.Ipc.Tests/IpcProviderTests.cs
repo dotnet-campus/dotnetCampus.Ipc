@@ -1,4 +1,9 @@
-﻿using dotnetCampus.Ipc.Pipes;
+﻿using System.Diagnostics;
+
+using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Utils.Logging;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace dotnetCampus.Ipc.Tests;
@@ -17,15 +22,31 @@ public class IpcProviderTests
     [TestMethod("使用 TryConnectToExistingPeerAsync 尝试连接存在的对方，可以返回连接成功")]
     public async Task TestTryConnectToExistingPeerAsync2()
     {
-        var peerName = "The_Exists_Peer_Name_E6EE8975-EF9A-480B-912D-B3C4530294E0";
-        var ipcProvider1 = new IpcProvider(peerName);
+        var peerName = "IpcProvider1_The_Exists_Peer_Name_E6EE8975-EF9A-480B-912D-B3C4530294E0";
+        var testLogger = new TestLogger();
+        var ipcProvider1 = new IpcProvider(peerName, new IpcConfiguration()
+        {
+            IpcLoggerProvider = _ => testLogger
+        });
         ipcProvider1.StartServer();
-        var ipcProvider2 = new IpcProvider();
+        var ipcProvider2 = new IpcProvider(peerName.Replace("IpcProvider1", "IpcProvider2"), new IpcConfiguration()
+        {
+            IpcLoggerProvider = _ => testLogger
+        });
         ipcProvider2.StartServer();
 
-        var result = await ipcProvider2.TryConnectToExistingPeerAsync(peerName).WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.PeerProxy);
+        try
+        {
+            var result = await ipcProvider2.TryConnectToExistingPeerAsync(peerName).WaitAsync(TimeSpan.FromSeconds(5));
+
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsNotNull(result.PeerProxy);
+        }
+        catch
+        {
+            Console.WriteLine(testLogger.GetAllLogMessage());
+            throw;
+        }
     }
 
     // 预期这一条是可能过也可能不过的，取决于时机，于是默认不加入单元测试去跑了
@@ -39,5 +60,35 @@ public class IpcProviderTests
 
         var result = await ipcProvider1.TryConnectToExistingPeerAsync(peerName).WaitAsync(TimeSpan.FromSeconds(5));
         _ = result;
+    }
+}
+
+class TestLogger : IpcLogger
+{
+    public TestLogger() : base(nameof(TestLogger))
+    {
+    }
+
+    protected override bool IsEnabled(LogLevel logLevel)
+    {
+        return true; // 这里为了测试，全部都开启
+    }
+
+    protected override void Log<TState>(LogLevel logLevel, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        lock (LogMessage)
+        {
+            LogMessage.Add($"[{DateTime.Now:HH:mm:ss,fff}] [IPC][{logLevel}]{formatter(state, exception)}");
+        }
+    }
+
+    public List<string> LogMessage { get; } = [];
+
+    public string GetAllLogMessage()
+    {
+        lock (LogMessage)
+        {
+            return string.Join("\n", LogMessage);
+        }
     }
 }

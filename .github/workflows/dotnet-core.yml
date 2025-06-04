@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test --configuration Release -v:n --tl:off --no-build
+      run: dotnet test --configuration Release -v:n --tl:off --no-build --logger:"console;verbosity=detailed"
 
     - name: Pack
       run: dotnet pack --configuration Release --no-build
