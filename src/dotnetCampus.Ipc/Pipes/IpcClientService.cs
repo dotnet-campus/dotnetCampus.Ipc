@@ -107,7 +107,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         public async Task Start(bool shouldRegisterToPeer = true)
         {
-            var result = await StartInternalAsync(isReConnect: false, shouldRegisterToPeer, onlyConnectExistsPeer: false/*不是只连接存在的对方，如果对方还不存在，则进行等待*/);
+            var result = await StartInternalAsync(isReConnect: false, shouldRegisterToPeer, onlyConnectToExistingPeer: false/*不是只连接存在的对方，如果对方还不存在，则进行等待*/);
 
             if (!result)
             {
@@ -121,22 +121,22 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         internal Task<bool> TryConnectToExistingPeerAsync()
         {
-            return StartInternalAsync(isReConnect: false, shouldRegisterToPeer: true, onlyConnectExistsPeer: true);
+            return StartInternalAsync(isReConnect: false, shouldRegisterToPeer: false, onlyConnectToExistingPeer: true);
         }
 
         /// <inheritdoc cref="Start"/>
         /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="shouldRegisterToPeer">是否需要向对方注册</param>
-        /// <param name="onlyConnectExistsPeer">只连接存在的对方</param>
+        /// <param name="onlyConnectToExistingPeer">只连接存在的对方</param>
         /// <returns>True:启动成功</returns>
-        internal async Task<bool> StartInternalAsync(bool isReConnect, bool shouldRegisterToPeer, bool onlyConnectExistsPeer)
+        internal async Task<bool> StartInternalAsync(bool isReConnect, bool shouldRegisterToPeer, bool onlyConnectToExistingPeer)
         {
             var localClient = IpcContext.PipeName;
             var remoteServer = PeerName;
 
             Logger.Trace($"StartInternalAsync Connecting NamedPipe. LocalClient:'{localClient}';RemoteServer:'{remoteServer}'");
 
-            if (onlyConnectExistsPeer)
+            if (onlyConnectToExistingPeer)
             {
                 if (!PipeHelper.IsPipeExists(remoteServer))
                 {
@@ -151,7 +151,7 @@ namespace dotnetCampus.Ipc.Pipes
 
             try
             {
-                var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream, onlyConnectExistsPeer);
+                var result = await ConnectNamedPipeAsync(isReConnect, namedPipeClientStream, onlyConnectToExistingPeer);
                 if (!result)
                 {
                     _namedPipeClientStreamTaskCompletionSource.TrySetResult(new NamedPipeClientStreamResult(namedPipeClientStream: null));
@@ -175,7 +175,7 @@ namespace dotnetCampus.Ipc.Pipes
             if (shouldRegisterToPeer)
             {
                 // 启动之后，向对方注册，此时对方是服务器
-                await RegisterToPeer();
+                await RegisterToPeerAsync();
             }
 
             return true;
@@ -186,17 +186,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="namedPipeClientStream"></param>
-        /// <param name="onlyConnectExistsPeer">只连接存在的对方</param>
+        /// <param name="onlyConnectToExistingPeer">只连接存在的对方</param>
         /// <returns>True 连接成功</returns>
         /// 独立方法，方便 dnspy 调试
-        private async Task<bool> ConnectNamedPipeAsync(bool isReConnect, NamedPipeClientStream namedPipeClientStream, bool onlyConnectExistsPeer)
+        private async Task<bool> ConnectNamedPipeAsync(bool isReConnect, NamedPipeClientStream namedPipeClientStream, bool onlyConnectToExistingPeer)
         {
             var connector = IpcContext.IpcClientPipeConnector;
 
             if (connector == null)
             {
                 var timeout = Timeout.Infinite;
-                if (onlyConnectExistsPeer)
+                if (onlyConnectToExistingPeer)
                 {
                     // 如果是只连接存在的对方的情况，即使对方存在，也需要设置一个短暂的超时时间
                     // 为什么这里还需要设置超时时间，这是因为可能上一步判断 IsPipeExists 时，对方还是存在的，然而当前准备连接的时候，对方已经挂了，因此不能无限等待，需要设置一个短暂的时间
@@ -209,10 +209,11 @@ namespace dotnetCampus.Ipc.Pipes
                 }
                 catch (Exception e)
                 {
-                    if (onlyConnectExistsPeer && e is IpcPipeConnectionException ipcPipeConnectionException)
+                    if (onlyConnectToExistingPeer && e is IpcPipeConnectionException ipcPipeConnectionException)
                     {
                         if (ipcPipeConnectionException.InnerException is TimeoutException)
                         {
+                            // 如果是只连接存在的对方，且连接超时了，则直接返回 false 证明对方现在无法被连接上，正常就是对方不存在
                             return false;
                         }
                     }
@@ -223,7 +224,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
             else
             {
-                return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream, onlyConnectExistsPeer);
+                return await CustomConnectNamedPipeAsync(connector, isReConnect, namedPipeClientStream, onlyConnectToExistingPeer);
             }
         }
 
@@ -233,16 +234,16 @@ namespace dotnetCampus.Ipc.Pipes
         /// <param name="ipcClientPipeConnector"></param>
         /// <param name="isReConnect">是否属于重新连接</param>
         /// <param name="namedPipeClientStream"></param>
-        /// <param name="onlyConnectExistsPeer"></param>
+        /// <param name="onlyConnectToExistingPeer"></param>
         /// <returns></returns>
         private async Task<bool> CustomConnectNamedPipeAsync(IIpcClientPipeConnector ipcClientPipeConnector,
             bool isReConnect,
-            NamedPipeClientStream namedPipeClientStream, bool onlyConnectExistsPeer)
+            NamedPipeClientStream namedPipeClientStream, bool onlyConnectToExistingPeer)
         {
             Logger.Trace($"Connecting NamedPipe by {nameof(CustomConnectNamedPipeAsync)}. LocalClient:'{IpcContext.PipeName}';RemoteServer:'{PeerName}'");
             var cancellationToken = CancellationToken.None;
 
-            if (onlyConnectExistsPeer)
+            if (onlyConnectToExistingPeer)
             {
                 cancellationToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(10)).Token;
             }
@@ -292,7 +293,7 @@ namespace dotnetCampus.Ipc.Pipes
             }
         }
 
-        private async Task RegisterToPeer()
+        internal async Task RegisterToPeerAsync()
         {
             Logger.Trace($"[{nameof(IpcClientService)}] StartRegisterToPeer PipeName={IpcContext.PipeName}");
 

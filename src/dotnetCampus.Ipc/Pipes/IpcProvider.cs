@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
+using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Utils;
 using dotnetCampus.Ipc.Utils.Extensions;
+using dotnetCampus.Ipc.Utils.Logging;
 
 namespace dotnetCampus.Ipc.Pipes
 {
@@ -80,7 +82,7 @@ namespace dotnetCampus.Ipc.Pipes
                 var ipcServerService = new IpcServerService(IpcContext);
                 _ipcServerService = ipcServerService;
 
-                ipcServerService.PeerConnected += NamedPipeServerStreamPoolPeerConnected;
+                ipcServerService.PeerConnected += IpcServerService_OnPeerConnected;
 
                 // 以下的 Start 是一个循环，不会返回的
                 await ipcServerService.Start().ConfigureAwait(false);
@@ -100,13 +102,17 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void NamedPipeServerStreamPoolPeerConnected(object? sender, IpcInternalPeerConnectedArgs e)
+        private async void IpcServerService_OnPeerConnected(object? sender, IpcInternalPeerConnectedArgs e)
         {
             try
             {
+                IpcContext.Logger.Debug($"[OnPeerConnected]IpcProvider.OnPeerConnected PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                 // 也许是对方反过来连接
                 if (PeerManager.TryGetValue(e.PeerName, out var peerProxy))
                 {
+                    IpcContext.Logger.Debug($"[OnPeerConnected]PeerManager.TryGetValue Success. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                     // 如果当前的 Peer 已断开且不需要重新连接，那么重新创建 Peer 反过来连接对方的服务器端
                     if (peerProxy.IsBroken && !IpcContext.IpcConfiguration.AutoReconnectPeers)
                     {
@@ -121,6 +127,8 @@ namespace dotnetCampus.Ipc.Pipes
                 }
                 else
                 {
+                    IpcContext.Logger.Debug($"[OnPeerConnected]PeerManager.TryGetValue Fail. ConnectBackToPeer. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                     // 其他客户端连接，需要反过来连接对方的服务器端
                     await ConnectBackToPeer(e);
                 }
@@ -136,6 +144,8 @@ namespace dotnetCampus.Ipc.Pipes
         {
             try
             {
+                IpcContext.Logger.Debug($"[OnPeerConnected] ConnectBackToPeer. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
+
                 await ConnectBackToPeerCore(e);
             }
             catch (ObjectDisposedException)
@@ -318,10 +328,10 @@ namespace dotnetCampus.Ipc.Pipes
         /// 尝试获取或连接到已经存在的 Peer 上。如果当前的 Peer 还没起来，则不等待连接，直接返回失败
         /// </summary>
         /// <param name="peerName">对方</param>
-        /// <param name="shouldWaitPeerConnectFinished">是否应该等待对方连接回来完成，完全完成双向连接。如设置为 false 则需要自己通过 <see cref="ConnectExistsPeerResult.PeerConnectFinishedTask"/> 进行等待。默认为 true 表示等待所有准备完成再返回</param>
+        /// <param name="shouldWaitPeerConnectFinished">是否应该等待对方连接回来完成，完全完成双向连接。如设置为 false 则需要自己通过 <see cref="ConnectToExistingPeerResult.PeerConnectFinishedTask"/> 进行等待。默认为 true 表示等待所有准备完成再返回</param>
         /// <returns></returns>
         /// 为什么会存在 <paramref name="shouldWaitPeerConnectFinished"/> 参数，这是为了解决极端情况下，刚好本进程能连接到对方，连接完成瞬间，对方挂了，无法反向连接回来的情况。正常不需要设置此参数
-        public async Task<ConnectExistsPeerResult> TryConnectToExistingPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
+        public async Task<ConnectToExistingPeerResult> TryConnectToExistingPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
         {
             if (PeerManager.TryGetValue(peerName, out var peerProxy))
             {
@@ -336,16 +346,22 @@ namespace dotnetCampus.Ipc.Pipes
 
                 var ipcClientService = CreateIpcClientService(peerName);
 
+                // 尝试连接对方
+                // 连接的时候不会立刻向对方注册自己，只是建立连接关系而已
+                // 这样是因为一旦向对方注册自己，那对方将会反过来向自己注册。然而此时存在多线程安全问题，此时的 PeerManager 还没加入对方。导致以下代码里面的 PeerManager.WaitForPeerConnectFinishedAsync 无法完成等待，导致单元测试失败
                 var result = await ipcClientService.TryConnectToExistingPeerAsync().ConfigureAwait(false);
                 if (!result)
                 {
                     // 对方不存在
-                    return ConnectExistsPeerResult.Fail();
+                    return ConnectToExistingPeerResult.Fail();
                 }
 
                 // 需要确定能连接上对方了，才能加入到 PeerManager 里面。确保不会在下次进来的时候，拿到了一个无法建立连接的 Peer 对象。这里的添加顺序是先确保连接再添加，这就意味着在并行的时候，可能会多次尝试连接。这是符合预期的，本身连接也没有多少损耗，最多只会多创建一个管道而已
                 peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
                 PeerManager.TryAdd(peerProxy);
+
+                // 在 PeerProxy 加入到管理之后，才能向对方注册自己，确保对方收到注册之后，反过来向自己注册时，可以从管理里面拿到注册的对方信息，从而让 PeerManager.WaitForPeerConnectFinishedAsync 能够完成
+                await ipcClientService.RegisterToPeerAsync();
             }
 
             // 等待对方回连，建立双向连接
@@ -364,11 +380,11 @@ namespace dotnetCampus.Ipc.Pipes
                 catch (IpcPeerConnectionBrokenException e)
                 {
                     // 对方连接断开了
-                    return ConnectExistsPeerResult.Fail();
+                    return ConnectToExistingPeerResult.Fail();
                 }
             }
 
-            return new ConnectExistsPeerResult(peerProxy, peerConnectFinishedTask);
+            return new ConnectToExistingPeerResult(peerProxy, peerConnectFinishedTask);
         }
 
         /// <summary>
