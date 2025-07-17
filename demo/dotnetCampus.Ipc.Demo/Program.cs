@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Pipes;
+using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Threading;
 using dotnetCampus.Ipc.Utils.Logging;
 
@@ -15,8 +16,31 @@ namespace dotnetCampus.Ipc.Demo
     {
         private static async Task Main(string[] args)
         {
-            var ipcProvider = new IpcProvider();
+            var ipcProvider = new IpcProvider("asdasd",new IpcConfiguration()
+            {
+                IpcClientPipeConnector = new IpcClientPipeConnector(context => false, stepTimeout:TimeSpan.FromSeconds(3))
+            });
             ipcProvider.StartServer();
+
+            // 测试在 Linux 连接不存在的对方，将会在 dotnet 框架内部不断重试制造异常
+            // System.Net.Sockets.SocketException (99): Cannot assign requested address /tmp/CoreFxPipe_DoNotExistFoo
+            // at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+            try
+            {
+                var peerProxy = await ipcProvider.GetOrCreatePeerProxyAsync("DoNotExistFoo");
+
+                Console.WriteLine($"Is PeerProxy null? {peerProxy == null}");
+
+                if (peerProxy is null)
+                {
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return;
+            }
 
             if (args.Length == 0)
             {
