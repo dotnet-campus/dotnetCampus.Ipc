@@ -43,6 +43,7 @@
   <ItemGroup>
     <PackageReference Include="dotnetCampus.LatestCSharpFeatures" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="System.ValueTuple" />
   </ItemGroup>
 
