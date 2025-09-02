@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
@@ -549,10 +550,14 @@ public class IpcObjectTests
 
     private async Task<(IPeerProxy peer, IFakeIpcObject proxy)> CreateIpcPairAsync(string name, FakeIpcObject? instance = null)
     {
+#if NET6_0_OR_GREATER
+        var configuration = new IpcConfiguration().UseSystemJsonIpcObjectSerializer(TestJsonContext.Default);
+#endif
+
         var aName = $"IpcObjectTests.IpcTests.{name}.A";
         var bName = $"IpcObjectTests.IpcTests.{name}.B";
-        var aProvider = new IpcProvider(aName);
-        var bProvider = new IpcProvider(bName);
+        var aProvider = new IpcProvider(aName, configuration);
+        var bProvider = new IpcProvider(bName, configuration);
         aProvider.StartServer();
         bProvider.StartServer();
         var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(instance ?? new FakeIpcObject());

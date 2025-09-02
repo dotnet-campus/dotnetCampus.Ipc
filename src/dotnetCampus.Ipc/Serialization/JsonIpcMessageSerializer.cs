@@ -52,13 +52,7 @@ internal static class JsonIpcMessageSerializer
             return false;
         }
 
-        var body = message.Body;
-        var stringBody = Encoding.UTF8.GetString(body.Buffer, body.Start, body.Length);
-        if (string.IsNullOrWhiteSpace(stringBody))
-        {
-            model = new T();
-            return true;
-        }
+        var body = deserializeMessage.Body;
 
         try
         {
