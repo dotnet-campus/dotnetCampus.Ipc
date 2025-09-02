@@ -1,6 +1,5 @@
-﻿#pragma warning disable format
-using System;
-
+﻿// ReSharper disable CheckNamespace
+#pragma warning disable format
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
 partial class GeneratedIpcProxy

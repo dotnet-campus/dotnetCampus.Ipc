@@ -1,8 +1,7 @@
-﻿using System;
-
-using dotnetCampus.Ipc.CompilerServices.Attributes;
+﻿using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+
 /// <summary>
 /// <para>IPC GARM 模型。</para>
 /// <para>GARM = Generated Argument and Return Model 生成类的参数与返回值模型。</para>

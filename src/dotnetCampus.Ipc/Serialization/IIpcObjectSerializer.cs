@@ -1,4 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+
+#if UseNewtonsoftJson
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonElement = Newtonsoft.Json.Linq.JToken;
+using JsonPropertyNameAttribute = Newtonsoft.Json.JsonPropertyAttribute;
+#else
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using JsonElement = System.Text.Json.JsonElement;
+using JsonPropertyNameAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
+#endif
 
 namespace dotnetCampus.Ipc.Serialization
 {
@@ -16,6 +28,8 @@ namespace dotnetCampus.Ipc.Serialization
 
         void Serialize(Stream stream, object? value);
 
+        IpcJsonElement SerializeToElement(object? value);
+
         /// <summary>
         /// 反序列化对象
         /// </summary>
@@ -26,11 +40,6 @@ namespace dotnetCampus.Ipc.Serialization
 
         T? Deserialize<T>(Stream stream);
 
-#if !UseNewtonsoftJson
-        [return: NotNullIfNotNull(nameof(value))]
-        System.Text.Json.JsonElement? SerializeToElement(object? value);
-
-        T? Deserialize<T>(System.Text.Json.JsonElement jsonElement);
-#endif
+        T? Deserialize<T>(IpcJsonElement jsonElement);
     }
 }

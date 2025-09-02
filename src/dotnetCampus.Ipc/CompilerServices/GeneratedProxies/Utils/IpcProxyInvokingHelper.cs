@@ -1,5 +1,6 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Exceptions;
+using dotnetCampus.Ipc.Serialization;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
 
@@ -91,7 +92,7 @@ internal class IpcProxyInvokingHelper
             return null;
         }
 
-        var requestMessage = GeneratedProxyMemberInvokeModel.Serialize(model);
+        var requestMessage = Context.ObjectSerializer.SerializeInternalRemoteObjectModelToIpcMessage(model, model.ToString());
         //requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
         var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
         if (GeneratedProxyMemberReturnModel.TryDeserialize(responseMessage, out var returnModel))
@@ -119,7 +120,7 @@ internal class IpcProxyInvokingHelper
         if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var ipcTypeFullName))
         {
             // 如果此参数是一个 IPC 对象。
-            return new GeneratedProxyObjectModel(Context.ObjectSerializer)
+            return new GeneratedProxyObjectModel
             {
                 Id = objectId,
                 IpcTypeFullName = ipcTypeFullName,
@@ -128,9 +129,9 @@ internal class IpcProxyInvokingHelper
         else
         {
             // 如果此参数只是一个普通对象。
-            return new GeneratedProxyObjectModel(Context.ObjectSerializer)
+            return new GeneratedProxyObjectModel
             {
-                Value = KnownTypeConverter.Convert(argModel.Value, Context.ObjectSerializer),
+                Value = IpcJsonElement.Serialize(argModel.Value, Context.ObjectSerializer),
             };
         }
     }

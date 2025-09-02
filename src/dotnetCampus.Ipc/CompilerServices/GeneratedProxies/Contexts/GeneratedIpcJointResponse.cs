@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Messages;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Contexts

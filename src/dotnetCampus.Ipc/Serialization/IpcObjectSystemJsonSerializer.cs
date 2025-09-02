@@ -13,7 +13,6 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
-
 namespace dotnetCampus.Ipc.Serialization;
 
 public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
@@ -47,15 +46,14 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
     }
 
-    [return: NotNullIfNotNull(nameof(value))]
-    public JsonElement? SerializeToElement(object? value)
+    public IpcJsonElement SerializeToElement(object? value)
     {
         if (value is null)
         {
-            return null;
+            return default;
         }
 
-        return JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext);
+        return new IpcJsonElement { RawValueOnSystemTextJson = JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext), };
     }
 
     public T? Deserialize<T>(byte[] data)
@@ -68,9 +66,13 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 
-    public T? Deserialize<T>(JsonElement jsonElement)
+    public T? Deserialize<T>(IpcJsonElement jsonElement)
     {
-        return jsonElement.Deserialize<T>((JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        if (jsonElement.RawValueOnSystemTextJson is not { } element)
+        {
+            return default;
+        }
+        return element.Deserialize<T>((JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 }
 
