@@ -1,4 +1,6 @@
-﻿namespace dotnetCampus.Ipc.Serialization
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace dotnetCampus.Ipc.Serialization
 {
     /// <summary>
     /// 对象序列化器
@@ -23,5 +25,12 @@
         T? Deserialize<T>(byte[] data);
 
         T? Deserialize<T>(Stream stream);
+
+#if !UseNewtonsoftJson
+        [return: NotNullIfNotNull(nameof(value))]
+        System.Text.Json.JsonElement? SerializeToElement(object? value);
+
+        T? Deserialize<T>(System.Text.Json.JsonElement jsonElement);
+#endif
     }
 }

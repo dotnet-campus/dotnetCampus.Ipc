@@ -1,9 +1,11 @@
-﻿using System;
-
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
 #if UseNewtonsoftJson
+using dotnetCampus.Ipc.Serialization;
 using Newtonsoft.Json.Linq;
+#else
+using System.Text.Json;
+using dotnetCampus.Ipc.Serialization;
 #endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
@@ -14,6 +16,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 internal readonly record struct Garm : IGarmObject
 {
     private readonly object? _value;
+    private readonly IIpcObjectSerializer _serializer;
 
 #if UseNewtonsoftJson
     /// <summary>
@@ -21,9 +24,25 @@ internal readonly record struct Garm : IGarmObject
     /// </summary>
     /// <param name="value">模型的值。</param>
     /// <param name="valueType">模型中值的类型。</param>
-    public Garm(JToken? value, Type valueType)
+    /// <param name="serializer">JSON 序列化器。</param>
+    public Garm(JToken? value, Type valueType, IIpcObjectSerializer serializer)
     {
         _value = value;
+        _serializer = serializer;
+        ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
+        IpcType = null;
+    }
+#else
+    /// <summary>
+    /// 创建一个存储 IPC 中 <see cref="JsonElement"/> 的临时 GARM 模型。
+    /// </summary>
+    /// <param name="value">模型的值。</param>
+    /// <param name="valueType">模型中值的类型。</param>
+    /// <param name="serializer">JSON 序列化器。</param>
+    public Garm(JsonElement? value, Type valueType, IIpcObjectSerializer serializer)
+    {
+        _value = value;
+        _serializer = serializer;
         ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
         IpcType = null;
     }
@@ -34,9 +53,11 @@ internal readonly record struct Garm : IGarmObject
     /// </summary>
     /// <param name="value">模型的值。</param>
     /// <param name="ipcType">模型中的 IPC 类型。</param>
-    public Garm(object? value, Type ipcType)
+    /// <param name="serializer">JSON 序列化器。</param>
+    public Garm(object? value, Type ipcType, IIpcObjectSerializer serializer)
     {
         _value = value;
+        _serializer = serializer;
         ValueType = ipcType ?? throw new ArgumentNullException(nameof(ipcType));
         IpcType = ipcType;
     }
@@ -49,7 +70,7 @@ internal readonly record struct Garm : IGarmObject
     /// proxy -> IPC model in proxy side -> IPC model in joint side -> joint
     /// 其中，proxy 和 joint 均由编译器在用户端生成了泛型代码，因此这些上下文中都可以获取到泛型类型。
     /// 但中间的传输过程中没有泛型上下文，所以会用到此临时类型中转值。
-    /// 由于中转的值可能是 <see cref="JToken"/> 这种未确定类型的值，为避免代码中意外写出错误的代码，因此禁止在此类型中获取值。
+    /// 由于中转的值可能是 JsonElement 这种未确定类型的值，为避免代码中意外写出错误的代码，因此禁止在此类型中获取值。
     /// </remarks>
     object? IGarmObject.Value => throw new InvalidOperationException("当 GARM 未获得泛型类型时，不可获取其值。请等待泛型上下文中调用 ToGeneric<T> 转换为泛型类型后再获取值。");
 
@@ -71,7 +92,7 @@ internal readonly record struct Garm : IGarmObject
     public Garm<T> ToGeneric<T>()
     {
         return new Garm<T>(
-            KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(_value),
+            KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(_value, _serializer),
             IpcType);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -28,7 +27,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         {
         }
 
-        public GeneratedProxyMemberReturnModel(object? @return)
+        public GeneratedProxyMemberReturnModel(object? @return, IIpcObjectSerializer serializer)
         {
             if (@return is null)
             {
@@ -38,10 +37,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             else
             {
                 // 当返回对象为其他类型时，将尝试进行序列化。
-                var jToken = KnownTypeConverter.Convert(@return);
-                Return = new GeneratedProxyObjectModel
+                var jsonElement = KnownTypeConverter.Convert(@return, serializer);
+                Return = new GeneratedProxyObjectModel(serializer)
                 {
-                    Value = jToken,
+                    Value = jsonElement,
                 };
             }
         }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Exceptions;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
@@ -110,7 +106,7 @@ internal class IpcProxyInvokingHelper
 
     private T? Cast<T>(object? arg)
     {
-        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(arg);
+        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(arg, Context.ObjectSerializer);
     }
 
     private GeneratedProxyObjectModel? SerializeArg(IGarmObject argModel)
@@ -123,7 +119,7 @@ internal class IpcProxyInvokingHelper
         if (Context.TryCreateSerializationInfoFromIpcRealInstance(argModel, out var objectId, out var ipcTypeFullName))
         {
             // 如果此参数是一个 IPC 对象。
-            return new GeneratedProxyObjectModel
+            return new GeneratedProxyObjectModel(Context.ObjectSerializer)
             {
                 Id = objectId,
                 IpcTypeFullName = ipcTypeFullName,
@@ -132,9 +128,9 @@ internal class IpcProxyInvokingHelper
         else
         {
             // 如果此参数只是一个普通对象。
-            return new GeneratedProxyObjectModel
+            return new GeneratedProxyObjectModel(Context.ObjectSerializer)
             {
-                Value = KnownTypeConverter.Convert(argModel.Value),
+                Value = KnownTypeConverter.Convert(argModel.Value, Context.ObjectSerializer),
             };
         }
     }

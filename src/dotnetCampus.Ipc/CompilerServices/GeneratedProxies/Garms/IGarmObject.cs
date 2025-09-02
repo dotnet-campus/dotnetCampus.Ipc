@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// <summary>
 /// 为 <see cref="Garm{T}"/> 提供非泛型访问的方法。
 /// </summary>

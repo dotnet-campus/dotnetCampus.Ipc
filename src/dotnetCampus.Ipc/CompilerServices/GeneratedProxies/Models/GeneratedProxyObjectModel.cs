@@ -1,16 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
-
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+using dotnetCampus.Ipc.Serialization;
 
 #if UseNewtonsoftJson
 using Newtonsoft.Json.Linq;
+#else
+using System.Text.Json;
 #endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 [DataContract]
-internal class GeneratedProxyObjectModel
+internal class GeneratedProxyObjectModel(IIpcObjectSerializer serializer)
 {
     [ContractPublicPropertyName(nameof(Id))]
     private string? _id;
@@ -41,7 +43,7 @@ internal class GeneratedProxyObjectModel
 #if UseNewtonsoftJson
     public JToken? Value { get; set; }
 #else
-    public object? Value { get; set; }
+    public JsonElement? Value { get; set; }
 #endif
 
     /// <summary>
@@ -51,6 +53,6 @@ internal class GeneratedProxyObjectModel
     /// <returns>转换后的对象。</returns>
     internal T? ToObject<T>()
     {
-        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(Value);
+        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(Value, serializer);
     }
 }

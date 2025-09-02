@@ -9,7 +9,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
-
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 
@@ -46,6 +47,17 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
     }
 
+    [return: NotNullIfNotNull(nameof(value))]
+    public JsonElement? SerializeToElement(object? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        return JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext);
+    }
+
     public T? Deserialize<T>(byte[] data)
     {
         return JsonSerializer.Deserialize<T>(data, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
@@ -54,6 +66,11 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
     public T? Deserialize<T>(Stream stream)
     {
         return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+    }
+
+    public T? Deserialize<T>(JsonElement jsonElement)
+    {
+        return jsonElement.Deserialize<T>((JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 }
 
@@ -74,12 +91,16 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
     protected override JsonSerializerOptions GeneratedSerializerOptions => _businessContext.Options;
 }
 
-
+// 远程对象
+[JsonSerializable(typeof(GeneratedProxyExceptionModel))]
+[JsonSerializable(typeof(GeneratedProxyMemberInvokeModel))]
+[JsonSerializable(typeof(GeneratedProxyMemberReturnModel))]
+[JsonSerializable(typeof(GeneratedProxyObjectModel))]
+// 路由
 [JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
 // 异常信息
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo))]
-
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(long))]

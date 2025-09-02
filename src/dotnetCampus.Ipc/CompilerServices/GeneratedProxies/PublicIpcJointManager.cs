@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Contexts;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -182,7 +178,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 if (argModel is null)
                 {
                     // 如果参数模型为 null，那么就是一个 null 参数。
-                    args[i] = new Garm(null, parameterType);
+                    args[i] = new Garm((object?) null, parameterType, _context.ObjectSerializer);
                 }
                 else
                 {
@@ -190,12 +186,12 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     if (_context.TryCreateProxyFromSerializationInfo(peer, ipcType, argModel.Id, out var proxy))
                     {
                         // 如果参数模型表示需要通过代理访问一个 IPC 远端对象，则创建一个代理对象。
-                        args[i] = new Garm(proxy, ipcType);
+                        args[i] = new Garm(proxy, ipcType, _context.ObjectSerializer);
                     }
                     else
                     {
                         // 如果参数模型表示是一个普通的值，则直接使用这个值。
-                        args[i] = new Garm(argModel?.Value, parameterType);
+                        args[i] = new Garm(argModel?.Value, parameterType, _context.ObjectSerializer);
                     }
                 }
             }
@@ -214,7 +210,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             {
                 return new GeneratedProxyMemberReturnModel
                 {
-                    Return = new GeneratedProxyObjectModel
+                    Return = new GeneratedProxyObjectModel(_context.ObjectSerializer)
                     {
                         Id = objectId,
                         IpcTypeFullName = ipcTypeFullName,
@@ -223,7 +219,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
             else
             {
-                return new GeneratedProxyMemberReturnModel(returnModel.Value);
+                return new GeneratedProxyMemberReturnModel(returnModel.Value, _context.ObjectSerializer);
             }
         }
 
