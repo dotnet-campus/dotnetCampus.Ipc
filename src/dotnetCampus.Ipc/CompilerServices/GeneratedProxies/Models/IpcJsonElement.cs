@@ -34,27 +34,30 @@ public readonly record struct IpcJsonElement
     {
         get
         {
+            var isNewtonsoftJsonNull = false;
+            var isSystemTextJsonNull = false;
+
 #if UseNewtonsoftJson
             if (RawValueOnNewtonsoftJson is null)
             {
-                return true;
+                isNewtonsoftJsonNull = true;
             }
-            if (RawValueOnNewtonsoftJson.Type == Newtonsoft.Json.Linq.JTokenType.Null)
+            if (RawValueOnNewtonsoftJson?.Type == Newtonsoft.Json.Linq.JTokenType.Null)
             {
-                return true;
+                isNewtonsoftJsonNull = true;
             }
 #endif
 #if NET6_0_OR_GREATER
             if (RawValueOnSystemTextJson is null)
             {
-                return true;
+                isSystemTextJsonNull = true;
             }
             if (RawValueOnSystemTextJson?.ValueKind == System.Text.Json.JsonValueKind.Null)
             {
-                return true;
+                isSystemTextJsonNull = true;
             }
 #endif
-            return true;
+            return isNewtonsoftJsonNull && isSystemTextJsonNull;
         }
     }
 
