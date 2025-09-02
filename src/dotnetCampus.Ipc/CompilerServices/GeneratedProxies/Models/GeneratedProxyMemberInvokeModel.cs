@@ -63,7 +63,7 @@ internal class GeneratedProxyMemberInvokeModel
 #if NET6_0_OR_GREATER
     [JsonPropertyName("d")]
 #endif
-    public ulong MemberId { get; internal set; }
+    public ulong MemberId { get; set; }
 
     /// <summary>
     /// 调用的成员名称（属性名、方法名）。

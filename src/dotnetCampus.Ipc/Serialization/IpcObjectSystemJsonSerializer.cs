@@ -94,6 +94,21 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
     protected override JsonSerializerOptions GeneratedSerializerOptions => _businessContext.Options;
 }
 
+// 基础类型
+[JsonSerializable(typeof(bool))]
+[JsonSerializable(typeof(byte))]
+[JsonSerializable(typeof(char))]
+[JsonSerializable(typeof(decimal))]
+[JsonSerializable(typeof(double))]
+[JsonSerializable(typeof(float))]
+[JsonSerializable(typeof(int))]
+[JsonSerializable(typeof(long))]
+[JsonSerializable(typeof(sbyte))]
+[JsonSerializable(typeof(short))]
+[JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(uint))]
+[JsonSerializable(typeof(ulong))]
+[JsonSerializable(typeof(ushort))]
 // 远程对象
 [JsonSerializable(typeof(GeneratedProxyExceptionModel))]
 [JsonSerializable(typeof(GeneratedProxyMemberInvokeModel))]
@@ -101,14 +116,8 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
 [JsonSerializable(typeof(GeneratedProxyObjectModel))]
 // 路由
 [JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
-// 异常信息
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo))]
-[JsonSerializable(typeof(string))]
-[JsonSerializable(typeof(int))]
-[JsonSerializable(typeof(long))]
-[JsonSerializable(typeof(short))]
-[JsonSerializable(typeof(bool))]
 internal partial class IpcInternalJsonSerializerContext : JsonSerializerContext
 {
 }
