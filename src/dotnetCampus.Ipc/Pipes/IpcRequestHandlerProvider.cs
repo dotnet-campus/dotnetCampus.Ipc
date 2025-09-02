@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Diagnostics;
 using dotnetCampus.Ipc.Exceptions;
@@ -150,7 +149,6 @@ namespace dotnetCampus.Ipc.Pipes
 
         private string FormatHandlerAsErrorMessage(IIpcRequestHandler handler) => handler switch
         {
-            GeneratedProxyJointIpcRequestHandler gpjirh => string.Join(", ", gpjirh.Owner.JointManager.EnumerateJointNames()),
             DelegateIpcRequestHandler dirh => nameof(DelegateIpcRequestHandler),
             EmptyIpcRequestHandler eirh => nameof(EmptyIpcRequestHandler),
             null => "null",

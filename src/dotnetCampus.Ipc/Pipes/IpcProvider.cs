@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Context.LoggingContext;
 using dotnetCampus.Ipc.Exceptions;
@@ -37,7 +36,7 @@ namespace dotnetCampus.Ipc.Pipes
         public IpcProvider(string pipeName, IpcConfiguration? ipcConfiguration = null)
         {
             IpcContext = new IpcContext(this, pipeName, ipcConfiguration);
-            IpcContext.IpcConfiguration.AddFrameworkRequestHandler(IpcContext.GeneratedProxyJointIpcContext.RequestHandler);
+         
             IpcContext.Logger.Trace($"[IpcProvider] 本地服务名 {pipeName}");
 
             PeerManager = new PeerManager(this);
