@@ -105,10 +105,9 @@ internal class IpcProxyInvokingHelper
         }
     }
 
-    private T? Cast<T>(object? arg)
-    {
-        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(arg, Context.ObjectSerializer);
-    }
+    private T? Cast<T>(IpcJsonElement? arg) => arg is { } jsonElement
+        ? IpcJsonElement.Deserialize<T>(jsonElement, Context.ObjectSerializer)
+        : default!;
 
     private GeneratedProxyObjectModel? SerializeArg(IGarmObject argModel)
     {

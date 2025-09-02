@@ -183,7 +183,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 if (argModel is null)
                 {
                     // 如果参数模型为 null，那么就是一个 null 参数。
-                    args[i] = new Garm((object?) null, parameterType, Context.ObjectSerializer);
+                    args[i] = new Garm(null, parameterType);
                 }
                 else
                 {
@@ -191,12 +191,12 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     if (Context.TryCreateProxyFromSerializationInfo(peer, ipcType, argModel.Id, out var proxy))
                     {
                         // 如果参数模型表示需要通过代理访问一个 IPC 远端对象，则创建一个代理对象。
-                        args[i] = new Garm(proxy, ipcType, Context.ObjectSerializer);
+                        args[i] = new Garm(proxy, ipcType);
                     }
                     else
                     {
                         // 如果参数模型表示是一个普通的值，则直接使用这个值。
-                        args[i] = new Garm(argModel?.Value, parameterType, Context.ObjectSerializer);
+                        args[i] = new Garm(argModel.Value, parameterType);
                     }
                 }
             }

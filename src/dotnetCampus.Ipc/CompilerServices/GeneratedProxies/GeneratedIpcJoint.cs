@@ -258,14 +258,12 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
         throw CreateMethodNotMatchException(memberId, methodName);
     }
 
-    private T? CastArg<T>(IGarmObject argModel)
+    private T? CastArg<T>(IGarmObject argModel) => argModel switch
     {
-        if (argModel is Garm go)
-        {
-            argModel = go.ToGeneric<T>();
-        }
-        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(argModel.Value);
-    }
+        Garm go => go.ToGeneric<T>(Context.ObjectSerializer).Value,
+        Garm<T> go => go.Value,
+        _ => throw new InvalidOperationException("不可能进入此分支，因为所有参数都应该是 GARM 对象。"),
+    };
 
     internal override Type[] GetParameterTypes(MemberInvokingType invokingType, ulong memberId)
     {

@@ -1,5 +1,11 @@
 ﻿using dotnetCampus.Ipc.Serialization;
 
+#if UseNewtonsoftJson
+using Newtonsoft.Json.Linq;
+#else
+using System.Text.Json;
+#endif
+
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
 /// <summary>
@@ -58,13 +64,49 @@ public readonly record struct IpcJsonElement
         return value switch
         {
             null => new IpcJsonElement(),
-#if NET6_0_OR_GREATER
-            System.Text.Json.JsonElement => throw new InvalidOperationException($"编写错误检查，不应该传入 JSON 对象 {value.GetType().FullName}。"),
-#endif
 #if UseNewtonsoftJson
             Newtonsoft.Json.Linq.JToken => throw new InvalidOperationException($"编写错误检查，不应该传入 JSON 对象 {value.GetType().FullName}。"),
 #endif
+#if NET6_0_OR_GREATER
+            System.Text.Json.JsonElement => throw new InvalidOperationException($"编写错误检查，不应该传入 JSON 对象 {value.GetType().FullName}。"),
+#endif
             _ => serializer.SerializeToElement(value),
         };
+    }
+
+    public static T? Deserialize<T>(IpcJsonElement jsonElement, IIpcObjectSerializer serializer)
+    {
+        if (jsonElement.IsNull)
+        {
+            return default!;
+        }
+
+#if UseNewtonsoftJson
+        if (jsonElement.RawValueOnNewtonsoftJson is JValue jValue)
+        {
+            return jValue.ToObject<T>();
+        }
+        if (jsonElement.RawValueOnNewtonsoftJson is JObject jObject)
+        {
+            return jObject.ToObject<T>();
+        }
+        if (jsonElement.RawValueOnNewtonsoftJson is JArray jArray)
+        {
+            return jArray.ToObject<T>();
+        }
+        if (jsonElement.RawValueOnNewtonsoftJson is not null)
+        {
+            throw new NotSupportedException("不支持将其他 JToken 类型转换成 IPC 业务类型。");
+        }
+#endif
+
+#if NET6_0_OR_GREATER
+        if (jsonElement.RawValueOnSystemTextJson is { } json)
+        {
+            return serializer.Deserialize<T>(jsonElement);
+        }
+#endif
+
+        throw new InvalidOperationException("不可能进入的分支，前面一定已经成功反序列化了。");
     }
 }

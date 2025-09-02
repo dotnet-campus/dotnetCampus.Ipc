@@ -15,7 +15,7 @@ namespace dotnetCampus.Ipc.Tests
 
             // Action
             var byteList = ipcObjectSerializer.Serialize(foo);
-            var deserializeFoo = ipcObjectSerializer.Deserialize<Foo>(byteList);
+            var deserializeFoo = ipcObjectSerializer.Deserialize<Foo>(byteList, 0, byteList.Length);
 
             // Assert
             Assert.AreEqual(foo.Name, deserializeFoo.Name);
