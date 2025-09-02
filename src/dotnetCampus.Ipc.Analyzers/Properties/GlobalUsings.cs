@@ -12,6 +12,7 @@ global using System.Threading.Tasks;
 
 global using dotnetCampus.Ipc.CodeAnalysis.Core;
 global using dotnetCampus.Ipc.CodeAnalysis.Utils;
+global using dotnetCampus.Ipc.CompilerServices.Attributes;
 global using dotnetCampus.Ipc.Core.ComponentModels;
 global using Microsoft.CodeAnalysis;
 global using Microsoft.CodeAnalysis.CSharp;

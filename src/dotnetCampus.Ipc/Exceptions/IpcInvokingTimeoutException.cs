@@ -1,5 +1,6 @@
 ﻿using System;
 
+using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Exceptions;
 

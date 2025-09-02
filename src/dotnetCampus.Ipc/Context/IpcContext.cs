@@ -1,4 +1,5 @@
-﻿using dotnetCampus.Ipc.Internals;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.Pipes.PipeConnectors;
 using dotnetCampus.Ipc.Threading;
@@ -34,6 +35,7 @@ namespace dotnetCampus.Ipc.Context
             IpcRequestHandlerProvider = new IpcRequestHandlerProvider(this);
 
             IpcConfiguration = ipcConfiguration ?? new IpcConfiguration();
+            GeneratedProxyJointIpcContext = new GeneratedProxyJointIpcContext(this);
 
             IpcClientPipeConnector = IpcConfiguration.IpcClientPipeConnector;
 
@@ -55,6 +57,7 @@ namespace dotnetCampus.Ipc.Context
 
         internal AckManager AckManager { get; }
 
+        internal GeneratedProxyJointIpcContext GeneratedProxyJointIpcContext { get; }
 
         /// <inheritdoc />
         public override string ToString()
