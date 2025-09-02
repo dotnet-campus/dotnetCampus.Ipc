@@ -21,6 +21,37 @@ public readonly record struct IpcJsonElement
     public System.Text.Json.JsonElement? RawValueOnSystemTextJson { get; init; }
 #endif
 
+    /// <summary>
+    /// 判断此 IPC 远端对象是否表示 <see langword="null"/>。
+    /// </summary>
+    public bool IsNull
+    {
+        get
+        {
+#if UseNewtonsoftJson
+            if (RawValueOnNewtonsoftJson is null)
+            {
+                return true;
+            }
+            if (RawValueOnNewtonsoftJson.Type == Newtonsoft.Json.Linq.JTokenType.Null)
+            {
+                return true;
+            }
+#endif
+#if NET6_0_OR_GREATER
+            if (RawValueOnSystemTextJson is null)
+            {
+                return true;
+            }
+            if (RawValueOnSystemTextJson?.ValueKind == System.Text.Json.JsonValueKind.Null)
+            {
+                return true;
+            }
+#endif
+            return true;
+        }
+    }
+
     public static IpcJsonElement Serialize(object? value, IIpcObjectSerializer serializer)
     {
         serializer.SerializeToElement(value);

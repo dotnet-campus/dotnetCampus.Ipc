@@ -94,6 +94,7 @@ internal static class ObjectToIpcProxyJointConverter
         var (jointManager, jointType, ipcType, instance) = tuple;
         var objectId = Guid.NewGuid().ToString();
         var jointInstance = (GeneratedIpcJoint) Activator.CreateInstance(jointType)!;
+        jointInstance.Context = jointManager.Context;
         jointInstance.SetInstance(instance);
         jointManager.AddPublicIpcObject(ipcType, jointInstance, objectId);
         return (jointInstance, objectId);

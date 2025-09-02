@@ -1,4 +1,5 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.Exceptions;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// <summary>
@@ -6,6 +7,17 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// </summary>
 public abstract class GeneratedIpcJoint
 {
+    private GeneratedProxyJointIpcContext? _context;
+
+    /// <summary>
+    /// 提供基于 .NET 类型的 IPC 传输上下文信息。
+    /// </summary>
+    internal GeneratedProxyJointIpcContext Context
+    {
+        get => _context ?? throw new IpcLocalException($"基于 .NET 类型的 IPC 传输机制应使用 {typeof(GeneratedIpcFactory)} 工厂类型来构造。");
+        set => _context = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
     /// <summary>
     /// 设置此对接对象的真实实例。
     /// </summary>
@@ -228,7 +240,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
 
     internal sealed override IGarmObject CallMethod(ulong memberId, string methodName, IGarmObject[]? args)
     {
-        var count = args is null ? 0 : args.Length;
+        var count = args?.Length ?? 0;
         if (_methods.TryGetValue(memberId, out var tuple))
         {
             return tuple.method(args);

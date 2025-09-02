@@ -56,9 +56,10 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         return new IpcJsonElement { RawValueOnSystemTextJson = JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext), };
     }
 
-    public T? Deserialize<T>(byte[] data)
+    public T? Deserialize<T>(byte[] data, int start, int length)
     {
-        return JsonSerializer.Deserialize<T>(data, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        var span = data.AsSpan(start, length);
+        return JsonSerializer.Deserialize<T>(span, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 
     public T? Deserialize<T>(Stream stream)

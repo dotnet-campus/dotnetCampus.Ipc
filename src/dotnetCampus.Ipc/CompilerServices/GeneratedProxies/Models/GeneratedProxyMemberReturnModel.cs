@@ -1,9 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
-using dotnetCampus.Ipc.Context;
-using dotnetCampus.Ipc.Messages;
-using dotnetCampus.Ipc.Serialization;
-using dotnetCampus.Ipc.Utils.Extensions;
+﻿using System.Runtime.Serialization;
 
 #if UseNewtonsoftJson
 using Newtonsoft.Json;
@@ -31,22 +26,10 @@ internal class GeneratedProxyMemberReturnModel
         Exception = new GeneratedProxyExceptionModel(exception);
     }
 
-    public GeneratedProxyMemberReturnModel(object? @return, IIpcObjectSerializer serializer)
+    public GeneratedProxyMemberReturnModel(IpcJsonElement @return)
     {
-        if (@return is null)
-        {
-            // 当返回的对象为 null 时，返回值直接设定为 null。
-            Return = null;
-        }
-        else
-        {
-            // 当返回对象为其他类型时，将尝试进行序列化。
-            var jsonElement = KnownTypeConverter.Convert(@return, serializer);
-            Return = new GeneratedProxyObjectModel(serializer)
-            {
-                Value = jsonElement,
-            };
-        }
+        // 当返回对象为其他类型时，将尝试进行序列化。
+        Return = new GeneratedProxyObjectModel { Value = @return };
     }
 
 #if DEBUG
@@ -74,29 +57,4 @@ internal class GeneratedProxyMemberReturnModel
     [JsonPropertyName("e")]
 #endif
     public GeneratedProxyExceptionModel? Exception { get; set; }
-
-    [Obsolete("正在向 System.Text.Json 迁移，标记表示此方法正在迁移中，实现不可靠。", true)]
-    public static IpcMessage Serialize(GeneratedProxyMemberReturnModel model)
-    {
-        var serializeMessage = JsonIpcMessageSerializer.Serialize("Return", model);
-
-        return new IpcMessage(serializeMessage.Tag, serializeMessage.Body,
-            (ulong) KnownMessageHeaders.RemoteObjectMessageHeader);
-    }
-
-    [Obsolete("正在向 System.Text.Json 迁移，标记表示此方法正在迁移中，实现不可靠。", true)]
-    public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberReturnModel? model)
-    {
-        const ulong header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
-        if (message.TryGetPayload(header, out var deserializeMessage))
-        {
-            return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
-        }
-        else
-        {
-            // 如果业务头不对，那就不需要解析了
-            model = null;
-            return false;
-        }
-    }
 }

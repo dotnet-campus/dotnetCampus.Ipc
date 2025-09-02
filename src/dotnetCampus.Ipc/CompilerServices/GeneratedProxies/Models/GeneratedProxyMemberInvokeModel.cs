@@ -1,10 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Text;
-using dotnetCampus.Ipc.Context;
-using dotnetCampus.Ipc.Messages;
-using dotnetCampus.Ipc.Serialization;
-using dotnetCampus.Ipc.Utils.Extensions;
 
 #if UseNewtonsoftJson
 using Newtonsoft.Json;
@@ -101,28 +97,6 @@ internal class GeneratedProxyMemberInvokeModel
     [JsonPropertyName("a")]
 #endif
     public GeneratedProxyObjectModel?[]? Args { get; set; }
-
-    /// <summary>
-    /// 尝试将跨进程传输过来的 IPC 消息反序列化成一个 IPC 方法调用内部模型。
-    /// </summary>
-    /// <param name="message">IPC 消息。</param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    [Obsolete("正在向 System.Text.Json 迁移，标记表示此方法正在迁移中，实现不可靠。", true)]
-    public static bool TryDeserialize(IpcMessage message, [NotNullWhen(true)] out GeneratedProxyMemberInvokeModel? model)
-    {
-        const ulong header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
-        if (message.TryGetPayload(header, out var deserializeMessage))
-        {
-            return JsonIpcMessageSerializer.TryDeserialize(deserializeMessage, out model);
-        }
-        else
-        {
-            // 如果业务头不对，那就不需要解析了
-            model = null;
-            return false;
-        }
-    }
 
     /// <summary>
     /// 把方法调用过程以调用栈一帧的方式表示出来。

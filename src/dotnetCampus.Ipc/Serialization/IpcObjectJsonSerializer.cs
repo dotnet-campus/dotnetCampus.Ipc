@@ -1,6 +1,4 @@
 ﻿#if UseNewtonsoftJson
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using Newtonsoft.Json;
@@ -55,9 +53,15 @@ namespace dotnetCampus.Ipc.Serialization
             },
         };
 
-        public T? Deserialize<T>(byte[] byteList)
+        public T? Deserialize<T>(byte[] byteList, int start, int length)
         {
-            var json = Encoding.UTF8.GetString(byteList);
+#if NETCOREAPP3_0_OR_GREATER
+            var data = byteList.AsSpan(start, length);
+#else
+            var data = new byte[length];
+            Array.Copy(byteList, start, data, 0, length);
+#endif
+            var json = Encoding.UTF8.GetString(data);
             return JsonConvert.DeserializeObject<T>(json);
         }
 

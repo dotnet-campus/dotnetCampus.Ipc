@@ -35,8 +35,10 @@ namespace dotnetCampus.Ipc.Serialization
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
+        /// <param name="start"></param>
+        /// <param name="length"></param>
         /// <returns></returns>
-        T? Deserialize<T>(byte[] data);
+        T? Deserialize<T>(byte[] data, int start, int length);
 
         T? Deserialize<T>(Stream stream);
 

@@ -118,7 +118,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
     /// <returns>可异步等待的属性设置。</returns>
     protected Task SetValueAsync<T>(ulong memberId, Garm<T> value, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
     {
-        return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, memberId, propertyName, new IGarmObject[] { value }, namedValues);
+        return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, memberId, propertyName, [value], namedValues);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
         var ignoresIpcException = namedValues.IgnoresIpcException ?? RuntimeConfigs?.IgnoresIpcException ?? false;
         try
         {
-            return (namedValues.Timeout ?? RuntimeConfigs?.Timeout) is int timeout && timeout > 0
+            return (namedValues.Timeout ?? RuntimeConfigs?.Timeout) is { } timeout and > 0
                 ? await InvokeWithTimeoutAsync<T>(
                     callType,
                     memberId,
@@ -222,10 +222,6 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
                 ExceptionDispatchInfo.Capture(innerException).Throw();
                 throw;
             }
-        }
-        catch (Exception)
-        {
-            throw;
         }
     }
 

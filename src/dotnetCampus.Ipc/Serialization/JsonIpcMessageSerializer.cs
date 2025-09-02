@@ -2,6 +2,7 @@
 using System.Text;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Utils.Extensions;
 
 #if UseNewtonsoftJson
 using Newtonsoft.Json;
@@ -23,17 +24,12 @@ internal static class JsonIpcMessageSerializer
     /// <param name="model">要序列化的 IPC 内部模型。</param>
     /// <param name="tag">用于追踪调试的消息标签。</param>
     /// <returns>用于 IPC 传输的消息。</returns>
-    internal static IpcMessage SerializeInternalRemoteObjectModelToIpcMessage(
+    internal static IpcMessage SerializeToIpcMessage(
         this IIpcObjectSerializer serializer,
         object model,
         string tag)
     {
-#if UseNewtonsoftJson
-        var json = JsonConvert.SerializeObject(model);
-        var data = Encoding.UTF8.GetBytes(json);
-#else
-        var data = JsonSerializer.SerializeToUtf8Bytes(model, IpcInternalJsonSerializerContext.Default.Options);
-#endif
+        var data = serializer.Serialize(model);
         var message = new IpcMessage(tag, new IpcMessageBody(data), (ulong) KnownMessageHeaders.RemoteObjectMessageHeader);
         return message;
     }
@@ -41,11 +37,21 @@ internal static class JsonIpcMessageSerializer
     /// <summary>
     /// 尝试将跨进程传输过来的 IPC 消息反序列化成 IPC 模块自动生成的内部模型。
     /// </summary>
+    /// <param name="serializer"></param>
     /// <param name="message">IPC 消息。</param>
     /// <param name="model"></param>
     /// <returns></returns>
-    public static bool TryDeserialize<T>(IpcMessage message, [NotNullWhen(true)] out T? model) where T : class, new()
+    internal static bool TryDeserializeFromIpcMessage<T>(this IIpcObjectSerializer serializer, IpcMessage message, [NotNullWhen(true)] out T? model)
+        where T : class, new()
     {
+        const ulong header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
+        if (!message.TryGetPayload(header, out var deserializeMessage))
+        {
+            // 如果业务头不对，那就不需要解析了。
+            model = null;
+            return false;
+        }
+
         var body = message.Body;
         var stringBody = Encoding.UTF8.GetString(body.Buffer, body.Start, body.Length);
         if (string.IsNullOrWhiteSpace(stringBody))
@@ -53,14 +59,11 @@ internal static class JsonIpcMessageSerializer
             model = new T();
             return true;
         }
+
         try
         {
-#if UseNewtonsoftJson
-            model = JsonConvert.DeserializeObject<T>(stringBody);
+            model = serializer.Deserialize<T>(body.Buffer, body.Start, body.Length);
             return model != null;
-#else
-            throw new NotSupportedException("当前不支持非 Newtonsoft.Json 的 JSON 序列化方式。");
-#endif
         }
 #if UseNewtonsoftJson
         catch (JsonSerializationException)
@@ -79,6 +82,13 @@ internal static class JsonIpcMessageSerializer
             return false;
         }
 #endif
+#if NET6_0_OR_GREATER
+        catch (JsonException)
+        {
+            model = null;
+            return false;
+        }
+#endif
         catch
         {
             // 此反序列化过程抛出异常是合理行为（毕竟 IPC 谁都能发，但应该主要是 JsonSerializationException）。
@@ -86,8 +96,8 @@ internal static class JsonIpcMessageSerializer
 #if DEBUG
             throw;
 #else
-                model = null;
-                return false;
+            model = null;
+            return false;
 #endif
         }
     }
