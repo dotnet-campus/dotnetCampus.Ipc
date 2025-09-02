@@ -122,9 +122,11 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             var realType = realInstance.GetType();
             if (IpcTypeToProxyJointCache[typeof(TContract)].jointType is { } jointType)
             {
+                var context = GetContext(ipcProvider);
                 var joint = (GeneratedIpcJoint<TContract>) Activator.CreateInstance(jointType)!;
+                joint.Context = context;
                 joint.SetInstance(realInstance);
-                GetContext(ipcProvider).JointManager.AddPublicIpcObject(joint, ipcObjectId);
+                context.JointManager.AddPublicIpcObject(joint, ipcObjectId);
                 return realInstance;
             }
             else

@@ -8,6 +8,7 @@ namespace dotnetCampus.Ipc.Tests;
 
 [JsonSerializable(typeof(BindingFlags))]
 [JsonSerializable(typeof(List<string>))]
+[JsonSerializable(typeof(IList<string>))]
 [JsonSerializable(typeof(string[]))]
 [JsonSerializable(typeof(FakeIpcObjectSubModelA))]
 [JsonSerializable(typeof(IFakeIpcObject.NestedEnum))]

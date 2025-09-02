@@ -14,7 +14,7 @@ public abstract class GeneratedIpcJoint
     /// </summary>
     internal GeneratedProxyJointIpcContext Context
     {
-        get => _context ?? throw new IpcLocalException($"基于 .NET 类型的 IPC 传输机制应使用 {typeof(GeneratedIpcFactory)} 工厂类型来构造。");
+        get => _context ?? throw new IpcRemoteException($"基于 .NET 类型的 IPC 传输机制应使用 {typeof(GeneratedIpcFactory)} 工厂类型来构造。");
         set => _context = value ?? throw new ArgumentNullException(nameof(value));
     }
 
