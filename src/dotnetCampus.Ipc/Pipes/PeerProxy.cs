@@ -8,7 +8,6 @@ using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Internals;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Utils.Extensions;
-using Newtonsoft.Json.Schema;
 
 namespace dotnetCampus.Ipc.Pipes
 {

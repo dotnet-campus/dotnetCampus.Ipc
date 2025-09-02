@@ -113,18 +113,10 @@ namespace dotnetCampus.Ipc.Context
         /// </summary>
         public IIpcObjectSerializer IpcObjectSerializer
         {
-            get => _ipcObjectSerializer ??= DefaultNewtonsoftJsonSerializer;
+            get => _ipcObjectSerializer ?? throw new Exception("xxxx");
             set => _ipcObjectSerializer = value;
         }
 
         private IIpcObjectSerializer? _ipcObjectSerializer;
-
-        /// <summary>
-        /// 默认的 Newtonsoft Json 序列化器
-        /// </summary>
-        public static IpcObjectJsonSerializer DefaultNewtonsoftJsonSerializer
-        // 不加上锁了，这里不管线程安全，最多就是多创建几个对象而已，不会影响业务逻辑
-            => _defaultNewtonsoftJsonSerializer ??= new IpcObjectJsonSerializer();
-        private static IpcObjectJsonSerializer? _defaultNewtonsoftJsonSerializer;
     }
 }
