@@ -2,9 +2,12 @@
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
+#if UseNewtonsoftJson
 using Newtonsoft.Json.Linq;
+#endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+
 /// <summary>
 /// 提供非泛型的临时 GARM 模型，最终使用时请转换为泛型版本再用。
 /// </summary>
@@ -12,6 +15,7 @@ internal readonly record struct Garm : IGarmObject
 {
     private readonly object? _value;
 
+#if UseNewtonsoftJson
     /// <summary>
     /// 创建一个存储 IPC 中 <see cref="JToken"/> 的临时 GARM 模型。
     /// </summary>
@@ -23,6 +27,7 @@ internal readonly record struct Garm : IGarmObject
         ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
         IpcType = null;
     }
+#endif
 
     /// <summary>
     /// 创建一个存储 IPC 中 IPC 代理对象的临时 GARM 模型。

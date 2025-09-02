@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿#if UseNewtonsoftJson
+using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -53,3 +54,4 @@ namespace dotnetCampus.Ipc.Serialization
         }
     }
 }
+#endif

@@ -113,12 +113,17 @@ namespace dotnetCampus.Ipc.Context
         /// </summary>
         public IIpcObjectSerializer IpcObjectSerializer
         {
+#if UseNewtonsoftJson
             get => _ipcObjectSerializer ??= DefaultNewtonsoftJsonSerializer;
+#else
+            get => _ipcObjectSerializer ?? throw new InvalidOperationException("必须先设置 IpcObjectSerializer 属性，才能使用 IPC 功能。");
+#endif
             set => _ipcObjectSerializer = value;
         }
 
         private IIpcObjectSerializer? _ipcObjectSerializer;
 
+#if UseNewtonsoftJson
         /// <summary>
         /// 默认的 Newtonsoft Json 序列化器
         /// </summary>
@@ -126,5 +131,6 @@ namespace dotnetCampus.Ipc.Context
         // 不加上锁了，这里不管线程安全，最多就是多创建几个对象而已，不会影响业务逻辑
             => _defaultNewtonsoftJsonSerializer ??= new IpcObjectJsonSerializer();
         private static IpcObjectJsonSerializer? _defaultNewtonsoftJsonSerializer;
+#endif
     }
 }

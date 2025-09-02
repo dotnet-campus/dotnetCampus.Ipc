@@ -1,13 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;net461;net45</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1;net461;net45;net9.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DefineConstants>$(DefineConstants)TRACE;PublicAsInternal</DefineConstants>
     <IsTrimmable Condition="'$(TargetFramework)'=='net6.0'">true</IsTrimmable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CanUseNewtonsoftJson>true</CanUseNewtonsoftJson>
+    <CanUseNewtonsoftJson Condition="'$(TargetFramework)'=='net9.0'">false</CanUseNewtonsoftJson>
+    <DefineConstants Condition="'$(CanUseNewtonsoftJson)'=='true'">$(DefineConstants);UseNewtonsoftJson</DefineConstants>
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
   </PropertyGroup>
 
   <!-- 在 GitHub 的 Action 构建会添加 GITHUB_ACTIONS 变量 -->
@@ -43,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="dotnetCampus.LatestCSharpFeatures" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Newtonsoft.Json" Condition="'$(CanUseNewtonsoftJson)'=='true'"/>
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="Microsoft.CSharp" />
   </ItemGroup>

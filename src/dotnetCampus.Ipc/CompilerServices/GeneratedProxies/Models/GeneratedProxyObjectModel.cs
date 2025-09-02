@@ -4,7 +4,9 @@ using System.Runtime.Serialization;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 
+#if UseNewtonsoftJson
 using Newtonsoft.Json.Linq;
+#endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 [DataContract]
@@ -36,7 +38,11 @@ internal class GeneratedProxyObjectModel
     /// 远端对象的值。
     /// </summary>
     [DataMember(Name = "v")]
+#if UseNewtonsoftJson
     public JToken? Value { get; set; }
+#else
+    public object? Value { get; set; }
+#endif
 
     /// <summary>
     /// 将 <see cref="Value"/> 转换为 <typeparamref name="T"/> 类型的对象。

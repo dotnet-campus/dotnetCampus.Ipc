@@ -4,7 +4,9 @@ using System.Text;
 
 using dotnetCampus.Ipc.Messages;
 
+#if UseNewtonsoftJson
 using Newtonsoft.Json;
+#endif
 
 namespace dotnetCampus.Ipc.Serialization
 {
@@ -26,10 +28,14 @@ namespace dotnetCampus.Ipc.Serialization
                 throw new ArgumentNullException(nameof(model));
             }
 
+#if UseNewtonsoftJson
             var json = JsonConvert.SerializeObject(model);
             var data = Encoding.UTF8.GetBytes(json);
             var message = new IpcMessage(tag, new IpcMessageBody(data));
             return message;
+#else
+            throw new NotSupportedException("当前不支持非 Newtonsoft.Json 的 JSON 序列化方式。");
+#endif
         }
 
         /// <summary>
@@ -49,9 +55,15 @@ namespace dotnetCampus.Ipc.Serialization
             }
             try
             {
+#if UseNewtonsoftJson
                 model = JsonConvert.DeserializeObject<T>(stringBody);
-                return true;
+                return model != null;
+#else
+                throw new NotSupportedException("当前不支持非 Newtonsoft.Json 的 JSON 序列化方式。");
+#endif
+
             }
+#if UseNewtonsoftJson
             catch (JsonSerializationException)
             {
                 model = null;
@@ -67,6 +79,7 @@ namespace dotnetCampus.Ipc.Serialization
                 model = null;
                 return false;
             }
+#endif
             catch
             {
                 // 此反序列化过程抛出异常是合理行为（毕竟 IPC 谁都能发，但应该主要是 JsonSerializationException）。
@@ -81,3 +94,4 @@ namespace dotnetCampus.Ipc.Serialization
         }
     }
 }
+
