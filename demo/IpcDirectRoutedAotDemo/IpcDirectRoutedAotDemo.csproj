@@ -7,8 +7,6 @@
 
     <IsPackable>false</IsPackable>
     <PublishAot>true</PublishAot>
-
-    <IlcDisableReflection>true</IlcDisableReflection>
   </PropertyGroup>
 
   <ItemGroup>
