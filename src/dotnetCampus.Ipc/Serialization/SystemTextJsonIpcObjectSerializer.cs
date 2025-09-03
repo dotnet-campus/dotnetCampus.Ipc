@@ -25,7 +25,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     /// <param name="jsonSerializerContext">业务端用于业务对象序列化和反序列化的 JSON 序列化上下文。可由源生成器生成。</param>
     public SystemTextJsonIpcObjectSerializer(JsonSerializerContext jsonSerializerContext)
     {
-        JsonSerializerContext = new IpcDefaultJsonSerializerContext(jsonSerializerContext);
+        JsonSerializerContext = new IpcCompositeJsonSerializerContext(jsonSerializerContext);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 }
 
-file class IpcDefaultJsonSerializerContext(JsonSerializerContext businessContext) : JsonSerializerContext(null)
+internal class IpcCompositeJsonSerializerContext(JsonSerializerContext businessContext) : JsonSerializerContext(null)
 {
     public override JsonTypeInfo? GetTypeInfo(Type type)
     {
