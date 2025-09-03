@@ -2,6 +2,8 @@
 
 class Foo : IFoo
 {
+    public string Name { get; set; } = "Foo";
+
     public int Add(int a, int b)
     {
         Console.WriteLine($"a({a})+b({b})={a + b}");
