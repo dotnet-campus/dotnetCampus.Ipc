@@ -1,29 +1,34 @@
 ﻿#if NET6_0_OR_GREATER
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using System.Threading.Tasks;
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
 namespace dotnetCampus.Ipc.Serialization;
 
-public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
+/// <summary>
+/// 以 <see cref="System.Text.Json"/> 作为底层机制支持 IPC 对象传输。
+/// </summary>
+public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 {
-    public IpcObjectSystemJsonSerializer(JsonSerializerContext jsonSerializerContext)
+    /// <summary>
+    /// 创建 <see cref="SystemTextJsonIpcObjectSerializer"/> 的新实例。
+    /// </summary>
+    /// <param name="jsonSerializerContext">业务端用于业务对象序列化和反序列化的 JSON 序列化上下文。可由源生成器生成。</param>
+    public SystemTextJsonIpcObjectSerializer(JsonSerializerContext jsonSerializerContext)
     {
         JsonSerializerContext = new IpcDefaultJsonSerializerContext(jsonSerializerContext);
     }
 
+    /// <summary>
+    /// 获取 JSON 序列化上下文。
+    /// </summary>
     public JsonSerializerContext JsonSerializerContext { get; }
 
+    /// <inheritdoc />
     public byte[] Serialize(object? value)
     {
         if (value is null)
@@ -35,6 +40,7 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         return Encoding.UTF8.GetBytes(json);
     }
 
+    /// <inheritdoc />
     public void Serialize(Stream stream, object? value)
     {
         if (value is null)
@@ -46,6 +52,7 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
     }
 
+    /// <inheritdoc />
     public IpcJsonElement SerializeToElement(object? value)
     {
         if (value is null)
@@ -56,17 +63,20 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
         return new IpcJsonElement { RawValueOnSystemTextJson = JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext), };
     }
 
+    /// <inheritdoc />
     public T? Deserialize<T>(byte[] data, int start, int length)
     {
         var span = data.AsSpan(start, length);
         return JsonSerializer.Deserialize<T>(span, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 
+    /// <inheritdoc />
     public T? Deserialize<T>(Stream stream)
     {
         return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
     }
 
+    /// <inheritdoc />
     public T? Deserialize<T>(IpcJsonElement jsonElement)
     {
         if (jsonElement.RawValueOnSystemTextJson is not { } element)
@@ -77,21 +87,14 @@ public class IpcObjectSystemJsonSerializer : IIpcObjectSerializer
     }
 }
 
-file class IpcDefaultJsonSerializerContext : JsonSerializerContext
+file class IpcDefaultJsonSerializerContext(JsonSerializerContext businessContext) : JsonSerializerContext(null)
 {
-    public IpcDefaultJsonSerializerContext(JsonSerializerContext businessContext) : base(null)
-    {
-        _businessContext = businessContext;
-    }
-
-    private readonly JsonSerializerContext _businessContext;
-
     public override JsonTypeInfo? GetTypeInfo(Type type)
     {
-        return _businessContext.GetTypeInfo(type) ?? IpcInternalJsonSerializerContext.Default.GetTypeInfo(type);
+        return businessContext.GetTypeInfo(type) ?? IpcInternalJsonSerializerContext.Default.GetTypeInfo(type);
     }
 
-    protected override JsonSerializerOptions GeneratedSerializerOptions => _businessContext.Options;
+    protected override JsonSerializerOptions GeneratedSerializerOptions => businessContext.Options;
 }
 
 // 基础类型

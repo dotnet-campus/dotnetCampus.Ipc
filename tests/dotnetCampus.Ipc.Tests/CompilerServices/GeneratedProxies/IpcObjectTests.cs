@@ -551,7 +551,7 @@ public class IpcObjectTests
     private async Task<(IPeerProxy peer, IFakeIpcObject proxy)> CreateIpcPairAsync(string name, FakeIpcObject? instance = null)
     {
 #if NET6_0_OR_GREATER
-        var configuration = new IpcConfiguration().UseSystemJsonIpcObjectSerializer(TestJsonContext.Default);
+        var configuration = new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(TestJsonContext.Default);
 #endif
 
         var aName = $"IpcObjectTests.IpcTests.{name}.A";

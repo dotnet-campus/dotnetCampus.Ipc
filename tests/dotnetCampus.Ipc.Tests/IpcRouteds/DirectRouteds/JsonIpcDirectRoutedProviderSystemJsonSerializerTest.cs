@@ -15,7 +15,7 @@ public class JsonIpcDirectRoutedProviderSystemJsonSerializerTest
     public async Task TestRequestNotMatchResponse()
     {
         var name = "JsonIpcDirectRoutedProviderSystemJsonSerializerTest_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(name, new IpcConfiguration().UseSystemJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
+        var serverProvider = new JsonIpcDirectRoutedProvider(name, new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
         var requestPath = "RequestPath1";
         var requestValue = "请求的内容";
         serverProvider.AddRequestHandler(requestPath, (JsonIpcDirectRoutedSystemJsonSerializerTestRequest1 request) =>
@@ -26,7 +26,7 @@ public class JsonIpcDirectRoutedProviderSystemJsonSerializerTest
         });
         serverProvider.StartServer();
 
-        var clientProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration: new IpcConfiguration().UseSystemJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
+        var clientProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration: new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
 
         JsonIpcDirectRoutedClientProxy jsonIpcDirectRoutedClientProxy = await clientProvider.GetAndConnectClientAsync(name);
 

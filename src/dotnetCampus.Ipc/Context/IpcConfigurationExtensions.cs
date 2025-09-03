@@ -25,7 +25,7 @@ public static class IpcConfigurationExtensions
         }
         else
         {
-            configuration.IpcObjectSerializer = new IpcObjectJsonSerializer(jsonSerializer);
+            configuration.IpcObjectSerializer = new NewtonsoftJsonIpcObjectSerializer(jsonSerializer);
         }
 
         return configuration;
@@ -39,10 +39,10 @@ public static class IpcConfigurationExtensions
     /// <param name="configuration"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public static IpcConfiguration UseSystemJsonIpcObjectSerializer(this IpcConfiguration configuration,
+    public static IpcConfiguration UseSystemTextJsonIpcObjectSerializer(this IpcConfiguration configuration,
         System.Text.Json.Serialization.JsonSerializerContext context)
     {
-        configuration.IpcObjectSerializer = new IpcObjectSystemJsonSerializer(context);
+        configuration.IpcObjectSerializer = new SystemTextJsonIpcObjectSerializer(context);
         return configuration;
     }
 #endif
