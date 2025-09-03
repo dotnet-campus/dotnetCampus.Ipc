@@ -14,6 +14,11 @@ namespace dotnetCampus.Ipc.Serialization;
 /// </summary>
 public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 {
+    internal SystemTextJsonIpcObjectSerializer()
+    {
+        JsonSerializerContext = IpcInternalJsonSerializerContext.Default;
+    }
+
     /// <summary>
     /// 创建 <see cref="SystemTextJsonIpcObjectSerializer"/> 的新实例。
     /// </summary>
