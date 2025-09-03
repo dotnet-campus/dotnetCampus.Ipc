@@ -550,18 +550,10 @@ public class IpcObjectTests
 
     private async Task<(IPeerProxy peer, IFakeIpcObject proxy)> CreateIpcPairAsync(string name, FakeIpcObject? instance = null)
     {
-#if NET8_0_OR_GREATER
-        // 在 .NET 8.0 及更高版本中，测试 System.Text.Json 作为底层 IPC 传输机制。
-        var configuration = new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(TestJsonContext.Default);
-#else
-        // 在旧版本的 .NET 中，测试 Newtonsoft.Json 作为底层 IPC 传输机制。
-        var configuration = new IpcConfiguration().UseNewtonsoftJsonIpcObjectSerializer(null);
-#endif
-
         var aName = $"IpcObjectTests.IpcTests.{name}.A";
         var bName = $"IpcObjectTests.IpcTests.{name}.B";
-        var aProvider = new IpcProvider(aName, configuration);
-        var bProvider = new IpcProvider(bName, configuration);
+        var aProvider = new IpcProvider(aName, TestJsonContext.CreateIpcConfiguration());
+        var bProvider = new IpcProvider(bName, TestJsonContext.CreateIpcConfiguration());
         aProvider.StartServer();
         bProvider.StartServer();
         var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(instance ?? new FakeIpcObject());

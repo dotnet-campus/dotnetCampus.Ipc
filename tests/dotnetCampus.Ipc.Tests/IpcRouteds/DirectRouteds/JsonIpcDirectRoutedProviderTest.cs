@@ -20,8 +20,8 @@ public class JsonIpcDirectRoutedProviderTest
         var name = "JsonIpcDirectRoutedProviderTest_1";
         var aName = $"IpcObjectTests.IpcTests.{name}.A";
         var bName = $"IpcObjectTests.IpcTests.{name}.B";
-        var aProvider = new IpcProvider(aName);
-        var bProvider = new IpcProvider(bName);
+        var aProvider = new IpcProvider(aName, TestJsonContext.CreateIpcConfiguration());
+        var bProvider = new IpcProvider(bName, TestJsonContext.CreateIpcConfiguration());
 
         var serverProvider = new JsonIpcDirectRoutedProvider(aProvider);
         var clientProvider = new JsonIpcDirectRoutedProvider(bProvider);
@@ -62,7 +62,9 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Request_1";
         var serverProvider = new JsonIpcDirectRoutedProvider(serverName,
-            new IpcConfiguration() { IpcLoggerProvider = name => new IpcLogger(name) { MinLogLevel = LogLevel.Debug, } });
+            new IpcConfiguration() { IpcLoggerProvider = name => new IpcLogger(name) { MinLogLevel = LogLevel.Debug, } }
+                .UseTestFrameworkJsonSerializer()
+            );
         var argument = new FakeArgument("TestName", 1);
 
         var responseText = $"OK_{Guid.NewGuid().ToString()}";
@@ -111,7 +113,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Request_2";
         var clientName = "JsonIpcDirectRoutedProviderTest_Request_Client_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var argument = new FakeArgument("TestName", 1);
 
         var responseText = Guid.NewGuid().ToString();
@@ -157,7 +159,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Request_3";
         // 这样的创建方式也是对 IPC 连接最高定制的方式
-        IpcProvider ipcProvider = new(serverName);
+        IpcProvider ipcProvider = new(serverName, TestJsonContext.CreateIpcConfiguration());
         var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
         var argument = new FakeArgument("TestName", 1);
         int enterCount = 0;
@@ -208,7 +210,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Request_4";
 
-        IpcProvider ipcProvider = new(serverName);
+        IpcProvider ipcProvider = new(serverName, TestJsonContext.CreateIpcConfiguration());
         var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
 
         serverProvider1.AddRequestHandler("F1", (FakeArgument arg) =>
@@ -234,7 +236,7 @@ public class JsonIpcDirectRoutedProviderTest
     {
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_TestException_1";
-        var jsonIpcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var jsonIpcDirectRoutedProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var path = "Foo";
         jsonIpcDirectRoutedProvider.AddRequestHandler(path, (FakeArgument fakeArgument) =>
         {
@@ -313,7 +315,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Notify_3";
         // 这样的创建方式也是对 IPC 连接最高定制的方式
-        IpcProvider ipcProvider = new(serverName);
+        IpcProvider ipcProvider = new(serverName, TestJsonContext.CreateIpcConfiguration());
         var serverProvider1 = new JsonIpcDirectRoutedProvider(ipcProvider);
         var argument = new FakeArgument("TestName", 1);
         int enterCount = 0;
@@ -368,7 +370,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Notify_2";
         var clientName = "JsonIpcDirectRoutedProviderTest_Notify_Client_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var argument = new FakeArgument("TestName", 1);
 
         int enterCount = 0;
@@ -410,7 +412,7 @@ public class JsonIpcDirectRoutedProviderTest
     {
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Notify_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var routedPath = "Foo1";
         var argument = new FakeArgument("TestName", 1);
 
@@ -496,7 +498,7 @@ public class JsonIpcDirectRoutedProviderTest
     {
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var routedPath = "Foo1";
 
         // 注册无参数请求处理
@@ -555,7 +557,7 @@ public class JsonIpcDirectRoutedProviderTest
         // 期望这样的情况服务端依然能够收到请求，达成兼容
         // 初始化服务端
         var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_3";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var routedPath = "Foo1";
 
         // 服务端订阅有参
@@ -585,7 +587,7 @@ public class JsonIpcDirectRoutedProviderTest
     public async Task TestParameterless4()
     {
         var serverName = "JsonIpcDirectRoutedProviderTest_Test_Parameterless_4";
-        var serverProvider = new JsonIpcDirectRoutedProvider(serverName);
+        var serverProvider = new JsonIpcDirectRoutedProvider(serverName, TestJsonContext.CreateIpcConfiguration());
         var routedPath = "Foo1";
 
         // 服务端订阅无参
@@ -609,13 +611,13 @@ public class JsonIpcDirectRoutedProviderTest
         Assert.AreEqual(nameof(TestParameterless), result.Name);
     }
 
-    record class FakeArgument(string Name, int Count)
+    internal record class FakeArgument(string Name, int Count)
     {
     }
 
-    record class FakeResult(string Name);
+    internal record class FakeResult(string Name);
 
-    class FooException1 : Exception
+    private class FooException1 : Exception
     {
         public FooException1(string? message) : base(message)
         {
