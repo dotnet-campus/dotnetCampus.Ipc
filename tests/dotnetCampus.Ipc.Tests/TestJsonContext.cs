@@ -13,5 +13,10 @@ namespace dotnetCampus.Ipc.Tests;
 [JsonSerializable(typeof(FakeIpcObjectSubModelA))]
 [JsonSerializable(typeof(IFakeIpcObject.NestedEnum))]
 [JsonSerializable(typeof((double a, uint b, int? c, byte d)))]
+[JsonSourceGenerationOptions(
+    PropertyNameCaseInsensitive = false,
+    IncludeFields = true,
+    UseStringEnumConverter = true)]
 internal partial class TestJsonContext : JsonSerializerContext;
+
 #endif
