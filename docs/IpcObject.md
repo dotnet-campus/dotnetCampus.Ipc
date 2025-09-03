@@ -100,3 +100,109 @@ class Foo : IFoo
 
 ## 进阶用法
 
+### `IpcPublic`
+
+上述 IPC 初始化的部分不变，实现不变的情况下，接口 `IFoo` 上的 `[IpcPublic]` 接口还有更多玩法。
+
+```csharp
+// IgnoresIpcException = true
+//  - A 进程调用 IFoo 的「代理」时，忽略所有的 IPC 异常（即对方进程断开、IFoo 接口出现方法签名的变更等）
+//  - 但 A 进程仍然能收到 B 进程 IFoo 实现类的业务异常（如 ArgumentNullException）
+// Timeout = 1000
+//  - A 进程调用 IFoo 的「代理」时，最多等待 1000 毫秒
+//  - 超出时间没有返回，则方法会立即返回；如果方法带有返回值，则会返回返回类型的默认值
+[IpcPublic(IgnoresIpcException = true, Timeout = 1000)]
+```
+
+这些是对 `IFoo` 这个接口的全局设置。当然，还可以对它内部的每个成员单独设置更多属性：
+
+```csharp
+// DefaultReturn = "Error"
+//  - A 进程调用 IFoo「代理」的此方法时，如果真发生了 IPC 异常，则会返回指定的默认值
+//  - 在这里，是返回 "Error"，而不是 string 的默认值 null（这可以避免破坏可空性）
+[IpcMethod(DefaultReturn = "Error", IgnoresIpcException = true, Timeout = 2000)]
+Task<string> AddAsync(string a, int b);
+```
+
+特别的，对于 void 返回值的方法，还有一个属性 `WaitsVoid`：
+
+```csharp
+// WaitsVoid = true
+//  - 默认情况下，IPC 不会等待 void 方法返回（因为库作者 @walterlv 认为如果你想等待，改用异步方法更好）
+//  - 这意味着你甚至还收不到 B 进程此方法实现的异常
+//  - 但如果你确实希望这个 void 像一个本地 void 一样等待，可以设置此属性
+[IpcMethod(WaitsVoid = true)]
+void Add(int a, int b);
+```
+
+哦，对了，属性上也有属性可以设置哦：
+
+```csharp
+// IsReadonly = true
+//  - 神奇吧，一个 get/set 属性设成只读有什么作用？
+//  - 这意味着 A 进程通过「代理」获取此属性的值时，会假设此属性不会再变了，于是缓存起来，只拿这一次；以后都使用这次的缓存
+[IpcProperty(IsReadonly = true)]
+string Name { get; set; }
+```
+
+你可能注意到我们还有一个 `IpcEvent` 可以标在事件上，不过很遗憾地告诉你，目前还没实现事件。所以你会看到我们写了个分析器告诉你不要这么做。
+
+### `IpcShape`
+
+好了，现在更麻烦的事来了。假设你有三个进程 A、B、C：
+
+- A 仍然是调用端
+- B 仍然是被调用端
+- 新增了一个 C，跟 A 一样是调用端，但希望用不同的方式调用 `IFoo` 这个接口怎么办？
+
+我们前面介绍了 `[IpcPublic]` 特性，它可以用来标记接口及其成员，以详细定制各个成员的 IPC 行为。但是，它一旦在接口上标记了，就意味着所有进程对这个接口的调用都会遵循这个标记的规则。
+
+有没有什么方法，能够允许我 A 和 C 进程使用不同的规则来调用 `IFoo` 接口呢？
+
+答案就是 `[IpcShape]` 特性：
+
+- 你可以在 C 进程里额外定义一个 `IFoo` 接口的空实现
+- 然后逐一设置这个空实现中你希望与 `IFoo` 接口中所定义的不同的调用规则
+
+```csharp
+[IpcShape(typeof(IFoo))]
+internal class IpcFooShape : IFoo
+{
+    // IFoo 接口上没有设置此属性，所以 A 进程是默认方式访问这个属性的
+    // 但是 C 进程通过 IpcShape，在不影响 A 进程访问规则的情况下，定制了 C 进程下的访问规则
+    [IpcProperty(IsReadonly = true)]
+    public string Name { get; set; } = null!;
+
+    public int Add(int a, int b) => throw null!;
+    public async Task<string> AddAsync(string a, int b) => throw null!;
+}
+```
+
+那么 C 进程的初始化需要有所变化：
+
+```diff
+    var ipcProvider = new IpcProvider("IpcRemotingObjectClientDemo");
+    ipcProvider.StartServer();
+    var peer = await ipcProvider.GetAndConnectToPeerAsync("IpcRemotingObjectServerDemo");
+
+    // 获取来自 B 进程的 IFoo 接口的「代理」（Proxy）
+--  var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
+++  // 不过这次，我们使用了 IpcFooShape 这个「形状」（Shape）作为「代理」（Proxy）
+++  var foo = ipcProvider.CreateIpcProxy<IpcFooShape>(peer);
+
+    Console.WriteLine(foo.Name);
+    Console.WriteLine(foo.Add(1, 2));
+    Console.WriteLine(await foo.AddAsync("a", 1));
+    Console.Read();
+```
+
+## 最佳实践
+
+为了更好地发挥 IPC「远程对象调用」的代码编写直观性优势，同时又避免不太喜欢的行为，库作者 @walterlv 推荐：
+
+1. IPC 接口中尽量全部使用异步方法
+    - 除非你希望这个对象用起来更加像一个本地对象一样，拥有属性、同步的方法
+2. 如果一定要用同步方法，也请避免使用 void 返回值
+    - 如果真用了 void 返回值，请认真考虑一下要不要设置 `WaitsVoid` 属性
+
+好了，就这些。其他你随便。
