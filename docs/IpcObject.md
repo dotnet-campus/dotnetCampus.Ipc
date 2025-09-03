@@ -196,6 +196,43 @@ internal class IpcFooShape : IFoo
     Console.Read();
 ```
 
+## 高级用法
+
+DotNetCampus.Ipc「远程对象调用」支持你嵌套 IPC 对象，这意味着你可以实现更加复杂的 IPC 需求。
+
+```csharp
+/// <summary>
+/// 嵌套 IPC 类型演示。
+/// </summary>
+[IpcPublic]
+public interface IBar
+{
+    /// <summary>
+    /// 这是一个超复杂的方法，参数和返回值都是 IPC 对象。
+    /// </summary>
+    Task<IBaz> AddAsync(IQux qux, IQuux quux);
+}
+```
+
+想想看，这里的每个类型，谁是调用方，谁是被调用方（实现方）？
+
+假设 A 进程试图调用 B 进程的 `IBar` 接口：
+
+| 类型    | A 进程           | B 进程           | 描述                                         |
+| ------- | ---------------- | ---------------- | -------------------------------------------- |
+| `IBar`  | 代理             | 实现（需要对接） | A 进程调用 `IBar` 的代理以访问 B 进程        |
+| `IBaz`  | 代理             | 对接（无需对接） | A 进程拿到了 B 进程的 `IBaz` 的代理          |
+| `IQux`  | 实现（无需对接） | 代理             | A 进程有一个 IQux 的实现，会传给 B 进程去用  |
+| `IQuux` | 实现（无需对接） | 代理             | A 进程有一个 IQuux 的实现，会传给 B 进程去用 |
+
+这里的 `IBaz` `IQux` `IQuux` 都需要标记 `[IpcPublic]` 或 `[IpcShape]`（当然，我们的分析器也会提示你需要标的）。但好在你不需要额外编写对接代码；我的意思是 IPC 的初始化代码里，你只需要处理 `IBar` 这一个接口就够了，剩下的 DotNetCampus.Ipc 会帮你完成。
+
+## 性能和 AOT 兼容性
+
+1. DotNetCampus.Ipc 库使用源生成器生成「代理」（Proxy）和「对接」（Joint）的代码，旨在提升性能和确保 AOT 兼容性。
+    - 目前还仍有少量代码在使用反射，不过我们计划很快将其完全消除
+2. DotNetCampus.Ipc 已移除 Newtonsoft.Json 库，完全使用 System.Text.Json 并配合源生成器来做跨进程对象的传输，旨在大幅减少 AOT 之后的大小。
+
 ## 最佳实践
 
 为了更好地发挥 IPC「远程对象调用」的代码编写直观性优势，同时又避免不太喜欢的行为，库作者 @walterlv 推荐：
