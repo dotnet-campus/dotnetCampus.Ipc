@@ -73,7 +73,8 @@ public class IpcObjectTests
         Assert.AreEqual(true, result2);
     }
 
-    [TestMethod("IPC 代理生成：没有原生序列化的属性（以指针属性为例）")]
+#if !NET8_0_OR_GREATER
+    [TestMethod("IPC 代理生成：没有原生序列化的属性（以指针属性为例，仅支持 Newtonsoft.Json）")]
     public async Task IpcPropertyTests5()
     {
         // 准备。
@@ -85,6 +86,7 @@ public class IpcObjectTests
         // 植物。
         Assert.AreEqual(new IntPtr(1), result);
     }
+#endif
 
     [TestMethod("IPC 代理生成：要等待完成的 void 方法")]
     public async Task IpcMethodsTests1()
