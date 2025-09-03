@@ -4,7 +4,7 @@ using dotnetCampus.Ipc.Tests.CompilerServices;
 
 namespace dotnetCampus.Ipc.Tests;
 
-#if NET6_0_OR_GREATER
+#if NET8_0_OR_GREATER
 
 [JsonSerializable(typeof(BindingFlags))]
 [JsonSerializable(typeof(List<string>))]
