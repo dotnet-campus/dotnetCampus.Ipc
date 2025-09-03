@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using DotNetCampus.Cli;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.WpfDemo.View;
@@ -34,7 +34,7 @@ namespace dotnetCampus.Ipc.WpfDemo
             InitializeComponent();
             DataContext = this;
 
-            var options = dotnetCampus.Cli.CommandLine.Parse(Environment.GetCommandLineArgs()).As<Options>();
+            var options = CommandLine.Parse(Environment.GetCommandLineArgs().Skip(1).ToArray()).As<Options>();
             if (!string.IsNullOrEmpty(options.ServerName))
             {
                 Debugger.Launch();
