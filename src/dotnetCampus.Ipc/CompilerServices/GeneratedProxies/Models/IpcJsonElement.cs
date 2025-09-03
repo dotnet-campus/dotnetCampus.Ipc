@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Text.Json;
 #endif
 
+// ReSharper disable ReplaceWithSingleAssignment.False
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
 /// <summary>
@@ -34,10 +35,8 @@ public readonly record struct IpcJsonElement
     {
         get
         {
-            var isNewtonsoftJsonNull = false;
-            var isSystemTextJsonNull = false;
-
 #if UseNewtonsoftJson
+            var isNewtonsoftJsonNull = false;
             if (RawValueOnNewtonsoftJson is null)
             {
                 isNewtonsoftJsonNull = true;
@@ -46,7 +45,11 @@ public readonly record struct IpcJsonElement
             {
                 isNewtonsoftJsonNull = true;
             }
+#else
+            var isNewtonsoftJsonNull = true;
 #endif
+
+            var isSystemTextJsonNull = false;
 #if NET6_0_OR_GREATER
             if (RawValueOnSystemTextJson is null)
             {
