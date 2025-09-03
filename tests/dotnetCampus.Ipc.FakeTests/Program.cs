@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
 

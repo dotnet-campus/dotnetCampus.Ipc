@@ -250,7 +250,6 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
 
     internal sealed override async Task<IGarmObject> CallMethodAsync(ulong memberId, string methodName, IGarmObject[]? args)
     {
-        var count = args is null ? 0 : args.Length;
         if (_asyncMethods.TryGetValue(memberId, out var tuple))
         {
             return await tuple.asyncMethod(args).ConfigureAwait(false);

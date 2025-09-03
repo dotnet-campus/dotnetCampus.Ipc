@@ -118,8 +118,6 @@ file class IpcDefaultJsonSerializerContext : JsonSerializerContext
 [JsonSerializable(typeof(JsonIpcDirectRoutedParameterlessType))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedHandleRequestExceptionResponse.JsonIpcDirectRoutedHandleRequestExceptionInfo))]
-internal partial class IpcInternalJsonSerializerContext : JsonSerializerContext
-{
-}
+internal partial class IpcInternalJsonSerializerContext : JsonSerializerContext;
 
 #endif

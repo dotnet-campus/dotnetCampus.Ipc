@@ -63,7 +63,6 @@ public readonly record struct IpcJsonElement
 
     public static IpcJsonElement Serialize(object? value, IIpcObjectSerializer serializer)
     {
-        serializer.SerializeToElement(value);
         return value switch
         {
             null => new IpcJsonElement(),
