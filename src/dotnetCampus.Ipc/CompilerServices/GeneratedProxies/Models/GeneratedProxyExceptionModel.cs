@@ -78,7 +78,9 @@ internal class GeneratedProxyExceptionModel
             }
             else
             {
-                throw new IpcRemoteException($"不支持的远端异常类型 {typeName}。如果是忘加了，请添加到 ExceptionRebuilders 属性中，否则请抛 IPC 自定义的异常。", StackTrace);
+                throw new IpcRemoteException(
+                    $"远端抛出了异常 {typeName}: {Message}\n如需抛出普通异常，请联系 IPC 库作者将异常添加到 ExceptionRebuilders 中。",
+                    StackTrace);
             }
         }
 
@@ -93,6 +95,7 @@ internal class GeneratedProxyExceptionModel
         { typeof(InvalidCastException).FullName!, (m, e) => new InvalidCastException(m) },
         { typeof(InvalidOperationException).FullName!, (m, e) => new InvalidOperationException(m) },
         { typeof(NotImplementedException).FullName!, (m, e) => new NotImplementedException(m) },
+        { typeof(NotSupportedException).FullName!, (m, e) => new NotSupportedException(m) },
         { typeof(NullReferenceException).FullName!, (m, e) => new NullReferenceException(m) },
     };
 }
