@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.Attributes;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
@@ -10,6 +8,7 @@ using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
 using dotnetCampus.Ipc.Exceptions;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+
 /// <summary>
 /// 提供给自动生成的代理对象使用，以便能够生成通过 IPC 方式访问目标成员的能力。
 /// </summary>
@@ -119,7 +118,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
     /// <returns>可异步等待的属性设置。</returns>
     protected Task SetValueAsync<T>(ulong memberId, Garm<T> value, IpcProxyMemberNamedValues namedValues, [CallerMemberName] string propertyName = "")
     {
-        return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, memberId, propertyName, new IGarmObject[] { value }, namedValues);
+        return IpcInvokeAsync<object>(MemberInvokingType.SetProperty, memberId, propertyName, [value], namedValues);
     }
 
     /// <summary>
@@ -189,7 +188,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
         var ignoresIpcException = namedValues.IgnoresIpcException ?? RuntimeConfigs?.IgnoresIpcException ?? false;
         try
         {
-            return (namedValues.Timeout ?? RuntimeConfigs?.Timeout) is int timeout && timeout > 0
+            return (namedValues.Timeout ?? RuntimeConfigs?.Timeout) is { } timeout and > 0
                 ? await InvokeWithTimeoutAsync<T>(
                     callType,
                     memberId,
@@ -223,10 +222,6 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
                 ExceptionDispatchInfo.Capture(innerException).Throw();
                 throw;
             }
-        }
-        catch (Exception)
-        {
-            throw;
         }
     }
 

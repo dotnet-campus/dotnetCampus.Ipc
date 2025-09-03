@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
@@ -72,7 +73,8 @@ public class IpcObjectTests
         Assert.AreEqual(true, result2);
     }
 
-    [TestMethod("IPC 代理生成：没有原生序列化的属性（以指针属性为例）")]
+#if !NET8_0_OR_GREATER
+    [TestMethod("IPC 代理生成：没有原生序列化的属性（以指针属性为例，仅支持 Newtonsoft.Json）")]
     public async Task IpcPropertyTests5()
     {
         // 准备。
@@ -84,6 +86,7 @@ public class IpcObjectTests
         // 植物。
         Assert.AreEqual(new IntPtr(1), result);
     }
+#endif
 
     [TestMethod("IPC 代理生成：要等待完成的 void 方法")]
     public async Task IpcMethodsTests1()
@@ -551,8 +554,8 @@ public class IpcObjectTests
     {
         var aName = $"IpcObjectTests.IpcTests.{name}.A";
         var bName = $"IpcObjectTests.IpcTests.{name}.B";
-        var aProvider = new IpcProvider(aName);
-        var bProvider = new IpcProvider(bName);
+        var aProvider = new IpcProvider(aName, TestJsonContext.CreateIpcConfiguration());
+        var bProvider = new IpcProvider(bName, TestJsonContext.CreateIpcConfiguration());
         aProvider.StartServer();
         bProvider.StartServer();
         var aJoint = aProvider.CreateIpcJoint<IFakeIpcObject>(instance ?? new FakeIpcObject());

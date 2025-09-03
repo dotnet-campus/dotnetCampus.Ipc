@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!--
+      请保持 net6.0 不变，不可升级到 net8.0：
+      1. 在 net6.0 下我们将使用 Newtonsoft.Json 作为 IPC 的底层传输机制；
+      2. 在 net8.0 下我们将使用 System.Text.Json 作为 IPC 的底层传输机制；
+      3. 主测试项目已经是双框架的了，但不能测试这两种机制之间的兼容性，所以需要一个旧框架的测试项目来专门测试。
+    -->
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Exceptions;
+using dotnetCampus.Ipc.Serialization;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Utils;
 
@@ -95,10 +92,10 @@ internal class IpcProxyInvokingHelper
             return null;
         }
 
-        var requestMessage = GeneratedProxyMemberInvokeModel.Serialize(model);
+        var requestMessage = Context.ObjectSerializer.SerializeToIpcMessage(model, model.ToString());
         //requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
         var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
-        if (GeneratedProxyMemberReturnModel.TryDeserialize(responseMessage, out var returnModel))
+        if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberReturnModel>(responseMessage, out var returnModel))
         {
             return returnModel;
         }
@@ -108,10 +105,9 @@ internal class IpcProxyInvokingHelper
         }
     }
 
-    private T? Cast<T>(object? arg)
-    {
-        return KnownTypeConverter.ConvertBackFromJTokenOrObject<T>(arg);
-    }
+    private T? Cast<T>(IpcJsonElement? arg) => arg is { } jsonElement
+        ? IpcJsonElement.Deserialize<T>(jsonElement, Context.ObjectSerializer)
+        : default!;
 
     private GeneratedProxyObjectModel? SerializeArg(IGarmObject argModel)
     {
@@ -134,7 +130,7 @@ internal class IpcProxyInvokingHelper
             // 如果此参数只是一个普通对象。
             return new GeneratedProxyObjectModel
             {
-                Value = KnownTypeConverter.Convert(argModel.Value),
+                Value = IpcJsonElement.Serialize(argModel.Value, Context.ObjectSerializer),
             };
         }
     }

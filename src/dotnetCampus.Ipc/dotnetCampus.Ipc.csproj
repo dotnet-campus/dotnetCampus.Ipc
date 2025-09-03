@@ -1,7 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;net461;net45;net9.0</TargetFrameworks>
+    <!--
+      We support:
+      1. The latest .NET version (net9)
+      2. Long-term support .NET version (net8, net6, netcoreapp3.1)
+      3. Legacy .NET Framework (net45)
+    -->
+    <TargetFrameworks>net9.0;net8.0;net6.0;netcoreapp3.1;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -12,9 +18,10 @@
 
   <PropertyGroup>
     <CanUseNewtonsoftJson>true</CanUseNewtonsoftJson>
-    <CanUseNewtonsoftJson Condition="'$(TargetFramework)'=='net9.0'">false</CanUseNewtonsoftJson>
+    <CanUseNewtonsoftJson Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">false</CanUseNewtonsoftJson>
     <DefineConstants Condition="'$(CanUseNewtonsoftJson)'=='true'">$(DefineConstants);UseNewtonsoftJson</DefineConstants>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
+    <IsIpcLegacyFramework Condition="'$(TargetFramework)'=='net45'">true</IsIpcLegacyFramework>
   </PropertyGroup>
 
   <!-- 在 GitHub 的 Action 构建会添加 GITHUB_ACTIONS 变量 -->
@@ -50,9 +57,9 @@
   <ItemGroup>
     <PackageReference Include="dotnetCampus.LatestCSharpFeatures" PrivateAssets="all" />
     <PackageReference Include="dotnetCampus.AsyncWorkerCollection.Source" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Condition="'$(CanUseNewtonsoftJson)'=='true'"/>
-    <PackageReference Include="System.ValueTuple" />
-    <PackageReference Include="Microsoft.CSharp" />
+    <PackageReference Include="Newtonsoft.Json" Condition="'$(CanUseNewtonsoftJson)'=='true'" />
+    <PackageReference Include="System.ValueTuple" Condition="'$(IsIpcLegacyFramework)'=='true'" />
+    <PackageReference Include="Microsoft.CSharp" Condition="'$(IsIpcLegacyFramework)'=='true'" />
   </ItemGroup>
 
   <ItemGroup>

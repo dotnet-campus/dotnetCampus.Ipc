@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Contexts;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
+using dotnetCampus.Ipc.Serialization;
 using dotnetCampus.Ipc.Utils;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
@@ -22,14 +19,18 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 包含所有目前已公开的 IPC 实例。
         /// </summary>
         private readonly ConcurrentDictionary<(string typeFullName, string objectId), GeneratedIpcJoint> _joints = new();
-        private readonly GeneratedProxyJointIpcContext _context;
         private readonly IpcContext _ipcContext;
 
         internal PublicIpcJointManager(GeneratedProxyJointIpcContext context, IpcContext ipcContext)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            Context = context ?? throw new ArgumentNullException(nameof(context));
             _ipcContext = ipcContext ?? throw new ArgumentNullException(nameof(ipcContext));
         }
+
+        /// <summary>
+        /// 包含基于 .NET 类型的 IPC 传输上下文信息。
+        /// </summary>
+        public GeneratedProxyJointIpcContext Context { get; }
 
         /// <summary>
         /// 以契约 <typeparamref name="TContract"/> 的方式公开对象 <paramref name="joint"/>，使其可被其他进程发现并使用。
@@ -69,12 +70,12 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </returns>
         public bool TryJoint(IIpcRequestContext request, out Task<IIpcResponseMessage> responseTask)
         {
-            if (GeneratedProxyMemberInvokeModel.TryDeserialize(request.IpcBufferMessage, out var requestModel)
+            if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberInvokeModel>(request.IpcBufferMessage, out var requestModel)
                 && TryFindJoint(requestModel, out var joint)
                 && requestModel.MemberName is { } memberName)
             {
                 var returnModelTask = InvokeAndReturn(joint, requestModel, request.Peer);
-                responseTask = GeneratedIpcJointResponse.FromAsyncReturnModel(returnModelTask)
+                responseTask = GeneratedIpcJointResponse.FromAsyncReturnModel(returnModelTask, Context.ObjectSerializer)
                     .As<GeneratedIpcJointResponse, IIpcResponseMessage>();
                 return true;
             }
@@ -187,7 +188,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                 else
                 {
                     var ipcType = parameterType;
-                    if (_context.TryCreateProxyFromSerializationInfo(peer, ipcType, argModel.Id, out var proxy))
+                    if (Context.TryCreateProxyFromSerializationInfo(peer, ipcType, argModel.Id, out var proxy))
                     {
                         // 如果参数模型表示需要通过代理访问一个 IPC 远端对象，则创建一个代理对象。
                         args[i] = new Garm(proxy, ipcType);
@@ -195,7 +196,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     else
                     {
                         // 如果参数模型表示是一个普通的值，则直接使用这个值。
-                        args[i] = new Garm(argModel?.Value, parameterType);
+                        args[i] = new Garm(argModel.Value, parameterType);
                     }
                 }
             }
@@ -210,20 +211,22 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <returns>可被序列化进行 IPC 传输的返回值模型。</returns>
         private GeneratedProxyMemberReturnModel CreateReturnModelFromReturnObject(IGarmObject returnModel)
         {
-            if (_context.TryCreateSerializationInfoFromIpcRealInstance(returnModel, out var objectId, out var ipcTypeFullName))
+            if (Context.TryCreateSerializationInfoFromIpcRealInstance(returnModel, out var objectId, out var ipcTypeFullName))
             {
+                // 如果是一个 IPC 对象。
                 return new GeneratedProxyMemberReturnModel
                 {
                     Return = new GeneratedProxyObjectModel
                     {
                         Id = objectId,
                         IpcTypeFullName = ipcTypeFullName,
-                    }
+                    },
                 };
             }
             else
             {
-                return new GeneratedProxyMemberReturnModel(returnModel.Value);
+                // 如果是一个普通对象。
+                return new GeneratedProxyMemberReturnModel(IpcJsonElement.Serialize(returnModel.Value, Context.ObjectSerializer));
             }
         }
 

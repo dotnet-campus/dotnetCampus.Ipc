@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using dotnetCampus.Ipc.Context;
+﻿using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
