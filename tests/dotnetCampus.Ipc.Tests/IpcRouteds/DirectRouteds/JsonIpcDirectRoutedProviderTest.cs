@@ -94,7 +94,7 @@ public class JsonIpcDirectRoutedProviderTest
         JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: new IpcConfiguration()
         {
             IpcLoggerProvider = name => new IpcLogger(name) { MinLogLevel = LogLevel.Debug, }
-        });
+        }.UseTestFrameworkJsonSerializer());
         // 对于 clientProvider 来说，可选调用 StartServer 方法
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -140,7 +140,7 @@ public class JsonIpcDirectRoutedProviderTest
 
         // 创建客户端
         // 允许无参数，如果只是做客户端使用的话
-        JsonIpcDirectRoutedProvider clientProvider = new(clientName);
+        JsonIpcDirectRoutedProvider clientProvider = new(clientName, TestJsonContext.CreateIpcConfiguration());
         // 对于 clientProvider 来说，可选调用 StartServer 方法
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -191,7 +191,7 @@ public class JsonIpcDirectRoutedProviderTest
 
         // 创建客户端
         // 允许无参数，如果只是做客户端使用的话
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
         var result = await clientProxy.GetResponseAsync<FakeResult>("Foo1", argument);
@@ -220,7 +220,7 @@ public class JsonIpcDirectRoutedProviderTest
         serverProvider1.StartServer();
 
         // 创建客户端
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
         var argument = new FakeArgument("TestName", 1);
 
@@ -249,7 +249,7 @@ public class JsonIpcDirectRoutedProviderTest
         });
         jsonIpcDirectRoutedProvider.StartServer();
 
-        var t = new JsonIpcDirectRoutedProvider();
+        var t = new JsonIpcDirectRoutedProvider(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         var client = await t.GetAndConnectClientAsync(serverName);
         try
         {
@@ -352,7 +352,7 @@ public class JsonIpcDirectRoutedProviderTest
 
         // 创建客户端
         // 允许无参数，如果只是做客户端使用的话
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
         await clientProxy.NotifyAsync("Foo1", argument);
         // 预期这条消息是在第二个服务处理的
@@ -395,7 +395,7 @@ public class JsonIpcDirectRoutedProviderTest
 
         // 创建客户端
         // 允许无参数，如果只是做客户端使用的话
-        JsonIpcDirectRoutedProvider clientProvider = new(clientName);
+        JsonIpcDirectRoutedProvider clientProvider = new(clientName, TestJsonContext.CreateIpcConfiguration());
         // 对于 clientProvider 来说，可选调用 StartServer 方法
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -437,7 +437,7 @@ public class JsonIpcDirectRoutedProviderTest
 
         // 创建客户端
         // 允许无参数，如果只是做客户端使用的话
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         clientProvider.StartServer();
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -510,7 +510,7 @@ public class JsonIpcDirectRoutedProviderTest
         serverProvider.StartServer();
 
         // 创建客户端
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         clientProvider.StartServer();
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -571,7 +571,7 @@ public class JsonIpcDirectRoutedProviderTest
         serverProvider.StartServer();
 
         // 创建客户端
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         clientProvider.StartServer();
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
@@ -599,7 +599,7 @@ public class JsonIpcDirectRoutedProviderTest
         serverProvider.StartServer();
 
         // 创建客户端
-        JsonIpcDirectRoutedProvider clientProvider = new();
+        JsonIpcDirectRoutedProvider clientProvider = new(ipcConfiguration: TestJsonContext.CreateIpcConfiguration());
         clientProvider.StartServer();
         var clientProxy = await clientProvider.GetAndConnectClientAsync(serverName);
 
