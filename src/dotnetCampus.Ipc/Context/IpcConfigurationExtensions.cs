@@ -1,5 +1,7 @@
 ﻿using dotnetCampus.Ipc.Serialization;
+#if UseNewtonsoftJson
 using Newtonsoft.Json;
+#endif
 
 namespace dotnetCampus.Ipc.Context;
 
@@ -8,6 +10,7 @@ namespace dotnetCampus.Ipc.Context;
 /// </summary>
 public static class IpcConfigurationExtensions
 {
+#if UseNewtonsoftJson
     /// <summary>
     /// 使用 Newtonsoft.Json 作为 IPC 对象序列化器
     /// </summary>
@@ -27,6 +30,7 @@ public static class IpcConfigurationExtensions
 
         return configuration;
     }
+#endif
 
 #if NET6_0_OR_GREATER
     /// <summary>

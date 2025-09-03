@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿#if UseNewtonsoftJson
+using Newtonsoft.Json;
+#endif
 
 namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 
@@ -7,7 +9,9 @@ namespace dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
 /// </summary>
 internal class JsonIpcDirectRoutedHandleRequestExceptionResponse
 {
+#if UseNewtonsoftJson
     [JsonProperty("__$Exception")]
+#endif
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonPropertyName("__$Exception")]
 #endif
