@@ -227,6 +227,34 @@ public interface IBar
 
 这里的 `IBaz` `IQux` `IQuux` 都需要标记 `[IpcPublic]` 或 `[IpcShape]`（当然，我们的分析器也会提示你需要标的）。但好在你不需要额外编写对接代码；我的意思是 IPC 的初始化代码里，你只需要处理 `IBar` 这一个接口就够了，剩下的 DotNetCampus.Ipc 会帮你完成。
 
+## 异常处理
+
+本 IPC 库有两种类型的异常：
+
+- `IpcLocalException`: 表示异常发生在本地进程中
+- `IpcRemoteException`: 表示异常发生在远端进程中，或者发生在 IPC 通信过程中
+
+你可能在初始化等过程中收到各种异常，不过「远程对象调用」中只会收到以下这些：
+
+- 本地异常 `IpcLocalException`
+    - 「远程对象调用」几乎不会发生本地异常
+- 代理异常，如果 IPC 接口的实现方法内抛出了以下这几种异常，则会在调用方也代理出相同类型的异常（这个列表详见 [这里](../src/dotnetCampus.Ipc/CompilerServices/GeneratedProxies/Models/GeneratedProxyExceptionModel.cs)，你也可以提 PR 修改这个列表）
+    - `ArgumentException`
+    - `ArgumentNullException`
+    - `BadImageFormatException`
+    - `InvalidCastException`
+    - `InvalidOperationException`
+    - `NotImplementedException`
+    - `NotSupportedException`
+    - `NullReferenceException`
+- 远端异常 `IpcRemoteException`
+    - `IpcInvokingException`: 如果 IPC 接口的实现方法内抛出了上述异常之外的其他异常，则会包装成此异常
+    - `IpcInvokingTimeoutException`: 远程对象调用超时（如前面所说，设置 `Timeout` 属性后可以支持超时）
+
+所以，大多数情况下，你只需要像一个本地对象一样去处理异常即可。
+
+不过，如果你想更加可靠一些处理异常，我们正计划做「自动代理」功能，以便能更好地用通用的方式来处理「远程对象调用」中发生的远端**非业务性**异常。功能计划中，文件夹已经建好了，请耐心等待。
+
 ## 性能和 AOT 兼容性
 
 1. DotNetCampus.Ipc 库使用源生成器生成「代理」（Proxy）和「对接」（Joint）的代码，旨在提升性能和确保 AOT 兼容性。
