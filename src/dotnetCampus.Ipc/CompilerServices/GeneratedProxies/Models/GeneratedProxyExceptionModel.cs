@@ -78,7 +78,7 @@ internal class GeneratedProxyExceptionModel
             }
             else
             {
-                throw new IpcRemoteException(
+                throw new IpcInvokingException(
                     $"远端抛出了异常 {typeName}: {Message}\n如需抛出普通异常，请联系 IPC 库作者将异常添加到 ExceptionRebuilders 中。",
                     StackTrace);
             }

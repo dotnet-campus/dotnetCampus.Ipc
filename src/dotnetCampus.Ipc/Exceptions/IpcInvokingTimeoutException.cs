@@ -1,13 +1,11 @@
-﻿using System;
-
-using dotnetCampus.Ipc.CompilerServices.Attributes;
+﻿using dotnetCampus.Ipc.CompilerServices.Attributes;
 
 namespace dotnetCampus.Ipc.Exceptions;
 
 /// <summary>
 /// 当获取设置属性值或调用方法时，如果指定了 <see cref="IpcMemberAttribute.Timeout"/> 但未在超时时间完成前完成调用，则会抛出此异常。
 /// </summary>
-internal class IpcInvokingTimeoutException : IpcLocalException
+internal class IpcInvokingTimeoutException : IpcRemoteException
 {
     public IpcInvokingTimeoutException(string memberName, TimeSpan timeout) : base()
     {
