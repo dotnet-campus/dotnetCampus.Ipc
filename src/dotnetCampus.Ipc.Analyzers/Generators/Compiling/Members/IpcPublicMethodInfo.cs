@@ -51,9 +51,9 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     public IpcPublicMethodInfo(INamedTypeSymbol contractType, INamedTypeSymbol ipcType, IMethodSymbol contractMethod, IMethodSymbol ipcMethod)
     {
         _contractType = contractType ?? throw new ArgumentNullException(nameof(contractType));
-        _ipcType = ipcType ?? throw new ArgumentNullException(nameof(contractType));
+        _ipcType = ipcType ?? throw new ArgumentNullException(nameof(ipcType));
         _contractMethod = contractMethod ?? throw new ArgumentNullException(nameof(contractMethod));
-        _ipcMethod = ipcMethod ?? throw new ArgumentNullException(nameof(contractMethod));
+        _ipcMethod = ipcMethod ?? throw new ArgumentNullException(nameof(ipcMethod));
         var returnType = contractMethod.ReturnType.OriginalDefinition.ToString();
         _isAsyncMethod = returnType is "System.Threading.Tasks.Task" or "System.Threading.Tasks.Task<TResult>";
     }

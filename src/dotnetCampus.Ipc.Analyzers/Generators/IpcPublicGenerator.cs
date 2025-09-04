@@ -60,7 +60,7 @@ public class IpcPublicGenerator : IIncrementalGenerator
         var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
 using {pc.GetNamespace()};
 
-[assembly: {GetAttributeName(typeof(AssemblyIpcProxyJointAttribute).Name)}(typeof({pc.IpcType}), typeof(__{pc.IpcType.Name}IpcProxy), typeof(__{pc.IpcType.Name}IpcJoint))]";
+[assembly: {GetAttributeName(nameof(AssemblyIpcProxyJointAttribute))}(typeof({pc.IpcType}), typeof(__{pc.IpcType.Name}IpcProxy), typeof(__{pc.IpcType.Name}IpcJoint))]";
         return sourceCode;
     }
 }

@@ -58,7 +58,7 @@ internal class IpcPublicCompilation : IEquatable<IpcPublicCompilation?>
     /// 查找 IPC 对象的所有成员。
     /// </summary>
     /// <returns>所有成员信息。</returns>
-    public virtual IEnumerable<(INamedTypeSymbol ipcType, ISymbol member)> EnumerateMembers()
+    public virtual IEnumerable<(INamedTypeSymbol IpcType, ISymbol Member)> EnumerateMembers()
     {
         var members = IpcType.AllInterfaces.SelectMany(x => x.GetMembers())
             .Concat(IpcType.GetMembers());

@@ -22,7 +22,7 @@ internal static class GeneratorHelper
                     ipc.IpcType.Name)
                 .WithGeneratedToolInfoWithoutEditorBrowsingAttributes()
                 .AddMemberDeclarations(root => ipc.EnumerateMembers()
-                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
+                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
                     .Select(x => x.GenerateProxyMember(root))));
         return builder.ToString();
     }
@@ -67,7 +67,7 @@ internal static class GeneratorHelper
                     ipc.IpcType.Name)
                 .WithAttribute($"[IpcShape(typeof({ipc.IpcType.Name}))]")
                 .AddMemberDeclarations(root => ipc.EnumerateMembers()
-                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
+                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
                     .Select(x => x.GenerateShapeMember(root))));
         return builder.ToString();
     }
@@ -92,7 +92,7 @@ internal static class GeneratorHelper
                 .AddMemberDeclaration(root => new MemberDeclarationSourceTextBuilder(root,
                         $"protected override void MatchMembers({ipc.IpcType.Name} {realInstanceName})")
                     .AddExpressions(root => ipc.EnumerateMembers()
-                        .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
+                        .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
                         .Select(x => x.GenerateJointMatch(root, realInstanceName)))));
         return builder.ToString();
     }

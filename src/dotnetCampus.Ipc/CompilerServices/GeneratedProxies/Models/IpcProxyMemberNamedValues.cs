@@ -1,4 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
+
+using dotnetCampus.Ipc.Utils;
+
 #pragma warning disable format
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
@@ -7,12 +10,17 @@ partial class GeneratedIpcProxy
     /// <summary>
     /// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
     /// </summary>
-    protected class IpcProxyMemberNamedValues
+    protected readonly record struct IpcProxyMemberNamedValues
     {
         /// <summary>
-        /// 设定此方法执行的超时时间（毫秒）。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
+        /// 存储 <see cref="Timeout"/> 的数值部分。
         /// </summary>
-        public int? Timeout { get; set; }
+        private readonly int _timeoutValue;
+
+        /// <summary>
+        /// 存储可空布尔值的集合。
+        /// </summary>
+        private readonly NullableBooleans _booleans;
 
         /// <summary>
         /// 在指定了 <see cref="IgnoresIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
@@ -29,7 +37,30 @@ partial class GeneratedIpcProxy
         /// </item>
         /// </list>
         /// </summary>
-        public object? DefaultReturn { get; set; }
+        public object? DefaultReturn { get; init; }
+
+        /// <summary>
+        /// 设定此方法执行的超时时间（毫秒）。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
+        /// </summary>
+        public int? Timeout
+        {
+            get => _booleans.GetBooleanAt(0) ? _timeoutValue : null;
+            init
+            {
+                _booleans.SetBooleanAt(0, value is not null);
+                _timeoutValue = value ?? 0;
+            }
+        }
+
+        /// <summary>
+        /// 标记一个属性是对于 IPC 代理访问来说是只读的。
+        /// 当通过 IPC 访问过一次这个属性后，此属性不再变化，后续无需再通过 IPC 读取，可直接使用本地缓存的值。
+        /// </summary>
+        public bool? IsReadonly
+        {
+            get => _booleans[0];
+            init => _booleans[0] = value;
+        }
 
         /// <summary>
         /// 如果指定为 true，则在 IPC 发生异常时会忽略这些异常，并返回默认值。
@@ -44,18 +75,20 @@ partial class GeneratedIpcProxy
         /// <item>另外，如果 IPC 框架内部出现了 bug 导致了异常，也不会因此而忽略。</item>
         /// </list>
         /// </remarks>
-        public bool? IgnoresIpcException { get; set; }
-
-        /// <summary>
-        /// 标记一个属性是对于 IPC 代理访问来说是只读的。
-        /// 当通过 IPC 访问过一次这个属性后，此属性不再变化，后续无需再通过 IPC 读取，可直接使用本地缓存的值。
-        /// </summary>
-        public bool? IsReadonly { get; set; }
+        public bool? IgnoresIpcException
+        {
+            get => _booleans[1];
+            init => _booleans[1] = value;
+        }
 
         /// <summary>
         /// 如果一个方法返回值是 void，那么此属性决定代理调用此方法时是否需要等待对方执行完成。
         /// 默认为 false，即不等待对方执行完成。
         /// </summary>
-        public bool? WaitsVoid { get; set; }
+        public bool? WaitsVoid
+        {
+            get => _booleans[2];
+            init => _booleans[2] = value;
+        }
     }
 }
