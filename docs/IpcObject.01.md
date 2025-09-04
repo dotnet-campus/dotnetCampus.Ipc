@@ -41,11 +41,11 @@ public interface IFoo
 // A 进程 Program.cs
 
 // 1. 初始化 IPC
-var ipcProvider = new IpcProvider("IpcRemotingObjectClientDemo");
+var ipcProvider = new IpcProvider("IPC-A");
 // 2. 启动 IPC（以支持双向通信）
 ipcProvider.StartServer();
 // 3. 连接进程 B
-var peer = await ipcProvider.GetAndConnectToPeerAsync("IpcRemotingObjectServerDemo");
+var peer = await ipcProvider.GetAndConnectToPeerAsync("IPC-B");
 
 // 获取来自 B 进程的 IFoo 接口的「代理」（Proxy）
 var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
@@ -61,7 +61,7 @@ Console.Read();
 // B 进程 Program.cs
 
 // 1. 初始化 IPC
-var ipcProvider = new IpcProvider("IpcRemotingObjectServerDemo");
+var ipcProvider = new IpcProvider("IPC-B");
 
 // 创建 IFoo 的实际对象，然后为其创建一个「对接」（Joint）
 ipcProvider.CreateIpcJoint<IFoo>(new Foo());
@@ -260,6 +260,7 @@ public interface IBar
 1. DotNetCampus.Ipc 库使用源生成器生成「代理」（Proxy）和「对接」（Joint）的代码，旨在提升性能和确保 AOT 兼容性。
     - 目前还仍有少量代码在使用反射，不过我们计划很快将其完全消除
 2. DotNetCampus.Ipc 已移除 Newtonsoft.Json 库，完全使用 System.Text.Json 并配合源生成器来做跨进程对象的传输，旨在大幅减少 AOT 之后的大小。
+    - **想要享受到完全移除 Newtonsoft.Json 库的好处，你的项目框架至少要到 .NET 8**
 
 ## 最佳实践
 
