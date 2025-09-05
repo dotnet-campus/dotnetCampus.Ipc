@@ -1,4 +1,4 @@
-﻿using dotnetCampus.Ipc.Generators.Models;
+﻿using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc.Generators.Compiling.Members;
 
@@ -61,101 +61,90 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     /// <summary>
     /// 生成此方法在 IPC 代理中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>方法源代码。</returns>
-    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder)
+    public string GenerateProxyMember()
     {
         var methodId = MemberIdGenerator.GenerateMethodId(_contractMethod);
-        var parameters = GenerateMethodParameters(builder, _contractMethod.Parameters);
-        var arguments = GenerateGarmArguments(builder, _contractMethod.Parameters);
+        var parameters = GenerateMethodParameters(_contractMethod.Parameters);
+        var arguments = GenerateGarmArguments(_contractMethod.Parameters) is { Length: > 0 } args ? $"[ {args} ]" : "[]";
         var asyncReturnType = GetAsyncReturnType(_contractMethod.ReturnType);
-        var returnTypeName = asyncReturnType is null ? "void" : builder.SimplifyNameByAddUsing(asyncReturnType);
-        var methodContainingTypeName = builder.SimplifyNameByAddUsing(_contractMethod.ContainingType);
+        var returnTypeName = asyncReturnType is null ? "void" : asyncReturnType.ToUsingString();
+        var methodContainingTypeName = _contractMethod.ContainingType.ToUsingString();
         var isAsync = _isAsyncMethod;
         var returnsVoid = _contractMethod.ReturnsVoid || asyncReturnType is null;
         var namedValues = _ipcMethod.GetIpcNamedValues(asyncReturnType, _ipcType);
 
-        return new(
-            builder.AddUsing("System.Threading.Tasks"),
-            (isAsync, returnsVoid) switch
-            {
-                // 异步 Task 方法。
-                (true, true) => $@"
-
-Task {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    return CallMethodAsync({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
-}}
-
-                ",
-                // 异步 Task<T> 方法。
-                (true, _) => $@"
-
-Task<{returnTypeName}> {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    return CallMethodAsync<{returnTypeName}>({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
-}}
-
-                ",
-                // 同步 void 方法。
-                (false, true) => namedValues.WaitsVoid
-                    ? @$"
-void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    CallMethod({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues}).Wait();
-}}"
-                    : @$"
-void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    _ = CallMethod({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues});
-}}",
-
-                // 同步 T 方法。
-                (false, _) => $@"
-{returnTypeName} {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    return CallMethod<{returnTypeName}>({methodId}, new IGarmObject[] {{ {arguments} }}, {namedValues}).Result;
-}}
-                ",
-            }
-        );
+        return (isAsync, returnsVoid) switch
+        {
+            // 异步 Task 方法。
+            (true, true) => $$"""
+                Task {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+                {
+                    return CallMethodAsync({{methodId}}, {{arguments}}, {{namedValues.ToIndentString("    ")}} );
+                }
+                """,
+            // 异步 Task<T> 方法。
+            (true, _) => $$"""
+                Task<{{returnTypeName}}> {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+                {
+                    return CallMethodAsync<{{returnTypeName}}>({{methodId}}, {{arguments}}, {{namedValues.ToIndentString("    ")}});
+                }
+                """,
+            // 同步 void 方法。
+            (false, true) => namedValues.WaitsVoid
+                ? $$"""
+                    void {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+                    {
+                        CallMethod({{methodId}}, {{arguments}}, {{namedValues.ToIndentString("    ")}}).Wait();
+                    }
+                    """
+                : $$"""
+                    void {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+                    {
+                        _ = CallMethod({{methodId}}, {{arguments}}, {{namedValues.ToIndentString("    ")}});
+                    }
+                    """,
+            // 同步 T 方法。
+            (false, _) => $$"""
+                {{returnTypeName}} {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+                {
+                    return CallMethod<{{returnTypeName}}>({{methodId}}, {{arguments}}, {{namedValues.ToIndentString("    ")}}).Result;
+                }
+                """,
+        };
     }
 
     /// <summary>
     /// 生成此成员在 IPC 代理壳中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>成员源代码。</returns>
-    public MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder)
+    public string GenerateShapeMember()
     {
-        var parameters = GenerateMethodParameters(builder, _contractMethod.Parameters);
-        var returnTypeName = builder.SimplifyNameByAddUsing(_contractMethod.ReturnType);
-        var methodContainingTypeName = builder.SimplifyNameByAddUsing(_contractMethod.ContainingType);
-        return new(
-            builder,
-            @$"
-[IpcMethod]
-{returnTypeName} {methodContainingTypeName}.{_contractMethod.Name}({parameters})
-{{
-    throw null;
-}}
-        ");
+        var parameters = GenerateMethodParameters(_contractMethod.Parameters);
+        var returnTypeName = _contractMethod.ReturnType.ToUsingString();
+        var methodContainingTypeName = _contractMethod.ContainingType.ToUsingString();
+        return $$"""
+            [IpcMethod]
+            {{returnTypeName}} {{methodContainingTypeName}}.{{_contractMethod.Name}}({{parameters}})
+            {
+                throw null;
+            }
+            """;
     }
 
     /// <summary>
     /// 生成此方法在 IPC 对接中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="real">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>方法源代码。</returns>
-    public string GenerateJointMatch(SourceTextBuilder builder, string real)
+    public string GenerateJointMatch(string real)
     {
         var methodId = MemberIdGenerator.GenerateMethodId(_contractMethod);
-        var containingTypeName = builder.SimplifyNameByAddUsing(_contractMethod.ContainingType);
-        var parameterTypes = GenerateMethodParameterTypes(builder, _contractMethod.Parameters);
+        var containingTypeName = _contractMethod.ContainingType.ToUsingString();
+        var parameterTypes = GenerateMethodParameterTypes(_contractMethod.Parameters);
         var arguments = GenerateMethodArguments(_contractMethod.Parameters);
         var asyncReturnType = GetAsyncReturnType(_contractMethod.ReturnType);
-        var returnTypeName = asyncReturnType is null ? "void" : builder.SimplifyNameByAddUsing(asyncReturnType);
+        var returnTypeName = asyncReturnType is null ? "void" : asyncReturnType.ToUsingString();
         var isAsync = _isAsyncMethod;
         var returnsVoid = _contractMethod.ReturnsVoid || asyncReturnType is null;
 
@@ -172,7 +161,7 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
         {
             // 异步 Task<T> 方法。
             var @return = $"Task<Garm<{returnTypeName}>>";
-            var call = GenerateGarmReturn(builder, asyncReturnType!, $"await {real}.{_contractMethod.Name}({arguments}).ConfigureAwait(false)");
+            var call = GenerateGarmReturn(asyncReturnType!, $"await {real}.{_contractMethod.Name}({arguments}).ConfigureAwait(false)");
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
                 ? $"MatchMethod({methodId}, new Func<{@return}>(async () => {call}));"
                 : $"MatchMethod({methodId}, new Func<{parameterTypes}, {@return}>(async ({arguments}) => {call}));";
@@ -191,7 +180,7 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
         {
             // 同步 T 方法。
             var @return = $"Garm<{returnTypeName}>";
-            var call = GenerateGarmReturn(builder, _contractMethod.ReturnType, $"{real}.{_contractMethod.Name}({arguments})");
+            var call = GenerateGarmReturn(_contractMethod.ReturnType, $"{real}.{_contractMethod.Name}({arguments})");
             var sourceCode = string.IsNullOrWhiteSpace(arguments)
                 ? $"MatchMethod({methodId}, new Func<{@return}>(() => {call}));"
                 : $"MatchMethod({methodId}, new Func<{parameterTypes}, {@return}>(({arguments}) => {call}));";
@@ -202,27 +191,25 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     /// <summary>
     /// 根据参数列表生成方法形参列表字符串。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="parameters">方法参数列表。</param>
     /// <returns>方法形参列表字符串。</returns>
-    private string GenerateMethodParameters(SourceTextBuilder builder, ImmutableArray<IParameterSymbol> parameters)
+    private string GenerateMethodParameters(ImmutableArray<IParameterSymbol> parameters)
     {
         return string.Join(
             ", ",
-            parameters.Select(x => $"{builder.SimplifyNameByAddUsing(x.Type)} {x.Name}"));
+            parameters.Select(x => $"{x.Type.ToUsingString()} {x.Name}"));
     }
 
     /// <summary>
     /// 根据参数列表生成方法参数类型列表字符串。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="parameters">方法参数列表。</param>
     /// <returns>方法参数类型列表字符串。</returns>
-    private string GenerateMethodParameterTypes(SourceTextBuilder builder, ImmutableArray<IParameterSymbol> parameters)
+    private string GenerateMethodParameterTypes(ImmutableArray<IParameterSymbol> parameters)
     {
         return string.Join(
             ", ",
-            parameters.Select(x => builder.SimplifyNameByAddUsing(x.Type)));
+            parameters.Select(x => x.Type.ToUsingString()));
     }
 
     /// <summary>
@@ -242,16 +229,15 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     /// <para>这么做是因为以下语句在 instance 实例为接口时因无法隐式转换而编译不通过，在其他情况下却可以：</para>
     /// <c>new Garm&lt;object?&gt;[] { instance }</c>
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="parameters">方法参数列表。</param>
     /// <returns>方法实参列表字符串。</returns>
-    private string GenerateGarmArguments(SourceTextBuilder builder, ImmutableArray<IParameterSymbol> parameters)
+    private string GenerateGarmArguments(ImmutableArray<IParameterSymbol> parameters)
     {
         return string.Join(
             ", ",
             parameters.Select(x => x.Type.GetIsIpcType()
-                ? $"new Garm<{builder.SimplifyNameByAddUsing(x.Type)}>({x.Name}, typeof({x.Type.Name}))"
-                : $"new Garm<{builder.SimplifyNameByAddUsing(x.Type)}>({x.Name})"));
+                ? $"new Garm<{x.Type.ToUsingString()}>({x.Name}, typeof({x.Type.ToUsingString()}))"
+                : $"new Garm<{x.Type.ToUsingString()}>({x.Name})"));
     }
 
     /// <summary>
@@ -292,14 +278,13 @@ void {methodContainingTypeName}.{_contractMethod.Name}({parameters})
     /// <para>这么做是因为以下语句在 instance 实例为接口时因无法隐式转换而编译不通过，在其他情况下却可以：</para>
     /// <c>new Garm&lt;object?&gt;[] { instance }</c>
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="return">方法返回值类型。</param>
     /// <param name="value">方法返回值。</param>
     /// <returns>方法实参列表字符串。</returns>
-    private string GenerateGarmReturn(SourceTextBuilder builder, ITypeSymbol @return, string value)
+    private string GenerateGarmReturn(ITypeSymbol @return, string value)
     {
         return @return.GetIsIpcType()
-                ? $"new Garm<{builder.SimplifyNameByAddUsing(@return)}>({value}, typeof({@return.Name}))"
-                : $"new Garm<{builder.SimplifyNameByAddUsing(@return)}>({value})";
+            ? $"new Garm<{@return.ToUsingString()}>({value}, typeof({@return.ToUsingString()}))"
+            : $"new Garm<{@return.ToUsingString()}>({value})";
     }
 }

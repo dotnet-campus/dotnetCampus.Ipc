@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "DotNetCampus.CommandLine.Tests": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../tests/dotnetCampus.Ipc.Tests/dotnetCampus.Ipc.Tests.csproj"
+    },
+    "DotNetCampus.CommandLine.Performance": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../demo/IpcRemotingObjectDemo/IpcRemotingObjectServerDemo/IpcRemotingObjectServerDemo.csproj"
+    }
+  }
+}

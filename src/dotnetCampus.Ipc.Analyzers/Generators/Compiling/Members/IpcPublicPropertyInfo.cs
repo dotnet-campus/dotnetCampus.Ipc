@@ -1,4 +1,4 @@
-﻿using dotnetCampus.Ipc.Generators.Models;
+﻿using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc.Generators.Compiling.Members;
 
@@ -54,95 +54,79 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     /// <summary>
     /// 生成此属性在 IPC 代理中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>属性源代码。</returns>
-    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder)
+    public string GenerateProxyMember()
     {
-        var propertyTypeName = builder.SimplifyNameByAddUsing(_contractProperty.Type);
-        var containingTypeName = builder.SimplifyNameByAddUsing(_contractProperty.ContainingType);
+        var propertyTypeName = _contractProperty.Type.ToUsingString();
+        var containingTypeName = _contractProperty.ContainingType.ToUsingString();
         var getMemberId = MemberIdGenerator.GeneratePropertyId("get", _ipcProperty.Name);
         var setMemberId = MemberIdGenerator.GeneratePropertyId("set", _ipcProperty.Name);
-        var valueArgumentName = GenerateGarmArgument(builder, _contractProperty.Type, "value");
+        var valueArgumentName = GenerateGarmArgument(_contractProperty.Type, "value");
         var namedValues = _ipcProperty.GetIpcNamedValues(_ipcType);
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
-        return new(
-            builder,
-            (hasGet, hasSet) switch
-            {
-                // get/set 属性。
-                (true, true) => $@"
-
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name}
-{{
-    get => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result;
-    set => SetValueAsync<{propertyTypeName}>({setMemberId}, {valueArgumentName}, {namedValues}).Wait();
-}}
-
-                ",
-                // get 属性。
-                (true, false) => $@"
-
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result;
-
-                ",
-                // 不支持 set 属性。
-                _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
-            }
-);
+        return (hasGet, hasSet) switch
+        {
+            // get/set 属性。
+            (true, true) => $$"""
+                    {{propertyTypeName}} {{containingTypeName}}.{{_contractProperty.Name}}
+                    {
+                        get => GetValueAsync<{{propertyTypeName}}>({{getMemberId}}, {{namedValues.ToIndentString("    ")}}).Result!;
+                        set => SetValueAsync<{{propertyTypeName}}>({{setMemberId}}, {{valueArgumentName}}, {{namedValues.ToIndentString("    ")}}).Wait();
+                    }
+                    """,
+            // get 属性。
+            (true, false) => $"""
+                    {propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result!;
+                    """,
+            // 不支持 set 属性。
+            _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
+        };
     }
 
     /// <summary>
     /// 生成此成员在 IPC 代理壳中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>成员源代码。</returns>
-    public MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder)
+    public string GenerateShapeMember()
     {
-        var propertyTypeName = builder.SimplifyNameByAddUsing(_contractProperty.Type);
-        var containingTypeName = builder.SimplifyNameByAddUsing(_contractProperty.ContainingType);
+        var propertyTypeName = _contractProperty.Type.ToUsingString();
+        var containingTypeName = _contractProperty.ContainingType.ToUsingString();
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
-        return new(
-            builder,
-            (hasGet, hasSet) switch
-            {
-                // get/set 属性。
-                (true, true) => $@"
-
-[IpcProperty]
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name} {{ get; set; }}
-
-                ",
-                // get 属性。
-                (true, false) => $@"
-
-[IpcProperty]
-{propertyTypeName} {containingTypeName}.{_contractProperty.Name} {{ get; }}
-
-                ",
-                // 不支持 set 属性。
-                _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
-            }
-);
+        return (hasGet, hasSet) switch
+        {
+            // get/set 属性。
+            (true, true) => $$"""
+                [IpcProperty]
+                {{propertyTypeName}} {{containingTypeName}}.{{_contractProperty.Name}} { get; set; }
+                """,
+            // get 属性。
+            (true, false) => $$"""
+                [IpcProperty]
+                {{propertyTypeName}} {{containingTypeName}}.{{_contractProperty.Name}} { get; }
+                """,
+            // 不支持 set 属性。
+            _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
+        };
     }
 
     /// <summary>
     /// 生成此属性在 IPC 对接中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="real">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>属性源代码。</returns>
-    public string GenerateJointMatch(SourceTextBuilder builder, string real)
+    public string GenerateJointMatch(string real)
     {
-        var containingTypeName = builder.SimplifyNameByAddUsing(_contractProperty.ContainingType);
-        var propertyTypeName = builder.SimplifyNameByAddUsing(_contractProperty.Type);
+        var containingTypeName = _contractProperty.ContainingType.ToUsingString();
+        var propertyTypeName = _contractProperty.Type.ToUsingString();
         var getMemberId = MemberIdGenerator.GeneratePropertyId("get", _ipcProperty.Name);
         var setMemberId = MemberIdGenerator.GeneratePropertyId("set", _ipcProperty.Name);
         var garmPropertyTypeName = $"Garm<{propertyTypeName}>";
-        var garmPropertyArgumentName = GenerateGarmArgument(builder, _contractProperty.Type, $"{real}.{_contractProperty.Name}");
+        var garmPropertyArgumentName = GenerateGarmArgument(_contractProperty.Type, $"{real}.{_contractProperty.Name}");
         var (hasGet, hasSet) = (_contractProperty.GetMethod is not null, _contractProperty.SetMethod is not null);
         if (hasGet && hasSet)
         {
-            var sourceCode = $"MatchProperty({getMemberId}, {setMemberId}, new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
+            var sourceCode =
+                $"MatchProperty({getMemberId}, {setMemberId}, new Func<{garmPropertyTypeName}>(() => {garmPropertyArgumentName}), new Action<{propertyTypeName}>(value => {real}.{_contractProperty.Name} = value));";
             return sourceCode;
         }
         else if (hasGet)
@@ -160,14 +144,13 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     /// <summary>
     /// 使用原参数生成 Garm 类型的参数，以支持 IPC 对象的跨进程传输。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="parameterType"></param>
     /// <param name="argumentName"></param>
     /// <returns></returns>
-    private string GenerateGarmArgument(SourceTextBuilder builder, ITypeSymbol parameterType, string argumentName)
+    private string GenerateGarmArgument(ITypeSymbol parameterType, string argumentName)
     {
         return parameterType.GetIsIpcType()
-                ? $"new Garm<{builder.SimplifyNameByAddUsing(parameterType)}>({argumentName}, typeof({parameterType.Name}))"
-                : $"new Garm<{builder.SimplifyNameByAddUsing(parameterType)}>({argumentName})";
+            ? $"new Garm<{parameterType.ToUsingString()}>({argumentName}, typeof({parameterType.ToUsingString()}))"
+            : $"new Garm<{parameterType.ToUsingString()}>({argumentName})";
     }
 }

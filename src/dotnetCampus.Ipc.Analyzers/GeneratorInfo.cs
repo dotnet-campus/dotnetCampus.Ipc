@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using dotnetCampus.Ipc.Generators.Models;
+using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc;
 
@@ -71,10 +71,10 @@ internal static class GeneratorInfo
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
-    public static ClassDeclarationSourceTextBuilder WithGeneratedToolInfoWithoutEditorBrowsingAttributes(this ClassDeclarationSourceTextBuilder builder)
+    public static TypeDeclarationSourceTextBuilder AddGeneratedToolAndEditorBrowsingAttributes(this TypeDeclarationSourceTextBuilder builder)
     {
         return builder
-            .WithAttribute("[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]")
-            .WithAttribute($@"[System.CodeDom.Compiler.GeneratedCode(""{ToolName}"", ""{ToolVersion}"")]");
+            .AddAttribute("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]")
+            .AddAttribute($"""[global::System.CodeDom.Compiler.GeneratedCode("{ToolName}", "{ToolVersion}")]""");
     }
 }
