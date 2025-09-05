@@ -19,12 +19,10 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// 包含所有目前已公开的 IPC 实例。
         /// </summary>
         private readonly ConcurrentDictionary<(string typeFullName, string objectId), GeneratedIpcJoint> _joints = new();
-        private readonly IpcContext _ipcContext;
 
-        internal PublicIpcJointManager(GeneratedProxyJointIpcContext context, IpcContext ipcContext)
+        internal PublicIpcJointManager(GeneratedProxyJointIpcContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
-            _ipcContext = ipcContext ?? throw new ArgumentNullException(nameof(ipcContext));
         }
 
         /// <summary>
@@ -73,7 +71,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberInvokeModel>(
                     request.IpcBufferMessage, (ulong)KnownMessageHeaders.RemoteObjectMessageHeader, out var requestModel)
                 && TryFindJoint(requestModel, out var joint)
-                && requestModel.MemberName is { } memberName)
+                && requestModel.MemberName is not null)
             {
                 var returnModelTask = InvokeAndReturn(joint, requestModel, request.Peer);
                 responseTask = GeneratedIpcJointResponse.FromAsyncReturnModel(returnModelTask, Context.ObjectSerializer)
@@ -103,7 +101,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
 
         private bool TryFindJoint(GeneratedProxyMemberInvokeModel model, [NotNullWhen(true)] out GeneratedIpcJoint? joint)
         {
-            var id = model.Id ?? "";
+            var id = model.Id;
             if (string.IsNullOrWhiteSpace(model.ContractFullTypeName)
                 || string.IsNullOrWhiteSpace(model.MemberName)
                 || model.CallType is MemberInvokingType.Unknown)
@@ -135,9 +133,9 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             GeneratedProxyMemberReturnModel? @return;
             try
             {
-                var parameterTypes = joint.GetParameterTypes(requestModel.CallType, requestModel.MemberId);
+                var parameterTypes = joint.GetParameterTypes(requestModel.MemberId, requestModel.MemberName, requestModel.CallType);
                 var args = ExtractArgsFromArgsModel(parameterTypes, requestModel.Args, peer);
-                var returnValue = await InvokeMember(joint, requestModel.CallType, requestModel.MemberId!, requestModel.MemberName!, args).ConfigureAwait(false);
+                var returnValue = await InvokeMember(joint, requestModel.CallType, requestModel.MemberId, requestModel.MemberName!, args).ConfigureAwait(false);
                 @return = CreateReturnModelFromReturnObject(returnValue);
 #if DEBUG
                 @return.Invoking = requestModel;
@@ -157,23 +155,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// <param name="argModels">参数模型列表。</param>
         /// <param name="peer">如果某个参数的模型表示需要通过代理访问一个 IPC 远端对象，则会用到这个远端。</param>
         /// <returns>参数实例列表。</returns>
-        private IGarmObject[]? ExtractArgsFromArgsModel(
+        private IGarmObject[] ExtractArgsFromArgsModel(
             Type[] parameterTypes,
             GeneratedProxyObjectModel?[]? argModels,
             IPeerProxy peer)
         {
-            if (argModels is null)
+            if (argModels is null || argModels.Length is 0)
             {
-                return null;
-            }
-
-            if (argModels.Length is 0)
-            {
-#if NETCOREAPP3_0_OR_GREATER
-                return Array.Empty<IGarmObject>();
-#else
-                return new IGarmObject[0];
-#endif
+                return [];
             }
 
             var args = new IGarmObject[argModels.Length];
@@ -231,12 +220,13 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
             }
         }
 
-        private static async Task<IGarmObject> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, IGarmObject[]? args)
+        private static async Task<IGarmObject> InvokeMember(GeneratedIpcJoint joint, MemberInvokingType callType, ulong memberId, string memberName, IGarmObject[] args)
         {
             return callType switch
             {
                 MemberInvokingType.GetProperty => joint.GetProperty(memberId, memberName),
-                MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args?.FirstOrDefault() ?? GarmObjectExtensions.Default),
+                MemberInvokingType.SetProperty => joint.SetProperty(memberId, memberName, args.FirstOrDefault() ?? GarmObjectExtensions.Default),
+                // ReSharper disable once MethodHasAsyncOverload
                 MemberInvokingType.Method => joint.CallMethod(memberId, memberName, args),
                 MemberInvokingType.AsyncMethod => await joint.CallMethodAsync(memberId, memberName, args).ConfigureAwait(false),
                 _ => GarmObjectExtensions.Default,
