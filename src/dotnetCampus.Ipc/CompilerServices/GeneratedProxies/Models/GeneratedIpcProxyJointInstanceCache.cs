@@ -5,10 +5,6 @@ using static dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFact
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
 
-using ProxyKey = (Type IpcPublicType, string? ObjectId, string PeerName);
-using JointKey = (PublicIpcJointManager JointManager, Type IpcPublicType, object RealInstance);
-using JointValue = (GeneratedIpcJoint JointInstance, string? ObjectId);
-
 /// <summary>
 /// 在跨进程的 IPC 方法调用中，方法参数或返回值可能并不是基本类型，而是另一个 IPC 类型的实例。
 /// 本类型提供辅助方法判断和转换 <see cref="object"/> 到可被序列化的 IPC 类型，并辅助生成 IPC 类型的代理和对接。
@@ -18,12 +14,12 @@ internal static class GeneratedIpcProxyJointInstanceCache
     /// <summary>
     /// 为代理返回值或对接参数自动创建的 <see cref="GeneratedIpcProxy"/> 对象缓存。
     /// </summary>
-    private static readonly CachePool<ProxyKey, GeneratedIpcProxy> ProxyCache = new(ConvertTypeAndIdToProxy, true);
+    private static readonly CachePool<(Type IpcPublicType, string? ObjectId, string PeerName), GeneratedIpcProxy> ProxyCache = new(ConvertTypeAndIdToProxy, true);
 
     /// <summary>
     /// 为代理参数或对接返回值自动创建的 <see cref="GeneratedIpcJoint"/> 对象缓存。
     /// </summary>
-    private static readonly CachePool<JointKey, JointValue> JointCache = new(ConvertTypeAndIdToJoint, true);
+    private static readonly CachePool<(PublicIpcJointManager JointManager, Type IpcPublicType, object RealInstance), (GeneratedIpcJoint JointInstance, string? ObjectId)> JointCache = new(ConvertTypeAndIdToJoint, true);
 
     /// <summary>
     /// 当从 IPC 传输过来一些对象信息时，通过此方法可以判断此对象是否是一个 IPC 公开的对象。
@@ -81,7 +77,7 @@ internal static class GeneratedIpcProxyJointInstanceCache
         return false;
     }
 
-    public static GeneratedIpcProxy ConvertTypeAndIdToProxy(ProxyKey key)
+    public static GeneratedIpcProxy ConvertTypeAndIdToProxy((Type IpcPublicType, string? ObjectId, string PeerName) key)
     {
         var (proxyType, objectId, _) = key;
         var proxyInstance = IpcPublicFactories[proxyType].ProxyFactory();
@@ -89,7 +85,7 @@ internal static class GeneratedIpcProxyJointInstanceCache
         return proxyInstance;
     }
 
-    public static JointValue ConvertTypeAndIdToJoint(JointKey key)
+    public static (GeneratedIpcJoint JointInstance, string? ObjectId) ConvertTypeAndIdToJoint((PublicIpcJointManager JointManager, Type IpcPublicType, object RealInstance) key)
     {
         var (jointManager, ipcPublicType, realInstance) = key;
         var objectId = Guid.NewGuid().ToString();
