@@ -35,7 +35,7 @@ internal class GeneratedProxyObjectModel
     }
 
     /// <summary>
-    /// 远端对象类型（即标记了 <see cref="IpcPublicAttribute"/> 的类型，不支持 <see cref="IpcShapeAttribute"/>）的名称。
+    /// 远端对象的契约类型（即标记了 <see cref="IpcPublicAttribute"/> 的类型，不支持 <see cref="IpcShapeAttribute"/>）的名称。
     /// </summary>
 #if UseNewtonsoftJson
     [JsonProperty("t")]
@@ -43,7 +43,7 @@ internal class GeneratedProxyObjectModel
 #if NET6_0_OR_GREATER
     [JsonPropertyName("t")]
 #endif
-    public string? IpcTypeFullName { get; set; }
+    public string? IpcPublicTypeFullName { get; set; }
 
     /// <summary>
     /// 远端对象的值。

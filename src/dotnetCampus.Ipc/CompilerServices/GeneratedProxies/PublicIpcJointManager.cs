@@ -209,7 +209,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
                     Return = new GeneratedProxyObjectModel
                     {
                         Id = objectId,
-                        IpcTypeFullName = ipcTypeFullName,
+                        IpcPublicTypeFullName = ipcTypeFullName,
                     },
                 };
             }

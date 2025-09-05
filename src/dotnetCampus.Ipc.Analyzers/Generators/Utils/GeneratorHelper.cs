@@ -118,9 +118,8 @@ internal static class GeneratorHelper
         """;
 
     private static string GenerateIpcPublicRegistration(IpcShapeCompilation ipc) => $"""
-        RegisterIpcPublic<{ipc.IpcType.ToUsingString()}>(
-            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
-            null);
+        RegisterIpcShape<{ipc.ContractType.ToUsingString()}, {ipc.IpcType.ToUsingString()}>(
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy());
         """;
 
     /// <summary>

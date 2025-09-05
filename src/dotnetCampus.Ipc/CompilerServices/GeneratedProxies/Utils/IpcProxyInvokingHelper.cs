@@ -70,7 +70,7 @@ internal class IpcProxyInvokingHelper
 
         if (returnModel.Return is { } model)
         {
-            var ipcType = string.IsNullOrWhiteSpace(model.IpcTypeFullName)
+            var ipcType = string.IsNullOrWhiteSpace(model.IpcPublicTypeFullName)
                 ? null
                 : typeof(T);
             if (ipcType is not null
@@ -124,7 +124,7 @@ internal class IpcProxyInvokingHelper
             return new GeneratedProxyObjectModel
             {
                 Id = objectId,
-                IpcTypeFullName = ipcTypeFullName,
+                IpcPublicTypeFullName = ipcTypeFullName,
             };
         }
         else
