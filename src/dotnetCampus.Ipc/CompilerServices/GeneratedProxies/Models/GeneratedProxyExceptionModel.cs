@@ -1,7 +1,8 @@
-﻿using System.Runtime.ExceptionServices;
+﻿using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.Serialization;
 using dotnetCampus.Ipc.Exceptions;
-using dotnetCampus.Ipc.Utils;
 
 #if UseNewtonsoftJson
 using Newtonsoft.Json;
@@ -68,13 +69,13 @@ internal class GeneratedProxyExceptionModel
                 var exception = builder(Message, ExtraInfo);
                 if (StackTrace is { } stackTrace)
                 {
-                    var deserializedRemoteException = ExceptionHacker.ReplaceStackTrace(exception, StackTrace);
-                    ExceptionDispatchInfo.Capture(deserializedRemoteException).Throw();
+#if NET6_0_OR_GREATER
+                    exception = ExceptionDispatchInfo.SetRemoteStackTrace(exception, stackTrace);
+#else
+                    exception = ExceptionHacker.SetRemoteStackTrace(exception, stackTrace);
+#endif
                 }
-                else
-                {
-                    ExceptionDispatchInfo.Capture(exception).Throw();
-                }
+                ExceptionDispatchInfo.Capture(exception).Throw();
             }
             else
             {
@@ -89,13 +90,48 @@ internal class GeneratedProxyExceptionModel
 
     private static readonly Dictionary<string, Func<string?, string?, Exception>> ExceptionRebuilders = new(StringComparer.Ordinal)
     {
-        { typeof(ArgumentException).FullName!, (m, e) => new ArgumentException(m) },
+        { typeof(ArgumentException).FullName!, (m, _) => new ArgumentException(m) },
         { typeof(ArgumentNullException).FullName!, (m, e) => new ArgumentNullException(e, m) },
-        { typeof(BadImageFormatException).FullName!, (m, e) => new BadImageFormatException(m) },
-        { typeof(InvalidCastException).FullName!, (m, e) => new InvalidCastException(m) },
-        { typeof(InvalidOperationException).FullName!, (m, e) => new InvalidOperationException(m) },
-        { typeof(NotImplementedException).FullName!, (m, e) => new NotImplementedException(m) },
-        { typeof(NotSupportedException).FullName!, (m, e) => new NotSupportedException(m) },
-        { typeof(NullReferenceException).FullName!, (m, e) => new NullReferenceException(m) },
+        { typeof(BadImageFormatException).FullName!, (m, _) => new BadImageFormatException(m) },
+        { typeof(InvalidCastException).FullName!, (m, _) => new InvalidCastException(m) },
+        { typeof(InvalidOperationException).FullName!, (m, _) => new InvalidOperationException(m) },
+        { typeof(NotImplementedException).FullName!, (m, _) => new NotImplementedException(m) },
+        { typeof(NotSupportedException).FullName!, (m, _) => new NotSupportedException(m) },
+        { typeof(NullReferenceException).FullName!, (m, _) => new NullReferenceException(m) },
     };
 }
+
+#if NET6_0_OR_GREATER
+#else
+file static class ExceptionHacker
+{
+    static ExceptionHacker()
+    {
+        HackExceptionStackTraceLazy = new Lazy<Func<Exception, string, Exception>>(() => HackExceptionStackTrace, LazyThreadSafetyMode.None);
+    }
+
+    internal static Exception SetRemoteStackTrace(Exception source, string stackTrace)
+    {
+        try
+        {
+            HackExceptionStackTraceLazy.Value(source, stackTrace);
+        }
+        catch
+        {
+            // 新框架已经处理了，不管旧框架的死活。
+        }
+        return source;
+    }
+
+    private static readonly Lazy<Func<Exception, string, Exception>> HackExceptionStackTraceLazy;
+
+    private static readonly Func<Exception, string, Exception> HackExceptionStackTrace = new Func<Func<Exception, string, Exception>>(() =>
+    {
+        var source = Expression.Parameter(typeof(Exception));
+        var stackTrace = Expression.Parameter(typeof(string));
+        var remoteStackTraceStringField = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var assign = Expression.Assign(Expression.Field(source, remoteStackTraceStringField), stackTrace);
+        return Expression.Lambda<Func<Exception, string, Exception>>(Expression.Block(assign, source), source, stackTrace).Compile();
+    })();
+}
+#endif
