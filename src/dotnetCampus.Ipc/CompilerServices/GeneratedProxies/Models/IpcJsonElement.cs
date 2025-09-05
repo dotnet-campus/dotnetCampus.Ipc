@@ -64,6 +64,12 @@ public readonly record struct IpcJsonElement
         }
     }
 
+    /// <summary>
+    /// 将一个本地对象序列化成 IPC 可传输的 JSON 对象。
+    /// </summary>
+    /// <param name="value">本地对象。</param>
+    /// <param name="serializer">对象序列化器。</param>
+    /// <returns>IPC 可传输的 JSON 对象。</returns>
     public static IpcJsonElement Serialize(object? value, IIpcObjectSerializer serializer)
     {
         return value switch
@@ -79,6 +85,13 @@ public readonly record struct IpcJsonElement
         };
     }
 
+    /// <summary>
+    /// 将 IPC 可传输的 JSON 对象反序列化成本地对象。
+    /// </summary>
+    /// <param name="jsonElement">IPC 可传输的 JSON 对象。</param>
+    /// <param name="serializer">对象序列化器。</param>
+    /// <typeparam name="T">本地对象类型。</typeparam>
+    /// <returns>本地对象。</returns>
     public static T? Deserialize<T>(IpcJsonElement jsonElement, IIpcObjectSerializer serializer)
     {
         if (jsonElement.IsNull)
