@@ -10,7 +10,7 @@ partial class GeneratedIpcProxy
     /// <summary>
     /// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
     /// </summary>
-    protected readonly record struct IpcProxyMemberNamedValues
+    protected readonly record struct IpcMemberInfo
     {
         /// <summary>
         /// 存储 <see cref="Timeout"/> 的数值部分。
