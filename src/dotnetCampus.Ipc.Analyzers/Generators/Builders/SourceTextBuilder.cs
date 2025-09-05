@@ -112,7 +112,7 @@ public class SourceTextBuilder : IDisposable
         }
         using var _ = UseFileScopedNamespace
             ? EmptyScope.Begin()
-            : BracketScope.Begin(builder);
+            : BracketScope.Begin(builder, Indent, indentLevel);
         var typeIndentLevel = UseFileScopedNamespace ? 0 : indentLevel + 1;
 
         // types
@@ -238,7 +238,7 @@ public class TypeDeclarationSourceTextBuilder(SourceTextBuilder root, string dec
         }
         builder.AppendLine();
 
-        using var _ = BracketScope.Begin(builder);
+        using var _ = BracketScope.Begin(builder, Indent, indentLevel);
         BuildMembersInto(builder, indentLevel + 1, _members);
     }
 }
@@ -290,7 +290,7 @@ public class MethodDeclarationSourceTextBuilder(SourceTextBuilder root, string s
         }
         builder.AppendLineWithIndent(Signature, Indent, indentLevel);
 
-        using var _ = BracketScope.Begin(builder);
+        using var _ = BracketScope.Begin(builder, Indent, indentLevel);
 
         for (var groupIndex = 0; groupIndex < _statementGroups.Count; groupIndex++)
         {
@@ -320,21 +320,33 @@ public class RawSourceTextBuilder(SourceTextBuilder root) : BracketSourceTextBui
 file class BracketScope : IDisposable
 {
     private readonly StringBuilder _builder;
+    private readonly string _indent;
+    private readonly int _indentLevel;
 
-    public BracketScope(StringBuilder builder)
+    public BracketScope(StringBuilder builder, string indent, int indentLevel)
     {
         _builder = builder;
+        _indent = indent;
+        _indentLevel = indentLevel;
+        for (var i = 0; i < _indentLevel; i++)
+        {
+            _builder.Append(_indent);
+        }
         _builder.AppendLine("{");
     }
 
     public void Dispose()
     {
+        for (var i = 0; i < _indentLevel; i++)
+        {
+            _builder.Append(_indent);
+        }
         _builder.AppendLine("}");
     }
 
-    public static IDisposable Begin(StringBuilder builder)
+    public static IDisposable Begin(StringBuilder builder, string indent, int indentLevel)
     {
-        return new BracketScope(builder);
+        return new BracketScope(builder, indent, indentLevel);
     }
 }
 
