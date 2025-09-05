@@ -18,31 +18,22 @@ internal struct NullableBooleans
     /// <param name="index">索引，值范围 [0, 15]。</param>
     public bool? this[int index]
     {
-        get => (_booleans & (1 << index * 2 + 1), _booleans & (1 << index * 2)) switch
+        get => ((_booleans & (1 << (index * 2 + 1))) >> (index * 2 + 1), (_booleans & (1 << (index * 2))) >> (index * 2)) switch
         {
             // 高位 1 表示非 null，0 表示 null；低位 1 表示 true，0 表示 false
             (1, 0) => false,
             (1, 1) => true,
             _ => null,
         };
-        set
+        set => _booleans = value switch
         {
-            if (value is null)
-            {
-                // 设置为 null：将索引处的两位都清零
-                _booleans &= (uint) ~(3 << index * 2);
-            }
-            else if (value.Value)
-            {
-                // 设置为 true：将高位置 1，低位置 1
-                _booleans |= (uint) (3 << index * 2);
-            }
-            else
-            {
-                // 设置为 false：将高位置 1，低位置清零
-                _booleans = (_booleans & (uint) ~(1 << index * 2 + 1)) | (uint) (1 << index * 2);
-            }
-        }
+            // 设置为 null：将索引处的两位都清零
+            null => _booleans & (uint)~(3 << (index * 2)),
+            // 设置为 true：将高位置 1，低位置 1
+            true => _booleans | (uint)(3 << (index * 2)),
+            // 设置为 false：将高位置 1，低位置清零
+            false => (_booleans & (uint)~(1 << (index * 2 + 1))) | (uint)(1 << (index * 2)),
+        };
     }
 
     [Pure]
