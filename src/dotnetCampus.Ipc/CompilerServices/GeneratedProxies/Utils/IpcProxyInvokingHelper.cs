@@ -1,4 +1,5 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.Serialization;
 
@@ -92,10 +93,11 @@ internal class IpcProxyInvokingHelper
             return null;
         }
 
-        var requestMessage = Context.ObjectSerializer.SerializeToIpcMessage(model, model.ToString());
+        var header = (ulong)KnownMessageHeaders.RemoteObjectMessageHeader;
+        var requestMessage = Context.ObjectSerializer.SerializeToIpcMessage(header, model, model.ToString());
         //requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
         var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
-        if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberReturnModel>(responseMessage, out var returnModel))
+        if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberReturnModel>(responseMessage, header, out var returnModel))
         {
             return returnModel;
         }
