@@ -70,13 +70,13 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
             (true, true) => $$"""
                     {{propertyTypeName}} {{containingTypeName}}.{{_contractProperty.Name}}
                     {
-                        get => GetValueAsync<{{propertyTypeName}}>({{getMemberId}}, {{namedValues.ToIndentString("    ")}}).Result!;
+                        get => GetValueAsync<{{propertyTypeName}}>({{getMemberId}}, {{namedValues.ToIndentString("    ")}}).Result;
                         set => SetValueAsync<{{propertyTypeName}}>({{setMemberId}}, {{valueArgumentName}}, {{namedValues.ToIndentString("    ")}}).Wait();
                     }
                     """,
             // get 属性。
             (true, false) => $"""
-                    {propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result!;
+                    {propertyTypeName} {containingTypeName}.{_contractProperty.Name} => GetValueAsync<{propertyTypeName}>({getMemberId}, {namedValues}).Result;
                     """,
             // 不支持 set 属性。
             _ => throw new DiagnosticException(IPC002_KnownDiagnosticError),
