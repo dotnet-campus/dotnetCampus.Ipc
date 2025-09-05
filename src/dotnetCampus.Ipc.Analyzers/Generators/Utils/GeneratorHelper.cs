@@ -102,7 +102,7 @@ internal static class GeneratorHelper
     {
         using var builder = new SourceTextBuilder(GeneratorInfo.RootNamespace)
             .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
-            .AddTypeDeclaration("internal static class DotNetCampusIpcModuleInitializer", t => t
+            .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
                 .AddGeneratedToolAndEditorBrowsingAttributes()
                 .AddMemberDeclaration("internal static void Initialize()", m => m
                     .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
