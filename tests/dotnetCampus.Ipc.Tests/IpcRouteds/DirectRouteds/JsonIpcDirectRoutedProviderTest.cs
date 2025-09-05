@@ -20,8 +20,8 @@ public class JsonIpcDirectRoutedProviderTest
         var name = "JsonIpcDirectRoutedProviderTest_1";
         var aName = $"IpcObjectTests.IpcTests.{name}.A";
         var bName = $"IpcObjectTests.IpcTests.{name}.B";
-        var aProvider = new IpcProvider(aName, TestJsonContext.CreateIpcConfiguration());
-        var bProvider = new IpcProvider(bName, TestJsonContext.CreateIpcConfiguration());
+        var aProvider = new IpcProvider(aName);
+        var bProvider = new IpcProvider(bName);
 
         var serverProvider = new JsonIpcDirectRoutedProvider(aProvider);
         var clientProvider = new JsonIpcDirectRoutedProvider(bProvider);
