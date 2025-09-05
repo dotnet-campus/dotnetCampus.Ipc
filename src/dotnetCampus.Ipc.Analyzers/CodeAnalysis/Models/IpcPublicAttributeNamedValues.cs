@@ -23,26 +23,44 @@ internal class IpcPublicAttributeNamedValues
 
     public ITypeSymbol? MemberReturnType { get; }
 
-    public Assignable<object?>? DefaultReturn { get; set; }
+    public Assignable<object?>? DefaultReturn { get; init; }
 
-    public Assignable<bool>? IgnoresIpcException { get; set; }
+    public Assignable<bool>? IgnoresIpcException { get; init; }
 
-    public Assignable<bool>? IsReadonly { get; set; }
+    public Assignable<bool>? IsReadonly { get; init; }
 
-    public Assignable<int>? Timeout { get; set; }
+    public Assignable<int>? Timeout { get; init; }
 
-    public Assignable<bool>? WaitsVoid { get; set; }
+    public Assignable<bool>? WaitsVoid { get; init; }
 
-    public override string ToString()
+    public override string ToString() => ToIndentString("    ", 0);
+
+    public string ToIndentString(string indent, int baseIndentLevel = 1)
     {
-        return $@"new()
-{{
-    {Format(nameof(DefaultReturn), DefaultReturn, x => Format(x, MemberReturnType))}
-    {Format(nameof(Timeout), Timeout)}
-    {Format(nameof(IgnoresIpcException), IgnoresIpcException)}
-    {Format(nameof(IsReadonly), IsReadonly)}
-    {Format(nameof(WaitsVoid), WaitsVoid)}
-}}";
+        var baseIndent = string.Concat(Enumerable.Repeat(indent, baseIndentLevel));
+        List<string> assignments =
+        [
+            Format(nameof(DefaultReturn), DefaultReturn, x => Format(x, MemberReturnType)),
+            Format(nameof(Timeout), Timeout),
+            Format(nameof(IgnoresIpcException), IgnoresIpcException),
+            Format(nameof(IsReadonly), IsReadonly),
+            Format(nameof(WaitsVoid), WaitsVoid),
+        ];
+        assignments.RemoveAll(string.IsNullOrEmpty);
+        if (assignments.Count is 0)
+        {
+            return "default";
+        }
+
+        var builder = new StringBuilder();
+        builder.AppendLine("new()");
+        builder.Append(baseIndent).AppendLine("{");
+        foreach (var assignment in assignments)
+        {
+            builder.Append(baseIndent).Append(indent).AppendLine(assignment);
+        }
+        builder.Append(baseIndent).Append("}");
+        return builder.ToString();
     }
 
     protected string Format<T>(string name, Assignable<T>? assignable, Func<T?, string>? customFormatter = null)

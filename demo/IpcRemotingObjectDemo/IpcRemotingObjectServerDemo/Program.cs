@@ -1,4 +1,5 @@
-﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿using System;
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.Pipes;
 using IpcRemotingObjectServerDemo;
 

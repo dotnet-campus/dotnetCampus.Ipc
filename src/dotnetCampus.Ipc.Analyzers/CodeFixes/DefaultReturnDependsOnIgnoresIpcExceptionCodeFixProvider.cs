@@ -37,15 +37,15 @@ public class DefaultReturnDependsOnIgnoresIpcExceptionCodeFixProvider : CodeFixP
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.IPC242_Fix1,
+                        title: Localizations.IPC242_Fix1,
                         createChangedDocument: c => RemoveDefaultReturn(context.Document, attributeNode, c),
-                        equivalenceKey: Resources.IPC242_Fix1),
+                        equivalenceKey: Localizations.IPC242_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.IPC242_Fix2,
+                        title: Localizations.IPC242_Fix2,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, c),
-                        equivalenceKey: Resources.IPC242_Fix2),
+                        equivalenceKey: Localizations.IPC242_Fix2),
                     diagnostic);
             }
         }

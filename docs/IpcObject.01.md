@@ -188,7 +188,7 @@ internal class IpcFooShape : IFoo
     // 获取来自 B 进程的 IFoo 接口的「代理」（Proxy）
 --  var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
 ++  // 不过这次，我们使用了 IpcFooShape 这个「形状」（Shape）作为「代理」（Proxy）
-++  var foo = ipcProvider.CreateIpcProxy<IpcFooShape>(peer);
+++  var foo = ipcProvider.CreateIpcProxy<IFoo, IpcFooShape>(peer);
 
     Console.WriteLine(foo.Name);
     Console.WriteLine(foo.Add(1, 2));

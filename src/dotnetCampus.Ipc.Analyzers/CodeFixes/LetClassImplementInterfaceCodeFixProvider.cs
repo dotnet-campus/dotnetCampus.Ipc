@@ -42,7 +42,7 @@ public class LetClassImplementInterfaceCodeFixProvider : CodeFixProvider
                 var (_, namedValues) = IpcAttributeHelper.TryFindIpcShapeAttributes(semanticModel, classDeclarationNode).FirstOrDefault();
                 if (namedValues.IpcType is { } realType && namedValues.ContractType is { } contractType)
                 {
-                    var fix = string.Format(Resources.IPC161_Fix2, realType.Name, contractType.Name);
+                    var fix = string.Format(Localizations.IPC161_Fix2, realType.Name, contractType.Name);
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             title: fix,

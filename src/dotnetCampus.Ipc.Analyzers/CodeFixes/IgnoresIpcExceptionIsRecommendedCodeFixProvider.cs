@@ -36,15 +36,15 @@ public class IgnoresIpcExceptionIsRecommendedCodeFixProvider : CodeFixProvider
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.IPC131_Fix1,
+                        title: Localizations.IPC131_Fix1,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, true, c),
-                        equivalenceKey: Resources.IPC131_Fix1),
+                        equivalenceKey: Localizations.IPC131_Fix1),
                     diagnostic);
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        title: Resources.IPC131_Fix2,
+                        title: Localizations.IPC131_Fix2,
                         createChangedDocument: c => SetIgnoresIpcException(context.Document, attributeNode, false, c),
-                        equivalenceKey: Resources.IPC131_Fix2),
+                        equivalenceKey: Localizations.IPC131_Fix2),
                     diagnostic);
             }
         }

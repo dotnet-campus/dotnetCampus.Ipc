@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -175,13 +175,13 @@
     <value>使 {0} 实现 {1} 接口</value>
   </data>
   <data name="IPC161_Message" xml:space="preserve">
-    <value>{0} 标记了 IPC 代理壳契约类型是 {1}，却并没有（完全）实现这个接口。</value>
+    <value>{0} 标记了 IPC 形状代理契约类型是 {1}，却并没有（完全）实现这个接口。</value>
   </data>
   <data name="IPC162" xml:space="preserve">
     <value>显式标记所有 IPC 成员</value>
   </data>
   <data name="IPC162_Message" xml:space="preserve">
-    <value>IPC 代理壳应显式标记所有成员的 IPC 行为，因为其无法继承契约接口的代理配置。</value>
+    <value>IPC 形状代理应显式标记所有成员的 IPC 行为，因为其无法继承契约接口的代理配置。</value>
   </data>
   <data name="IPC200" xml:space="preserve">
     <value>IPC 成员仅支持属性、方法和事件</value>
@@ -202,7 +202,7 @@
     <value>标记 IPC 成员</value>
   </data>
   <data name="IPC202_Message" xml:space="preserve">
-    <value>建议为 IPC 代理壳的 {0} 成员配置代理行为。</value>
+    <value>建议为 IPC 形状代理的 {0} 成员配置代理行为。</value>
   </data>
   <data name="IPC240" xml:space="preserve">
     <value>不建议使用 IPC 属性</value>
@@ -355,16 +355,16 @@
     <value>通过 IPC 配置项配置 IPC 代理行为。</value>
   </data>
   <data name="IPC302" xml:space="preserve">
-    <value>通过 IPC 代理壳配置代理行为</value>
+    <value>通过 IPC 形状代理配置代理行为</value>
   </data>
   <data name="IPC302_Fix1" xml:space="preserve">
-    <value>为 {0} 生成 IPC 代理壳</value>
+    <value>为 {0} 生成 IPC 形状代理</value>
   </data>
   <data name="IPC302_Fix2" xml:space="preserve">
-    <value>在新文件中为 {0} 生成 IPC 代理壳</value>
+    <value>在新文件中为 {0} 生成 IPC 形状代理</value>
   </data>
   <data name="IPC302_Message" xml:space="preserve">
-    <value>通过 IPC 代理壳配置代理行为。</value>
+    <value>通过 IPC 形状代理配置代理行为。</value>
   </data>
   <data name="IPC303" xml:space="preserve">
     <value>传入 IPC 配置项来配置 IPC 代理行为</value>
@@ -403,15 +403,15 @@
     <value>无需设置 Timeout，因为 IPC 契约类型上已经设置了此属性。</value>
   </data>
   <data name="IPC309" xml:space="preserve">
-    <value>不是有效的 IPC 代理壳</value>
+    <value>不是有效的 IPC 形状代理</value>
   </data>
   <data name="IPC309_Message" xml:space="preserve">
-    <value>指定的 IpcShape 参数 {0} 不是有效的 IPC 代理壳。</value>
+    <value>指定的 IpcShape 参数 {0} 不是有效的 IPC 形状代理。</value>
   </data>
   <data name="IPC310" xml:space="preserve">
-    <value>契约接口与代理壳不匹配</value>
+    <value>契约接口与形状代理不匹配</value>
   </data>
   <data name="IPC310_Message" xml:space="preserve">
-    <value>指定的 IpcShape 参数 {0} 不是针对 {1} 的 IPC 代理壳。</value>
+    <value>指定的 IpcShape 参数 {0} 不是针对 {1} 的 IPC 形状代理。</value>
   </data>
 </root>

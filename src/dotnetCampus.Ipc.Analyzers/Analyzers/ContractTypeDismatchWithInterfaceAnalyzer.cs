@@ -47,7 +47,7 @@ internal class ContractTypeDismatchWithInterfaceAnalyzer : DiagnosticAnalyzer
                     typeLocation,
                     realType.Name, contractType.Name));
 
-                // 在代理壳类型上报告。
+                // 在形状代理类型上报告。
                 if (attributeNode.Parent is AttributeListSyntax attributeListNode
                     && attributeListNode.Parent is ClassDeclarationSyntax classDeclarationNode)
                 {

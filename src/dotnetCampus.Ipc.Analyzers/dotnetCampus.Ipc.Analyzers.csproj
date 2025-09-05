@@ -28,14 +28,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources*.Designer.cs">
+    <Compile Update="Properties\Localizations.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>Localizations.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Update="Properties\Resources*.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Properties\Localizations.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Localizations.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Localizations.*.resx">
+      <DependentUpon>Localizations.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
 

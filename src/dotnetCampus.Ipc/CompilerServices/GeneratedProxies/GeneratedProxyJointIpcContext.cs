@@ -15,7 +15,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         internal GeneratedProxyJointIpcContext(IpcContext ipcContext)
         {
             ObjectSerializer = ipcContext.IpcConfiguration.IpcObjectSerializer;
-            JointManager = new PublicIpcJointManager(this, ipcContext);
+            JointManager = new PublicIpcJointManager(this);
             RequestHandler = new GeneratedProxyJointIpcRequestHandler(this, ipcContext);
         }
 

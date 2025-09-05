@@ -1,6 +1,6 @@
 ﻿namespace dotnetCampus.Ipc.Generators.Compiling;
 /// <summary>
-/// 提供 IPC 对象（代理壳类）的语法和语义分析。
+/// 提供 IPC 对象（形状代理类）的语法和语义分析。
 /// </summary>
 [DebuggerDisplay("{ShapeType} : {ContractType.Name,nq}")]
 internal class IpcShapeCompilation : IpcPublicCompilation, IEquatable<IpcShapeCompilation?>
@@ -10,7 +10,7 @@ internal class IpcShapeCompilation : IpcPublicCompilation, IEquatable<IpcShapeCo
     /// </summary>
     /// <param name="syntaxTree">IPC 对象所在整个文件的语法树。</param>
     /// <param name="semanticModel">语义模型。</param>
-    /// <param name="ipcType">IPC 代理壳的语义符号。</param>
+    /// <param name="ipcType">IPC 形状代理的语义符号。</param>
     /// <param name="contractType">IPC 契约类型的语义符号。</param>
     public IpcShapeCompilation(SyntaxTree syntaxTree, SemanticModel semanticModel,
         INamedTypeSymbol ipcType, INamedTypeSymbol contractType)
