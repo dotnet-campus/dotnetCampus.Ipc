@@ -12,20 +12,35 @@ public class IpcPublicGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var compilations = context.SyntaxProvider.CreateSyntaxProvider(
-            // 基本过滤：有特性的接口。
-            (syntaxNode, ct) => syntaxNode is InterfaceDeclarationSyntax ids && ids.AttributeLists.Count > 0,
-            // 语义解析：确定是否真的是感兴趣的 IPC 接口。
-            (generatorSyntaxContext, ct) => IpcPublicCompilation.TryCreateIpcPublicCompilation(
-                (InterfaceDeclarationSyntax) generatorSyntaxContext.Node,
-                generatorSyntaxContext.SemanticModel,
-                out var ipcPublicCompilation)
+        var ipcPublic = context.SyntaxProvider.CreateSyntaxProvider(
+                // 基本过滤：有特性的接口。
+                (syntaxNode, ct) => syntaxNode is InterfaceDeclarationSyntax { AttributeLists.Count: > 0 },
+                // 语义解析：确定是否真的是感兴趣的 IPC 接口。
+                (generatorSyntaxContext, ct) => IpcPublicCompilation.TryCreateIpcPublicCompilation(
+                    (InterfaceDeclarationSyntax)generatorSyntaxContext.Node,
+                    generatorSyntaxContext.SemanticModel,
+                    out var ipcPublicCompilation)
                     ? ipcPublicCompilation
                     : null)
             .Where(x => x is not null)
             .Select((x, ct) => x!);
 
-        context.RegisterSourceOutput(compilations, Execute);
+        var ipcShape = context.SyntaxProvider.CreateSyntaxProvider(
+                // 基本过滤：有特性的接口。
+                (syntaxNode, ct) => syntaxNode is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
+                // 语义解析：确定是否真的是感兴趣的 IPC 接口。
+                (generatorSyntaxContext, ct) => IpcShapeCompilation.TryCreateIpcShapeCompilation(
+                    (ClassDeclarationSyntax)generatorSyntaxContext.Node,
+                    generatorSyntaxContext.SemanticModel,
+                    out var ipcPublicCompilation)
+                    ? ipcPublicCompilation
+                    : null)
+            .Where(x => x is not null)
+            .Select((x, ct) => x!);
+
+        context.RegisterSourceOutput(ipcPublic, Execute);
+        context.RegisterSourceOutput(ipcShape, Execute);
+        context.RegisterSourceOutput(ipcPublic.Collect().Combine(ipcShape.Collect()), Execute);
     }
 
     private void Execute(SourceProductionContext context, IpcPublicCompilation ipcPublicCompilation)
@@ -35,10 +50,8 @@ public class IpcPublicGenerator : IIncrementalGenerator
             var ipcType = ipcPublicCompilation.IpcType;
             var proxySource = GenerateProxySource(ipcPublicCompilation);
             var jointSource = GenerateJointSource(ipcPublicCompilation);
-            var assemblySource = GenerateAssemblySource(ipcPublicCompilation);
-            context.AddSource($"{ipcType.Name}.proxy", SourceText.From(proxySource, Encoding.UTF8));
-            context.AddSource($"{ipcType.Name}.joint", SourceText.From(jointSource, Encoding.UTF8));
-            context.AddSource($"{ipcType.Name}.assembly", SourceText.From(assemblySource, Encoding.UTF8));
+            context.AddSource($"{ipcType.Name}.proxy.cs", SourceText.From(proxySource, Encoding.UTF8));
+            context.AddSource($"{ipcType.Name}.joint.cs", SourceText.From(jointSource, Encoding.UTF8));
         }
         catch (DiagnosticException ex)
         {
@@ -50,17 +63,39 @@ public class IpcPublicGenerator : IIncrementalGenerator
         }
     }
 
-    /// <summary>
-    /// 生成代理对接关系信息。
-    /// </summary>
-    /// <param name="pc">真实对象的编译信息。</param>
-    /// <returns>程序集特性的源代码。</returns>
-    private string GenerateAssemblySource(IpcPublicCompilation pc)
+    private void Execute(SourceProductionContext context, IpcShapeCompilation ipcShapeCompilation)
     {
-        var sourceCode = @$"using dotnetCampus.Ipc.CompilerServices.Attributes;
-using {pc.GetNamespace()};
+        try
+        {
+            var contractType = ipcShapeCompilation.ContractType;
+            var ipcType = ipcShapeCompilation.IpcType;
+            var proxySource = GenerateProxySource(ipcShapeCompilation);
+            context.AddSource($"{contractType.Name}.{ipcType.Name}.shape.cs", SourceText.From(proxySource, Encoding.UTF8));
+        }
+        catch (DiagnosticException ex)
+        {
+            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
+        }
+    }
 
-[assembly: {GetAttributeName(nameof(AssemblyIpcProxyJointAttribute))}(typeof({pc.IpcType}), typeof(__{pc.IpcType.Name}IpcProxy), typeof(__{pc.IpcType.Name}IpcJoint))]";
-        return sourceCode;
+    private void Execute(SourceProductionContext context, (ImmutableArray<IpcPublicCompilation> IpcPublics, ImmutableArray<IpcShapeCompilation> IpcShapes) compilations)
+    {
+        try
+        {
+            var moduleInitializerSource = GenerateModuleInitializerSource(compilations.IpcPublics, compilations.IpcShapes);
+            context.AddSource("_ModuleInitializer.cs", SourceText.From(moduleInitializerSource, Encoding.UTF8));
+        }
+        catch (DiagnosticException ex)
+        {
+            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
+        }
     }
 }

@@ -4,6 +4,7 @@ public class SourceTextBuilder : IDisposable
 {
     private readonly HashSet<string> _systemUsings = [];
     private readonly HashSet<string> _otherUsings = [];
+    private readonly HashSet<string> _staticUsings = [];
     private readonly HashSet<string> _aliasUsings = [];
     private readonly List<BracketSourceTextBuilder> _typeDeclarations = [];
     private readonly IDisposable _scope;
@@ -52,9 +53,25 @@ public class SourceTextBuilder : IDisposable
         return this;
     }
 
+    public SourceTextBuilder UsingStatic(string usingNamespace)
+    {
+        _staticUsings.Add(usingNamespace.PrependGlobal(ShouldPrependGlobal));
+        return this;
+    }
+
     public SourceTextBuilder UsingTypeAlias(string alias, string fullTypeName)
     {
         _aliasUsings.Add($"{alias} = {fullTypeName.PrependGlobal(ShouldPrependGlobal)}");
+        return this;
+    }
+
+    public SourceTextBuilder AddRawText(string rawText)
+    {
+        var rawDeclaration = new RawSourceTextBuilder(this)
+        {
+            RawText = rawText,
+        };
+        _typeDeclarations.Add(rawDeclaration);
         return this;
     }
 
@@ -92,11 +109,15 @@ public class SourceTextBuilder : IDisposable
         {
             builder.AppendLine($"using {line};");
         }
+        foreach (var line in _staticUsings.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+        {
+            builder.AppendLine($"using static {line};");
+        }
         foreach (var line in _aliasUsings.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
         {
             builder.AppendLine($"using {line};");
         }
-        if (_systemUsings.Count > 0 || _otherUsings.Count > 0 || _aliasUsings.Count > 0)
+        if (_systemUsings.Count > 0 || _otherUsings.Count > 0 || _staticUsings.Count > 0 || _aliasUsings.Count > 0)
         {
             builder.AppendLine();
         }
@@ -437,7 +458,6 @@ public static class SourceTextBuilderExtensions
         if (typeSymbol.ToGlobalDisplayString().Contains("INestedFakeIpcArgumentOrReturn")
             && typeSymbol.ToGlobalDisplayString().Contains("Task"))
         {
-
         }
 
         if (typeSymbol.Kind is SymbolKind.ArrayType)

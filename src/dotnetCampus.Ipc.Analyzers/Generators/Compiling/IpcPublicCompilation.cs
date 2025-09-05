@@ -16,8 +16,7 @@ internal class IpcPublicCompilation : IEquatable<IpcPublicCompilation?>
     /// <param name="syntaxTree">IPC 对象所在整个文件的语法树。</param>
     /// <param name="semanticModel">语义模型。</param>
     /// <param name="ipcType">IPC 对象的语义符号。</param>
-    public IpcPublicCompilation(SyntaxTree syntaxTree, SemanticModel semanticModel,
-        INamedTypeSymbol ipcType)
+    public IpcPublicCompilation(SyntaxTree syntaxTree, SemanticModel semanticModel, INamedTypeSymbol ipcType)
     {
         _compilationUnitSyntax = syntaxTree.GetCompilationUnitRoot();
         SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));

@@ -91,6 +91,39 @@ internal static class GeneratorHelper
     }
 
     /// <summary>
+    /// 生成代理对接关系信息。
+    /// </summary>
+    /// <param name="ipcPublicCompilations">真实对象的编译信息。</param>
+    /// <param name="ipcShapeCompilations">代理壳类型的编译信息。</param>
+    /// <returns>程序集特性的源代码。</returns>
+    internal static string GenerateModuleInitializerSource(
+        IReadOnlyList<IpcPublicCompilation> ipcPublicCompilations,
+        IReadOnlyList<IpcShapeCompilation> ipcShapeCompilations)
+    {
+        using var builder = new SourceTextBuilder(GeneratorInfo.RootNamespace)
+            .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
+            .AddTypeDeclaration("internal static class DotNetCampusIpcModuleInitializer", t => t
+                .AddGeneratedToolAndEditorBrowsingAttributes()
+                .AddMemberDeclaration("internal static void Initialize()", m => m
+                    .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
+                    .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
+                    .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))));
+        return builder.ToString();
+    }
+
+    private static string GenerateIpcPublicRegistration(IpcPublicCompilation ipc) => $"""
+        RegisterIpcPublic<{ipc.IpcType.ToUsingString()}>(
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcJoint());
+        """;
+
+    private static string GenerateIpcPublicRegistration(IpcShapeCompilation ipc) => $"""
+        RegisterIpcPublic<{ipc.IpcType.ToUsingString()}>(
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
+            null);
+        """;
+
+    /// <summary>
     /// 在代码生成器中报告那些分析器中没有报告的编译错误。
     /// <para>注意：虽然代码生成器和分析器都能报告编译错误，但只有分析器才能在 Visual Studio 中画波浪线。所以我们会考虑将一些需要立即觉察的错误放到分析器中报告。</para>
     /// <para>因此，在这个代码生成器项目中：</para>
@@ -119,16 +152,5 @@ internal static class GeneratorHelper
 
         // 报告所有非已知诊断。
         context.ReportDiagnostic(ex.ToDiagnostic());
-    }
-
-    /// <summary>
-    /// 格式化代码。
-    /// </summary>
-    /// <param name="sourceCode">未格式化的源代码。</param>
-    /// <returns>格式化的源代码。</returns>
-    internal static string FormatCode(string sourceCode)
-    {
-        var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
-        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 }
