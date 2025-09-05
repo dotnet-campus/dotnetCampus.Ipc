@@ -1,4 +1,5 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies.Models;
+using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Messages;
 using dotnetCampus.Ipc.Serialization;
 
@@ -26,7 +27,7 @@ internal class GeneratedIpcJointResponse : IIpcResponseMessage
         var returnModel = await asyncReturnModel.ConfigureAwait(false);
         var message = returnModel is null
             ? new IpcMessage()
-            : serializer.SerializeToIpcMessage(returnModel, "Return");
+            : serializer.SerializeToIpcMessage((ulong)KnownMessageHeaders.RemoteObjectMessageHeader, returnModel, "Return");
         return new GeneratedIpcJointResponse(message);
     }
 }

@@ -70,7 +70,8 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies
         /// </returns>
         public bool TryJoint(IIpcRequestContext request, out Task<IIpcResponseMessage> responseTask)
         {
-            if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberInvokeModel>(request.IpcBufferMessage, out var requestModel)
+            if (Context.ObjectSerializer.TryDeserializeFromIpcMessage<GeneratedProxyMemberInvokeModel>(
+                    request.IpcBufferMessage, (ulong)KnownMessageHeaders.RemoteObjectMessageHeader, out var requestModel)
                 && TryFindJoint(requestModel, out var joint)
                 && requestModel.MemberName is { } memberName)
             {
