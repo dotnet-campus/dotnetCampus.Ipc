@@ -16,7 +16,8 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 {
     internal SystemTextJsonIpcObjectSerializer()
     {
-        JsonSerializerContext = IpcInternalJsonSerializerContext.Default;
+        // 完全走反射的方式
+        //JsonSerializerContext = IpcInternalJsonSerializerContext.Default;
     }
 
     /// <summary>
@@ -31,7 +32,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     /// <summary>
     /// 获取 JSON 序列化上下文。
     /// </summary>
-    public JsonSerializerContext JsonSerializerContext { get; }
+    public JsonSerializerContext? JsonSerializerContext { get; }
 
     /// <inheritdoc />
     public byte[] Serialize(object? value)
@@ -41,7 +42,16 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
             return "{}"u8.ToArray();
         }
 
-        var json = JsonSerializer.Serialize(value, value.GetType(), JsonSerializerContext);
+        string json;
+        if (JsonSerializerContext is null)
+        {
+            json = JsonSerializer.Serialize(value);
+        }
+        else
+        {
+            json = JsonSerializer.Serialize(value, value.GetType(), JsonSerializerContext);
+        }
+
         return Encoding.UTF8.GetBytes(json);
     }
 
@@ -54,7 +64,14 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
             return;
         }
 
-        JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
+        if (JsonSerializerContext is null)
+        {
+            JsonSerializer.Serialize(stream, value);
+        }
+        else
+        {
+            JsonSerializer.Serialize(stream, value, value.GetType(), JsonSerializerContext);
+        }
     }
 
     /// <inheritdoc />
@@ -65,20 +82,45 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
             return default;
         }
 
-        return new IpcJsonElement { RawValueOnSystemTextJson = JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext), };
+        JsonElement jsonElement;
+        if (JsonSerializerContext is null)
+        {
+            jsonElement = JsonSerializer.SerializeToElement(value);
+        }
+        else
+        {
+            jsonElement = JsonSerializer.SerializeToElement(value, value.GetType(), JsonSerializerContext);
+        }
+
+        return new IpcJsonElement { RawValueOnSystemTextJson = jsonElement, };
     }
 
     /// <inheritdoc />
     public T? Deserialize<T>(byte[] data, int start, int length)
     {
         var span = data.AsSpan(start, length);
-        return JsonSerializer.Deserialize<T>(span, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+
+        if (JsonSerializerContext is null)
+        {
+            return JsonSerializer.Deserialize<T>(span);
+        }
+        else
+        {
+            return JsonSerializer.Deserialize<T>(span, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        }
     }
 
     /// <inheritdoc />
     public T? Deserialize<T>(Stream stream)
     {
-        return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        if (JsonSerializerContext is null)
+        {
+            return JsonSerializer.Deserialize<T>(stream);
+        }
+        else
+        {
+            return JsonSerializer.Deserialize<T>(stream, (JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        }
     }
 
     /// <inheritdoc />
@@ -88,7 +130,15 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
         {
             return default;
         }
-        return element.Deserialize<T>((JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+
+        if (JsonSerializerContext is null)
+        {
+            return element.Deserialize<T>();
+        }
+        else
+        {
+            return element.Deserialize<T>((JsonTypeInfo<T>) JsonSerializerContext.GetTypeInfo(typeof(T))!);
+        }
     }
 }
 
