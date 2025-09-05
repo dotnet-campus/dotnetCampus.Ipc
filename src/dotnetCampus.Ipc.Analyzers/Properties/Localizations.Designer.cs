@@ -10,8 +10,8 @@
 
 namespace dotnetCampus.Ipc.Properties {
     using System;
-    
-    
+
+
     /// <summary>
     ///   一个强类型的资源类，用于查找本地化的字符串等。
     /// </summary>
@@ -22,16 +22,16 @@ namespace dotnetCampus.Ipc.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-        
+    internal class Localizations {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Localizations() {
         }
-        
+
         /// <summary>
         ///   返回此类使用的缓存的 ResourceManager 实例。
         /// </summary>
@@ -39,13 +39,13 @@ namespace dotnetCampus.Ipc.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("dotnetCampus.Ipc.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("dotnetCampus.Ipc.Properties.Resources", typeof(Localizations).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   重写当前线程的 CurrentUICulture 属性，对
         ///   使用此强类型资源类的所有资源查找执行重写。
@@ -59,7 +59,7 @@ namespace dotnetCampus.Ipc.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC unknown error 的本地化字符串。
         /// </summary>
@@ -68,7 +68,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC000", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 An unknown error occurred when generating IPC types. The error is: {0} 的本地化字符串。
         /// </summary>
@@ -77,7 +77,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC000_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC known compiler error 的本地化字符串。
         /// </summary>
@@ -86,7 +86,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC001", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 An known compiler error occurred when generating IPC types. We&apos;ll not report it because the compiler will do this. 的本地化字符串。
         /// </summary>
@@ -95,7 +95,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC001_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC known diagnostic error 的本地化字符串。
         /// </summary>
@@ -104,7 +104,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC002", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 An known diagnostic error occurred when generating IPC types. We&apos;ll not report it because the analyzer will do this. 的本地化字符串。
         /// </summary>
@@ -113,7 +113,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC002_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC timeout can&apos;t be negative 的本地化字符串。
         /// </summary>
@@ -122,7 +122,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC101", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC timeout can&apos;t be negative, but it is set to {0}ms. 的本地化字符串。
         /// </summary>
@@ -131,7 +131,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC101_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The timeout is zero 的本地化字符串。
         /// </summary>
@@ -140,7 +140,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC102", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 A timeout with zero milliseconds does nothing so there is no need to assign this property. 的本地化字符串。
         /// </summary>
@@ -149,7 +149,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC102_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IgnoresIpcException is recommended 的本地化字符串。
         /// </summary>
@@ -158,7 +158,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC131", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
         /// </summary>
@@ -167,7 +167,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC131_Fix1", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set IgnoresIpcException to false 的本地化字符串。
         /// </summary>
@@ -176,7 +176,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC131_Fix2", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here. 的本地化字符串。
         /// </summary>
@@ -185,7 +185,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC131_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC contract type must be an interface 的本地化字符串。
         /// </summary>
@@ -194,7 +194,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC160", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC contract type must be an interface but {0} is not. 的本地化字符串。
         /// </summary>
@@ -203,7 +203,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC160_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC contract type dismatches with interface 的本地化字符串。
         /// </summary>
@@ -212,7 +212,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC161", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Change the contract type to {0} 的本地化字符串。
         /// </summary>
@@ -221,7 +221,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC161_Fix1", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Let {0} implement {1} 的本地化字符串。
         /// </summary>
@@ -230,7 +230,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC161_Fix2", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 {0} does not fully implement the contract type {1} that the IpcShape marked. 的本地化字符串。
         /// </summary>
@@ -239,7 +239,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC161_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Mark all members as IPC members 的本地化字符串。
         /// </summary>
@@ -248,7 +248,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC162", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 An IPC shape should mark all the members as IPC members, because it cannot use any behaviors from the original contract type. 的本地化字符串。
         /// </summary>
@@ -257,7 +257,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC162_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Only properties, methods and events are supported 的本地化字符串。
         /// </summary>
@@ -266,7 +266,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC200", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Unknown IPC member {0}. IPC object only supports properties, methods and events. 的本地化字符串。
         /// </summary>
@@ -275,7 +275,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC200_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Empty IPC member attribute is not needed 的本地化字符串。
         /// </summary>
@@ -284,7 +284,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC201", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Remove the {0} 的本地化字符串。
         /// </summary>
@@ -293,7 +293,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC201_Fix", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Empty {0} does nothing, so there is no need to add it. 的本地化字符串。
         /// </summary>
@@ -302,7 +302,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC201_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Mark the member as an IPC member 的本地化字符串。
         /// </summary>
@@ -311,7 +311,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC202", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 As an IPC shape, it is recommended to mark {0} as an IPC member. 的本地化字符串。
         /// </summary>
@@ -320,7 +320,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC202_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC property is not recommended 的本地化字符串。
         /// </summary>
@@ -329,7 +329,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC240", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 It&apos;s better to use an async method instead of a property as an IPC member to avoid potential UI frozen or deadlocks. 的本地化字符串。
         /// </summary>
@@ -338,7 +338,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC240_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set-only property is not supported 的本地化字符串。
         /// </summary>
@@ -347,7 +347,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC241", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Unknown IPC property {0}. Only get or get-set property is supported. 的本地化字符串。
         /// </summary>
@@ -356,7 +356,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC241_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn is useless 的本地化字符串。
         /// </summary>
@@ -365,7 +365,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC242", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Remove the DefaultReturn 的本地化字符串。
         /// </summary>
@@ -374,7 +374,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC242_Fix1", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
         /// </summary>
@@ -383,7 +383,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC242_Fix2", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn only works with the situation in which IgnoresIpcException is set to true. 的本地化字符串。
         /// </summary>
@@ -392,7 +392,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC242_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IsReadonly is unnecessary 的本地化字符串。
         /// </summary>
@@ -401,7 +401,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC243", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IsReadonly is set to false by default, so there is no need to assign it to false manully. 的本地化字符串。
         /// </summary>
@@ -410,7 +410,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC243_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn type does not match the property type 的本地化字符串。
         /// </summary>
@@ -419,7 +419,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC244", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The IPC DefaultReturn type {0} does not match the property type {1}. 的本地化字符串。
         /// </summary>
@@ -428,7 +428,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC244_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet 的本地化字符串。
         /// </summary>
@@ -437,7 +437,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC245", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @&quot;&quot;&quot;{0}&quot;&quot;&quot; instead. 的本地化字符串。
         /// </summary>
@@ -446,7 +446,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC245_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet 的本地化字符串。
         /// </summary>
@@ -455,7 +455,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC246", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet and will be set to a {1} type. 的本地化字符串。
         /// </summary>
@@ -464,7 +464,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC246_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet but cannot be compiled 的本地化字符串。
         /// </summary>
@@ -473,7 +473,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC247", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet but cannot be compiled. 的本地化字符串。
         /// </summary>
@@ -482,7 +482,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC247_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The property type is not supported 的本地化字符串。
         /// </summary>
@@ -491,7 +491,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC248", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The type {1} of the property {0} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC property types. 的本地化字符串。
         /// </summary>
@@ -500,7 +500,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC248_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IPC sync method is not recommended 的本地化字符串。
         /// </summary>
@@ -509,7 +509,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC260", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 It&apos;s better to use an async method instead of a sync one as an IPC member to avoid potential UI frozen or deadlocks. 的本地化字符串。
         /// </summary>
@@ -518,7 +518,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC260_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn is useless 的本地化字符串。
         /// </summary>
@@ -527,7 +527,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC261", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Remove the DefaultReturn 的本地化字符串。
         /// </summary>
@@ -536,7 +536,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC261_Fix1", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set IgnoresIpcException to true 的本地化字符串。
         /// </summary>
@@ -545,7 +545,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC261_Fix2", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn only works with the situation in which IgnoresIpcException is set to true. 的本地化字符串。
         /// </summary>
@@ -554,7 +554,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC261_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 WaitsVoid is recommended 的本地化字符串。
         /// </summary>
@@ -563,7 +563,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC262", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Commonly, developers can hardly determin whether a waiting is happened during an IPC call if a method returns void. So it&apos;s recommended to assign WaitsVoid to the value you want instead of keeping it as false by default. 的本地化字符串。
         /// </summary>
@@ -572,7 +572,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC262_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The WaitsVoid is useless 的本地化字符串。
         /// </summary>
@@ -581,7 +581,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC263", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 This method has a return value so WaitsVoid does not work for it. 的本地化字符串。
         /// </summary>
@@ -590,7 +590,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC263_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn type does not match the method return type 的本地化字符串。
         /// </summary>
@@ -599,7 +599,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC264", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The IPC DefaultReturn type {0} does not match the method return type {1}. 的本地化字符串。
         /// </summary>
@@ -608,7 +608,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC264_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn value for a void method is useless 的本地化字符串。
         /// </summary>
@@ -617,7 +617,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC265", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn value for a void method {0} is useless. 的本地化字符串。
         /// </summary>
@@ -626,7 +626,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC265_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn value for an async Task method is useless 的本地化字符串。
         /// </summary>
@@ -635,7 +635,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC266", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The DefaultReturn value for an async Task method {0} is useless. 的本地化字符串。
         /// </summary>
@@ -644,7 +644,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC266_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet 的本地化字符串。
         /// </summary>
@@ -653,7 +653,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC267", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet and will be set to an object type. If you want to set the original string to it, use @&quot;&quot;&quot;{0}&quot;&quot;&quot; instead. 的本地化字符串。
         /// </summary>
@@ -662,7 +662,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC267_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet 的本地化字符串。
         /// </summary>
@@ -671,7 +671,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC268", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet and will be set to a {1} type. 的本地化字符串。
         /// </summary>
@@ -680,7 +680,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC268_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string is treated as a code snippet but cannot be compiled 的本地化字符串。
         /// </summary>
@@ -689,7 +689,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC269", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The string {0} is treated as a code snippet but cannot be compiled. 的本地化字符串。
         /// </summary>
@@ -698,7 +698,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC269_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Generic methods are not supported 的本地化字符串。
         /// </summary>
@@ -707,7 +707,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC270", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Generic methods are not supported, because we cannot determine a generic type at runtime which should have been determined at compile time. 的本地化字符串。
         /// </summary>
@@ -716,7 +716,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC270_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The method parameter type is not supported 的本地化字符串。
         /// </summary>
@@ -725,7 +725,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC271", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The type {2} of the method {0} pamameter {1} is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types. 的本地化字符串。
         /// </summary>
@@ -734,7 +734,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC271_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The method return type is not supported 的本地化字符串。
         /// </summary>
@@ -743,7 +743,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC272", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The type {1} of the method {0} return is not supported for an IPC type. Only the primary types, the types that can be serialized via JSON, or the types that are marked with the IpcPublic can be IPC types. 的本地化字符串。
         /// </summary>
@@ -752,7 +752,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC272_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Add IpcProxyConfigs 的本地化字符串。
         /// </summary>
@@ -761,7 +761,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC301", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Configure the IPC behaviors by adding IpcProxyConfigs. 的本地化字符串。
         /// </summary>
@@ -770,7 +770,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC301_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Add an IpcShape 的本地化字符串。
         /// </summary>
@@ -779,7 +779,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC302", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Generate an IpcShape for {0} 的本地化字符串。
         /// </summary>
@@ -788,7 +788,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC302_Fix1", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Generate an IpcShape for {0} in a new file 的本地化字符串。
         /// </summary>
@@ -797,7 +797,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC302_Fix2", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Configure the IPC behaviors by adding an IpcShape. 的本地化字符串。
         /// </summary>
@@ -806,7 +806,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC302_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Add IpcProxyConfigs 的本地化字符串。
         /// </summary>
@@ -815,7 +815,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC303", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Configure the IPC behaviors by adding IpcProxyConfigs because no behaviors are specified on the IPC contract type. 的本地化字符串。
         /// </summary>
@@ -824,7 +824,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC303_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IpcProxyConfigs are not needed 的本地化字符串。
         /// </summary>
@@ -833,7 +833,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC304", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 All the behaviors are specified by the IPC contract type, so every value here does not work. 的本地化字符串。
         /// </summary>
@@ -842,7 +842,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC304_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set IgnoresIpcException 的本地化字符串。
         /// </summary>
@@ -851,7 +851,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC305", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 For better readability, IgnoresIpcException is recommended to set so that the developers know that there may have been some IPC exceptions here. 的本地化字符串。
         /// </summary>
@@ -860,7 +860,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC305_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IgnoresIpcException is not needed 的本地化字符串。
         /// </summary>
@@ -869,7 +869,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC306", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 IgnoresIpcException is not needed because it has been set on the IPC contract type. 的本地化字符串。
         /// </summary>
@@ -878,7 +878,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC306_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set Timeout 的本地化字符串。
         /// </summary>
@@ -887,7 +887,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC307", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Set timeout explicitly. 的本地化字符串。
         /// </summary>
@@ -896,7 +896,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC307_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Timeout is not needed 的本地化字符串。
         /// </summary>
@@ -905,7 +905,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC308", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Timeout is not needed because it has been set on the IPC contract type. 的本地化字符串。
         /// </summary>
@@ -914,7 +914,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC308_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The type argument is not an IpcShape 的本地化字符串。
         /// </summary>
@@ -923,7 +923,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC309", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The type argument {0} is not an IpcShape. 的本地化字符串。
         /// </summary>
@@ -932,7 +932,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC309_Message", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The IPC proxy type does not match the IPC contract type 的本地化字符串。
         /// </summary>
@@ -941,7 +941,7 @@ namespace dotnetCampus.Ipc.Properties {
                 return ResourceManager.GetString("IPC310", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 The IPC proxy type {0} does not match the IPC contract type {1}. 的本地化字符串。
         /// </summary>

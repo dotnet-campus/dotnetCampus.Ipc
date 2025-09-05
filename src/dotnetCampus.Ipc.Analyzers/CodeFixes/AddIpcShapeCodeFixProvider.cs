@@ -51,7 +51,7 @@ public class AddIpcShapeCodeFixProvider : CodeFixProvider
                 if (invokingInfo.ShapeType is null)
                 {
                     // 在新文件中生成 IPC 形状代理。（在当前文件中生成的这一个，因为字符串拼接的代码很难和语法节点的代码保持格式统一，所以就不做了。）
-                    var fix2 = string.Format(Resources.IPC302_Fix2, invokingInfo.ContractType.Name);
+                    var fix2 = string.Format(Localizations.IPC302_Fix2, invokingInfo.ContractType.Name);
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             title: fix2,

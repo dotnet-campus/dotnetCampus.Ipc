@@ -34,7 +34,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
             var node = root.FindNode(diagnosticSpan);
             if (node is AttributeSyntax attributeNode)
             {
-                var fix = string.Format(Resources.IPC201_Fix, attributeNode.Name);
+                var fix = string.Format(Localizations.IPC201_Fix, attributeNode.Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
@@ -44,7 +44,7 @@ public class EmptyIpcMemberAttributeIsUnnecessaryCodeFixProvider : CodeFixProvid
             }
             else if (node is AttributeListSyntax attributeListNode)
             {
-                var fix = string.Format(Resources.IPC201_Fix, attributeListNode.Attributes[0].Name);
+                var fix = string.Format(Localizations.IPC201_Fix, attributeListNode.Attributes[0].Name);
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: fix,
