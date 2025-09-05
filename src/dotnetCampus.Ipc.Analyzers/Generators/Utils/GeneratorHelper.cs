@@ -44,7 +44,7 @@ internal static class GeneratorHelper
     }
 
     /// <summary>
-    /// 生成代理壳类。
+    /// 生成形状代理类。
     /// </summary>
     /// <param name="ipc">真实对象的编译信息。</param>
     /// <param name="typeName">类型名称。</param>
@@ -94,7 +94,7 @@ internal static class GeneratorHelper
     /// 生成代理对接关系信息。
     /// </summary>
     /// <param name="ipcPublicCompilations">真实对象的编译信息。</param>
-    /// <param name="ipcShapeCompilations">代理壳类型的编译信息。</param>
+    /// <param name="ipcShapeCompilations">形状代理类型的编译信息。</param>
     /// <returns>程序集特性的源代码。</returns>
     internal static string GenerateModuleInitializerSource(
         IReadOnlyList<IpcPublicCompilation> ipcPublicCompilations,

@@ -47,7 +47,7 @@ internal struct IpcProxyInvokingInfo
     public INamedTypeSymbol ContractType { get; }
 
     /// <summary>
-    /// 如果本次调用使用到了 IPC 代理壳，那么此属性是 IPC 代理壳的类型。
+    /// 如果本次调用使用到了 IPC 形状代理，那么此属性是 IPC 形状代理的类型。
     /// </summary>
     public INamedTypeSymbol? ShapeType { get; }
 

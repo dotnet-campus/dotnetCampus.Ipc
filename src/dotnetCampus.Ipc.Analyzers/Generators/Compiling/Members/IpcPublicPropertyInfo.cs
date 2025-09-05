@@ -84,7 +84,7 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     }
 
     /// <summary>
-    /// 生成此成员在 IPC 代理壳中的源代码。
+    /// 生成此成员在 IPC 形状代理中的源代码。
     /// </summary>
     /// <returns>成员源代码。</returns>
     public string GenerateShapeMember()

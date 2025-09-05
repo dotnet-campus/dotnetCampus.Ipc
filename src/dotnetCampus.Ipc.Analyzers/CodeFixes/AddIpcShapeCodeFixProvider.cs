@@ -50,7 +50,7 @@ public class AddIpcShapeCodeFixProvider : CodeFixProvider
             {
                 if (invokingInfo.ShapeType is null)
                 {
-                    // 在新文件中生成 IPC 代理壳。（在当前文件中生成的这一个，因为字符串拼接的代码很难和语法节点的代码保持格式统一，所以就不做了。）
+                    // 在新文件中生成 IPC 形状代理。（在当前文件中生成的这一个，因为字符串拼接的代码很难和语法节点的代码保持格式统一，所以就不做了。）
                     var fix2 = string.Format(Resources.IPC302_Fix2, invokingInfo.ContractType.Name);
                     context.RegisterCodeFix(
                         CodeAction.Create(
@@ -86,7 +86,7 @@ public class AddIpcShapeCodeFixProvider : CodeFixProvider
             var contractTypeDeclarationNode = invokingInfo.ContractType.TryGetTypeDeclaration();
             if (contractTypeDeclarationNode is not null)
             {
-                // 新生成一个 IPC 代理壳类型。
+                // 新生成一个 IPC 形状代理类型。
                 var ipcPublicCompilation = new IpcPublicCompilation(contractTypeDeclarationNode.SyntaxTree, invokingInfo.SemanticModel, invokingInfo.ContractType);
                 var shapeSource = GenerateShapeSource(ipcPublicCompilation, newTypeName, GetNamespace(newRoot));
                 var newDocumentRoot = SF.ParseSyntaxTree(shapeSource).GetRoot();

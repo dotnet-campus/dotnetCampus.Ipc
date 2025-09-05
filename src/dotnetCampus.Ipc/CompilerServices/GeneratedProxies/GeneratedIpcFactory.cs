@@ -23,12 +23,12 @@ public static class GeneratedIpcFactory
     private static readonly ConcurrentDictionary<Assembly, AssemblyIpcProxyJointAttribute[]> AssemblyIpcAttributesCache = [];
 
     /// <summary>
-    /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口或标记了 <see cref="IpcShapeAttribute"/> 的代理壳类型）到代理对接类型的缓存。
+    /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口或标记了 <see cref="IpcShapeAttribute"/> 的形状代理类型）到代理对接类型的缓存。
     /// </summary>
     internal static CachePool<Type, (Type? proxyType, Type? jointType)> IpcTypeToProxyJointCache { get; } = new(ConvertShapeTypeToProxyJointTypes, true);
 
     /// <summary>
-    /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口或标记了 <see cref="IpcShapeAttribute"/> 的代理壳类型）到代理对接对象的创建器。
+    /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口或标记了 <see cref="IpcShapeAttribute"/> 的形状代理类型）到代理对接对象的创建器。
     /// </summary>
     private static readonly ConcurrentDictionary<Type, (Func<object>? ProxyFactory, Func<object>? JointFactory)> IpcFactories = [];
 
@@ -102,7 +102,7 @@ public static class GeneratedIpcFactory
     /// 创建用于通过 IPC 访问其他端 <typeparamref name="TContract"/> 类型的代理对象。
     /// </summary>
     /// <typeparam name="TContract">IPC 对象的契约类型。</typeparam>
-    /// <typeparam name="TShape">用于配置 IPC 代理行为的 IPC 代理壳类型。</typeparam>
+    /// <typeparam name="TShape">用于配置 IPC 代理行为的 IPC 形状代理类型。</typeparam>
     /// <param name="ipcProvider">关联的 <see cref="IIpcProvider"/>。</param>
     /// <param name="peer">IPC 远端。</param>
     /// <param name="ipcObjectId">如果要调用的远端对象有多个实例，请设置此 Id 值以找到期望的实例。</param>
@@ -156,7 +156,7 @@ public static class GeneratedIpcFactory
     /// <summary>
     /// 编译期契约与傀儡类型到代理对接的转换。
     /// </summary>
-    /// <param name="ipcType">标记了 <see cref="IpcPublicAttribute"/> 的契约类型或标记了 <see cref="IpcShapeAttribute"/> 的代理壳类型。</param>
+    /// <param name="ipcType">标记了 <see cref="IpcPublicAttribute"/> 的契约类型或标记了 <see cref="IpcShapeAttribute"/> 的形状代理类型。</param>
     /// <returns>IPC 类型。</returns>
     private static (Type? proxyType, Type? jointType) ConvertShapeTypeToProxyJointTypes(Type ipcType)
     {
@@ -166,11 +166,11 @@ public static class GeneratedIpcFactory
 
         if (ipcType?.IsDefined(typeof(IpcShapeAttribute)) is true)
         {
-            // 因为 IpcShape 继承了 IpcPublic，所以需要首先检查代理壳，否则 IpcPublic 接口直接就通过了，产生错误。
+            // 因为 IpcShape 继承了 IpcPublic，所以需要首先检查形状代理，否则 IpcPublic 接口直接就通过了，产生错误。
             var attribute = attributes.FirstOrDefault(x => x.IpcType == ipcType);
             if (attribute is null)
             {
-                throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”代理壳的 IPC 代理类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
+                throw new NotSupportedException($"因为编译时没有生成“{ipcType.Name}”形状代理的 IPC 代理类，所以运行时无法创建它们的实例。请确保使用 Visual Studio 2022 或以上版本、MSBuild 17 或以上版本进行编译。");
             }
             return (attribute.ProxyType, null);
         }

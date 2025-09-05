@@ -12,7 +12,7 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// <para>注意：</para>
 /// <list type="number">
 /// <item>使用此方式指定的 IPC 代理配置优先级为“最低”，低于 <see cref="IpcPublicAttribute"/> 指定的配置，更低于在接口的成员上单独指定的配置。因此仅在接口上或接口的成员上没有指定 IPC 代理配置时才会生效。</item>
-/// <item>如需覆盖接口上指定的 IPC 代理配置，请额外生成一个 IPC 代理壳（）</item>
+/// <item>如需覆盖接口上指定的 IPC 代理配置，请额外生成一个 IPC 形状代理（）</item>
 /// </list>
 /// </summary>
 public class IpcProxyConfigs
