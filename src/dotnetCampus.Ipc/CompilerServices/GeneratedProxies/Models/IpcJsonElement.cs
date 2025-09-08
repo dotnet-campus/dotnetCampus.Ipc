@@ -64,6 +64,24 @@ public readonly record struct IpcJsonElement
         }
     }
 
+    /// <inheritdoc />
+    public override string ToString()
+    {
+#if UseNewtonsoftJson
+        if (RawValueOnNewtonsoftJson is { } jToken)
+        {
+            return jToken.ToString();
+        }
+#endif
+#if NET6_0_OR_GREATER
+        if (RawValueOnSystemTextJson is { } json)
+        {
+            return json.ToString();
+        }
+#endif
+        return "<null>";
+    }
+
     /// <summary>
     /// 将一个本地对象序列化成 IPC 可传输的 JSON 对象。
     /// </summary>
