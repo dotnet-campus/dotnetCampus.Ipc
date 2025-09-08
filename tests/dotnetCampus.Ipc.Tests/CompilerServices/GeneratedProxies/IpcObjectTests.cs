@@ -331,7 +331,16 @@ public class IpcObjectTests
             throw new FileNotFoundException($"在执行真正跨进程 IPC 通信时，目标程序集未找到，请确认代码中编写的路径是否已更新到最新路径。路径为：{remoteExecutablePath}");
         }
 
-        var process = Process.Start(new ProcessStartInfo("dotnet") { UseShellExecute = true, ArgumentList = { remoteExecutablePath, }, })!;
+        var process = Process.Start(new ProcessStartInfo("dotnet")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            ArgumentList =
+            {
+                remoteExecutablePath,
+            },
+            WorkingDirectory = Path.GetDirectoryName(remoteExecutablePath),
+        })!;
         try
         {
             var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject";
