@@ -129,8 +129,15 @@ file static class ExceptionHacker
     {
         var source = Expression.Parameter(typeof(Exception));
         var stackTrace = Expression.Parameter(typeof(string));
-        var remoteStackTraceStringField = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var assign = Expression.Assign(Expression.Field(source, remoteStackTraceStringField), stackTrace);
+        // Try to get _remoteStackTraceString first, then fallback to _stackTraceString for older .NET Frameworks
+        var fieldInfo = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.NonPublic | BindingFlags.Instance)
+                        ?? typeof(Exception).GetField("_stackTraceString", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (fieldInfo == null)
+        {
+            // If neither field exists, just return the exception unchanged
+            return (ex, st) => ex;
+        }
+        var assign = Expression.Assign(Expression.Field(source, fieldInfo), stackTrace);
         return Expression.Lambda<Func<Exception, string, Exception>>(Expression.Block(assign, source), source, stackTrace).Compile();
     })();
 }
