@@ -1,5 +1,5 @@
-﻿using dotnetCampus.Ipc.Generators.Builders;
-using dotnetCampus.Ipc.Generators.Compiling;
+﻿using dotnetCampus.Ipc.Generators.Compiling;
+using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc.Generators.Utils;
 
@@ -83,7 +83,7 @@ internal static class GeneratorHelper
             .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcJoint", t => t
                 .AddBaseTypes($"GeneratedIpcJoint<{ipc.IpcType.ToUsingString()}>")
                 .AddGeneratedToolAndEditorBrowsingAttributes()
-                .AddMemberDeclaration($"protected override void MatchMembers({ipc.IpcType.ToUsingString()} {realInstanceName})", m => m
+                .AddMethodDeclaration($"protected override void MatchMembers({ipc.IpcType.ToUsingString()} {realInstanceName})", m => m
                     .AddRawStatements(ipc.EnumerateMembers()
                         .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
                         .Select(x => x.GenerateJointMatch(realInstanceName)))));
@@ -104,7 +104,7 @@ internal static class GeneratorHelper
             .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
             .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
                 .AddGeneratedToolAndEditorBrowsingAttributes()
-                .AddMemberDeclaration("internal static void Initialize()", m => m
+                .AddMethodDeclaration("internal static void Initialize()", m => m
                     .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
                     .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
                     .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))));
