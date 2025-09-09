@@ -342,7 +342,11 @@ public class IpcObjectTests
         })!;
         try
         {
-            var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject";
+#if NET8_0_OR_GREATER
+            var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject.net8";
+#else
+            var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject.net6";
+#endif
             var ipcProvider = new IpcProvider(ipcPeerName + ".Local");
             ipcProvider.StartServer();
             var ipcPeer = await ipcProvider.GetAndConnectToPeerAsync(ipcPeerName);
