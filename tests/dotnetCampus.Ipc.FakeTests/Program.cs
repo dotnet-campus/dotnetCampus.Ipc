@@ -17,7 +17,6 @@ Console.WriteLine("IPC 对接已创建");
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine("IPC 交互中...");
 Console.ResetColor();
-await jointObject.WaitForShutdownAsync();
+await jointObject.WaitForShutdownAsync().WaitAsync(TimeSpan.FromSeconds(3));
 Console.WriteLine("IPC 收到退出信号");
-Thread.Sleep(1000);
 Console.WriteLine("IPC 远程进程单元测试已退出");

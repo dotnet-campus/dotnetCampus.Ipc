@@ -333,8 +333,7 @@ public class IpcObjectTests
 
         var process = Process.Start(new ProcessStartInfo("dotnet")
         {
-            UseShellExecute = false,
-            CreateNoWindow = true,
+            UseShellExecute = true,
             ArgumentList =
             {
                 remoteExecutablePath,
