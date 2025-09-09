@@ -8,7 +8,7 @@
       3. 可以分别测试这两种机制单独是否能正常工作。
       4. 额外配合 dotnetCampus.Ipc.FakeTests 测试项目，可以测试两个机制之间的兼容性。
     -->
-    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
