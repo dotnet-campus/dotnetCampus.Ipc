@@ -1,5 +1,4 @@
 ﻿using dotnetCampus.Ipc.Generators.Compiling.Members;
-using dotnetCampus.Ipc.Generators.Models;
 
 namespace dotnetCampus.Ipc.Generators.Compiling;
 
@@ -15,7 +14,6 @@ internal class IpcPublicMemberProxyJointGenerator
     /// <summary>
     /// 创建 IPC 对象的其中一个成员信息。
     /// </summary>
-    /// <param name="ipcType">契约接口类型的语义符号。</param>
     /// <param name="ipcType">IPC 类型（即标记了 <see cref="IpcPublicAttribute"/> 或 <see cref="IpcShapeAttribute"/> 的类型）的语义符号。（可能与 <paramref name="ipcType"/> 是相同类型。）</param>
     /// <param name="member"><paramref name="ipcType"/> 中成员的语义符号。</param>
     public IpcPublicMemberProxyJointGenerator(INamedTypeSymbol ipcType, ISymbol member)
@@ -64,22 +62,19 @@ internal class IpcPublicMemberProxyJointGenerator
     /// <summary>
     /// 生成此成员在 IPC 代理中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>成员源代码。</returns>
-    public MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder) => _proxyMemberGenerator.GenerateProxyMember(builder);
+    public string GenerateProxyMember() => _proxyMemberGenerator.GenerateProxyMember();
 
     /// <summary>
-    /// 生成此成员在 IPC 代理壳中的源代码。
+    /// 生成此成员在 IPC 形状代理中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <returns>成员源代码。</returns>
-    internal MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder) => _shapeMemberGenerator.GenerateShapeMember(builder);
+    internal string GenerateShapeMember() => _shapeMemberGenerator.GenerateShapeMember();
 
     /// <summary>
     /// 生成此成员在 IPC 对接中的源代码。
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="realInstanceVariableName">IPC 对接方法中真实实例的实参名称。</param>
     /// <returns>成员源代码。</returns>
-    public string GenerateJointMatch(SourceTextBuilder builder, string realInstanceVariableName) => _jointMatchGenerator.GenerateJointMatch(builder, realInstanceVariableName);
+    public string GenerateJointMatch(string realInstanceVariableName) => _jointMatchGenerator.GenerateJointMatch(realInstanceVariableName);
 }

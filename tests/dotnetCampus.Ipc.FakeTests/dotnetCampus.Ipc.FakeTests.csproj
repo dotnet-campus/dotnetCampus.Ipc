@@ -14,7 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dotnetCampus.CommandLine" />
+    <PackageReference Include="DotNetCampus.CommandLine" />
+    <PackageReference Include="DotNetCampus.LatestCSharpFeatures" />
   </ItemGroup>
 
   <ItemGroup>

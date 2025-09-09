@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace dotnetCampus.Ipc.Core.ComponentModels;
+﻿namespace dotnetCampus.Ipc.Core.ComponentModels;
 
 /// <summary>
 /// 表示一个可被赋值的量，对于值类型，含已赋值和未赋值两种状态；对于引用类型，含已赋值为 null、已赋值为非 null 和未赋值三种状态。

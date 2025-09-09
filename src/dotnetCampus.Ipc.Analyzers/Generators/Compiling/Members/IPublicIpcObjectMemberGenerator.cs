@@ -1,18 +1,16 @@
-﻿using dotnetCampus.Ipc.Generators.Models;
-
-namespace dotnetCampus.Ipc.Generators.Compiling.Members;
+﻿namespace dotnetCampus.Ipc.Generators.Compiling.Members;
 
 internal interface IPublicIpcObjectProxyMemberGenerator
 {
-    MemberDeclarationSourceTextBuilder GenerateProxyMember(SourceTextBuilder builder);
+    string GenerateProxyMember();
 }
 
 internal interface IPublicIpcObjectShapeMemberGenerator
 {
-    MemberDeclarationSourceTextBuilder GenerateShapeMember(SourceTextBuilder builder);
+    string GenerateShapeMember();
 }
 
 internal interface IPublicIpcObjectJointMatchGenerator
 {
-    string GenerateJointMatch(SourceTextBuilder builder, string real);
+    string GenerateJointMatch(string real);
 }

@@ -1,6 +1,6 @@
 ﻿using dotnetCampus.Ipc.Properties;
 
-using static dotnetCampus.Ipc.Properties.Resources;
+using static dotnetCampus.Ipc.Properties.Localizations;
 using static Microsoft.CodeAnalysis.WellKnownDiagnosticTags;
 
 namespace dotnetCampus.Ipc.CodeAnalysis.Core;
@@ -441,5 +441,5 @@ internal static class Diagnostics
         public const string Useless = "dotnetCampus.Useless";
     }
 
-    private static LocalizableString Localize(string key) => new LocalizableResourceString(key, ResourceManager, typeof(Resources));
+    private static LocalizableString Localize(string key) => new LocalizableResourceString(key, ResourceManager, typeof(Localizations));
 }

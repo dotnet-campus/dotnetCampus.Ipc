@@ -53,7 +53,7 @@ public class ChangeClassContractTypeCodeFixProvider : CodeFixProvider
 
                     foreach (var @interface in ipcType.AllInterfaces)
                     {
-                        var fix = string.Format(Resources.IPC161_Fix1, @interface.Name);
+                        var fix = string.Format(Localizations.IPC161_Fix1, @interface.Name);
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 title: fix,

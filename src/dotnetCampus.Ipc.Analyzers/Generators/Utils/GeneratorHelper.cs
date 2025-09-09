@@ -1,5 +1,5 @@
 ﻿using dotnetCampus.Ipc.Generators.Compiling;
-using dotnetCampus.Ipc.Generators.Models;
+using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc.Generators.Utils;
 
@@ -12,18 +12,15 @@ internal static class GeneratorHelper
     /// <returns>代理类的源代码。</returns>
     internal static string GenerateProxySource(IpcPublicCompilation ipc)
     {
-        var builder = new SourceTextBuilder()
-            .AddUsing("System.Threading.Tasks")
-            .AddUsing("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
-            .DeclareNamespace(ipc.GetNamespace())
-            .AddClassDeclaration(root => new ClassDeclarationSourceTextBuilder(root,
-                    $"__{ipc.IpcType.Name}IpcProxy",
-                    $"GeneratedIpcProxy<{ipc.IpcType.Name}>",
-                    ipc.IpcType.Name)
-                .WithGeneratedToolInfoWithoutEditorBrowsingAttributes()
-                .AddMemberDeclarations(root => ipc.EnumerateMembers()
-                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
-                    .Select(x => x.GenerateProxyMember(root))));
+        using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            .Using("System.Threading.Tasks")
+            .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
+            .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcProxy", t => t
+                .AddBaseTypes($"GeneratedIpcProxy<{ipc.IpcType.ToUsingString()}>", ipc.IpcType.ToUsingString())
+                .AddGeneratedToolAndEditorBrowsingAttributes()
+                .AddRawMembers(ipc.EnumerateMembers()
+                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
+                    .Select(x => x.GenerateProxyMember())));
         return builder.ToString();
     }
 
@@ -34,23 +31,20 @@ internal static class GeneratorHelper
     /// <returns>代理类的源代码。</returns>
     internal static string GenerateProxySource(IpcShapeCompilation ipc)
     {
-        var builder = new SourceTextBuilder()
-            .AddUsing("System.Threading.Tasks")
-            .AddUsing("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
-            .DeclareNamespace(ipc.GetNamespace())
-            .AddClassDeclaration(root => new ClassDeclarationSourceTextBuilder(root,
-                    $"__{ipc.IpcType.Name}IpcProxy",
-                    $"GeneratedIpcProxy<{ipc.ContractType.Name}>",
-                    ipc.ContractType.Name)
-                .WithGeneratedToolInfoWithoutEditorBrowsingAttributes()
-                .AddMemberDeclarations(root => ipc.EnumerateMembersByContractType()
+        using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            .Using("System.Threading.Tasks")
+            .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
+            .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcProxy", t => t
+                .AddBaseTypes($"GeneratedIpcProxy<{ipc.ContractType.ToUsingString()}>", ipc.ContractType.ToUsingString())
+                .AddGeneratedToolAndEditorBrowsingAttributes()
+                .AddRawMembers(ipc.EnumerateMembersByContractType()
                     .Select(x => new IpcPublicMemberProxyJointGenerator(x.contractType, x.shapeType, x.member, x.shapeMember))
-                    .Select(x => x.GenerateProxyMember(root))));
+                    .Select(x => x.GenerateProxyMember())));
         return builder.ToString();
     }
 
     /// <summary>
-    /// 生成代理壳类。
+    /// 生成形状代理类。
     /// </summary>
     /// <param name="ipc">真实对象的编译信息。</param>
     /// <param name="typeName">类型名称。</param>
@@ -58,17 +52,19 @@ internal static class GeneratorHelper
     /// <returns>代理类的源代码。</returns>
     internal static string GenerateShapeSource(IpcPublicCompilation ipc, string? typeName, string? @namespace)
     {
-        var builder = new SourceTextBuilder()
-            .AddUsing("dotnetCampus.Ipc.CompilerServices.Attributes")
-            .AddUsing("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
-            .DeclareNamespace(@namespace ?? ipc.IpcType.ContainingNamespace.ToString())
-            .AddClassDeclaration(root => new ClassDeclarationSourceTextBuilder(root,
-                    typeName ?? $"{ipc.IpcType.Name}IpcShape",
-                    ipc.IpcType.Name)
-                .WithAttribute($"[IpcShape(typeof({ipc.IpcType.Name}))]")
-                .AddMemberDeclarations(root => ipc.EnumerateMembers()
-                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
-                    .Select(x => x.GenerateShapeMember(root))));
+        using var builder = new SourceTextBuilder(@namespace ?? ipc.IpcType.ContainingNamespace.ToString())
+            {
+                SimplifyTypeNamesByUsingNamespace = true,
+                ShouldPrependGlobal = false,
+            }
+            .Using("dotnetCampus.Ipc.CompilerServices.Attributes")
+            .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
+            .AddTypeDeclaration($"internal sealed class {typeName ?? $"{ipc.IpcType.Name}IpcShape"}", t => t
+                .AddBaseTypes(ipc.IpcType.ToUsingString())
+                .AddAttribute($"[IpcShape(typeof({ipc.IpcType.ToUsingString()}))]")
+                .AddRawMembers(ipc.EnumerateMembers()
+                    .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
+                    .Select(x => x.GenerateShapeMember())));
         return builder.ToString();
     }
 
@@ -80,22 +76,51 @@ internal static class GeneratorHelper
     internal static string GenerateJointSource(IpcPublicCompilation ipc)
     {
         const string realInstanceName = "real";
-        var builder = new SourceTextBuilder()
-            .AddUsing("System")
-            .AddUsing("System.Threading.Tasks")
-            .AddUsing("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
-            .DeclareNamespace(ipc.GetNamespace())
-            .AddClassDeclaration(root => new ClassDeclarationSourceTextBuilder(root,
-                    $"__{ipc.IpcType.Name}IpcJoint",
-                    $"GeneratedIpcJoint<{ipc.IpcType.Name}>")
-                .WithGeneratedToolInfoWithoutEditorBrowsingAttributes()
-                .AddMemberDeclaration(root => new MemberDeclarationSourceTextBuilder(root,
-                        $"protected override void MatchMembers({ipc.IpcType.Name} {realInstanceName})")
-                    .AddExpressions(root => ipc.EnumerateMembers()
-                        .Select(x => new IpcPublicMemberProxyJointGenerator(x.ipcType, x.member))
-                        .Select(x => x.GenerateJointMatch(root, realInstanceName)))));
+        using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            .Using("System")
+            .Using("System.Threading.Tasks")
+            .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
+            .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcJoint", t => t
+                .AddBaseTypes($"GeneratedIpcJoint<{ipc.IpcType.ToUsingString()}>")
+                .AddGeneratedToolAndEditorBrowsingAttributes()
+                .AddMethodDeclaration($"protected override void MatchMembers({ipc.IpcType.ToUsingString()} {realInstanceName})", m => m
+                    .AddRawStatements(ipc.EnumerateMembers()
+                        .Select(x => new IpcPublicMemberProxyJointGenerator(x.IpcType, x.Member))
+                        .Select(x => x.GenerateJointMatch(realInstanceName)))));
         return builder.ToString();
     }
+
+    /// <summary>
+    /// 生成代理对接关系信息。
+    /// </summary>
+    /// <param name="ipcPublicCompilations">真实对象的编译信息。</param>
+    /// <param name="ipcShapeCompilations">形状代理类型的编译信息。</param>
+    /// <returns>程序集特性的源代码。</returns>
+    internal static string GenerateModuleInitializerSource(
+        IReadOnlyList<IpcPublicCompilation> ipcPublicCompilations,
+        IReadOnlyList<IpcShapeCompilation> ipcShapeCompilations)
+    {
+        using var builder = new SourceTextBuilder(GeneratorInfo.RootNamespace)
+            .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
+            .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
+                .AddGeneratedToolAndEditorBrowsingAttributes()
+                .AddMethodDeclaration("internal static void Initialize()", m => m
+                    .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
+                    .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
+                    .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))));
+        return builder.ToString();
+    }
+
+    private static string GenerateIpcPublicRegistration(IpcPublicCompilation ipc) => $"""
+        RegisterIpcPublic<{ipc.IpcType.ToUsingString()}>(
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcJoint());
+        """;
+
+    private static string GenerateIpcPublicRegistration(IpcShapeCompilation ipc) => $"""
+        RegisterIpcShape<{ipc.ContractType.ToUsingString()}, {ipc.IpcType.ToUsingString()}>(
+            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy());
+        """;
 
     /// <summary>
     /// 在代码生成器中报告那些分析器中没有报告的编译错误。
@@ -126,16 +151,5 @@ internal static class GeneratorHelper
 
         // 报告所有非已知诊断。
         context.ReportDiagnostic(ex.ToDiagnostic());
-    }
-
-    /// <summary>
-    /// 格式化代码。
-    /// </summary>
-    /// <param name="sourceCode">未格式化的源代码。</param>
-    /// <returns>格式化的源代码。</returns>
-    internal static string FormatCode(string sourceCode)
-    {
-        var rootSyntaxNode = CSharpSyntaxTree.ParseText(sourceCode).GetRoot();
-        return rootSyntaxNode.NormalizeWhitespace().SyntaxTree.GetText().ToString();
     }
 }

@@ -331,10 +331,24 @@ public class IpcObjectTests
             throw new FileNotFoundException($"在执行真正跨进程 IPC 通信时，目标程序集未找到，请确认代码中编写的路径是否已更新到最新路径。路径为：{remoteExecutablePath}");
         }
 
-        var process = Process.Start(new ProcessStartInfo("dotnet") { UseShellExecute = true, ArgumentList = { remoteExecutablePath, }, })!;
+#if NET8_0_OR_GREATER
+        var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject.net8";
+#else
+        var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject.net6";
+#endif
+        var process = Process.Start(new ProcessStartInfo("dotnet")
+        {
+            UseShellExecute = true,
+            ArgumentList =
+            {
+                remoteExecutablePath,
+                "--peer-name",
+                ipcPeerName,
+            },
+            WorkingDirectory = Path.GetDirectoryName(remoteExecutablePath),
+        })!;
         try
         {
-            var ipcPeerName = $"IpcObjectTests.IpcTests.RemoteFakeIpcObject";
             var ipcProvider = new IpcProvider(ipcPeerName + ".Local");
             ipcProvider.StartServer();
             var ipcPeer = await ipcProvider.GetAndConnectToPeerAsync(ipcPeerName);

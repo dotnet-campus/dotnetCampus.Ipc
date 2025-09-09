@@ -20,10 +20,13 @@ jobs:
           9.0.x
 
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build -c release
 
-    - name: Test
-      run: dotnet test --configuration Release -v:n --tl:off --no-build --logger:"console;verbosity=detailed"
+    - name: Test-net8.0
+      run: dotnet test -c release -f net8.0 -v:n --tl:off --no-build --logger:"console;verbosity=detailed"
+
+    - name: Test-net6.0
+      run: dotnet test -c release -f net6.0 -v:n --tl:off --no-build --logger:"console;verbosity=detailed"
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-build
+      run: dotnet pack -c release --no-build
