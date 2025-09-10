@@ -45,57 +45,25 @@ public class IpcPublicGenerator : IIncrementalGenerator
 
     private void Execute(SourceProductionContext context, IpcPublicCompilation ipcPublicCompilation)
     {
-        try
-        {
-            var ipcType = ipcPublicCompilation.IpcType;
-            var proxySource = GenerateProxySource(ipcPublicCompilation);
-            var jointSource = GenerateJointSource(ipcPublicCompilation);
-            context.AddSource($"{ipcType.Name}.proxy.cs", SourceText.From(proxySource, Encoding.UTF8));
-            context.AddSource($"{ipcType.Name}.joint.cs", SourceText.From(jointSource, Encoding.UTF8));
-        }
-        catch (DiagnosticException ex)
-        {
-            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
-        }
-        catch (Exception ex)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
-        }
+        var ipcType = ipcPublicCompilation.IpcType;
+        var proxySource = GenerateProxySource(ipcPublicCompilation);
+        var jointSource = GenerateJointSource(ipcPublicCompilation);
+        context.AddSource($"{ipcType.Name}.proxy.cs", SourceText.From(proxySource, Encoding.UTF8));
+        context.AddSource($"{ipcType.Name}.joint.cs", SourceText.From(jointSource, Encoding.UTF8));
     }
 
     private void Execute(SourceProductionContext context, IpcShapeCompilation ipcShapeCompilation)
     {
-        try
-        {
-            var contractType = ipcShapeCompilation.ContractType;
-            var ipcType = ipcShapeCompilation.IpcType;
-            var proxySource = GenerateProxySource(ipcShapeCompilation);
-            context.AddSource($"{contractType.Name}.{ipcType.Name}.shape.cs", SourceText.From(proxySource, Encoding.UTF8));
-        }
-        catch (DiagnosticException ex)
-        {
-            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
-        }
-        catch (Exception ex)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
-        }
+        var contractType = ipcShapeCompilation.ContractType;
+        var ipcType = ipcShapeCompilation.IpcType;
+        var proxySource = GenerateProxySource(ipcShapeCompilation);
+        context.AddSource($"{contractType.Name}.{ipcType.Name}.shape.cs", SourceText.From(proxySource, Encoding.UTF8));
     }
 
-    private void Execute(SourceProductionContext context, (ImmutableArray<IpcPublicCompilation> IpcPublics, ImmutableArray<IpcShapeCompilation> IpcShapes) compilations)
+    private void Execute(SourceProductionContext context,
+        (ImmutableArray<IpcPublicCompilation> IpcPublics, ImmutableArray<IpcShapeCompilation> IpcShapes) compilations)
     {
-        try
-        {
-            var moduleInitializerSource = GenerateModuleInitializerSource(compilations.IpcPublics, compilations.IpcShapes);
-            context.AddSource("_ModuleInitializer.cs", SourceText.From(moduleInitializerSource, Encoding.UTF8));
-        }
-        catch (DiagnosticException ex)
-        {
-            ReportDiagnosticsThatHaveNotBeenReported(context, ex);
-        }
-        catch (Exception ex)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(IPC000_UnknownError, null, ex));
-        }
+        var moduleInitializerSource = GenerateModuleInitializerSource(compilations.IpcPublics, compilations.IpcShapes);
+        context.AddSource("_ModuleInitializer.cs", SourceText.From(moduleInitializerSource, Encoding.UTF8));
     }
 }

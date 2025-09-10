@@ -50,23 +50,23 @@ namespace dotnetCampus.Ipc.Tests.CompilerServices
         Task<FakeIpcObjectSubModelA?> MethodThatHasAsyncNullableComplexReturn();
 #nullable restore
 
-        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "\"default1\"", IgnoresIpcException = true, Timeout = 100)]
         Task<string> MethodThatHasDefaultReturn();
 
         [IpcMethod(DefaultReturn = "default", IgnoresIpcException = true, Timeout = 100)]
         Task<object> MethodThatHasObjectWithObjectDefaultReturn();
 
-        [IpcMethod(DefaultReturn = @"""default1""", IgnoresIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "\"default1\"", IgnoresIpcException = true, Timeout = 100)]
         Task<object> MethodThatHasObjectWithStringDefaultReturn();
 
         // 请不要将这里的 String 改为 string，这是为了测试代码生成器能否处理类型而非关键字。
-        [IpcMethod(DefaultReturn = "default1", IgnoresIpcException = true, Timeout = 100)]
+        [IpcMethod(DefaultReturn = "\"default1\"", IgnoresIpcException = true, Timeout = 100)]
         Task<String> MethodThatHasStringDefaultReturn();
 
         [IpcMethod(DefaultReturn = "new System.IntPtr(1)", IgnoresIpcException = true, Timeout = 100)]
         Task<IntPtr> MethodThatHasCustomDefaultReturn();
 
-        [IpcMethod(DefaultReturn = "default1")]
+        [IpcMethod(DefaultReturn = "\"default1\"")]
         Task<string> MethodThatCannotBeCompiled_MustSetOtherAttributes();
 
         Task<List<string>> MethodWithListParametersAndListReturn(List<string> a, List<string> b);

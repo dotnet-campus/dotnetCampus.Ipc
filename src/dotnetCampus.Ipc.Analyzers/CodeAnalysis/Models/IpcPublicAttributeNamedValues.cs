@@ -23,7 +23,7 @@ internal class IpcPublicAttributeNamedValues
 
     public ITypeSymbol? MemberReturnType { get; }
 
-    public Assignable<object?>? DefaultReturn { get; init; }
+    public Assignable<string?>? DefaultReturn { get; init; }
 
     public Assignable<bool>? IgnoresIpcException { get; init; }
 
@@ -40,7 +40,7 @@ internal class IpcPublicAttributeNamedValues
         var baseIndent = string.Concat(Enumerable.Repeat(indent, baseIndentLevel));
         List<string> assignments =
         [
-            Format(nameof(DefaultReturn), DefaultReturn, x => Format(x, MemberReturnType)),
+            Format(nameof(DefaultReturn), DefaultReturn, x => x ?? "null"),
             Format(nameof(Timeout), Timeout),
             Format(nameof(IgnoresIpcException), IgnoresIpcException),
             Format(nameof(IsReadonly), IsReadonly),
@@ -100,36 +100,6 @@ internal class IpcPublicAttributeNamedValues
         if (value is int int32Value)
         {
             // 可能会出现隐式转换，所以难以判断目标类型。
-            return int32Value.ToString(CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            return value.ToString();
-        }
-    }
-
-    /// <summary>
-    /// 将 Attribute 里设置的值转为字符串。
-    /// </summary>
-    /// <param name="value">值。</param>
-    /// <param name="valueType">值的类型。</param>
-    /// <returns></returns>
-    protected static string Format(object? value, ITypeSymbol? valueType)
-    {
-        if (value is null)
-        {
-            return "null";
-        }
-        else if (valueType?.ToString() == "string")
-        {
-            return $@"""{value}""";
-        }
-        if (valueType?.ToString() == "bool" && value is bool booleanValue)
-        {
-            return booleanValue ? "true" : "false";
-        }
-        if (value is int int32Value)
-        {
             return int32Value.ToString(CultureInfo.InvariantCulture);
         }
         else
