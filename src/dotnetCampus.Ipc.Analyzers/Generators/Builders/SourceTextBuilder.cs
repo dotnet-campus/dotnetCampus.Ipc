@@ -458,7 +458,7 @@ public static class SourceTextBuilderExtensions
         if (typeSymbol.Kind is SymbolKind.ArrayType)
         {
             // 数组类型（如 int[]、string[,] 等）
-            var arrayType = (IArrayTypeSymbol)typeSymbol;
+            var arrayType = (IArrayTypeSymbol) typeSymbol;
             return $"{SimplifyNameByAddUsing(arrayType.ElementType, namespaces)}[{new string(',', arrayType.Rank - 1)}]";
         }
 
@@ -471,7 +471,7 @@ public static class SourceTextBuilderExtensions
         if (originalDefinitionString.Equals("System.Nullable<T>", StringComparison.Ordinal))
         {
             // Nullable<T> 类型
-            var genericType = ((INamedTypeSymbol)typeSymbol).TypeArguments[0];
+            var genericType = ((INamedTypeSymbol) typeSymbol).TypeArguments[0];
             return $"{SimplifyNameByAddUsing(genericType, namespaces)}?";
         }
         if (originalDefinitionString.Equals("System.IntPtr", StringComparison.Ordinal))
