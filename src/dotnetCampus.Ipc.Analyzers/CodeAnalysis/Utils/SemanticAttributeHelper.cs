@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
+﻿namespace dotnetCampus.Ipc.CodeAnalysis.Utils;
 
 /// <summary>
 /// 包含语义分析的辅助扩展方法。
@@ -15,10 +13,9 @@ internal static class SemanticAttributeHelper
     /// <param name="symbol">要查找特性的语义符号。</param>
     /// <param name="namedArgumentName">参数名称。</param>
     /// <returns>参数的值。</returns>
-    [return: MaybeNull]
     public static Assignable<T>? GetAttributeValue<TAttribute, T>(this ISymbol symbol, string namedArgumentName)
     {
-        var assignable = GetAttributeValue(symbol, typeof(TAttribute).FullName, namedArgumentName);
+        var assignable = GetAttributeValue(symbol, typeof(TAttribute).FullName!, namedArgumentName);
 
         // 未赋值。
         if (assignable is null)
@@ -28,6 +25,10 @@ internal static class SemanticAttributeHelper
 
         // 引用类型已赋值。
         if (typeof(T) == typeof(object))
+        {
+            return new((T?) assignable.Value);
+        }
+        else if (typeof(T) == typeof(string))
         {
             return new((T?) assignable.Value);
         }
@@ -64,7 +65,7 @@ internal static class SemanticAttributeHelper
         return symbol.GetAttributes().FirstOrDefault(x => string.Equals(
             x.AttributeClass?.ToString(),
             typeof(TAttribute).FullName,
-            StringComparison.Ordinal)) is { } ipcMethodAttribute;
+            StringComparison.Ordinal)) is not null;
     }
 
     /// <summary>

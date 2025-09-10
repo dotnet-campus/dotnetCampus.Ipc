@@ -64,7 +64,7 @@ internal static class IpcSemanticAttributeHelper
         var waitsVoid = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.WaitsVoid));
         var ignoresIpcException = method.GetAttributeValue<IpcMethodAttribute, bool>(nameof(IpcMethodAttribute.IgnoresIpcException))
             ?? type.GetAttributeValue<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException));
-        var defaultReturn = method.GetAttributeValue<IpcMethodAttribute, object?>(nameof(IpcMethodAttribute.DefaultReturn));
+        var defaultReturn = method.GetAttributeValue<IpcMethodAttribute, string?>(nameof(IpcMethodAttribute.DefaultReturn));
         var timeout = method.GetAttributeValue<IpcMethodAttribute, int>(nameof(IpcMethodAttribute.Timeout))
             ?? type.GetAttributeValue<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout));
         return new IpcPublicAttributeNamedValues(type, method, returnTypeSymbol)
@@ -88,7 +88,7 @@ internal static class IpcSemanticAttributeHelper
         var isReadonly = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IsReadonly));
         var ignoresIpcException = property.GetAttributeValue<IpcPropertyAttribute, bool>(nameof(IpcPropertyAttribute.IgnoresIpcException))
             ?? type.GetAttributeValue<IpcPublicAttribute, bool>(nameof(IpcPublicAttribute.IgnoresIpcException));
-        var defaultReturn = property.GetAttributeValue<IpcPropertyAttribute, object?>(nameof(IpcPropertyAttribute.DefaultReturn));
+        var defaultReturn = property.GetAttributeValue<IpcPropertyAttribute, string?>(nameof(IpcPropertyAttribute.DefaultReturn));
         var timeout = property.GetAttributeValue<IpcPropertyAttribute, int>(nameof(IpcPropertyAttribute.Timeout))
             ?? type.GetAttributeValue<IpcPublicAttribute, int>(nameof(IpcPublicAttribute.Timeout));
         return new IpcPublicAttributeNamedValues(type, property, property.Type)

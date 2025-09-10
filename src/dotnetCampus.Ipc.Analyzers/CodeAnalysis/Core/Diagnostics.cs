@@ -20,7 +20,7 @@ internal static class Diagnostics
         Categories.Compiler,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { AnalyzerException, NotConfigurable });
+        customTags: [AnalyzerException, NotConfigurable]);
 
     /// <summary>
     /// 生成代码时出现已知错误。本生成器不会报告此错误，因为后续编译器会准确报告之。
@@ -32,7 +32,7 @@ internal static class Diagnostics
         Categories.Compiler,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     /// <summary>
     /// 生成代码时出现已知错误。本生成器不会报告此错误，因为分析器会准确报告之。
@@ -44,7 +44,7 @@ internal static class Diagnostics
         Categories.Compiler,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC101_IpcType_TimeoutCannotBeNegative { get; } = new(
         nameof(IPC101),
@@ -61,7 +61,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC131_IpcMembers_IgnoresIpcExceptionIsRecommended { get; } = new(
         nameof(IPC131),
@@ -78,7 +78,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC161_IpcShape_ContractTypeDismatchWithInterface { get; } = new(
         nameof(IPC161),
@@ -87,7 +87,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC162_IpcShape_AllMembersShouldBeMarkedAsIpcMembers { get; } = new(
         nameof(IPC162),
@@ -104,7 +104,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC201_IpcMember_EmptyIpcMemberAttributeIsUnnecessary { get; } = new(
         nameof(IPC201),
@@ -113,7 +113,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC202_IpcMember_AllMembersShouldBeMarkedAsIpcMembers { get; } = new(
         nameof(IPC202),
@@ -130,7 +130,7 @@ internal static class Diagnostics
         Categories.AvoidBugs,
         DiagnosticSeverity.Info,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC241_IpcProperty_SetOnlyPropertyIsNotSupported { get; } = new(
         nameof(IPC241),
@@ -139,7 +139,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC242_IpcProperty_DefaultReturnDependsOnIgnoresIpcException { get; } = new(
         nameof(IPC242),
@@ -148,7 +148,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC243_IpcProperty_IsReadonlyFalseIsUnnecessary { get; } = new(
         nameof(IPC243),
@@ -157,7 +157,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC244_IpcProperty_DefaultReturnDismatchWithPropertyType { get; } = new(
         nameof(IPC244),
@@ -206,7 +206,7 @@ internal static class Diagnostics
         Categories.AvoidBugs,
         DiagnosticSeverity.Info,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC261_IpcMethod_DefaultReturnDependsOnIgnoresIpcException { get; } = new(
         nameof(IPC261),
@@ -215,7 +215,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC262_IpcMethod_WaitsVoidIsRecommended { get; } = new(
         nameof(IPC262),
@@ -232,7 +232,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC264_IpcMethod_DefaultReturnDismatchWithMethodReturnType { get; } = new(
         nameof(IPC264),
@@ -249,7 +249,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC266_IpcMethod_DefaultReturnIsUselessForATaskMethod { get; } = new(
         nameof(IPC266),
@@ -258,7 +258,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC267_IpcMethod_DefaultReturnsStringForAnObjectType { get; } = new(
         nameof(IPC267),
@@ -291,7 +291,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC271_IpcMethod_MethodParameterTypeIsNotSupportedForIpc { get; } = new(
         nameof(IPC271),
@@ -340,7 +340,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC305_CreateIpcProxy_IgnoresIpcExceptionIsRecommended { get; } = new(
         nameof(IPC305),
@@ -357,7 +357,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC307_CreateIpcProxy_TimeoutIsRecommended { get; } = new(
         nameof(IPC307),
@@ -374,7 +374,7 @@ internal static class Diagnostics
         Categories.Useless,
         DiagnosticSeverity.Hidden,
         true,
-        customTags: new[] { Unnecessary });
+        customTags: [Unnecessary]);
 
     public static DiagnosticDescriptor IPC309_CreateIpcProxy_IpcShapeIsNotValid { get; } = new(
         nameof(IPC309),
@@ -383,7 +383,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPC310_CreateIpcProxy_IpcShapeDismatchWithContractType { get; } = new(
         nameof(IPC310),
@@ -392,7 +392,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     public static DiagnosticDescriptor IPCTMP1_IpcMembers_EventIsNotSupported { get; } = new(
         "IPCTMP1",
@@ -401,7 +401,7 @@ internal static class Diagnostics
         Categories.Mechanism,
         DiagnosticSeverity.Error,
         true,
-        customTags: new[] { NotConfigurable });
+        customTags: [NotConfigurable]);
 
     private static class Categories
     {

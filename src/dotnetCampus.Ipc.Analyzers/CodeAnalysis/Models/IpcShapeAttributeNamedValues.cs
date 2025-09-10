@@ -23,7 +23,7 @@ internal class IpcShapeAttributeNamedValues : IpcPublicAttributeNamedValues
     {
         return $@"new()
 {{
-    {Format(nameof(DefaultReturn), DefaultReturn, x => Format(x, MemberReturnType))}
+    {Format(nameof(DefaultReturn), DefaultReturn, x => x ?? "null")}
     {Format(nameof(Timeout), Timeout)}
     {Format(nameof(IgnoresIpcException), IgnoresIpcException)}
     {Format(nameof(IsReadonly), IsReadonly)}
