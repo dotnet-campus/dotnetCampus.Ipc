@@ -100,14 +100,19 @@ internal static class GeneratorHelper
         IReadOnlyList<IpcPublicCompilation> ipcPublicCompilations,
         IReadOnlyList<IpcShapeCompilation> ipcShapeCompilations)
     {
-        using var builder = new SourceTextBuilder(GeneratorInfo.RootNamespace)
+        using var builder = new SourceTextBuilder()
+            .AddRawText("#if NET5_0_OR_GREATER")
             .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
             .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
                 .AddGeneratedToolAndEditorBrowsingAttributes()
                 .AddMethodDeclaration("internal static void Initialize()", m => m
                     .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
                     .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
-                    .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))));
+                    .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))))
+            .AddRawText("#else")
+            .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicAssemblyAttribute))
+            .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicAssemblyAttribute))
+            .AddRawText("#endif");
         return builder.ToString();
     }
 
@@ -120,6 +125,20 @@ internal static class GeneratorHelper
     private static string GenerateIpcPublicRegistration(IpcShapeCompilation ipc) => $"""
         RegisterIpcShape<{ipc.ContractType.ToUsingString()}, {ipc.IpcType.ToUsingString()}>(
             static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy());
+        """;
+
+    private static string GenerateIpcPublicAssemblyAttribute(IpcPublicCompilation ipc) => $"""
+        [assembly: global::dotnetCampus.Ipc.CompilerServices.Attributes.AssemblyIpcProxyJointAttribute(
+            typeof({ipc.IpcType.ToUsingString()}),
+            typeof(global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy),
+            typeof(global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcJoint))]
+        """;
+
+    private static string GenerateIpcPublicAssemblyAttribute(IpcShapeCompilation ipc) => $"""
+        [assembly: global::dotnetCampus.Ipc.CompilerServices.Attributes.AssemblyIpcProxyAttribute(
+            typeof({ipc.ContractType.ToUsingString()}),
+            typeof({ipc.IpcType.ToUsingString()}),
+            typeof(global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy))]
         """;
 
     /// <summary>
