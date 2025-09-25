@@ -7,9 +7,8 @@
       2. 在 net6.0 下我们将使用 Newtonsoft.Json 作为 IPC 的底层传输机制；
       3. 可以分别测试这两种机制单独是否能正常工作。
       4. 额外配合 dotnetCampus.Ipc.FakeTests 测试项目，可以测试两个机制之间的兼容性。
-      5. netcoreapp3.1 用于测试利用反射（而不是模块初始化器）注册 IPC 服务的功能。
     -->
-    <TargetFrameworks>net8.0;net6.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
