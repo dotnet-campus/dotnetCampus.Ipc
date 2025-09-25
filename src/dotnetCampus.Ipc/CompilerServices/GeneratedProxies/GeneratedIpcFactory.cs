@@ -17,6 +17,14 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 public static class GeneratedIpcFactory
 {
     /// <summary>
+    /// 一旦模块初始化器开始工作，我们就禁用反射。
+    /// </summary>
+    /// <remarks>
+    /// 模块初始化器自 .NET 5 起支持，所以旧版本的 .NET 会使用反射来实现 IPC 注册功能。
+    /// </remarks>
+    private static bool _isReflectionDisabled;
+
+    /// <summary>
     /// 编译期 IPC 类型的程序集到此程序集中的所有编译期 IPC 类型的缓存。
     /// </summary>
     private static readonly ConcurrentDictionary<Assembly, AssemblyIpcProxyJointAttribute[]> AssemblyIpcAttributesCache = [];
@@ -41,6 +49,7 @@ public static class GeneratedIpcFactory
     public static void RegisterIpcPublic<TPublic>(Func<GeneratedIpcProxy<TPublic>> proxyFactory, Func<GeneratedIpcJoint<TPublic>> jointFactory)
         where TPublic : class
     {
+        _isReflectionDisabled = true;
         IpcPublicFactories[typeof(TPublic)] = (proxyFactory, jointFactory);
     }
 
@@ -55,6 +64,7 @@ public static class GeneratedIpcFactory
         where TPublic : class
         where TShape : class
     {
+        _isReflectionDisabled = true;
         IpcShapeFactories[typeof(TShape)] = shapeFactory;
     }
 

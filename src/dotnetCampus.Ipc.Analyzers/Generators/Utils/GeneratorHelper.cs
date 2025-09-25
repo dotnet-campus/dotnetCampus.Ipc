@@ -102,12 +102,13 @@ internal static class GeneratorHelper
     {
         using var builder = new SourceTextBuilder()
             .AddRawText("#if NET5_0_OR_GREATER")
-            .UsingStatic("dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory")
+            .AddRawText("using static global::dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory;")
             .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
                 .AddGeneratedToolAndEditorBrowsingAttributes()
                 .AddMethodDeclaration("internal static void Initialize()", m => m
                     .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
                     .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
+                    .AddLineSeparator()
                     .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))))
             .AddRawText("#else")
             .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicAssemblyAttribute))
