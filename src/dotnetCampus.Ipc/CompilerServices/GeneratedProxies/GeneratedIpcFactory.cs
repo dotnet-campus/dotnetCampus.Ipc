@@ -1,7 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Reflection;
+using System.Runtime.CompilerServices;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+#if !NET5_0_OR_GREATER
+using System.Reflection;
+#endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
@@ -16,19 +19,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// </summary>
 public static class GeneratedIpcFactory
 {
-    /// <summary>
-    /// 一旦模块初始化器开始工作，我们就禁用反射。
-    /// </summary>
-    /// <remarks>
-    /// 模块初始化器自 .NET 5 起支持，所以旧版本的 .NET 会使用反射来实现 IPC 注册功能。
-    /// </remarks>
-    private static bool _isReflectionDisabled;
-
-    /// <summary>
-    /// 编译期 IPC 类型的程序集到此程序集中的所有编译期 IPC 类型的缓存。
-    /// </summary>
-    private static readonly ConcurrentDictionary<Assembly, AssemblyIpcProxyJointAttribute[]> AssemblyIpcAttributesCache = [];
-
     /// <summary>
     /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口）到代理对接对象的创建器。
     /// </summary>
@@ -49,7 +39,6 @@ public static class GeneratedIpcFactory
     public static void RegisterIpcPublic<TPublic>(Func<GeneratedIpcProxy<TPublic>> proxyFactory, Func<GeneratedIpcJoint<TPublic>> jointFactory)
         where TPublic : class
     {
-        _isReflectionDisabled = true;
         IpcPublicFactories[typeof(TPublic)] = (proxyFactory, jointFactory);
     }
 
@@ -64,7 +53,6 @@ public static class GeneratedIpcFactory
         where TPublic : class
         where TShape : class
     {
-        _isReflectionDisabled = true;
         IpcShapeFactories[typeof(TShape)] = shapeFactory;
     }
 
@@ -185,12 +173,12 @@ public static class GeneratedIpcFactory
     private static (Func<GeneratedIpcProxy>? ProxyFactory, Func<GeneratedIpcJoint>? JointFactory) SafeGetIpcPublicFactories<TPublic>()
         where TPublic : class
     {
-        if (IpcPublicFactories.TryGetValue(typeof(TPublic), out var factories)
-            || _isReflectionDisabled)
+        if (IpcPublicFactories.TryGetValue(typeof(TPublic), out var factories))
         {
             return factories;
         }
 
+#if !NET5_0_OR_GREATER
         // 兼容旧版本 .NET 的反射实现。
         foreach (var attribute in typeof(TPublic).Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>())
         {
@@ -203,6 +191,8 @@ public static class GeneratedIpcFactory
         {
             return factories;
         }
+#endif
+
         return default;
     }
 
@@ -216,15 +206,16 @@ public static class GeneratedIpcFactory
     /// 此方法虽然可能在线程并发时多次创建 IPC 公共类型的代理与对接创建器，但最终只会缓存并返回一个创建器。<br/>
     /// 又由于此方法是幂等的，无论执行多少次，都不会往字典里存放多余的创建器；所以总体而言是线程安全的。
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Func<GeneratedIpcProxy>? SafeGetIpcShapeFactory<TPublic, TShape>()
         where TPublic : class
     {
-        if (IpcShapeFactories.TryGetValue(typeof(TShape), out var factories)
-            || _isReflectionDisabled)
+        if (IpcShapeFactories.TryGetValue(typeof(TShape), out var factories))
         {
             return factories;
         }
 
+#if !NET5_0_OR_GREATER
         // 兼容旧版本 .NET 的反射实现。
         foreach (var attribute in typeof(TShape).Assembly.GetCustomAttributes<AssemblyIpcProxyAttribute>())
         {
@@ -234,6 +225,8 @@ public static class GeneratedIpcFactory
         {
             return factories;
         }
+#endif
+
         return null;
     }
 
