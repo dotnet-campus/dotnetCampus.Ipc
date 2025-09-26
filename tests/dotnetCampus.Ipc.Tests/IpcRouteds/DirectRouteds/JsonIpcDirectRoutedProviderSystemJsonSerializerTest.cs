@@ -1,9 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Exceptions;
 using dotnetCampus.Ipc.IpcRouteds.DirectRouteds;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace dotnetCampus.Ipc.Tests.IpcRouteds.DirectRouteds;
@@ -15,7 +13,12 @@ public class JsonIpcDirectRoutedProviderSystemJsonSerializerTest
     public async Task TestRequestNotMatchResponse()
     {
         var name = "JsonIpcDirectRoutedProviderSystemJsonSerializerTest_1";
-        var serverProvider = new JsonIpcDirectRoutedProvider(name, new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
+        var serverProvider = new JsonIpcDirectRoutedProvider(name, new IpcConfiguration()
+#if NET8_0_OR_GREATER
+            .UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default)
+#endif
+        );
+
         var requestPath = "RequestPath1";
         var requestValue = "请求的内容";
         serverProvider.AddRequestHandler(requestPath, (JsonIpcDirectRoutedSystemJsonSerializerTestRequest1 request) =>
@@ -26,7 +29,11 @@ public class JsonIpcDirectRoutedProviderSystemJsonSerializerTest
         });
         serverProvider.StartServer();
 
-        var clientProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration: new IpcConfiguration().UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default));
+        var clientProvider = new JsonIpcDirectRoutedProvider(ipcConfiguration: new IpcConfiguration()
+#if NET8_0_OR_GREATER
+            .UseSystemTextJsonIpcObjectSerializer(JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext.Default)
+#endif
+        );
 
         JsonIpcDirectRoutedClientProxy jsonIpcDirectRoutedClientProxy = await clientProvider.GetAndConnectClientAsync(name);
 
@@ -54,11 +61,13 @@ public class JsonIpcDirectRoutedProviderSystemJsonSerializerTest
     }
 }
 
+#if NET8_0_OR_GREATER
 [JsonSerializable(typeof(JsonIpcDirectRoutedSystemJsonSerializerTestRequest1))]
 [JsonSerializable(typeof(JsonIpcDirectRoutedSystemJsonSerializerTestResponse1))]
 internal partial class JsonIpcDirectRoutedSystemJsonSerializerTestGenerationContext : JsonSerializerContext
 {
 }
+#endif
 
 public record JsonIpcDirectRoutedSystemJsonSerializerTestRequest1
 {

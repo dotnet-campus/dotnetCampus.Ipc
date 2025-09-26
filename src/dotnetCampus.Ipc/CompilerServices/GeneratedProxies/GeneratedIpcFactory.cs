@@ -1,7 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Reflection;
+using System.Runtime.CompilerServices;
 using dotnetCampus.Ipc.CompilerServices.Attributes;
+#if !NET5_0_OR_GREATER
+using System.Reflection;
+#endif
 
 namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 
@@ -16,11 +19,6 @@ namespace dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 /// </summary>
 public static class GeneratedIpcFactory
 {
-    /// <summary>
-    /// 编译期 IPC 类型的程序集到此程序集中的所有编译期 IPC 类型的缓存。
-    /// </summary>
-    private static readonly ConcurrentDictionary<Assembly, AssemblyIpcProxyJointAttribute[]> AssemblyIpcAttributesCache = [];
-
     /// <summary>
     /// 编译期 IPC 类型（标记了 <see cref="IpcPublicAttribute"/> 的接口）到代理对接对象的创建器。
     /// </summary>
@@ -69,7 +67,7 @@ public static class GeneratedIpcFactory
     public static TPublic CreateIpcProxy<TPublic>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
         where TPublic : class
     {
-        if (IpcPublicFactories[typeof(TPublic)].ProxyFactory is not { } proxyFactory)
+        if (SafeGetIpcPublicFactories<TPublic>().ProxyFactory is not { } proxyFactory)
         {
             throw new ArgumentException(
                 $"接口 {typeof(TPublic).Name} 上没有找到 {nameof(IpcPublicAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 代理。",
@@ -96,7 +94,7 @@ public static class GeneratedIpcFactory
         string? ipcObjectId = null)
         where TPublic : class
     {
-        if (IpcPublicFactories[typeof(TPublic)].ProxyFactory is not { } proxyFactory)
+        if (SafeGetIpcPublicFactories<TPublic>().ProxyFactory is not { } proxyFactory)
         {
             throw new ArgumentException(
                 $"接口 {typeof(TPublic).Name} 上没有找到 {nameof(IpcPublicAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 代理。",
@@ -123,7 +121,7 @@ public static class GeneratedIpcFactory
     public static TPublic CreateIpcProxy<TPublic, TShape>(this IIpcProvider ipcProvider, IPeerProxy peer, string? ipcObjectId = null)
         where TPublic : class
     {
-        if (IpcShapeFactories[typeof(TShape)] is not { } proxyFactory)
+        if (SafeGetIpcShapeFactory<TPublic, TShape>() is not { } proxyFactory)
         {
             throw new ArgumentException(
                 $"类型 {typeof(TShape).Name} 上没有找到 {nameof(IpcShapeAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 代理。",
@@ -148,7 +146,7 @@ public static class GeneratedIpcFactory
         where TPublic : class
     {
         var realType = realInstance.GetType();
-        if (IpcPublicFactories[typeof(TPublic)].JointFactory is not { } jointFactory)
+        if (SafeGetIpcPublicFactories<TPublic>().JointFactory is not { } jointFactory)
         {
             throw new ArgumentException(
                 $"类型 {realType.Name} 上没有找到 {nameof(IpcPublicAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 对接。",
@@ -161,6 +159,75 @@ public static class GeneratedIpcFactory
         joint.SetInstance(realInstance);
         context.JointManager.AddPublicIpcObject(joint, ipcObjectId);
         return realInstance;
+    }
+
+    /// <summary>
+    /// 安全地获取 IPC 公共类型的代理与对接创建器。
+    /// </summary>
+    /// <typeparam name="TPublic">IPC 对象的契约类型。</typeparam>
+    /// <returns>代理与对接创建器。</returns>
+    /// <remarks>
+    /// 此方法虽然可能在线程并发时多次创建 IPC 公共类型的代理与对接创建器，但最终只会缓存并返回一个创建器。<br/>
+    /// 又由于此方法是幂等的，无论执行多少次，都不会往字典里存放多余的创建器；所以总体而言是线程安全的。
+    /// </remarks>
+    private static (Func<GeneratedIpcProxy>? ProxyFactory, Func<GeneratedIpcJoint>? JointFactory) SafeGetIpcPublicFactories<TPublic>()
+        where TPublic : class
+    {
+        if (IpcPublicFactories.TryGetValue(typeof(TPublic), out var factories))
+        {
+            return factories;
+        }
+
+#if !NET5_0_OR_GREATER
+        // 兼容旧版本 .NET 的反射实现。
+        foreach (var attribute in typeof(TPublic).Assembly.GetCustomAttributes<AssemblyIpcProxyJointAttribute>())
+        {
+            IpcPublicFactories.TryAdd(attribute.IpcType, (
+                () => (GeneratedIpcProxy)Activator.CreateInstance(attribute.ProxyType)!,
+                () => (GeneratedIpcJoint)Activator.CreateInstance(attribute.JointType)!
+            ));
+        }
+        if (IpcPublicFactories.TryGetValue(typeof(TPublic), out factories))
+        {
+            return factories;
+        }
+#endif
+
+        return default;
+    }
+
+    /// <summary>
+    /// 安全地获取 IPC 形状类型的代理创建器。
+    /// </summary>
+    /// <typeparam name="TPublic">IPC 对象的契约类型。</typeparam>
+    /// <typeparam name="TShape">IPC 对象的形状类型。</typeparam>
+    /// <returns>代理创建器。</returns>
+    /// <remarks>
+    /// 此方法虽然可能在线程并发时多次创建 IPC 公共类型的代理与对接创建器，但最终只会缓存并返回一个创建器。<br/>
+    /// 又由于此方法是幂等的，无论执行多少次，都不会往字典里存放多余的创建器；所以总体而言是线程安全的。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Func<GeneratedIpcProxy>? SafeGetIpcShapeFactory<TPublic, TShape>()
+        where TPublic : class
+    {
+        if (IpcShapeFactories.TryGetValue(typeof(TShape), out var factories))
+        {
+            return factories;
+        }
+
+#if !NET5_0_OR_GREATER
+        // 兼容旧版本 .NET 的反射实现。
+        foreach (var attribute in typeof(TShape).Assembly.GetCustomAttributes<AssemblyIpcProxyAttribute>())
+        {
+            IpcShapeFactories.TryAdd(attribute.IpcType, () => (GeneratedIpcProxy)Activator.CreateInstance(attribute.ProxyType)!);
+        }
+        if (IpcShapeFactories.TryGetValue(typeof(TShape), out factories))
+        {
+            return factories;
+        }
+#endif
+
+        return null;
     }
 
     private static GeneratedProxyJointIpcContext GetGeneratedContext(this IIpcProvider ipcProvider)

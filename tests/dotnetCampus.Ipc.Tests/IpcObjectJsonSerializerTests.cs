@@ -33,5 +33,7 @@ public class IpcObjectJsonSerializerTests
     }
 }
 
+#if NET8_0_OR_GREATER
 [JsonSerializable(typeof(IpcObjectJsonSerializerTests.Foo))]
 internal partial class FooJsonContext : JsonSerializerContext;
+#endif
