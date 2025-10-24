@@ -141,23 +141,20 @@ namespace dotnetCampus.Ipc.Pipes
                 // 标记在这一级消费
                 args.SetHandle(message: nameof(HandleRequest));
 
-                var currentPosition = message.Position;
-
                 var binaryReader = new BinaryReader(message);
                 var messageId = binaryReader.ReadUInt64();
                 var requestMessageLength = binaryReader.ReadInt32();
+                // 兼容旧版本 2.0.0-alpha412 的行为，MessageReceived 中收到的是已经去掉 Request 头的数据
+                var currentPosition = message.Position;
 
-                var headLength = sizeof(ulong)/*messageId*/ + sizeof(int)/*requestMessageLength*/;
                 try
                 {
                     IpcMessageBody ipcBufferMessage;
                     if (message is ByteListMessageStream byteListMessageStream)
                     {
                         var messageBuffer = byteListMessageStream.IpcMessageContext.MessageBuffer;
-                        // 开始等于原来读取掉的，加上当前的头的长度
-                        var start = (int) currentPosition + headLength;
 
-                        ipcBufferMessage = new IpcMessageBody(messageBuffer, start, requestMessageLength);
+                        ipcBufferMessage = new IpcMessageBody(messageBuffer, (int) currentPosition, requestMessageLength);
                     }
                     else
                     {
