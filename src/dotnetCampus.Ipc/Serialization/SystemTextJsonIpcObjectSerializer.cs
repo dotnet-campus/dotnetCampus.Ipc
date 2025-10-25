@@ -95,6 +95,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 
     /// <inheritdoc />
     [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public IpcJsonElement SerializeToElement(object? value)
     {
         if (value is null)
@@ -117,6 +118,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 
     /// <inheritdoc />
     [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(byte[] data, int start, int length)
     {
         var span = data.AsSpan(start, length);
@@ -133,6 +135,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 
     /// <inheritdoc />
     [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(Stream stream)
     {
         if (JsonSerializerContext is null)
@@ -147,6 +150,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
 
     /// <inheritdoc />
     [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(IpcJsonElement jsonElement)
     {
         if (jsonElement.RawValueOnSystemTextJson is not { } element)
