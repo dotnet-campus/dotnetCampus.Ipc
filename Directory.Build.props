@@ -19,10 +19,8 @@
     <NoWarn>$(NoWarn);NU1507;NU1803;NETSDK1201;NETSDK1138;PRI257</NoWarn>
     <!--
       CA1416: Platform compatibility warning
-      CS8785: Analyzer does not generate sources
-      CS9057: Analyer version is greator than the compiler version
     -->
-    <WarningsAsErrors>$(WarningAsErrors);CA1416;CS8785;CS9057</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);CA1416</WarningsAsErrors>
   </PropertyGroup>
 
   <!-- Custom properties -->

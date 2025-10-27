@@ -65,6 +65,8 @@
   <!-- 生成 NuGet 包。 -->
   <Target Name="_IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
+      <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="\" />
+      <None Include="Package\build\Package.props" Pack="True" PackagePath="build\$(PackageId).props" />
       <None Include="$(ArtifactsPath)\bin\dotnetCampus.Ipc.Analyzers\$(Configuration)\**\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
     </ItemGroup>
   </Target>
