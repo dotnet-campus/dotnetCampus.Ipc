@@ -2,7 +2,7 @@
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="dotnetCampus.AsyncWorkerCollection.Source" Version="1.7.2" />
-    <PackageVersion Include="DotNetCampus.CodeAnalysisUtils" Version="0.0.1-alpha.4" />
+    <PackageVersion Include="DotNetCampus.CodeAnalysisUtils" Version="0.0.1-alpha.5" />
     <PackageVersion Include="DotNetCampus.CommandLine" Version="4.0.1-alpha.1" />
     <PackageVersion Include="DotNetCampus.LatestCSharpFeatures" Version="13.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
