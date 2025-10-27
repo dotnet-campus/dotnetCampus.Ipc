@@ -20,7 +20,7 @@
     <!--
       CA1416: Platform compatibility warning
     -->
-    <WarningsAsErrors>$(WarningAsErrors);CA1416</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);CA1416</WarningsAsErrors>
   </PropertyGroup>
 
   <!-- Custom properties -->
