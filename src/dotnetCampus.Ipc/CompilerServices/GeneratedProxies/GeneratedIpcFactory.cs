@@ -149,7 +149,7 @@ public static class GeneratedIpcFactory
         if (SafeGetIpcPublicFactories<TPublic>().JointFactory is not { } jointFactory)
         {
             throw new ArgumentException(
-                $"类型 {realType.Name} 上没有找到 {nameof(IpcPublicAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 对接。",
+                $"类型 {typeof(TPublic).Name} 上没有找到 {nameof(IpcPublicAttribute)} 特性，因此不知道如何创建 {typeof(TPublic).Name} 的 IPC 对接。",
                 nameof(realInstance));
         }
 
