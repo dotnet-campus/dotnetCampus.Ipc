@@ -74,11 +74,11 @@ public static class GeneratedIpcFactory
                 nameof(TPublic));
         }
 
-        var proxy = (GeneratedIpcProxy<TPublic>) proxyFactory();
+        var proxy = (GeneratedIpcProxy<TPublic>)proxyFactory();
         proxy.Context = ipcProvider.GetGeneratedContext();
         proxy.PeerProxy = peer;
         proxy.ObjectId = ipcObjectId;
-        return (TPublic) (object) proxy;
+        return (TPublic)(object)proxy;
     }
 
     /// <summary>
@@ -101,12 +101,12 @@ public static class GeneratedIpcFactory
                 nameof(TPublic));
         }
 
-        var proxy = (GeneratedIpcProxy<TPublic>) proxyFactory();
+        var proxy = (GeneratedIpcProxy<TPublic>)proxyFactory();
         proxy.Context = ipcProvider.GetGeneratedContext();
         proxy.PeerProxy = peer;
         proxy.ObjectId = ipcObjectId;
         proxy.RuntimeConfigs = ipcProxyConfigs;
-        return (TPublic) (object) proxy;
+        return (TPublic)(object)proxy;
     }
 
     /// <summary>
@@ -128,11 +128,11 @@ public static class GeneratedIpcFactory
                 nameof(TShape));
         }
 
-        var proxy = (GeneratedIpcProxy<TPublic>) proxyFactory();
+        var proxy = (GeneratedIpcProxy<TPublic>)proxyFactory();
         proxy.Context = ipcProvider.GetGeneratedContext();
         proxy.PeerProxy = peer;
         proxy.ObjectId = ipcObjectId;
-        return (TPublic) (object) proxy;
+        return (TPublic)(object)proxy;
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public static class GeneratedIpcFactory
         }
 
         var context = ipcProvider.GetGeneratedContext();
-        var joint = (GeneratedIpcJoint<TPublic>) jointFactory();
+        var joint = (GeneratedIpcJoint<TPublic>)jointFactory();
         joint.Context = context;
         joint.SetInstance(realInstance);
         context.JointManager.AddPublicIpcObject(joint, ipcObjectId);

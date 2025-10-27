@@ -93,7 +93,7 @@ internal class IpcProxyInvokingHelper
             return null;
         }
 
-        var header = (ulong) KnownMessageHeaders.RemoteObjectMessageHeader;
+        var header = (ulong)KnownMessageHeaders.RemoteObjectMessageHeader;
         var requestMessage = Context.ObjectSerializer.SerializeToIpcMessage(header, model, model.ToString());
         //requestMessage = new IpcMessage(requestMessage.Tag, requestMessage.Body, CoreMessageType.JsonObject);
         var responseMessage = await PeerProxy.GetResponseAsync(requestMessage).ConfigureAwait(false);
