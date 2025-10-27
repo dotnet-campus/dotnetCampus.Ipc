@@ -72,7 +72,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
     /// 设置此对接对象的真实实例。
     /// </summary>
     /// <param name="realInstance">真实实例。</param>
-    internal sealed override void SetInstance(object realInstance) => SetInstance((TContract) realInstance);
+    internal sealed override void SetInstance(object realInstance) => SetInstance((TContract)realInstance);
 
     /// <summary>
     /// 设置此对接对象的真实实例。
@@ -107,7 +107,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
                     methodInvoker();
                     return DefaultGarm;
                 }
-        ));
+            ));
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
                     await methodInvoker().ConfigureAwait(false);
                     return DefaultGarm;
                 }
-        ));
+            ));
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
                     methodInvoker(CastArg<T>(args[0])!);
                     return DefaultGarm;
                 }
-        ));
+            ));
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public abstract partial class GeneratedIpcJoint<TContract> : GeneratedIpcJoint w
                     await methodInvoker(CastArg<T>(args[0])!).ConfigureAwait(false);
                     return DefaultGarm;
                 }
-        ));
+            ));
     }
 
     /// <summary>

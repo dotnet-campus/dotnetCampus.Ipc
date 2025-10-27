@@ -1,5 +1,5 @@
-﻿using dotnetCampus.Ipc.Generators.Builders;
-using dotnetCampus.Ipc.Generators.Compiling;
+﻿using dotnetCampus.Ipc.Generators.Compiling;
+using dotnetCampus.Ipc.Generators.Builders;
 
 namespace dotnetCampus.Ipc.Generators.Utils;
 
@@ -53,10 +53,10 @@ internal static class GeneratorHelper
     internal static string GenerateShapeSource(IpcPublicCompilation ipc, string? typeName, string? @namespace)
     {
         using var builder = new SourceTextBuilder(@namespace ?? ipc.IpcType.ContainingNamespace.ToString())
-        {
-            SimplifyTypeNamesByUsingNamespace = true,
-            ShouldPrependGlobal = false,
-        }
+            {
+                SimplifyTypeNamesByUsingNamespace = true,
+                ShouldPrependGlobal = false,
+            }
             .Using("dotnetCampus.Ipc.CompilerServices.Attributes")
             .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
             .AddTypeDeclaration($"internal sealed class {typeName ?? $"{ipc.IpcType.Name}IpcShape"}", t => t

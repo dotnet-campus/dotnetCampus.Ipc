@@ -1,8 +1,8 @@
-﻿using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
+﻿using DotNetCampus.Cli;
+using DotNetCampus.Cli.Compiler;
+using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
-using DotNetCampus.Cli;
-using DotNetCampus.Cli.Compiler;
 
 namespace dotnetCampus.Ipc.FakeTests;
 

@@ -27,7 +27,7 @@ internal class GeneratedIpcJointResponse : IIpcResponseMessage
         var returnModel = await asyncReturnModel.ConfigureAwait(false);
         var message = returnModel is null
             ? new IpcMessage()
-            : serializer.SerializeToIpcMessage((ulong) KnownMessageHeaders.RemoteObjectMessageHeader, returnModel, "Return");
+            : serializer.SerializeToIpcMessage((ulong)KnownMessageHeaders.RemoteObjectMessageHeader, returnModel, "Return");
         return new GeneratedIpcJointResponse(message);
     }
 }

@@ -28,11 +28,11 @@ internal struct NullableBooleans
         set => _booleans = value switch
         {
             // 设置为 null：将索引处的两位都清零
-            null => _booleans & (uint) ~(3 << (index * 2)),
+            null => _booleans & (uint)~(3 << (index * 2)),
             // 设置为 true：将高位置 1，低位置 1
-            true => _booleans | (uint) (3 << (index * 2)),
+            true => _booleans | (uint)(3 << (index * 2)),
             // 设置为 false：将高位置 1，低位置清零
-            false => (_booleans & (uint) ~(1 << (index * 2 + 1))) | (uint) (1 << (index * 2)),
+            false => (_booleans & (uint)~(1 << (index * 2 + 1))) | (uint)(1 << (index * 2)),
         };
     }
 
@@ -47,7 +47,7 @@ internal struct NullableBooleans
     {
         var index = 31 - indexFromEnd;
         _booleans = value
-            ? _booleans | (uint) (1 << index)
-            : _booleans & (uint) ~(1 << index);
+            ? _booleans | (uint)(1 << index)
+            : _booleans & (uint)~(1 << index);
     }
 }
