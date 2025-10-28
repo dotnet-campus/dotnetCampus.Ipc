@@ -13,6 +13,23 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--
+      在绝大多数项目里面，我们希望使用最新的 C# 版本；但源生成器必须支持旧版本的 C# 语法以支持旧的 IDE；
+      所以我们选了一个普通代码最少的项目降低 C# 版本，以确保源生成器可以生成旧语法代码的同时，不影响其他项目使用最新的 C# 版本。
+
+      有一台构建机是 Windows Server 2016，最高只能安装 Visual Studio 17.6，最高支持到 .NET 7：
+      https://learn.microsoft.com/en-us/dotnet/core/install/windows#net-versions-and-visual-studio
+
+      .NET 7 对应的 C# 版本是 11.0：
+      https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-versioning
+
+      从 C# 12.0 开始，才可使用集合表达式：
+      https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#collection-expressions
+    -->
+    <LangVersion>11.0</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="DotNetCampus.CommandLine" />
     <PackageReference Include="DotNetCampus.LatestCSharpFeatures" />

@@ -66,7 +66,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     {
         var methodId = MemberIdGenerator.GenerateMethodId(_contractMethod);
         var parameters = GenerateMethodParameters(_contractMethod.Parameters);
-        var arguments = GenerateGarmArguments(_contractMethod.Parameters) is { Length: > 0 } args ? $"[ {args} ]" : "[]";
+        var arguments = GenerateGarmArguments(_contractMethod.Parameters) is { Length: > 0 } args ? $"new global::dotnetCampus.Ipc.CompilerServices.GeneratedProxies.IGarmObject[] {{ {args} }}" : "null";
         var asyncReturnType = GetAsyncReturnType(_contractMethod.ReturnType);
         var returnTypeName = asyncReturnType is null ? "void" : asyncReturnType.ToUsingString();
         var methodContainingTypeName = _contractMethod.ContainingType.ToUsingString();
