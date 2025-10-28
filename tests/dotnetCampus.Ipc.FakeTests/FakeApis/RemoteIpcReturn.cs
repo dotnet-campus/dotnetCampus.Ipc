@@ -1,13 +1,14 @@
 ﻿using dotnetCampus.Ipc.FakeTests.FakeApis;
 
-namespace dotnetCampus.Ipc.Tests.CompilerServices.FakeRemote;
-
-public class RemoteIpcReturn : IRemoteFakeIpcArgumentOrReturn
+namespace dotnetCampus.Ipc.Tests.CompilerServices.FakeRemote
 {
-    public RemoteIpcReturn(string value)
+    public class RemoteIpcReturn : IRemoteFakeIpcArgumentOrReturn
     {
-        Value = value;
-    }
+        public RemoteIpcReturn(string value)
+        {
+            Value = value;
+        }
 
-    public string Value { get; set; }
+        public string Value { get; set; }
+    }
 }

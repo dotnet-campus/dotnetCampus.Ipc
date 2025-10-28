@@ -53,7 +53,7 @@ internal class IpcPublicAttributeNamedValues
         }
 
         var builder = new StringBuilder();
-        builder.AppendLine("new()");
+        builder.AppendLine("new global::dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcProxy.IpcMemberInfo()");
         builder.Append(baseIndent).AppendLine("{");
         foreach (var assignment in assignments)
         {

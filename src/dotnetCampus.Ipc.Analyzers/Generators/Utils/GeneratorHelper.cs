@@ -13,6 +13,10 @@ internal static class GeneratorHelper
     internal static string GenerateProxySource(IpcPublicCompilation ipc)
     {
         using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            {
+                UseFileScopedNamespace = false,
+                Nullable = null,
+            }
             .Using("System.Threading.Tasks")
             .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
             .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcProxy", t => t
@@ -32,6 +36,10 @@ internal static class GeneratorHelper
     internal static string GenerateProxySource(IpcShapeCompilation ipc)
     {
         using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            {
+                UseFileScopedNamespace = false,
+                Nullable = null,
+            }
             .Using("System.Threading.Tasks")
             .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
             .AddTypeDeclaration($"internal sealed class __{ipc.IpcType.Name}IpcProxy", t => t
@@ -56,6 +64,8 @@ internal static class GeneratorHelper
             {
                 SimplifyTypeNamesByUsingNamespace = true,
                 ShouldPrependGlobal = false,
+                UseFileScopedNamespace = false,
+                Nullable = null,
             }
             .Using("dotnetCampus.Ipc.CompilerServices.Attributes")
             .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
@@ -77,6 +87,10 @@ internal static class GeneratorHelper
     {
         const string realInstanceName = "real";
         using var builder = new SourceTextBuilder(ipc.GetNamespace())
+            {
+                UseFileScopedNamespace = false,
+                Nullable = null,
+            }
             .Using("System")
             .Using("System.Threading.Tasks")
             .Using("dotnetCampus.Ipc.CompilerServices.GeneratedProxies")
@@ -101,31 +115,36 @@ internal static class GeneratorHelper
         IReadOnlyList<IpcShapeCompilation> ipcShapeCompilations)
     {
         using var builder = new SourceTextBuilder()
-            .AddRawText("#if NET5_0_OR_GREATER")
-            .AddRawText("using static global::dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory;")
-            .AddTypeDeclaration("file static class DotNetCampusIpcModuleInitializer", t => t
-                .AddGeneratedToolAndEditorBrowsingAttributes()
-                .AddMethodDeclaration("internal static void Initialize()", m => m
-                    .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
-                    .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
-                    .AddLineSeparator()
-                    .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))))
-            .AddRawText("#else")
+            {
+                UseFileScopedNamespace = false,
+                Nullable = null,
+            }
+            // .AddRawText("#if NET5_0_OR_GREATER")
+            // .AddRawText("using static global::dotnetCampus.Ipc.CompilerServices.GeneratedProxies.GeneratedIpcFactory;")
+            // .AddTypeDeclaration("internal static class DotNetCampusIpcModuleInitializer", t => t
+            //     .AddGeneratedToolAndEditorBrowsingAttributes()
+            //     .AddMethodDeclaration("internal static void Initialize()", m => m
+            //         .AddAttribute("[global::System.Runtime.CompilerServices.ModuleInitializerAttribute]")
+            //         .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicRegistration))
+            //         .AddLineSeparator()
+            //         .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicRegistration))))
+            // .AddRawText("#else")
             .AddRawStatements(ipcPublicCompilations.Select(GenerateIpcPublicAssemblyAttribute))
             .AddRawStatements(ipcShapeCompilations.Select(GenerateIpcPublicAssemblyAttribute))
-            .AddRawText("#endif");
+            // .AddRawText("#endif")
+            ;
         return builder.ToString();
     }
 
     private static string GenerateIpcPublicRegistration(IpcPublicCompilation ipc) => $"""
         RegisterIpcPublic<{ipc.IpcType.ToUsingString()}>(
-            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
-            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcJoint());
+            () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy(),
+            () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcJoint());
         """;
 
     private static string GenerateIpcPublicRegistration(IpcShapeCompilation ipc) => $"""
         RegisterIpcShape<{ipc.ContractType.ToUsingString()}, {ipc.IpcType.ToUsingString()}>(
-            static () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy());
+            () => new global::{ipc.GetNamespace()}.__{ipc.IpcType.Name}IpcProxy());
         """;
 
     private static string GenerateIpcPublicAssemblyAttribute(IpcPublicCompilation ipc) => $"""
