@@ -150,7 +150,7 @@ internal class IpcPublicPropertyInfo : IPublicIpcObjectProxyMemberGenerator, IPu
     private string GenerateGarmArgument(ITypeSymbol parameterType, string argumentName)
     {
         return parameterType.GetIsIpcType()
-            ? $"new Garm<{parameterType.ToUsingString()}>({argumentName}, typeof({parameterType.ToUsingString()}))"
+            ? $"new Garm<{parameterType.ToUsingString()}>({argumentName}, typeof({parameterType.ToNotNullGlobalDisplayString()}))"
             : $"new Garm<{parameterType.ToUsingString()}>({argumentName})";
     }
 }

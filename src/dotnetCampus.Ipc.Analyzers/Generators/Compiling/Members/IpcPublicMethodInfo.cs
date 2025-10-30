@@ -236,7 +236,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
         return string.Join(
             ", ",
             parameters.Select(x => x.Type.GetIsIpcType()
-                ? $"new Garm<{x.Type.ToUsingString()}>({x.Name}, typeof({x.Type.ToUsingString()}))"
+                ? $"new Garm<{x.Type.ToUsingString()}>({x.Name}, typeof({x.Type.ToNotNullGlobalDisplayString()}))"
                 : $"new Garm<{x.Type.ToUsingString()}>({x.Name})"));
     }
 
@@ -284,7 +284,7 @@ internal class IpcPublicMethodInfo : IPublicIpcObjectProxyMemberGenerator, IPubl
     private string GenerateGarmReturn(ITypeSymbol @return, string value)
     {
         return @return.GetIsIpcType()
-            ? $"new Garm<{@return.ToUsingString()}>({value}, typeof({@return.ToUsingString()}))"
+            ? $"new Garm<{@return.ToUsingString()}>({value}, typeof({@return.ToNotNullGlobalDisplayString()}))"
             : $"new Garm<{@return.ToUsingString()}>({value})";
     }
 }
