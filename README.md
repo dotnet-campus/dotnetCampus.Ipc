@@ -139,13 +139,13 @@ Q: 此 Ipc 库支持 AOT 吗？
 A: 此 Ipc 库支持 AOT，但需要注意以下几点：
 
 - 如果是完全使用 byte[] 作为数据传输格式，则不需要任何额外的配置，直接就支持 AOT 了
-- 如果是采用 Json 通讯系列，则需要在使用 Json 序列化时，使用 `JsonSerializerOptions` 的 `TypeInfoResolver` 属性来指定类型解析器。具体的配置可以参考 [JsonSerializerOptions](https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions?view=dotnet-plat-ext-7.0) 的文档。一般而言，可采用封装好的 UseSystemJsonIpcObjectSerializer 扩展方法辅助传入 `System.Text.Json.Serialization.JsonSerializerContext` 对象，如以下示例代码所示
+- 如果是采用 Json 通讯系列，则需要在使用 Json 序列化时，使用 `JsonSerializerOptions` 的 `TypeInfoResolver` 属性来指定类型解析器。具体的配置可以参考 [JsonSerializerOptions](https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions?view=dotnet-plat-ext-7.0) 的文档。一般而言，可采用封装好的 UseSystemTextJsonIpcObjectSerializer 扩展方法辅助传入 `System.Text.Json.Serialization.JsonSerializerContext` 对象，如以下示例代码所示
 
 ``` C#
     IpcConfiguration ipcConfiguration = new IpcConfiguration()
     {
         // 进行设置其他配置
-    }.UseSystemJsonIpcObjectSerializer(SourceGenerationContext.Default);
+    }.UseSystemTextJsonIpcObjectSerializer(SourceGenerationContext.Default);
 
     var ipcProvider = new IpcProvider(pipeName, ipcConfiguration);
 ```
@@ -154,7 +154,7 @@ A: 此 Ipc 库支持 AOT，但需要注意以下几点：
 
 Q: 采用 直接路由 Json 通信（JsonIpcDirectRoutedProvider）时，如何改造让其支持 AOT 编译？
 
-A：如上问所述，可在 IpcConfiguration 里面设置 IpcObjectSerializer 属性，或调用 UseSystemJsonIpcObjectSerializer 扩展辅助方法。如以下示代码所示
+A：如上问所述，可在 IpcConfiguration 里面设置 IpcObjectSerializer 属性，或调用 UseSystemTextJsonIpcObjectSerializer 扩展辅助方法。如以下示代码所示
 
 ``` C#
     // 创建一个 IpcProvider，实际创建管道，进行IPC通信的底层对象
@@ -162,7 +162,7 @@ A：如上问所述，可在 IpcConfiguration 里面设置 IpcObjectSerializer �
     IpcConfiguration ipcConfiguration = new IpcConfiguration()
     {
         // 进行设置其他配置
-    }.UseSystemJsonIpcObjectSerializer(SourceGenerationContext.Default);
+    }.UseSystemTextJsonIpcObjectSerializer(SourceGenerationContext.Default);
     var ipcProvider = new IpcProvider(pipeName, ipcConfiguration);
 
     // 创建一个 JsonIpcDirectRoutedProvider，封装了通信中的Json数据解析、简化方法调用
