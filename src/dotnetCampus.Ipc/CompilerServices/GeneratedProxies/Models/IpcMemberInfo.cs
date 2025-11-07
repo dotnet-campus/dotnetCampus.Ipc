@@ -10,17 +10,17 @@ partial class GeneratedIpcProxy
     /// <summary>
     /// 仅供 <see cref="GeneratedIpcProxy"/> 的自动生成的派生类与基类传递参数使用，包含参数传递所需的各种个性化需求。
     /// </summary>
-    protected readonly record struct IpcMemberInfo
+    protected struct IpcMemberInfo
     {
         /// <summary>
         /// 存储 <see cref="Timeout"/> 的数值部分。
         /// </summary>
-        private readonly int _timeoutValue;
+        private int _timeoutValue;
 
         /// <summary>
         /// 存储可空布尔值的集合。
         /// </summary>
-        private readonly NullableBooleans _booleans;
+        private NullableBooleans _booleans;
 
         /// <summary>
         /// 在指定了 <see cref="IgnoresIpcException"/> 或者 <see cref="Timeout"/> 的情况下，如果真的发生了异常或超时，则会使用此默认值。
@@ -37,7 +37,7 @@ partial class GeneratedIpcProxy
         /// </item>
         /// </list>
         /// </summary>
-        public object? DefaultReturn { get; init; }
+        public object? DefaultReturn { get; set; }
 
         /// <summary>
         /// 设定此方法执行的超时时间（毫秒）。如果自此方法执行开始直至超时时间后依然没有返回，则会引发 <see cref="dotnetCampus.Ipc.Exceptions.IpcInvokingTimeoutException"/>。
@@ -45,7 +45,7 @@ partial class GeneratedIpcProxy
         public int? Timeout
         {
             get => _booleans.GetBooleanAt(0) ? _timeoutValue : null;
-            init
+            set
             {
                 _booleans.SetBooleanAt(0, value is not null);
                 _timeoutValue = value ?? 0;
@@ -59,7 +59,7 @@ partial class GeneratedIpcProxy
         public bool? IsReadonly
         {
             get => _booleans[0];
-            init => _booleans[0] = value;
+            set => _booleans[0] = value;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ partial class GeneratedIpcProxy
         public bool? IgnoresIpcException
         {
             get => _booleans[1];
-            init => _booleans[1] = value;
+            set => _booleans[1] = value;
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ partial class GeneratedIpcProxy
         public bool? WaitsVoid
         {
             get => _booleans[2];
-            init => _booleans[2] = value;
+            set => _booleans[2] = value;
         }
     }
 }
