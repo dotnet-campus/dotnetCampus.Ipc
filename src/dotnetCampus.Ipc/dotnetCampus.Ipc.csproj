@@ -62,6 +62,12 @@
     <PackageReference Include="Microsoft.CSharp" Condition="'$(IsIpcLegacyFramework)'=='true'" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <!-- .NET 6/7 版本的 System.Text.Json 功能很弱，也有一些不可接受的 bug，所以强制使用新版 -->
+    <!-- 比如，标记了 JsonIgnore 的属性也会生成反序列化代码，导致对 Newtonsoft.Json.JToken 被迫生成了必然 StackOverflow 的代码 -->
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
+
   <!-- 生成 NuGet 包。 -->
   <Target Name="_IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
