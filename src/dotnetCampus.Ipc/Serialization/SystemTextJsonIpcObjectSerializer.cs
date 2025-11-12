@@ -1,5 +1,6 @@
 ﻿#if NET6_0_OR_GREATER
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -35,6 +36,15 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     public JsonSerializerContext? JsonSerializerContext { get; }
 
     /// <inheritdoc />
+
+<<<<<<< TODO: Unmerged change from project 'dotnetCampus.Ipc(net6.0)', Before:
+    public byte[] Serialize(object? value)
+=======
+    [RequiresUnreferencedCode()]
+    public byte[] Serialize(object? value)
+>>>>>>> After
+    [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public byte[] Serialize(object? value)
     {
         if (value is null)
@@ -56,6 +66,15 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 
     /// <inheritdoc />
+
+<<<<<<< TODO: Unmerged change from project 'dotnetCampus.Ipc(net6.0)', Before:
+    public void Serialize(Stream stream, object? value)
+=======
+    [RequiresUnreferencedCode()]
+    public void Serialize(Stream stream, object? value)
+>>>>>>> After
+    [RequiresUnreferencedCode()]
+    [RequiresDynamicCode()]
     public void Serialize(Stream stream, object? value)
     {
         if (value is null)
@@ -75,6 +94,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 
     /// <inheritdoc />
+    [RequiresDynamicCode()]
     public IpcJsonElement SerializeToElement(object? value)
     {
         if (value is null)
@@ -96,6 +116,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 
     /// <inheritdoc />
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(byte[] data, int start, int length)
     {
         var span = data.AsSpan(start, length);
@@ -111,6 +132,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 
     /// <inheritdoc />
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(Stream stream)
     {
         if (JsonSerializerContext is null)
@@ -124,6 +146,7 @@ public class SystemTextJsonIpcObjectSerializer : IIpcObjectSerializer
     }
 
     /// <inheritdoc />
+    [RequiresDynamicCode()]
     public T? Deserialize<T>(IpcJsonElement jsonElement)
     {
         if (jsonElement.RawValueOnSystemTextJson is not { } element)
