@@ -9,8 +9,7 @@
       3. 主测试项目已经是双框架的了，但不能测试这两种机制之间的兼容性，所以需要一个旧框架的测试项目来专门测试。
     -->
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,13 +26,9 @@
       从 C# 12.0 开始，才可使用集合表达式：
       https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#collection-expressions
     -->
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>7.3</LangVersion>
+    <ImplicitUsings>false</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="DotNetCampus.CommandLine" />
-    <PackageReference Include="DotNetCampus.LatestCSharpFeatures" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\dotnetCampus.Ipc.Analyzers\dotnetCampus.Ipc.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
