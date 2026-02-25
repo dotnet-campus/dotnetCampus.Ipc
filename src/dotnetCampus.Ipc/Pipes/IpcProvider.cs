@@ -46,6 +46,11 @@ namespace dotnetCampus.Ipc.Pipes
         /// <inheritdoc />
         public IpcContext IpcContext { get; }
 
+        /// <summary>
+        /// 管理所有连接方
+        /// </summary>
+        public IPeerManager PeerManager => PeerManagerInternal;
+
         private PeerManager PeerManagerInternal { get; }
 
         /// <summary>
