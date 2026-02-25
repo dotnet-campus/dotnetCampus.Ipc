@@ -19,12 +19,12 @@ namespace dotnetCampus.Ipc.Internals
         {
             peerProxy.PeerConnectionBroken += PeerProxy_PeerConnectionBroken;
             OnAdd(peerProxy);
-            return ConnectedServerManagerList.TryAdd(peerProxy.PeerName, peerProxy);
+            return ConnectedServerManagerDictionary.TryAdd(peerProxy.PeerName, peerProxy);
         }
 
         public bool TryGetValue(string key, [NotNullWhen(true)] out PeerProxy? peer)
         {
-            return ConnectedServerManagerList.TryGetValue(key, out peer);
+            return ConnectedServerManagerDictionary.TryGetValue(key, out peer);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace dotnetCampus.Ipc.Internals
                 throw new ArgumentException($"Must remove the Broken peer. PeerName={peerProxy.PeerName}");
             }
 
-            ConnectedServerManagerList.TryRemove(peerProxy.PeerName, out var value);
+            ConnectedServerManagerDictionary.TryRemove(peerProxy.PeerName, out var value);
 
             if (ReferenceEquals(peerProxy, value) || value is null)
             {
@@ -55,7 +55,7 @@ namespace dotnetCampus.Ipc.Internals
                         $"Peer 断开之后，从已有列表删除时发现列表里面记录的 Peer 和当前的不是相同的一个。仅调试下抛出。PeerName={peerProxy.PeerName}");
                 }
 
-                ConnectedServerManagerList.TryAdd(value.PeerName, value);
+                ConnectedServerManagerDictionary.TryAdd(value.PeerName, value);
             }
         }
 
@@ -70,7 +70,7 @@ namespace dotnetCampus.Ipc.Internals
 
             OnAdd(peerProxy);
             // 更新或注册，用于解决之前注册的实际上是断开的连接
-            ConnectedServerManagerList.AddOrUpdate(peerProxy.PeerName, peerProxy, (s, proxy) => proxy);
+            ConnectedServerManagerDictionary.AddOrUpdate(peerProxy.PeerName, peerProxy, (s, proxy) => proxy);
         }
 
         private void OnAdd(PeerProxy peerProxy)
@@ -95,7 +95,7 @@ namespace dotnetCampus.Ipc.Internals
 
         public void Dispose()
         {
-            foreach (var pair in ConnectedServerManagerList)
+            foreach (var pair in ConnectedServerManagerDictionary)
             {
                 var peer = pair.Value;
                 // 为什么 PeerProxy 不加上 IDisposable 方法
@@ -104,7 +104,7 @@ namespace dotnetCampus.Ipc.Internals
             }
         }
 
-        private ConcurrentDictionary<string, PeerProxy> ConnectedServerManagerList { get; } =
+        private ConcurrentDictionary<string/*PeerName*/, PeerProxy> ConnectedServerManagerDictionary { get; } =
             new ConcurrentDictionary<string, PeerProxy>();
         private readonly IpcProvider _ipcProvider;
 
