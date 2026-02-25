@@ -85,7 +85,7 @@ namespace dotnetCampus.Ipc.Pipes
         }
 
         /// <summary>
-        /// 当收到消息时触发
+        /// 当收到消息时触发。无论是哪个 Peer 收到消息，都会引发此事件
         /// </summary>
         public event EventHandler<PeerMessageArgs>? MessageReceived;
 
@@ -94,6 +94,11 @@ namespace dotnetCampus.Ipc.Pipes
         /// </summary>
         internal event EventHandler<IpcInternalPeerConnectedArgs>? PeerConnected;
 
+        /// <summary>
+        /// 当接收到消息时触发。无论是哪个 Peer 收到消息，都会引发此事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         internal void OnMessageReceived(object? sender, PeerStreamMessageArgs e)
         {
             string? debugMessageBody = null;
