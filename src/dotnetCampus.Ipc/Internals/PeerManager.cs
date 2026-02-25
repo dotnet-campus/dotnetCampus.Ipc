@@ -8,7 +8,10 @@ using dotnetCampus.Ipc.Pipes;
 
 namespace dotnetCampus.Ipc.Internals
 {
-    internal interface IPeerManager
+    /// <summary>
+    /// 管理所有连接方
+    /// </summary>
+    public interface IPeerManager
     {
         /// <summary>
         /// 和 <see cref="IpcProvider"/> 不同的是，无论是主动连接还是被动连过来的，都会触发此事件
@@ -16,15 +19,15 @@ namespace dotnetCampus.Ipc.Internals
         event EventHandler<PeerConnectedArgs>? PeerConnected;
 
         /// <summary>
-        /// 当前连接的数量。此属性仅有记日志的作用。由于 IPC 将会不断多进程连接和断开，所以这个数量是不断变化的。可能获取的一刻，实际情况就和此不相同
+        /// 当前连接的数量。无论是主动连接的还是被连接的对方都会记录在此。此属性仅有记日志的作用。由于 IPC 将会不断多进程连接和断开，所以这个数量是不断变化的。可能获取的一刻，实际情况就和此不相同
         /// </summary>
         int CurrentConnectedPeerProxyCount { get; }
 
         /// <summary>
-        /// 获取当前连接到的 <see cref="PeerProxy"/> 列表。仅表示获取时的状态，由于 IPC 将会不断多进程连接和断开，所以这个列表是不断变化的。可能获取的一刻，实际情况就和此不相同
+        /// 获取当前连接到的 <see cref="PeerProxy"/> 列表。无论是主动连接的还是被连接的对方都会记录在此。仅表示获取时的状态，由于 IPC 将会不断多进程连接和断开，所以这个列表是不断变化的。可能获取的一刻，实际情况就和此不相同
         /// </summary>
         /// <returns></returns>
-        IReadOnlyList <PeerProxy> GetCurrentConnectedPeerProxyList();
+        IReadOnlyList<PeerProxy> GetCurrentConnectedPeerProxyList();
     }
 
     class PeerManager : IPeerManager, IDisposable
