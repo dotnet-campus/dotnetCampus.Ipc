@@ -50,7 +50,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// 启动服务
         /// </summary>
         /// <returns></returns>
-        public async Task Start()
+        internal async Task Start()
         {
             while (!_isDisposed)
             {
