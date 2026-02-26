@@ -301,6 +301,9 @@ namespace dotnetCampus.Ipc.Pipes
         /// <summary>
         /// 本机作为服务端，有对方连接过来时触发
         /// </summary>
+        /// <remarks>
+        /// 仅被动连接（被对方连接过来）时触发。主动去连接对方时，不会触发此事件。如需要获取无论是主动还是被动连接过来的事件，请使用 <see cref="IPeerManager.PeerConnected"/> 事件
+        /// </remarks>
         public event EventHandler<PeerConnectedArgs>? PeerConnected;
 
         /// <summary>
