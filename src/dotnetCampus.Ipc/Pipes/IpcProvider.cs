@@ -40,13 +40,18 @@ namespace dotnetCampus.Ipc.Pipes
             IpcContext.IpcConfiguration.AddFrameworkRequestHandler(IpcContext.GeneratedProxyJointIpcContext.RequestHandler);
             IpcContext.Logger.Trace($"[IpcProvider] 本地服务名 {pipeName}");
 
-            PeerManager = new PeerManager(this);
+            PeerManagerInternal = new PeerManager(this);
         }
 
         /// <inheritdoc />
         public IpcContext IpcContext { get; }
 
-        private PeerManager PeerManager { get; }
+        /// <summary>
+        /// 管理所有连接方
+        /// </summary>
+        public IPeerManager PeerManager => PeerManagerInternal;
+
+        private PeerManager PeerManagerInternal { get; }
 
         /// <summary>
         /// 是否启动了
@@ -109,7 +114,7 @@ namespace dotnetCampus.Ipc.Pipes
                 IpcContext.Logger.Debug($"[OnPeerConnected]IpcProvider.OnPeerConnected PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
 
                 // 也许是对方反过来连接
-                if (PeerManager.TryGetValue(e.PeerName, out var peerProxy))
+                if (PeerManagerInternal.TryGetValue(e.PeerName, out var peerProxy))
                 {
                     IpcContext.Logger.Debug($"[OnPeerConnected]PeerManager.TryGetValue Success. PeerName={e.PeerName};CurrentName={IpcContext.PipeName}");
 
@@ -117,7 +122,7 @@ namespace dotnetCampus.Ipc.Pipes
                     if (peerProxy.IsBroken && !IpcContext.IpcConfiguration.AutoReconnectPeers)
                     {
                         // 理论上不会进入这个分支，因为如果 IsBroken 将会自动去清理，除非刚好一个断开，然后立刻连接
-                        PeerManager.RemovePeerProxy(peerProxy);
+                        PeerManagerInternal.RemovePeerProxy(peerProxy);
                         await ConnectBackToPeer(e);
                     }
                     else
@@ -211,7 +216,7 @@ namespace dotnetCampus.Ipc.Pipes
             var peerName = e.PeerName;
             //var receivedAck = e.Ack;
 
-            if (PeerManager.TryGetValue(peerName, out _))
+            if (PeerManagerInternal.TryGetValue(peerName, out _))
             {
                 // 预期不会进入此分支，也就是之前没有连接过才对
                 Debug.Assert(false, "对方连接之前没有记录对方");
@@ -269,7 +274,7 @@ namespace dotnetCampus.Ipc.Pipes
             {
                 var peerProxy = new PeerProxy(e.PeerName, ipcClientService, e, IpcContext);
 
-                if (PeerManager.TryAdd(peerProxy))
+                if (PeerManagerInternal.TryAdd(peerProxy))
                 {
                     // 理论上会进入此分支，除非是此时收到了多次的发送
                 }
@@ -296,6 +301,9 @@ namespace dotnetCampus.Ipc.Pipes
         /// <summary>
         /// 本机作为服务端，有对方连接过来时触发
         /// </summary>
+        /// <remarks>
+        /// 仅被动连接（被对方连接过来）时触发。主动去连接对方时，不会触发此事件。如需要获取无论是主动还是被动连接过来的事件，请使用 <see cref="IPeerManager.PeerConnected"/> 事件
+        /// </remarks>
         public event EventHandler<PeerConnectedArgs>? PeerConnected;
 
         /// <summary>
@@ -319,7 +327,7 @@ namespace dotnetCampus.Ipc.Pipes
         {
             var peerProxy = await GetOrCreatePeerProxyAsync(peerName);
 
-            await PeerManager.WaitForPeerConnectFinishedAsync(peerProxy);
+            await PeerManagerInternal.WaitForPeerConnectFinishedAsync(peerProxy);
 
             return peerProxy;
         }
@@ -333,7 +341,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// 为什么会存在 <paramref name="shouldWaitPeerConnectFinished"/> 参数，这是为了解决极端情况下，刚好本进程能连接到对方，连接完成瞬间，对方挂了，无法反向连接回来的情况。正常不需要设置此参数
         public async Task<ConnectToExistingPeerResult> TryConnectToExistingPeerAsync(string peerName, bool shouldWaitPeerConnectFinished = true)
         {
-            if (PeerManager.TryGetValue(peerName, out var peerProxy))
+            if (PeerManagerInternal.TryGetValue(peerName, out var peerProxy))
             {
 
             }
@@ -358,14 +366,14 @@ namespace dotnetCampus.Ipc.Pipes
 
                 // 需要确定能连接上对方了，才能加入到 PeerManager 里面。确保不会在下次进来的时候，拿到了一个无法建立连接的 Peer 对象。这里的添加顺序是先确保连接再添加，这就意味着在并行的时候，可能会多次尝试连接。这是符合预期的，本身连接也没有多少损耗，最多只会多创建一个管道而已
                 peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
-                PeerManager.TryAdd(peerProxy);
+                PeerManagerInternal.TryAdd(peerProxy);
 
                 // 在 PeerProxy 加入到管理之后，才能向对方注册自己，确保对方收到注册之后，反过来向自己注册时，可以从管理里面拿到注册的对方信息，从而让 PeerManager.WaitForPeerConnectFinishedAsync 能够完成
                 await ipcClientService.RegisterToPeerAsync();
             }
 
             // 等待对方回连，建立双向连接
-            Task peerConnectFinishedTask = PeerManager.WaitForPeerConnectFinishedAsync(peerProxy);
+            Task peerConnectFinishedTask = PeerManagerInternal.WaitForPeerConnectFinishedAsync(peerProxy);
             if (shouldWaitPeerConnectFinished)
             {
                 try
@@ -394,7 +402,7 @@ namespace dotnetCampus.Ipc.Pipes
         /// <returns></returns>
         internal async Task<PeerProxy> GetOrCreatePeerProxyAsync(string peerName)
         {
-            if (PeerManager.TryGetValue(peerName, out var peerProxy))
+            if (PeerManagerInternal.TryGetValue(peerName, out var peerProxy))
             {
             }
             else
@@ -413,7 +421,7 @@ namespace dotnetCampus.Ipc.Pipes
             var ipcClientService = CreateIpcClientService(peerName);
 
             var peerProxy = new PeerProxy(peerName, ipcClientService, IpcContext);
-            PeerManager.TryAdd(peerProxy);
+            PeerManagerInternal.TryAdd(peerProxy);
 
             await ipcClientService.Start().ConfigureAwait(false);
 
@@ -429,7 +437,7 @@ namespace dotnetCampus.Ipc.Pipes
             IpcContext.IsDisposing = true;
             IpcContext.Logger.Trace($"[IpcProvider][Dispose] {IpcContext.PipeName}");
             IpcServerService.Dispose();
-            PeerManager.Dispose();
+            PeerManagerInternal.Dispose();
             IpcContext.IsDisposed = true;
         }
 
