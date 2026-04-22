@@ -15,11 +15,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using DotNetCampus.Cli;
 using dotnetCampus.Ipc.Context;
 using dotnetCampus.Ipc.Pipes;
 using dotnetCampus.Ipc.WpfDemo.View;
-
+using DotNetCampus.Cli;
 using Walterlv.ThreadSwitchingTasks;
 
 namespace dotnetCampus.Ipc.WpfDemo
