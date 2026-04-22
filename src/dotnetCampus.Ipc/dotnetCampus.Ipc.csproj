@@ -68,6 +68,10 @@
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="System.IO.Pipes.AccessControl" />
+  </ItemGroup>
+
   <!-- 生成 NuGet 包。 -->
   <Target Name="_IncludeAllDependencies" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
