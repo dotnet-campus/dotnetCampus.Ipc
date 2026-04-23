@@ -1,38 +1,33 @@
-﻿using DotNetCampus.Cli;
-using DotNetCampus.Cli.Compiler;
+﻿using System;
+using System.Threading.Tasks;
 using dotnetCampus.Ipc.CompilerServices.GeneratedProxies;
 using dotnetCampus.Ipc.FakeTests.FakeApis;
 using dotnetCampus.Ipc.Pipes;
 
-namespace dotnetCampus.Ipc.FakeTests;
-
-internal static class Program
+namespace dotnetCampus.Ipc.FakeTests
 {
-    private static async Task Main(string[] args)
+    internal static class Program
     {
-        Console.WriteLine("【IPC 远程进程单元测试】");
-        var ipcPeerName = CommandLine.Parse(args).As<CommandLineOptions>().IpcPeerName;
-        var ipcProvider = new IpcProvider(ipcPeerName);
-        Console.WriteLine($"IPC 服务启动中 [{ipcPeerName}] ...");
-        ipcProvider.StartServer();
-        Console.CursorTop--;
-        Console.WriteLine("IPC 服务已启动");
-        var jointObject = new RemoteFakeIpcObject();
-        Console.WriteLine("IPC 对接创建中...");
-        ipcProvider.CreateIpcJoint<IRemoteFakeIpcObject>(jointObject);
-        Console.CursorTop--;
-        Console.WriteLine("IPC 对接已创建");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("IPC 交互中...");
-        Console.ResetColor();
-        await jointObject.WaitForShutdownAsync().WaitAsync(TimeSpan.FromSeconds(3));
-        Console.WriteLine("IPC 收到退出信号");
-        Console.WriteLine("IPC 远程进程单元测试已退出");
+        private static async Task Main(string[] args)
+        {
+            // Console.WriteLine("【IPC 远程进程单元测试】");
+            // var ipcPeerName = CommandLine.Parse(args).As<CommandLineOptions>().IpcPeerName;
+            // var ipcProvider = new IpcProvider(ipcPeerName);
+            // Console.WriteLine($"IPC 服务启动中 [{ipcPeerName}] ...");
+            // ipcProvider.StartServer();
+            // Console.CursorTop--;
+            // Console.WriteLine("IPC 服务已启动");
+            // var jointObject = new RemoteFakeIpcObject();
+            // Console.WriteLine("IPC 对接创建中...");
+            // ipcProvider.CreateIpcJoint<IRemoteFakeIpcObject>(jointObject);
+            // Console.CursorTop--;
+            // Console.WriteLine("IPC 对接已创建");
+            // Console.ForegroundColor = ConsoleColor.Yellow;
+            // Console.WriteLine("IPC 交互中...");
+            // Console.ResetColor();
+            // await jointObject.WaitForShutdownAsync().WaitAsync(TimeSpan.FromSeconds(3));
+            // Console.WriteLine("IPC 收到退出信号");
+            // Console.WriteLine("IPC 远程进程单元测试已退出");
+        }
     }
-}
-
-internal record CommandLineOptions
-{
-    [Option("peer-name")]
-    public required string IpcPeerName { get; init; }
 }
