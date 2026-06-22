@@ -22,4 +22,9 @@ public interface IFoo
     /// 异步方法（更推荐）演示。支持参数、返回值，支持跨进程报告异常。
     /// </summary>
     Task<string> AddAsync(string a, int b);
+
+    /// <summary>
+    /// 无参异步方法演示。支持返回值，支持跨进程报告异常。
+    /// </summary>
+    Task<string> GetInfoAsync();
 }
