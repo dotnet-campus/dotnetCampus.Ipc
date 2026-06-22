@@ -1,4 +1,4 @@
-# 使用「远程对象调用」的方式做进程间通信
+﻿# 使用「远程对象调用」的方式做进程间通信
 
 假设你有一个接口 `IFoo`，有 A、B 两个进程想做进程间通信。通过 IPC 的「远程对象调用」的方式，你可以让 A 进程调用 B 进程的 `IFoo` 接口方法，就像调用本地对象一样。
 
@@ -27,6 +27,11 @@ public interface IFoo
     /// 异步方法（更推荐）演示。支持参数、返回值，支持跨进程报告异常。
     /// </summary>
     Task<string> AddAsync(string a, int b);
+
+    /// <summary>
+    /// 无参异步方法演示。支持返回值，支持跨进程报告异常。
+    /// </summary>
+    Task<string> GetInfoAsync();
 }
 ```
 
@@ -54,6 +59,7 @@ var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
 Console.WriteLine(foo.Name);
 Console.WriteLine(foo.Add(1, 2));
 Console.WriteLine(await foo.AddAsync("a", 1));
+Console.WriteLine(await foo.GetInfoAsync());
 Console.Read();
 ```
 
@@ -91,6 +97,15 @@ class Foo : IFoo
         {
             Console.WriteLine($"a({a})+b({b})={a + b}");
             return a + b;
+        });
+    }
+
+    public async Task<string> GetInfoAsync()
+    {
+        return await Task.Run(() =>
+        {
+            Console.WriteLine("GetInfoAsync called.");
+            return "Hello from Foo";
         });
     }
 }

@@ -18,4 +18,13 @@ class Foo : IFoo
             return a + b;
         });
     }
+
+    public async Task<string> GetInfoAsync()
+    {
+        return await Task.Run(() =>
+        {
+            Console.WriteLine("GetInfoAsync called.");
+            return "Hello from Foo";
+        });
+    }
 }
