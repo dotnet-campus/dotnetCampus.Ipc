@@ -7,11 +7,7 @@ var ipcProvider = new IpcProvider("IpcRemotingObjectClientDemo");
 
 ipcProvider.StartServer();
 
-Console.WriteLine($"等待连接 IpcRemotingObjectServerDemo 中，请确保 IpcRemotingObjectServerDemo 已启动");
-
 var peer = await ipcProvider.GetAndConnectToPeerAsync("IpcRemotingObjectServerDemo");
-
-Console.WriteLine($"已与 IpcRemotingObjectServerDemo 建立连接");
 
 var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
 
