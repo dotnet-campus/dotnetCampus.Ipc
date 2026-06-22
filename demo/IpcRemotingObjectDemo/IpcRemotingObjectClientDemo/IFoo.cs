@@ -1,5 +1,7 @@
 ﻿using dotnetCampus.Ipc.CompilerServices.Attributes;
 
+// ReSharper disable once CheckNamespace
+// 命名空间必须保持和服务端一致
 namespace IpcRemotingObjectServerDemo; // Must the same namespace
 
 /// <summary>
