@@ -17,7 +17,7 @@ public class IpcPublicGenerator : IIncrementalGenerator
                 (syntaxNode, ct) => syntaxNode is InterfaceDeclarationSyntax { AttributeLists.Count: > 0 },
                 // 语义解析：确定是否真的是感兴趣的 IPC 接口。
                 (generatorSyntaxContext, ct) => IpcPublicCompilation.TryCreateIpcPublicCompilation(
-                    (InterfaceDeclarationSyntax)generatorSyntaxContext.Node,
+                    (InterfaceDeclarationSyntax) generatorSyntaxContext.Node,
                     generatorSyntaxContext.SemanticModel,
                     out var ipcPublicCompilation)
                     ? ipcPublicCompilation
@@ -30,7 +30,7 @@ public class IpcPublicGenerator : IIncrementalGenerator
                 (syntaxNode, ct) => syntaxNode is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
                 // 语义解析：确定是否真的是感兴趣的 IPC 接口。
                 (generatorSyntaxContext, ct) => IpcShapeCompilation.TryCreateIpcShapeCompilation(
-                    (ClassDeclarationSyntax)generatorSyntaxContext.Node,
+                    (ClassDeclarationSyntax) generatorSyntaxContext.Node,
                     generatorSyntaxContext.SemanticModel,
                     out var ipcPublicCompilation)
                     ? ipcPublicCompilation
