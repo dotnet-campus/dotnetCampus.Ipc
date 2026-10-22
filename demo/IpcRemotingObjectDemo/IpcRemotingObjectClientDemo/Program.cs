@@ -13,5 +13,6 @@ var foo = ipcProvider.CreateIpcProxy<IFoo>(peer);
 
 Console.WriteLine(await foo.AddAsync("a", 1));
 Console.WriteLine(foo.Add(1, 2));
+Console.WriteLine(await foo.GetInfoAsync());
 
 Console.Read();
