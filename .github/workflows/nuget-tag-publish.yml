@@ -1,9 +1,13 @@
 name: publish nuget
 
-on: 
+on:
   push:
     tags:
     - '*'
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -11,38 +15,35 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v6
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           3.1.x
           6.0.x
           8.0.x
           9.0.x
+          10.0.x
 
-    - name: Install dotnet tool
-      run: dotnet tool install -g dotnetCampus.TagToVersion
-
-    - name: Set tag to version  
-      run: dotnet TagToVersion -t ${{ github.ref }}
+    - name: Set tag to version
+      env:
+        RELEASE_TAG: ${{ github.ref }}
+      run: dnx --yes DotNetCampus.TagToVersion -t "$env:RELEASE_TAG"
 
     - name: Build with dotnet
       run: |
         dotnet build --configuration Release
         dotnet pack --configuration Release --no-build
 
-    - name: Install Nuget
-      uses: nuget/setup-nuget@v1
-      with:
-        nuget-version: '6.x'
+    - name: Push generated packages to GitHub Packages
+      env:
+        GITHUB_PACKAGES_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push .\artifacts\package\release\*.nupkg --source "$env:GITHUB_PACKAGES_SOURCE" --api-key "$env:GITHUB_TOKEN" --skip-duplicate
 
-    - name: Add private GitHub registry to NuGet
-      run: |
-        nuget sources add -name github -Source https://nuget.pkg.github.com/dotnet-campus/index.json -Username dotnet-campus -Password ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Push generated package to GitHub registry
-      run: |
-        nuget push .\artifacts\package\release\*.nupkg -Source github -SkipDuplicate
-        nuget push .\artifacts\package\release\*.nupkg -Source https://api.nuget.org/v3/index.json -SkipDuplicate -ApiKey ${{ secrets.NugetKey }} 
+    - name: Push generated packages to NuGet.org
+      env:
+        NUGET_API_KEY: ${{ secrets.NugetKey }}
+      run: dotnet nuget push .\artifacts\package\release\*.nupkg --source https://api.nuget.org/v3/index.json --api-key "$env:NUGET_API_KEY" --skip-duplicate
