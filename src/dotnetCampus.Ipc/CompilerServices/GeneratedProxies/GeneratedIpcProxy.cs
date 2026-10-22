@@ -93,7 +93,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
             if (_readonlyPropertyValues.TryGetValue(propertyName, out var cachedValue))
             {
                 // 当只读字典中存在此属性的缓存时，直接取缓存。
-                return (T)cachedValue!;
+                return (T) cachedValue!;
             }
             // 否则，通过 IPC 访问获取此属性的值后设入缓存。（这里可能存在并发情况，会导致浪费的 IPC 访问，但能确保数据一致性）。
             var value = await IpcInvokeAsync<T>(MemberInvokingType.GetProperty, memberId, propertyName, null, info).ConfigureAwait(false);
@@ -206,7 +206,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
         catch (IpcRemoteException) when (ignoresIpcException)
         {
             // 如果目标要求忽略异常，则返回指定值或默认值。
-            return info.DefaultReturn is { } defaultReturn ? (T)defaultReturn : default!;
+            return info.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default!;
         }
         catch (AggregateException ex) when (ex.InnerExceptions.Count >= 1)
         {
@@ -214,7 +214,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
             if (innerException is IpcRemoteException)
             {
                 // 如果目标要求忽略异常，则返回指定值或默认值。
-                return info.DefaultReturn is { } defaultReturn ? (T)defaultReturn : default!;
+                return info.DefaultReturn is { } defaultReturn ? (T) defaultReturn : default!;
             }
             else
             {
@@ -240,7 +240,7 @@ public abstract class GeneratedIpcProxy<TContract> : GeneratedIpcProxy where TCo
         {
             // 任务超时（不抛异常）。
             IgnoreTaskExceptionsAsync(ipcTask);
-            return defaultReturn is null ? default! : (T)defaultReturn;
+            return defaultReturn is null ? default! : (T) defaultReturn;
         }
         // 任务超时（抛异常）。
         IgnoreTaskExceptionsAsync(ipcTask);

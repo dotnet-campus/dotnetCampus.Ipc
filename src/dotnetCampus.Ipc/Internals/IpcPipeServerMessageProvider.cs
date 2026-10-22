@@ -126,8 +126,8 @@ namespace dotnetCampus.Ipc.Internals
                     inBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
                     outBufferSize: 0, // If it is 0, the buffer size is allocated as needed.
                     pipeSecurity
-                    //, HandleInheritability.None 默认值
-                    //, PipeAccessRights.ReadWrite 默认值
+                //, HandleInheritability.None 默认值
+                //, PipeAccessRights.ReadWrite 默认值
                 );
 #else
                 // ===== 仅 .NET Core 3.1 使用：通过 P/Invoke 创建带 PipeSecurity 的命名管道 =====
